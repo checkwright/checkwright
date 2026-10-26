@@ -1,1 +1,22 @@
 # contract: evidence-manifest v1
+installer-review-residue-pass gates sha256=2a634782b1c815c53e767d1df037f377b917effe4425efc4c7be12a8148a9c9d pass=156 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass gate_sdk sha256=c1ad68813979393b485d2b07b7aafc72953e0f2453bed750b8e8ee5dd3711eae pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass canon_kit sha256=7da861c196258fd00b91559ec77ed8c768822bd5bde1ce22c3191410addd736c pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass context_kit sha256=a2ca733bb2ca535152b4188d3a9b1e15ad84eae97a5268ff2cfe171c8fb97c32 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass delegation_kit sha256=e8b7dacc5b3a03c2084bd61274ee3c701400be4001eeaafa4126bc7f4b710363 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass doctrine_kit sha256=4339002031d4b8eefe2c3a57b24a576022514d9657297d49ed71c18a1c93d877 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass evidence_kit sha256=c62871f8123949178b90372d234262f4c133b06c830e8faa9bbb9af4d2767fea pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass guard_kit sha256=6cb4ff2f4bd80b6561bd33590971d82cddcaa430595db7b5b0fefd800ace387b pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass lifecycle_kit sha256=83b0f30c7091e60a96eac9d498bf22cc7766ac4d472b56501a4777e0e6507c4c pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass queue_kit sha256=a4c89486a636a6d9c43ded5bbbb06f21bd7c7b3db7a8a330bdcf89eb952b9f7d pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass site_kit sha256=9a315d2c0239c08b3c5d4fb7435d5c8a4f3a1faf11c4cdffd9788f2249ba03eb pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass scripts sha256=479e481bd1d4c0da197db543326cac0c1fb2f54141758bc2821fef6b02dd543e pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass guard_tests sha256=13a010dc18b6a1f9980ff8efb9e7220f407fce43aa2d0f3394a593247e43c367 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass demo sha256=01efdefd68d2ecdcaac3e67ca02dfd9f9a715c3b3d1e6ae7bf6e10d5615e9c1d pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass installer_smoke sha256=f99d665c6e1d99d102c9e8dc5ede841149dedad2a47168642b164b409681ccac pass=30 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass consumer_smoke sha256=f5a8ad491c93960d2e1ea351b8e7eb98ce78df483fc967222bda556f625068ab pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass upgrade sha256=01d9fa062a81685f0edf276d2fa30e3b79a9a29ee2aa209157fed6be3d90b2c5 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass agents_md_smoke sha256=bd6b8f930d7c64a4480ce34596759c3983517d4f2022b540713f637805ce6d04 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass index_tests sha256=c6eba03d58dbfb04bdf8c910924d9f4251c5ddf0112965be819fd622adbb4141 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass native_crate sha256=37c61e14c565d19954ca6bad2c2b27a80924ce331499360c24ba9e0a0414b310 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
+installer-review-residue-pass projection_witness sha256=c359fbe53dfc2eb22ec6e11d1b332819949b19d5d884cac7c34728619527b734 pass=1 fail=0 ignore=0 verdict=clean 2026-10-26
