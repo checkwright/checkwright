@@ -28,6 +28,16 @@
 
 **Cost while deferred:** on such a harness the arm cannot be enforced without refusing every supported wait, so an adopter keeps it log-only. Surfaced 2026-11-14 by a production adopter's handoff (asks 9a and 4, and an observe-mode finding), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `resume-wait`, `declared handoff`, `unreadable transcript` in this file and the disposed-findings record, none; the icebox's [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait) is the opposite misuse. Owner delegation-kit/SPEC.md §The turn-end liveness hook.
 
+### liveness-hook-no-repo-run
+
+[spec: gate-sdk/SPEC-hook-tree-free.md]
+
+Started with no front end outside any git repository, `--hook` fails open (gate-sdk/SPEC.md §The harness-integration arm): `subagent-stop-liveness` exits 0, its operator notice a `systemMessage` envelope on stdout and stderr carrying only 'not inside a git repository', so a turn end with the agent's own task running goes unguarded and a pipe test reading stderr calls it silent. A harness may fire the child-turn-end event from any cwd, and this arm's inputs (the payload, its log, its liveness reader) can all resolve absolute.
+
+**Deliverable:** design-pending, a feature: which arms run with no repository and how their knobs resolve there, a loud decline where one cannot, and the notice's stream documented. [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) lands in the same batch, since it fixes the same toplevel read.
+
+**Cost while deferred:** an adopter must run the arm inside a scratch repository kept for the purpose, and a harness firing from elsewhere leaves the turn end unguarded. Surfaced 2026-11-14 by a production adopter's handoff (item 10), re-measured at HEAD by the lead, filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `outside any git`, `no repository` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
 ## Technical Debt
 
 ### nonutf8-repo-path-reads
@@ -221,16 +231,6 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 **First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
-
-### liveness-hook-no-repo-run
-
-[cost: event/high] [surface: gate-sdk]
-
-Started with no front end outside any git repository, `--hook` fails open (gate-sdk/SPEC.md §The harness-integration arm): `subagent-stop-liveness` exits 0, its operator notice a `systemMessage` envelope on stdout and stderr carrying only 'not inside a git repository', so a turn end with the agent's own task running goes unguarded and a pipe test reading stderr calls it silent. A harness may fire the child-turn-end event from any cwd, and this arm's inputs (the payload, its log, its liveness reader) can all resolve absolute.
-
-**Deliverable:** design-pending, a feature: which arms run with no repository and how their knobs resolve there, a loud decline where one cannot, and the notice's stream documented. [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) lands in the same batch, since it fixes the same toplevel read.
-
-**Cost while deferred:** an adopter must run the arm inside a scratch repository kept for the purpose, and a harness firing from elsewhere leaves the turn end unguarded. Surfaced 2026-11-14 by a production adopter's handoff (item 10), re-measured at HEAD by the lead, filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `outside any git`, `no repository` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ### hook-observe-mode
 
