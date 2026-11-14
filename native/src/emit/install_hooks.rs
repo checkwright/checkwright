@@ -851,6 +851,20 @@ mod tests {
         assert_eq!(walk::escaped_bytes("a\u{fffd}é".as_bytes()), "a\u{fffd}é");
     }
 
+    // spec: gate-sdk/SPEC.md §install-hooks — on Windows each unpaired UTF-16 surrogate is escaped
+    // as `\u{XXXX}` and a pair, which spells a character, is kept
+    #[cfg(windows)]
+    #[test]
+    fn an_unpaired_surrogate_is_escaped_and_a_pair_kept() {
+        use std::os::windows::ffi::OsStringExt;
+        let lone = std::ffi::OsString::from_wide(&[0x68, 0xd800, 0x6b]);
+        assert_eq!(walk::escaped_os(&lone), "h\\u{d800}k");
+        let trailing = std::ffi::OsString::from_wide(&[0xdc00, 0x68]);
+        assert_eq!(walk::escaped_os(&trailing), "\\u{dc00}h");
+        let pair = std::ffi::OsString::from_wide(&[0xd83d, 0xde00]);
+        assert_eq!(walk::escaped_os(&pair), "\u{1f600}");
+    }
+
     // spec: gate-sdk/SPEC.md §install-hooks — a value the local scope does not itself set, here an
     // included file's, records an empty restore
     #[test]

@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, `liveness-hook-no-repo-run`, `hook-observe-mode`, [hook-only-user-install](#hook-only-user-install), [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: `nonutf8-repo-path-reads` in the no-repo run's batch, [installer-crate-test-gaps](#installer-crate-test-gaps) in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by [hook-only-user-install](#hook-only-user-install), which goes first; `nonutf8-repo-path-reads` reshaped by `liveness-hook-no-repo-run`, one batch.
+  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, `liveness-hook-no-repo-run`, `hook-observe-mode`, `hook-only-user-install`, [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: `nonutf8-repo-path-reads` in the no-repo run's batch, `installer-crate-test-gaps` in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by `hook-only-user-install`, which goes first; `nonutf8-repo-path-reads` reshaped by `liveness-hook-no-repo-run`, one batch.
 
   **Adopter target (lead decision 2026-11-14, operator-delegated):** an adopter running its own work engine is served the checks and the session hooks only, with no lifecycle or queue read adapter, its evidence seam [gate-run-attestation-predicate](#gate-run-attestation-predicate); the absorb candidates rank below the adopter's asks, false refusals first.
 
@@ -15,16 +15,6 @@
 ---
 
 ## New Features
-
-### hook-only-user-install
-
-[spec: installer/SPEC-user-install.md]
-
-One session-hook arm today needs a vendored kit: `subagent-stop-liveness` is wired by hand from delegation-kit/README.md, and the installer's verbs act on a repository (installer/SPEC.md §The verbs). An adopter running its own work engine wants the gate binary placed for the user and the harness settings entry for one chosen arm printed, its scratch and log outside any repository.
-
-**Deliverable:** design-pending, a feature: the verb or flag, where the binary and the arm's scratch and log land, the settings entry it prints and for which harness versions, and how update and uninstall reach it. It builds on `liveness-hook-no-repo-run`, and the debt [installer-crate-test-gaps](#installer-crate-test-gaps) rides its batch.
-
-**Cost while deferred:** an adopter vendors a kit into a tree it owns or places the binary by hand. Surfaced 2026-11-14 by a production adopter's handoff (ask 1), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `user install`, `hooks --user` in this file and the disposed-findings record, none; [personal-one-kit-hooks](#personal-one-kit-hooks) is reshaped by it. Owner installer/SPEC.md §The verbs.
 
 ### hook-arm-adopter-page
 
@@ -37,14 +27,6 @@ A consumer weighing one hook arm reads a SPEC of 0.1-1 MB to learn what it reads
 **Cost while deferred:** each evaluator buys the SPEC read the page would save. Surfaced 2026-11-14 by a production adopter's handoff (ask 8 and item 11), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `adopter page`, `attestation verify` in this file and the disposed-findings record, none; owner docs/site-architecture.md.
 
 ## Technical Debt
-
-### installer-crate-test-gaps
-
-Two test gaps on the installer's commit path. The `git()` setup and assertion helper in native/tests/installer_commit.rs spawns `git -C <scratch>` with the environment inherited, so an exported `GIT_DIR` or `GIT_WORK_TREE` aims its writes and reads at another repository; only `verb()` scrubs `GIT_*`, and `installer::tests::the_identity_precondition_refuses_what_gits_strict_read_refuses` fails with `GIT_AUTHOR_*` and `GIT_COMMITTER_*` exported (ran). And installer/SPEC.md §init's identity precondition and §uninstall's restore line carry untested promises: every refusal case empties `user.name`, so neither the author nor the committer half is tested alone; no case covers the `--no-commit`, personal or `--dry-run` waivers, an identity-less run with nothing to change, the refusal through update, or a `git var` read that cannot spawn; the restore line is tested only on a failed commit with an unset value. gate-sdk/SPEC.md §install-hooks' Windows unpaired-surrogate escape has no case either.
-
-**Deliverable:** a fix: the helper scrubs `GIT_*` as `verb()` does, and one case per untested promise, each shown able to fail.
-
-**Cost while deferred:** the suite passes or fails by the invoking shell, and a regression in either half of the precondition passes. Surfaced 2026-10-26 by installer-review-residue-pass' close (its second-vendor review) as two gap bullets; filed at liveness-arm-adoption-pass' scope. Owner lookup: `GIT_DIR`, `identity precondition` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
 
 ## Deferred
 
@@ -248,7 +230,7 @@ No check holds an agent to handing off past a context size: an adopter measured 
 
 `--personal` installs every selected kit's hooks, and its exclude block and hooks sit in the common git directory, so they reach every linked worktree (installer/SPEC.md §The personal install). An adopter asks for one kit's hooks alone and a per-worktree opt-out.
 
-**Deliverable:** design-pending, a feature: a one-kit personal selection and a worktree opt-out, or a refusal recorded. Reshaped by [hook-only-user-install](#hook-only-user-install), which goes first.
+**Deliverable:** design-pending, a feature: a one-kit personal selection and a worktree opt-out, or a refusal recorded. Reshaped by `hook-only-user-install`, which goes first.
 
 **Cost while deferred:** a personal install takes kits and worktrees its owner did not choose. Surfaced 2026-11-14 by a production adopter's handoff (ask 7); filed at liveness-arm-adoption-pass' scope. Owner lookup: `one kit`, `per-worktree` in this file, none; owner installer/SPEC.md §The personal install.
 
@@ -276,7 +258,7 @@ An adopter reads from the docs, unobserved, that a hook fires twice where the pl
 
 [cost: event/low] [surface: evidence-kit]
 
-The fixture pair proves a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipline), and nothing shipped proves it of a test a suite records, so a recorded run of a test that cannot fail still supports a done claim. Consult advice of 2026-11-14: off unless a consumer selects it, a declared control (an adopter's form is an environment flag re-introducing the defect and naming the test it must fail), its run recorded as a witnessed red beside the suite's line, and a gate that a new test carries one. doctrine-kit/DOCTRINE.md's mutation corollary names that check buildable and unbuilt, and [installer-crate-test-gaps](#installer-crate-test-gaps)' two-halves case is an instance.
+The fixture pair proves a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipline), and nothing shipped proves it of a test a suite records, so a recorded run of a test that cannot fail still supports a done claim. Consult advice of 2026-11-14: off unless a consumer selects it, a declared control (an adopter's form is an environment flag re-introducing the defect and naming the test it must fail), its run recorded as a witnessed red beside the suite's line, and a gate that a new test carries one. doctrine-kit/DOCTRINE.md's mutation corollary names that check buildable and unbuilt, and `installer-crate-test-gaps`' two-halves case is an instance.
 
 **Deliverable:** design-pending, a feature: how a control is stated in no consumer's vocabulary, where the witnessed red is recorded, and what counts as a new test.
 
@@ -1018,4 +1000,6 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 - liveness-hook-no-repo-run
 - nonutf8-repo-path-reads
 - hook-observe-mode
+- hook-only-user-install
+- installer-crate-test-gaps
 

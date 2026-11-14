@@ -22,7 +22,7 @@ Pairs `hook-arm-adopter-page`. A consumer weighing one session-hook arm today re
 2. What it reads: the payload keys it relies on, the launch records in its scratch dir, and the knob file.
 3. How it exits, and where each notice lands: the refusal text, the decline notice, the stop log, and the observe log.
 4. Its knobs: the generated block (delta 2).
-5. Installing it alone: `init --user <member>`, the settings block it prints, and the `--observe` trial before enforcing (installer/SPEC-user-install.md, gate-sdk/SPEC.md §The harness-integration arm). The manual path links docs/manual-install.md and its verify step (delta 4), and is not restated.
+5. Installing it alone: `init --user <member>`, the settings block it prints, and the `--observe` trial before enforcing (installer/SPEC.md §The user install, gate-sdk/SPEC.md §The harness-integration arm). The manual path links docs/manual-install.md and its verify step (delta 4), and is not restated.
 6. Removing it: `uninstall --user`, and the settings entry to delete.
 
 **Which arms owe a page.** A page is owed for every member whose `HOOKS` tree-free column is true, the set an adopter can run on its own (gate-sdk/SPEC.md §The harness-integration arm). Today that is `subagent-stop-liveness` alone. A page for a tree-bound member is allowed and not owed, and a widening of the column brings its page in the commit that widens it (delta 2's gate). **Not yet applied.**

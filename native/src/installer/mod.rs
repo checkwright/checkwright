@@ -418,9 +418,15 @@ pub fn commit_or_refuse_to(err: &mut dyn std::io::Write, root: &Path, message: &
 // spec: installer/SPEC.md §init — the identity precondition: the commit needs the author and the
 // committer both, read as git's strict read takes them, and a failed read relays git's account
 pub fn identity_or_refuse(err: &mut dyn std::io::Write, root: &Path, valve: &str) -> Result<(), Refusal> {
+    identity_read_by(&programs::GIT, err, root, valve)
+}
+
+// spec: installer/SPEC.md §init — the identity read through the named git, so a read that cannot be
+// spawned is reached without unmaking the host's own
+fn identity_read_by(git: &programs::Program, err: &mut dyn std::io::Write, root: &Path, valve: &str) -> Result<(), Refusal> {
     let root_s = root.to_string_lossy().into_owned();
     for half in ["GIT_AUTHOR_IDENT", "GIT_COMMITTER_IDENT"] {
-        let account = match proc::run_merged_in(&programs::GIT, &["-C", &root_s, "var", half], &[], None) {
+        let account = match proc::run_merged_in(git, &["-C", &root_s, "var", half], &[], None) {
             Ok(m) if m.succeeded() => continue,
             Ok(m) => String::from_utf8_lossy(m.output()).trim_end().to_string(),
             Err(spawn) => spawn,
@@ -590,10 +596,24 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    // spec: installer/SPEC.md §init — the identity the host exports names the author and the
+    // committer ahead of any config, so a read about config alone runs with those names unset
+    fn without_exported_identity(env: &crate::knobenv::KnobEnv) {
+        let names: Vec<String> = std::env::vars_os()
+            .filter_map(|(k, _)| k.into_string().ok())
+            .filter(|k| k.starts_with("GIT_AUTHOR_") || k.starts_with("GIT_COMMITTER_"))
+            .collect();
+        for name in names {
+            env.remove(&name);
+        }
+    }
+
     // spec: installer/SPEC.md §init — a local identity passes, and an empty local `user.name` refuses
     // under any host's global config, with git's account and the verb's own valve
     #[test]
     fn the_identity_precondition_refuses_what_gits_strict_read_refuses() {
+        let env = crate::knobenv::lock();
+        without_exported_identity(&env);
         let dir = std::env::temp_dir().join(format!("cw-identity-{}", std::process::id()));
         std::fs::remove_dir_all(&dir).ok();
         std::fs::create_dir_all(&dir).expect("cannot make the scratch repo");
@@ -614,6 +634,23 @@ mod tests {
         assert_eq!((r.message.as_str(), r.code), ("git has no identity to make the commit with", 1));
         assert!(r.help.contains("--no-commit to stage the vendoring and commit it yourself"), "{}", r.help);
         assert!(String::from_utf8_lossy(&err).contains("fatal: "), "git's account was not relayed");
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §init — a read that cannot be spawned refuses at exit 1 as a read that
+    // exits non-zero does, the spawn's own account printed ahead of the refusal
+    #[test]
+    fn an_identity_read_that_cannot_spawn_refuses() {
+        let dir = std::env::temp_dir().join(format!("cw-identity-nospawn-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        std::fs::create_dir_all(&dir).expect("cannot make the scratch dir");
+        let absent = programs::GIT.at(dir.join("no-such-git").display().to_string());
+        let mut err = Vec::new();
+        let r = identity_read_by(&absent, &mut err, &dir, "the removal").expect_err("an unspawnable read passed");
+        assert_eq!((r.message.as_str(), r.code), ("git has no identity to make the commit with", 1));
+        assert!(r.help.contains("--no-commit to stage the removal and commit it yourself"), "{}", r.help);
+        let said = String::from_utf8_lossy(&err).into_owned();
+        assert!(said.starts_with("cannot run git"), "the spawn's account was not relayed: {}", said);
         std::fs::remove_dir_all(&dir).ok();
     }
 
