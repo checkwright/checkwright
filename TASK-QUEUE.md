@@ -60,6 +60,16 @@ One session-hook arm today needs a vendored kit: `subagent-stop-liveness` is wir
 
 **Cost while deferred:** an adopter vendors a kit into a tree it owns or places the binary by hand. Surfaced 2026-11-14 by a production adopter's handoff (ask 1), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `user install`, `hooks --user` in this file and the disposed-findings record, none; [personal-one-kit-hooks](#personal-one-kit-hooks) is reshaped by it. Owner installer/SPEC.md §The verbs.
 
+### hook-arm-adopter-page
+
+[spec: site-kit/SPEC-hook-arm-pages.md]
+
+A consumer weighing one hook arm reads a SPEC of 0.1-1 MB to learn what it reads, its exit codes, its knobs and its settings entry. And an adopter told to run `gh attestation verify` on the release tarball saw nothing on stdout or stderr at exit 0, so could not tell what was verified (reported, not reproduced here).
+
+**Deliverable:** design-pending, a feature: a page per hook arm, `subagent-stop-liveness` first, held to its SPEC (what it reads, exit codes, knobs, settings entry, the payload keys it relies on, where the operator notice lands), and the verify step's expected output or its `--format json` form. It settles [site-documents-unreleased](#site-documents-unreleased) for its own pages, since a page served from master describes master.
+
+**Cost while deferred:** each evaluator buys the SPEC read the page would save. Surfaced 2026-11-14 by a production adopter's handoff (ask 8 and item 11), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `adopter page`, `attestation verify` in this file and the disposed-findings record, none; owner docs/site-architecture.md.
+
 ## Technical Debt
 
 ### nonutf8-repo-path-reads
@@ -253,16 +263,6 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 **First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
-
-### hook-arm-adopter-page
-
-[cost: event/low] [surface: docs]
-
-A consumer weighing one hook arm reads a SPEC of 0.1-1 MB to learn what it reads, its exit codes, its knobs and its settings entry. And an adopter told to run `gh attestation verify` on the release tarball saw nothing on stdout or stderr at exit 0, so could not tell what was verified (reported, not reproduced here).
-
-**Deliverable:** design-pending, a feature: a page per hook arm, `subagent-stop-liveness` first, held to its SPEC (what it reads, exit codes, knobs, settings entry, the payload keys it relies on, where the operator notice lands), and the verify step's expected output or its `--format json` form. It settles [site-documents-unreleased](#site-documents-unreleased) for its own pages, since a page served from master describes master.
-
-**Cost while deferred:** each evaluator buys the SPEC read the page would save. Surfaced 2026-11-14 by a production adopter's handoff (ask 8 and item 11), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `adopter page`, `attestation verify` in this file and the disposed-findings record, none; owner docs/site-architecture.md.
 
 ### liveness-reader-template
 
