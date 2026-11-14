@@ -5,6 +5,7 @@
 - `check-settings-paths` and `check-plugin-parity` — red a hook registration whose tokens after the member leave `--hook <member> [--observe] [--binding <name>] [--knobs <absolute file>]`, which they read as clean before; the arm now refuses such a registration at run time. Fix the misspelled or misordered token.
 - `check-settings-paths` — reds a hook registration whose `--knobs` names a relative path, which it read as clean before; the arm declines such a registration on every firing. Write the file's absolute path.
 - `check-hook-knobs-fresh` — new, off until `GATE_SDK_HOOK_PAGES_DIR` is set: holds each hook-arm page's knob block to its member's knob table, and reds a page naming no member and a tree-free member with no page. Nothing to do unless you publish a page per hook arm; register it with the knob, then run `--emit hook-knobs --write`.
+- `check-gate-substrate-parity` — assertion I reds on `check-hook-knobs-fresh`, a new gate-sdk gate the binary carries, until your `gates.list` registers it or declares `# unregistered: check-hook-knobs-fresh — <reason>`. It reads clean while `GATE_SDK_HOOK_PAGES_DIR` is empty, so register it.
 
 ## Knob changes
 
