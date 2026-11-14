@@ -142,16 +142,6 @@ Codex keys an installed plugin at version `1.0.0`, since neither manifest carrie
 
 **Cost while deferred:** a Codex user may stay on an old package after a release. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's limit and no `version` key in `plugin/plugin.json`. Owner lookup: `codex`, `marketplace upgrade` in this file, none; owner plugin/SPEC.md §The manifests.
 
-### personal-workflow-export
-
-[cost: event/low] [surface: installer]
-
-the workflow half of `personal-adoption`: a developer runs the stage machine on a personal branch or fork of a project that does not adopt it, `init` as today, plus an export keeping commits that touch only lock-roster and workflow paths out of an upstream pull request. Untracked workflow state was refused on consult advice, since every stamp is committed and names its commit (lifecycle-kit/SPEC.md §The state machine and §check-stage-evidence).
-
-**Deliverable:** design-pending, a feature: the export arm's shape (a path-filtered branch rewrite or a patch series), how it reads the lock roster and the workflow paths without a kit literal naming a layout, and what it refuses.
-
-**Cost while deferred:** the workflow half stays usable only by vendoring into a tree the developer does not own, or by stripping its commits by hand before an upstream pull request. Filed 2026-10-24 by personal-overlay-pass' scope, split from personal-adoption (operator direction 2026-10-24, lead-relayed, not a ruling). Owner lookup: `export`, `fork`, `personal branch` in this file, none beyond the parent; owner installer/SPEC.md.
-
 ### npm-trusted-publishing
 
 [cost: event/high] [surface: .github] [observed-by: publish]
@@ -164,7 +154,7 @@ The publish workflow's npm job authenticates with a stored `NPM_TOKEN` secret, w
 
 ### site-documents-unreleased
 
-[cost: event/low] [surface: docs]
+[cost: event/low] [surface: docs] [not-icebox-eligible: 2026-11-14 its since: lever landed at liveness-arm-adoption-pass, and which pages it widens to is the next scope's call]
 
 The site, served from master, documents behaviour no release ships yet. `hookspath-chain` landed after v0.33.0, and an operator-seat install (`op-01`) of v0.33.0 had its `core.hooksPath` replaced with no chain record and an unset restore while gate-sdk/SPEC.md §install-hooks on the site described chaining. v0.34.0 shipped that fix; the gap between a landing and its release stays. Since liveness-arm-adoption-pass, `since:` front matter settles the `docs/hooks/` pages alone; `SITE_KIT_SINCE_PAGES` is the widening lever, and each page it widens to owes a `since:` value judged against the release history.
 
@@ -1054,13 +1044,9 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 
 Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs alone (skill load, Cursor's Bash-to-Shell hook mapping, Muse's hook payload) until a machine carrying either CLI turns them from read to run, and no build machine carries one.
 
-## Done
+### personal-workflow-export
 
-- liveness-hook-false-refusals
-- liveness-hook-no-repo-run
-- nonutf8-repo-path-reads
-- hook-observe-mode
-- hook-only-user-install
-- installer-crate-test-gaps
-- hook-arm-adopter-page
+No arm exports a developer's workflow commits off a vendored tree they do not own, so the workflow half of a personal adoption is stripped by hand before an upstream pull request.
+
+## Done
 
