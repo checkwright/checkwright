@@ -38,6 +38,18 @@ Started with no front end outside any git repository, `--hook` fails open (gate-
 
 **Cost while deferred:** an adopter must run the arm inside a scratch repository kept for the purpose, and a harness firing from elsewhere leaves the turn end unguarded. Surfaced 2026-11-14 by a production adopter's handoff (item 10), re-measured at HEAD by the lead, filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `outside any git`, `no repository` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
+### hook-observe-mode
+
+[spec: gate-sdk/SPEC-hook-observe.md]
+
+A consumer adopting a blocking hook in production wants a log-only period before enforcing it, and none ships: delegation-kit/SPEC.md §The turn-end liveness hook names unwiring the hook as the only valve, so the adopter wrapped the arm to run it log-only.
+
+**Direction (operator direction 2026-11-14, lead-relayed, not a ruling; the operator was shown it reverses the hook section's no-knob line):** one `--observe` flag where `--hook` dispatches, for every blocking arm: the arm decides, logs its verdict and exits 0. It rides the registration argv, the consumer's settings surface, which is the surface unwiring edits. Fixtures cover `subagent-stop-liveness` and one other blocking arm.
+
+**Deliverable:** a feature: the flag's grammar, where each arm logs an observed verdict, and the no-knob line amended.
+
+**Cost while deferred:** every production adopter writes its own wrapper or enforces with no trial, and [reader-handback-head-line](#reader-handback-head-line) waits on it. Surfaced 2026-11-14 by a production adopter's handoff (ask 2), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `observe mode`, `log-only` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
 ## Technical Debt
 
 ### nonutf8-repo-path-reads
@@ -231,18 +243,6 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 **First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
-
-### hook-observe-mode
-
-[cost: event/high] [surface: gate-sdk]
-
-A consumer adopting a blocking hook in production wants a log-only period before enforcing it, and none ships: delegation-kit/SPEC.md §The turn-end liveness hook names unwiring the hook as the only valve, so the adopter wrapped the arm to run it log-only.
-
-**Direction (operator direction 2026-11-14, lead-relayed, not a ruling; the operator was shown it reverses the hook section's no-knob line):** one `--observe` flag where `--hook` dispatches, for every blocking arm: the arm decides, logs its verdict and exits 0. It rides the registration argv, the consumer's settings surface, which is the surface unwiring edits. Fixtures cover `subagent-stop-liveness` and one other blocking arm.
-
-**Deliverable:** a feature: the flag's grammar, where each arm logs an observed verdict, and the no-knob line amended.
-
-**Cost while deferred:** every production adopter writes its own wrapper or enforces with no trial, and [reader-handback-head-line](#reader-handback-head-line) waits on it. Surfaced 2026-11-14 by a production adopter's handoff (ask 2), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `observe mode`, `log-only` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ### hook-only-user-install
 
