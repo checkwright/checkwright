@@ -22,7 +22,7 @@
 29066cp companion/SPEC.md
 119119cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-271834cp delegation-kit/SPEC.md
+271528cp delegation-kit/SPEC.md
 40545cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 3468cp docs/agent-index.md
@@ -37,7 +37,7 @@
 1463cp docs/gate-sdk/index.md
 11608cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
-7031cp docs/hooks/subagent-stop-liveness.md
+7028cp docs/hooks/subagent-stop-liveness.md
 5308cp docs/index.md
 8768cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
@@ -88,6 +88,7 @@
 2981cp docs/posts/2026-10-24-checkwright-v0-33-0.md
 7929cp docs/posts/2026-10-25-checkwright-v0-34-0.md
 4894cp docs/posts/2026-10-25-checkwright-v0-35-0.md
+10719cp docs/posts/2026-11-14-checkwright-v0-36-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 8984cp docs/requirements.md
@@ -101,7 +102,7 @@
 2698cp drift-kit/templates/close-knowledge.md
 4680cp drift-kit/templates/economics.md
 86089cp evidence-kit/SPEC.md
-1080755cp gate-sdk/SPEC.md
+1080598cp gate-sdk/SPEC.md
 3130cp gate-sdk/templates/adopt.md
 355765cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
@@ -124,4 +125,4 @@
 25216cp plugin/SPEC.md
 159740cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
-63233cp site-kit/SPEC.md
+63179cp site-kit/SPEC.md

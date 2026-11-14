@@ -2,7 +2,7 @@
 title: The turn-end hook
 nav_parent: install
 nav_child_order: 4
-since: unreleased
+since: v0.36.0
 description: The subagent-stop-liveness hook keeps a dispatched agent session from ending its turn while work it launched is still writing, and installs on its own, for one user, with no repository.
 ---
 
