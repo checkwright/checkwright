@@ -57,6 +57,20 @@ if poller "file://$pp/nonexistent.json" 2>/dev/null; then
 fi
 cmp -s "$pp/usage.before" "$pp/usage.txt" || {
     echo "delegation-kit/smoke: poller fetch failure touched the snapshot" >&2; exit 1; }
+# spec: delegation-kit/SPEC.md §The usage.txt contract — a source with no five-hour window writes the empty pair beside the weekly one, which the verdict judges; neither axis refuses and leaves the snapshot
+printf '{"five_hour":null,"seven_day":{"utilization":7,"resets_at":%s}}\n' "$(( now + 86400 ))" > "$pp/weekly.json"
+poller "file://$pp/weekly.json" || { echo "delegation-kit/smoke: poller weekly-only payload failed" >&2; exit 1; }
+grep -qx 'five_hour_used_pct=' "$pp/usage.txt" || {
+    echo "delegation-kit/smoke: poller weekly-only payload did not write the empty five-hour pair" >&2; exit 1; }
+DELEGATION_KIT_CRED_FILE="$pp/absent.json" bash "$SDK/bin/run-gates.sh" --usage-verdict "$pp/usage.txt" >/dev/null || {
+    echo "delegation-kit/smoke: poller weekly-only snapshot did not verdict OK" >&2; exit 1; }
+cp "$pp/usage.txt" "$pp/usage.before"
+printf '{"five_hour":null,"seven_day":null}\n' > "$pp/none.json"
+if poller "file://$pp/none.json" 2>/dev/null; then
+    echo "delegation-kit/smoke: poller axis-less payload exited zero" >&2; exit 1
+fi
+cmp -s "$pp/usage.before" "$pp/usage.txt" || {
+    echo "delegation-kit/smoke: poller axis-less payload touched the snapshot" >&2; exit 1; }
 rm -rf "$pp"
 
 # spec: delegation-kit/SPEC.md §The turn-end liveness hook — the --hook subagent-stop-liveness arm is exercised with a crafted payload on its allowing arm: the knob is emptied, so the reader is the binary's own compiled gate, and over a record naming a dead pid it reads green and allows. The route to the allowing arm is a reading rather than the absence of one, which is what a vendored consumer tree buys by holding the default — it must exit 0 and append exactly one grammar-conformant line

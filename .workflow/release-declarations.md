@@ -31,3 +31,4 @@
 - **The gate binary** — refuses an argument that is not UTF-8 at exit 2, naming its position, where it panicked.
 - **`uninstall`** — prints the line restoring `core.hooksPath` on every exit after it removes the placed hooks directory, a failed commit included, where a refusal there lost it.
 - **`init`, `uninstall` and `prove`** — read a personal install as personal when its exclude file also holds a line that is not UTF-8, where they read it as a tracked install: `init` ran the committing install and `uninstall` left the block.
+- **`--usage-poll`** — writes a snapshot whose five-hour pair is empty beside the weekly pair when the source carries no five-hour window, which the verdict judges on the weekly axis, where it refused the payload as unparseable and left the snapshot to go STALE. A payload with neither window, or with half of one, still refuses. Nothing to do.

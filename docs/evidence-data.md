@@ -310,3 +310,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | restore-line-marker-tail-pass | sc · · b v c | 0f/3d | 0 | 21s clean | 156 |
 | install-commit-hooks-pass | sc sp a b v c | 3f/1d | 2 · ≤0d | 21s clean | 156 |
 | installer-review-residue-pass | sc sp a b v c | 4f/1d | 2 · ≤1d | 21s clean | 156 |
+| liveness-arm-adoption-pass | sc sp a b v c | 11f/2d | 5 · ≤0d | 21s clean | 158 |

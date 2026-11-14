@@ -73,35 +73,15 @@ pub fn run(args: &[String]) -> i32 {
         ),
     };
 
-    // spec: delegation-kit/SPEC.md §The usage.txt contract — two accepted source shapes per axis,
-    // the flat one first and the `rate_limits`-nested one behind it, so a source that moved between
-    // them is still read; a `//` chain in the shell form, an ordered lookup here.
-    let five = axis(&payload, "five_hour");
-    if !usage::is_utilization(&five.0) {
-        return fail(
-            &format!("unparseable payload: no five-hour utilization at {}", endpoint),
-            moved,
-        );
-    }
-    let five_resets = usage::epoch_of(&five.1);
-    if five_resets.is_empty() {
-        return fail(
-            &format!("unparseable payload: no five-hour reset epoch at {}", endpoint),
-            moved,
-        );
-    }
-
-    let seven = axis(&payload, "seven_day");
-    let seven_resets = usage::epoch_of(&seven.1);
+    let [five_pct, five_resets, seven_pct, seven_resets] = match axes(&payload) {
+        Ok(a) => a,
+        Err(why) => return fail(&format!("unparseable payload: {} at {}", why, endpoint), moved),
+    };
 
     let snapshot = Snapshot {
-        five_hour_used_pct: five.0,
+        five_hour_used_pct: five_pct,
         five_hour_resets_at: five_resets,
-        seven_day_used_pct: if usage::is_utilization(&seven.0) {
-            seven.0
-        } else {
-            String::new()
-        },
+        seven_day_used_pct: seven_pct,
         seven_day_resets_at: seven_resets,
         account: usage::json_field(&account_config, &["oauthAccount", "accountUuid"]),
         tier: usage::json_field(&cred_file, &["claudeAiOauth", "subscriptionType"]),
@@ -113,6 +93,30 @@ pub fn run(args: &[String]) -> i32 {
         );
     }
     0
+}
+
+// spec: delegation-kit/SPEC.md §The usage.txt contract — the payload mapped onto the snapshot's two
+// axes (five-hour pct and reset, weekly pct and reset). A source with no five-hour window writes that
+// pair empty beside an armed weekly pair; a payload carrying neither axis is unparseable.
+fn axes(payload: &Value) -> Result<[String; 4], &'static str> {
+    let five = axis(payload, "five_hour");
+    let seven = axis(payload, "seven_day");
+    let seven_resets = usage::epoch_of(&seven.1);
+    let seven_pct = if usage::is_utilization(&seven.0) { seven.0 } else { String::new() };
+    if five.0.is_empty() && five.1.is_empty() {
+        if seven_pct.is_empty() || seven_resets.is_empty() {
+            return Err("no five-hour and no weekly window");
+        }
+        return Ok([String::new(), String::new(), seven_pct, seven_resets]);
+    }
+    if !usage::is_utilization(&five.0) {
+        return Err("no five-hour utilization");
+    }
+    let five_resets = usage::epoch_of(&five.1);
+    if five_resets.is_empty() {
+        return Err("no five-hour reset epoch");
+    }
+    Ok([five.0, five_resets, seven_pct, seven_resets])
 }
 
 fn fetch(token: &str, endpoint: &str) -> Option<Value> {
@@ -192,6 +196,29 @@ mod tests {
             r#"{"five_hour":{"utilization":"1"},"rate_limits":{"five_hour":{"used_percentage":"2"}}}"#,
         );
         assert_eq!(axis(&both, "five_hour").0, "1");
+    }
+
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — no five-hour window maps to the empty
+    // pair beside an armed weekly one, and only a payload with neither axis, or a half axis, refuses
+    #[test]
+    fn a_missing_five_hour_window_maps_to_the_empty_pair() {
+        let weekly = doc(r#"{"five_hour":null,"seven_day":{"utilization":56,"resets_at":"1756656000"}}"#);
+        assert_eq!(
+            axes(&weekly),
+            Ok([String::new(), String::new(), "56".to_string(), "1756656000".to_string()])
+        );
+        let nested = doc(r#"{"rate_limits":{"seven_day":{"used_percentage":3,"resets_at":1756656000}}}"#);
+        assert_eq!(axes(&nested).map(|a| a[2].clone()), Ok("3".to_string()));
+        assert!(axes(&doc(r#"{"five_hour":null,"seven_day":null}"#)).is_err());
+        assert!(axes(&doc(r#"{"seven_day":{"utilization":56}}"#)).is_err());
+        assert_eq!(
+            axes(&doc(r#"{"five_hour":{"utilization":4},"seven_day":{"utilization":5,"resets_at":"1"}}"#)),
+            Err("no five-hour reset epoch")
+        );
+        assert_eq!(
+            axes(&doc(r#"{"five_hour":{"resets_at":"1"}}"#)),
+            Err("no five-hour utilization")
+        );
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — a surplus argument, `--help` included, refuses

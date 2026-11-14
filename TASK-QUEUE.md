@@ -166,7 +166,7 @@ The publish workflow's npm job authenticates with a stored `NPM_TOKEN` secret, w
 
 [cost: event/low] [surface: docs]
 
-The site, served from master, documents behaviour no release ships yet. `hookspath-chain` landed after v0.33.0, and an operator-seat install (`op-01`) of v0.33.0 had its `core.hooksPath` replaced with no chain record and an unset restore while gate-sdk/SPEC.md §install-hooks on the site described chaining. v0.34.0 shipped that fix; the gap between a landing and its release stays.
+The site, served from master, documents behaviour no release ships yet. `hookspath-chain` landed after v0.33.0, and an operator-seat install (`op-01`) of v0.33.0 had its `core.hooksPath` replaced with no chain record and an unset restore while gate-sdk/SPEC.md §install-hooks on the site described chaining. v0.34.0 shipped that fix; the gap between a landing and its release stays. Since liveness-arm-adoption-pass, `since:` front matter settles the `docs/hooks/` pages alone; `SITE_KIT_SINCE_PAGES` is the widening lever, and each page it widens to owes a `since:` value judged against the release history.
 
 **Deliverable:** design-pending: whether the site may describe unreleased behaviour, and if not, what marks it (a since-version note, or a release-pinned SPEC copy).
 
@@ -220,7 +220,7 @@ No check holds an agent to handing off past a context size: an adopter measured 
 
 `--personal` installs every selected kit's hooks, and its exclude block and hooks sit in the common git directory, so they reach every linked worktree (installer/SPEC.md §The personal install). An adopter asks for one kit's hooks alone and a per-worktree opt-out.
 
-**Deliverable:** design-pending, a feature: a one-kit personal selection and a worktree opt-out, or a refusal recorded. Reshaped by `hook-only-user-install`, which goes first.
+**Deliverable:** design-pending, a feature: a one-kit personal selection and a worktree opt-out, or a refusal recorded. Reshaped by `hook-only-user-install`, landed at liveness-arm-adoption-pass, whose one-arm install is the hook-only half.
 
 **Cost while deferred:** a personal install takes kits and worktrees its owner did not choose. Surfaced 2026-11-14 by a production adopter's handoff (ask 7); filed at liveness-arm-adoption-pass' scope. Owner lookup: `one kit`, `per-worktree` in this file, none; owner installer/SPEC.md §The personal install.
 
@@ -270,7 +270,7 @@ check-commit-msg and check-tree-terms hold a commit message and the tracked file
 
 No shipped return contract names the commit a reviewing agent read, so a review of a stale tree reads like any other. Consult advice of 2026-11-14: an opt-in turn-end check that the report names the head it read, resolving and matching the dispatch's base; the child-turn-end payload carries the final message, which no hook member reads today (gate-sdk/SPEC.md §The hook contract). Kept out: a closed verdict set and any classing of a report. One family with the icebox's unattested-completion and unverified-base entries, re-filing neither.
 
-**Deliverable:** design-pending, a feature, after `hook-observe-mode`, since it adds a refusing hook.
+**Deliverable:** design-pending, a feature, trialled first under `--observe` (`hook-observe-mode`, landed at liveness-arm-adoption-pass), since it adds a refusing hook.
 
 **Cost while deferred:** a stale-tree review passes as current. Surfaced 2026-11-14 by a production adopter's handoff, ranked third of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `head line`, `hand-back` in this file, none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
 
@@ -283,6 +283,76 @@ A read-only audit child cannot run the gate binary: agent-dispatch-guard isolate
 **Deliverable:** design-pending: a route for an isolated read-only child to the non-writing arms, or a dispatch brief that carries the arm's output.
 
 **Cost while deferred:** an isolated reader emulates an oracle it cannot run (Oracle-first). Surfaced 2026-11-14 by a consultation's dispatcher, held in its journal; filed at liveness-arm-adoption-pass' scope. Owner lookup: `READONLY`, `isolated` in this file, none; owner delegation-kit/SPEC.md.
+
+### price-table-row-shape
+
+[cost: event/low] [surface: drift-kit]
+
+A `scripts/price-table.tsv` row whose model id and input column fused passed the full battery, and `--price-coverage` reported every model priced. The stage-economics reader already counts such a row and its run prints the skip count; no gate and no coverage line reads it.
+
+**Deliverable:** a fix: `--price-coverage` reports a malformed row as unpriced, or a born-native gate holds the table's shape, with its fixture pair.
+
+**Cost while deferred:** a mistyped row drops its model's cost from the meter, with only a line in a run nobody reads to say so. Surfaced 2026-11-14 at liveness-arm-adoption-pass' scope, which fixed the row; filed at its close. Owner lookup: `price` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md §The stage-economics meter.
+
+### tree-free-hook-roster-widening
+
+[cost: event/low] [surface: gate-sdk]
+
+The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (gate-sdk/SPEC.md §The harness-integration arm). Another member whose inputs all resolve absolute (payload, knobs, spawned programs) could run outside a repository too. Operator direction 2026-11-14, lead-relayed (not a ruling), names this a filed follow-on.
+
+**Deliverable:** a feature: each other member weighed, the column widened with its cases or the member's tree-bound reason recorded.
+
+**Cost while deferred:** an adopter running outside any repository gets only the turn-end guard. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `tree-free` in this file, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
+### user-install-doctor-diff
+
+[cost: event/low] [surface: installer]
+
+`doctor` and `diff` read no user install (installer/SPEC.md §The user install, Honest limits), so a user whose knob file was edited or whose placed binary drifted has no read-only verb to ask.
+
+**Deliverable:** design-pending, a feature: a user-manifest reader per verb with cases, and whether `doctor` reports a user install beside a repository one.
+
+**Cost while deferred:** a drifted user install is found only by re-running `init --user`. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `doctor`, `user install` in this file, none; owner installer/SPEC.md §The user install.
+
+### user-install-update-notice
+
+[cost: event/low] [surface: installer]
+
+A user install gets no update notice, since the notice reads a repository's lock (installer/SPEC.md §The user install, Honest limits).
+
+**Deliverable:** design-pending, a feature: a notice reading `user.lock`'s version without network on the turn-end path, and where a tree-free notice may print.
+
+**Cost while deferred:** an adopter on `init --user` learns of a release only by re-running the bootstrap. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `update notice` in this file, none; owner installer/SPEC.md §The user install.
+
+### tree-bound-hook-pages
+
+[cost: event/low] [surface: docs]
+
+`check-hook-knobs-fresh` owes a page only for a tree-free HOOKS member, so `shell-guard` and the other tree-bound arms have no `docs/hooks/` page. The gate already allows one.
+
+**Deliverable:** a page per arm an adopter weighs, then `--emit hook-knobs --write`.
+
+**Cost while deferred:** an adopter weighing one tree-bound arm reads its knobs off the SPEC. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `docs/hooks` in this file, none; owner docs/site-architecture.md.
+
+### powershell-verify-probe
+
+[cost: event/low] [surface: docs]
+
+docs/manual-install.md's PowerShell attestation-verify block, which reads `--format json` through `ConvertFrom-Json`, is unprobed; the POSIX block's filter was probed against a published release.
+
+**Deliverable:** a fix: one run on a Windows host with `gh` signed in, and the property path corrected if it differs.
+
+**Cost while deferred:** a Windows adopter verifying a download may meet a block that errors. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `PowerShell`, `ConvertFrom` in this file and the disposed-findings record, none on this block; owner docs/manual-install.md.
+
+### projection-witness-wall-clock
+
+[cost: iteration/high] [surface: gate-sdk]
+
+`--run-validate`'s projection_witness suite took about 3 of the 4 hours of liveness-arm-adoption-pass' validate. It spawns `check-trajectory-fresh` once per perturbation, up to three per class over about 134 classes, each spawn 15-28s wall at about 2s CPU (gate-sdk/SPEC.md §projection-witness).
+
+**Deliverable:** a fix: a faster trajectory arm, since the wall is mostly not CPU and likely a git-history read it could cache or narrow, or a narrower witness sample for a member whose trigger is wide.
+
+**Cost while deferred:** every validate pays about three hours of wall-clock. Surfaced 2026-11-14 at liveness-arm-adoption-pass' validate; filed at its close. Owner lookup: `projection_witness`, `projection-witness` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §projection-witness.
 
 ## Icebox
 
