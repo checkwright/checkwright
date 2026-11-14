@@ -2,6 +2,8 @@
 #   verdict  exit  pct  age_off  reset_off  cred_age  pct_7d  reset7d_off  account  live  append  axis  desc
 # Offsets are seconds from *now* (static fixtures would age into permanent STALE).
 # pct_7d '-' omits the seven_day keys (a three-line snapshot — today's behavior).
+# pct 'empty' writes the five_hour pair present and empty (a source with no five-hour window;
+# reset_off is then unread) and 'absent' omits both five_hour keys.
 # account is the snapshot's account key and live the oauthAccount.accountUuid the case
 # writes into a fixture account config; '-' omits each.
 # append is the sample-line count the run must leave in the history log (0 or 1);
@@ -52,3 +54,14 @@ PAUSE	1	95	0	3600	60	-	0	acctA	acctB	1	5h	mismatched account at or over threshol
 OK	0	40	0	3600	300	-	0	acctA	acctA	1	-	matched account past the settle floor inside the old window -> OK: the settle floor replaces the blanket window
 STALE	2	40	0	3600	60	-	0	acctA	acctA	1	-	matched account within the settle floor -> STALE: the server-fed pct may still lag the login
 STALE	2	40	0	3600	300	-	0	-	acctA	1	-	snapshot without account keeps the blanket window -> STALE inside LOGIN_WINDOW
+
+# No five-hour window — the five_hour pair written empty is judged on the weekly axis alone
+OK	0	empty	0	0	-	56	500000	-	-	1	-	empty 5h pair, weekly under its threshold -> OK on the weekly axis alone
+OK	0	empty	0	0	-	94.999	500000	-	-	1	-	empty 5h pair, weekly just under its threshold -> the at-or-over boundary's non-firing side
+PAUSE	1	empty	0	0	-	95	500000	-	-	1	7d	empty 5h pair, weekly exactly at its threshold -> PAUSE names the 7-day axis
+PAUSE	1	empty	0	0	-	99	500000	-	-	1	7d	empty 5h pair, weekly over its threshold -> PAUSE names the 7-day axis
+RESET-OK	0	empty	0	0	-	99	-100	-	-	1	-	empty 5h pair, dead weekly window -> RESET-OK on the weekly clock
+STALE	2	empty	1200	0	-	56	500000	-	-	1	-	empty 5h pair, reading older than STALE_AGE -> STALE, parsed so it still logs
+STALE	2	empty	0	0	60	56	500000	-	-	1	-	empty 5h pair, weekly under with a fresh login -> the reroute still suppresses the OK
+STALE	2	empty	0	0	-	-	0	-	-	0	-	both axes empty -> STALE (no pause axis to judge) and appends nothing
+STALE	2	absent	0	0	-	56	500000	-	-	0	-	five_hour keys absent -> STALE (missing keys, never read as no window) and appends nothing

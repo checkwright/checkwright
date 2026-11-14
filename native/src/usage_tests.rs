@@ -148,13 +148,15 @@ struct Verdict<'a> {
 impl Verdict<'_> {
     // spec: delegation-kit/SPEC.md §Testing — every snapshot timestamp is relative to one reading
     // of the clock: a per-case read introduces cross-case skew at the at-or-over boundary rows.
+    // spec: delegation-kit/SPEC.md §Testing — the pct column's two tokens: `empty` writes the
+    // five-hour pair present and empty, `absent` omits it
     fn write_snapshot(&self, pct: &str, age_off: i64, reset_off: i64, weekly: Option<(&str, i64)>) {
-        let mut body = format!(
-            "five_hour_used_pct={}\nfive_hour_resets_at={}\nupdated_at={}\n",
-            pct,
-            self.now + reset_off,
-            self.now - age_off
-        );
+        let short = match pct {
+            "empty" => "five_hour_used_pct=\nfive_hour_resets_at=\n".to_string(),
+            "absent" => String::new(),
+            _ => format!("five_hour_used_pct={}\nfive_hour_resets_at={}\n", pct, self.now + reset_off),
+        };
+        let mut body = format!("{}updated_at={}\n", short, self.now - age_off);
         if let Some((pct_7d, reset7d_off)) = weekly {
             body.push_str(&format!(
                 "seven_day_used_pct={}\nseven_day_resets_at={}\n",
@@ -347,6 +349,13 @@ fn the_kits_verdict_decision_table_holds() {
                 log.contains("pct_7d="),
                 pct_7d != "-",
                 "[{}]: the sample line's pct_7d does not track the snapshot's: {}",
+                desc,
+                log
+            );
+            assert_eq!(
+                log.contains(" pct=") && log.contains(" resets_at="),
+                pct != "empty",
+                "[{}]: the sample line's five-hour pair does not track the snapshot's: {}",
                 desc,
                 log
             );

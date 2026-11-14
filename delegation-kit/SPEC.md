@@ -553,7 +553,7 @@ Check order: parse → RESET-OK → age-STALE → pause axes → account-STALE o
 
 Exit codes: **0** OK / RESET-OK, **1** PAUSE, **2** STALE or unreadable. Exit 2 is fail-closed on *trusting the number* and deliberately fail-open on *refusing work*: budget-unknown never blocks delegation, so a reading that should refuse an expensive dispatch never lands on it. Fail-closed throughout:
 
-- missing keys and a non-numeric percentage route to STALE;
+- missing keys, a non-numeric percentage and no pause axis route to STALE;
 - each threshold compare is a float compare, so a fractional percentage cannot silently skip PAUSE;
 - both pause compares are **at-or-over** (`>=`), so a reading exactly at `DELEGATION_KIT_PAUSE_PCT` or `DELEGATION_KIT_PAUSE_PCT_7D` pauses.
 
@@ -567,7 +567,13 @@ It is **fail-soft**: a non-zero refresh exit leaves the snapshot untouched and t
 
 **The `width=<n>` field.** Every verdict line, the fail-closed STALE diagnostics included, carries `width=<n>` immediately before the `` -> <verdict> `` arrow, read from `DELEGATION_KIT_FAN_WIDTH` (§Layout and configuration). It is the knob's mechanical reader, and it reports the bound without enforcing it (§The delegation model). The budget check already runs before every dispatch, and `agent-budget-guard` relays the line verbatim, so the read-only fan-out bound reaches context at the wave-sizing decision. *Verbatim* governs the line's own text, not its frame: the guard prefixes the relayed line and the PAUSE arm appends its corrective, but no arm restates the payload, and the one advise arm adds nothing. The field is a config constant, not derived from the snapshot, so it is present even on an unreadable-snapshot STALE.
 
-**Two pause axes.** The five-hour window is the always-on axis. The weekly (7-day) window is a second, armed only when both `seven_day_used_pct` and `seven_day_resets_at` are present, so a three-line snapshot is judged on the 5h axis alone. The weekly limit can deplete while the 5h window sits comfortable, and a weekly PAUSE costs days rather than hours. So it gates delegation, the discretionary spend and the first to stop near the weekly ceiling, keeping the rest of the week with the supervisor. The axes are judged independently against `DELEGATION_KIT_PAUSE_PCT` and `DELEGATION_KIT_PAUSE_PCT_7D`, and either firing is a PAUSE (exit 1). The message names the axis that fired, `PAUSE (7-day window)` or `PAUSE (5h window)`, the weekly when both fire, because the remediation differs by days.
+**Two pause axes.** The five-hour window is the axis on wherever the source has one. The weekly (7-day) window is a second, armed only when both `seven_day_used_pct` and `seven_day_resets_at` are present, so a three-line snapshot is judged on the 5h axis alone. The weekly limit can deplete while the 5h window sits comfortable, and a weekly PAUSE costs days rather than hours. So it gates delegation, the discretionary spend and the first to stop near the weekly ceiling, keeping the rest of the week with the supervisor. The axes are judged independently against `DELEGATION_KIT_PAUSE_PCT` and `DELEGATION_KIT_PAUSE_PCT_7D`, and either firing is a PAUSE (exit 1). The message names the axis that fired, `PAUSE (7-day window)` or `PAUSE (5h window)`, the weekly when both fire, because the remediation differs by days.
+
+A source with no five-hour window writes the mandatory pair present and empty (§The usage.txt contract), read as no five-hour axis, never a parse failure:
+
+- **Empty pair, weekly armed:** judged on the weekly axis alone, whose reset is the dead-window clock. The reading prints `used=- (7d <pct>%)` and the sample omits `pct` and `resets_at`.
+- **Both axes empty:** STALE (`no pause axis`), no sample: an OK there is green over no reading.
+- **A five-hour key absent, or the pair half-empty:** STALE (`missing key(s)`): the pair is always written, so its absence is a non-conforming snapshot, never a declared no-window.
 
 **Usage-history sampling.** When `DELEGATION_KIT_USAGE_HISTORY` is non-empty, `usage-verdict` appends one sample line (§The usage.txt contract) to that log after every parsed snapshot, whatever the verdict. The line carries the raw harness-reported values. Write-time smoothing or correction is forbidden, since a later corrective push is evidence about the earlier sample and only the reader has both. A STALE from an unreadable or unparseable snapshot appends nothing: a sample the verdict would not trust is not history. `--emit-usage-trend` (§Trend reporter) reads the log, and so does the verdict, for a roll witness. That read is strictly fall-open, so the log stays an advisory trend surface rather than a correctness dependency, and sampling off changes no verdict.
 
@@ -588,7 +594,7 @@ Beyond the three mandatory lines a producer may write optional keys its source e
 - `tier`, the subscription tier, the denominator behind the percentages;
 - `tokens_in` / `tokens_out`, cumulative token counts, the axis that binds an API-billed consumer, to whom no subscription percentage applies.
 
-An optional key is omitted when its source has no value, never written empty.
+An optional key is omitted when its source has no value, never written empty; the mandatory five-hour pair, inversely, is written empty, never omitted (§usage-verdict).
 
 The contract also serves a foreign adapter's snapshot, where the axes are read by length: the mandatory triple is the vendor's shorter window and the weekly pair its longer one (§The keyed verdict).
 
@@ -848,7 +854,7 @@ A foreign run spends a window the account-keyed verdict cannot see, so each adap
 
 **Sizing a consumer should know.** A vendor with no usage endpoint reports its window only as a by-product of a turn, and only of a turn whose session its store keeps: an adapter run in a vendor's non-persisting mode feeds nothing. The snapshot is then as old as the last kept turn on that account, so across a gap the oracle keeps a pause and loses an OK, by the first difference above.
 
-**The line** is `foreign-budget: adapter=<adapter> used=<pct>% age=<n>s resets_in=<n>s -> <VERDICT> (<status>; <consequence>)`, with `(long <pct>%)` after the short percentage where the snapshot carries a well-formed weekly pair. It honors §usage-verdict's verdict-string contract: reading, status and consequence on every line, an `OK` included. A PAUSE names its axis as the *short window* or the *long window*, the long one when both fire, and says when that window resets. A long-window PAUSE beside a dead short window carries that window's percentage, so its status clause says the short window rolled over. A line with no parsed snapshot carries no reading fields: it names the adapter and why.
+**The line** is `foreign-budget: adapter=<adapter> used=<pct>% age=<n>s resets_in=<n>s -> <VERDICT> (<status>; <consequence>)`, with `(long <pct>%)` after the short percentage where the snapshot carries a well-formed weekly pair. With no short window it prints `used=-` and judges the long one alone (§usage-verdict). It honors §usage-verdict's verdict-string contract: reading, status and consequence on every line, an `OK` included. A PAUSE names its axis as the *short window* or the *long window*, the long one when both fire, and says when that window resets. A long-window PAUSE beside a dead short window carries that window's percentage, so its status clause says the short window rolled over. A line with no parsed snapshot carries no reading fields: it names the adapter and why.
 
 **The verdicts and exits are §usage-verdict's, with one more non-reading.**
 
@@ -953,7 +959,7 @@ The kit's gates speak the full gate contract (`<GATE>: clean (…)` / findings +
 - an added one matching nothing staged stays silent;
 - a staged *deletion* of a gate file reads as an empty exemption set rather than a failure to read.
 
-**The `usage-verdict` decision table.** `usage-verdict` renders a three-state verdict, not a clean/violation pair, so it takes a decision table rather than the gate contract. `usage-tests/cases.tsv` pairs an expected verdict token (`OK`/`PAUSE`/`STALE`/`RESET-OK`) and exit code with scenario knobs: percentage, snapshot age offset, reset offset, credential age, the snapshot's `account` and the live identity. The crate test module `native/src/usage_tests.rs` reads that table off disk. It materializes each case as a generated snapshot file and asserts verdict and exit code. Timestamps are computed relative to *now*, because static fixtures would age into permanent STALE.
+**The `usage-verdict` decision table.** `usage-verdict` renders a three-state verdict, not a clean/violation pair, so it takes a decision table rather than the gate contract. `usage-tests/cases.tsv` pairs an expected verdict token (`OK`/`PAUSE`/`STALE`/`RESET-OK`) and exit code with scenario knobs: percentage (or the five-hour pair empty or absent), snapshot age offset, reset offset, credential age, the snapshot's `account` and the live identity. The crate test module `native/src/usage_tests.rs` reads that table off disk. It materializes each case as a generated snapshot file and asserts verdict and exit code. Timestamps are computed relative to *now*, because static fixtures would age into permanent STALE.
 
 - **The subject is reached in process**, one call to the same `verdict(args) -> (String, i32)` the budget guard makes (§usage-verdict).
 - **The clock is read once for the whole run**, and every case's timestamps are computed against that one reading. A per-case read introduces cross-case skew that flakes exactly the at-or-over boundary rows the table exists to pin.

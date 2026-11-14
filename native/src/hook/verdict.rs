@@ -155,6 +155,8 @@ struct Snapshot {
     tier: String,
     tokens_in: String,
     tokens_out: String,
+    pct_key: bool,
+    resets_key: bool,
 }
 
 fn read_snapshot(body: &str) -> Snapshot {
@@ -164,6 +166,11 @@ fn read_snapshot(body: &str) -> Snapshot {
             Some(kv) => kv,
             None => (line, ""),
         };
+        match key {
+            "five_hour_used_pct" => s.pct_key = true,
+            "five_hour_resets_at" => s.resets_key = true,
+            _ => {}
+        }
         let slot = match key {
             "five_hour_used_pct" => &mut s.pct,
             "five_hour_resets_at" => &mut s.resets_at,
@@ -182,26 +189,52 @@ fn read_snapshot(body: &str) -> Snapshot {
 }
 
 // spec: delegation-kit/SPEC.md §usage-verdict — the fail-closed readings: an unreadable snapshot, a
-// missing mandatory key and a non-numeric percentage, each a budget-unknown its caller words.
+// missing mandatory key, a non-numeric percentage and a snapshot with no pause axis at all, each a
+// budget-unknown its caller words.
 enum Loaded {
     Read(Snapshot),
     Unreadable,
     MissingKeys(Snapshot),
     NonNumeric(Snapshot),
+    NoAxis,
+}
+
+// spec: delegation-kit/SPEC.md §usage-verdict — the five-hour pair written present and both empty is
+// a source with no five-hour window, never a missing key; an absent key or a half-empty pair is.
+fn short_armed(snap: &Snapshot) -> bool {
+    !snap.pct.is_empty()
 }
 
 fn load(path: &str) -> Loaded {
     let Ok(body) = std::fs::read_to_string(path) else {
         return Loaded::Unreadable;
     };
-    let snap = read_snapshot(&body);
-    if snap.pct.is_empty() || snap.resets_at.is_empty() || snap.updated_at.is_empty() {
+    classify(read_snapshot(&body))
+}
+
+fn classify(snap: Snapshot) -> Loaded {
+    if !snap.pct_key || !snap.resets_key || snap.updated_at.is_empty() {
+        return Loaded::MissingKeys(snap);
+    }
+    if snap.pct.is_empty() && snap.resets_at.is_empty() {
+        if long_armed(&snap) {
+            return Loaded::Read(snap);
+        }
+        return Loaded::NoAxis;
+    }
+    if snap.pct.is_empty() || snap.resets_at.is_empty() {
         return Loaded::MissingKeys(snap);
     }
     if !is_percentage(&snap.pct) {
         return Loaded::NonNumeric(snap);
     }
     Loaded::Read(snap)
+}
+
+// spec: delegation-kit/SPEC.md §usage-verdict — the dead-window clock is the five-hour reset, the
+// weekly one on a snapshot judged on the weekly axis alone.
+fn reset_clock(snap: &Snapshot) -> i64 {
+    int(if short_armed(snap) { &snap.resets_at } else { &snap.resets_7d })
 }
 
 struct Limits<'a> {
@@ -235,14 +268,14 @@ fn judge(snap: &Snapshot, now: i64, limits: &Limits) -> Judged {
     if long && limits.pause_first {
         return Judged::Pause { long };
     }
-    if int(&snap.resets_at) - now <= 0 {
+    if reset_clock(snap) - now <= 0 {
         return Judged::ResetOk;
     }
     let stale = now - int(&snap.updated_at) > limits.stale_age;
     if stale && !limits.pause_first {
         return Judged::AgeStale;
     }
-    let short = at_or_over(&snap.pct, limits.pause);
+    let short = short_armed(snap) && at_or_over(&snap.pct, limits.pause);
     if short || long {
         return Judged::Pause { long };
     }
@@ -258,10 +291,11 @@ fn append_sample(cfg: &Config, snap: &Snapshot, login_at: i64, verdict: &str) {
     if cfg.history.is_empty() {
         return;
     }
-    let mut line = format!(
-        "updated_at={} pct={} resets_at={} verdict={} login_at={}",
-        snap.updated_at, snap.pct, snap.resets_at, verdict, login_at
-    );
+    let mut line = format!("updated_at={}", snap.updated_at);
+    if short_armed(snap) {
+        line.push_str(&format!(" pct={} resets_at={}", snap.pct, snap.resets_at));
+    }
+    line.push_str(&format!(" verdict={} login_at={}", verdict, login_at));
     if !snap.account.is_empty() {
         line.push_str(&format!(" account={}", snap.account));
     }
@@ -411,23 +445,39 @@ pub fn verdict(args: &[String]) -> (String, i32) {
                 snap.pct, cfg.usage_file, cfg.width
             ))
         }
+        Loaded::NoAxis => {
+            return stale(format!(
+                "usage-verdict: no pause axis in {} (five_hour pair empty, no weekly pair) width={}",
+                cfg.usage_file, cfg.width
+            ))
+        }
     };
 
     let now = now_epoch();
     let age = now - int(&snap.updated_at);
-    let resets_in = int(&snap.resets_at) - now;
+    let resets_in = reset_clock(&snap) - now;
     let login_at = if std::fs::metadata(&cfg.cred_file).is_ok() {
         credentials_mtime(&cfg.cred_file)
     } else {
         0
     };
     let rolled = match previous_boundary(&walk::capture_path(&cfg.history), &snap.account) {
-        Some(prev) => int(&snap.resets_at) != prev && int(&snap.updated_at) > prev,
+        Some(prev) => short_armed(&snap) && int(&snap.resets_at) != prev && int(&snap.updated_at) > prev,
         None => false,
     };
+    let used = if short_armed(&snap) {
+        format!("{}%", snap.pct)
+    } else {
+        format!("- (7d {}%)", snap.pct_7d)
+    };
+    let used_both = if short_armed(&snap) {
+        format!("{}% (7d {}%)", snap.pct, snap.pct_7d)
+    } else {
+        used.clone()
+    };
     let reading = format!(
-        "used={}% age={}s resets_in={}s width={}",
-        snap.pct, age, resets_in, cfg.width
+        "used={} age={}s resets_in={}s width={}",
+        used, age, resets_in, cfg.width
     );
     let limits = Limits {
         pause: &cfg.pause_pct,
@@ -462,8 +512,8 @@ pub fn verdict(args: &[String]) -> (String, i32) {
             append_sample(&cfg, &snap, login_at, "PAUSE");
             return (
                 format!(
-                    "used={}% (7d {}%) age={}s resets_in={}s width={} -> PAUSE (7-day window; at or over {}% of the live weekly window — remediation is days, not hours)",
-                    snap.pct, snap.pct_7d, age, resets_in, cfg.width, cfg.pause_pct_7d
+                    "used={} age={}s resets_in={}s width={} -> PAUSE (7-day window; at or over {}% of the live weekly window — remediation is days, not hours)",
+                    used_both, age, resets_in, cfg.width, cfg.pause_pct_7d
                 ),
                 1,
             );
@@ -606,16 +656,20 @@ pub fn keyed(cfg: &KeyedConfig, adapter: &str) -> Keyed {
         Loaded::NonNumeric(snap) => {
             return stale(format!("non-numeric five_hour_used_pct='{}' in {}", snap.pct, path))
         }
+        Loaded::NoAxis => {
+            return stale(format!("no pause axis in {} (five_hour pair empty, no weekly pair)", path))
+        }
     };
     let now = now_epoch();
     let age = now - int(&snap.updated_at);
-    let resets_in = int(&snap.resets_at) - now;
+    let resets_in = reset_clock(&snap) - now;
     let long = if long_armed(&snap) {
         format!(" (long {}%)", snap.pct_7d)
     } else {
         String::new()
     };
-    let reading = format!("{} used={}%{} age={}s resets_in={}s", head, snap.pct, long, age, resets_in);
+    let short = if short_armed(&snap) { format!("{}%", snap.pct) } else { "-".to_string() };
+    let reading = format!("{} used={}{} age={}s resets_in={}s", head, short, long, age, resets_in);
     let limits = Limits {
         pause: &cfg.pause,
         pause_long: &cfg.pause_long,
@@ -711,6 +765,30 @@ mod tests {
         let truncated = read_snapshot("five_hour_used_pct=42\nupdated_at=7");
         assert_eq!(truncated.pct, "42");
         assert_eq!(truncated.updated_at, "");
+    }
+
+    // spec: delegation-kit/SPEC.md §usage-verdict — a five-hour pair written empty is no five-hour
+    // axis, judged on the weekly one alone; with no weekly pair either it is no axis at all, and an
+    // absent key or a half-empty pair stays a missing key
+    #[test]
+    fn an_empty_five_hour_pair_is_no_axis_and_an_absent_one_is_missing() {
+        let at = |body: &str| classify(read_snapshot(body));
+        let weekly = "seven_day_used_pct=56\nseven_day_resets_at=20000\n";
+        let empty = "five_hour_used_pct=\nfive_hour_resets_at=\nupdated_at=9990\n";
+        let Loaded::Read(snap) = at(&format!("{}{}", empty, weekly)) else {
+            panic!("an empty five-hour pair beside a weekly pair must parse");
+        };
+        assert!(!short_armed(&snap) && long_armed(&snap));
+        let limits = |pause_long| Limits { pause: "80", pause_long, stale_age: 600, pause_first: false };
+        assert_eq!(judge(&snap, 10_000, &limits("90")), Judged::Clear);
+        assert_eq!(judge(&snap, 10_000, &limits("50")), Judged::Pause { long: true });
+        assert_eq!(judge(&snap, 20_001, &limits("50")), Judged::ResetOk);
+        assert!(matches!(at(empty), Loaded::NoAxis));
+        assert!(matches!(at(&format!("updated_at=9990\n{}", weekly)), Loaded::MissingKeys(_)));
+        assert!(matches!(
+            at(&format!("five_hour_used_pct=40\nfive_hour_resets_at=\nupdated_at=9990\n{}", weekly)),
+            Loaded::MissingKeys(_)
+        ));
     }
 
     // spec: delegation-kit/SPEC.md §usage-verdict — both pause compares are at-or-over and a
