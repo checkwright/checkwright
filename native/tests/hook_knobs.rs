@@ -92,9 +92,13 @@ fn refused_turn_end(f: &Fired, case: &str) {
 
 fn declined(f: &Fired, names: &[&str]) {
     assert_eq!(f.code, Some(0), "a decline exits 0: {}", f.stderr);
-    assert!(f.stdout.contains("systemMessage") && f.stdout.contains("--knobs"), "{}", f.stdout);
+    let message = serde_json::from_str::<serde_json::Value>(&f.stdout)
+        .ok()
+        .and_then(|v| v["systemMessage"].as_str().map(str::to_owned))
+        .unwrap_or_else(|| panic!("the decline printed no systemMessage: {}", f.stdout));
+    assert!(message.contains("--knobs"), "{}", message);
     for n in names {
-        assert!(f.stdout.contains(n), "the decline did not name {}: {}", n, f.stdout);
+        assert!(message.contains(n), "the decline did not name {}: {}", n, message);
     }
     assert!(!f.stdout.contains(NOTICE), "{}", f.stdout);
 }
