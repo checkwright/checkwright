@@ -16,6 +16,18 @@
 
 ## New Features
 
+### liveness-hook-false-refusals
+
+[spec: delegation-kit/SPEC-resume-wait.md]
+
+`subagent-stop-liveness` refuses turn ends a consumer's harness treats as legitimate, three ways (delegation-kit/SPEC.md §The turn-end liveness hook). An absent or unreadable agent transcript counts every running shell task as the agent's own, so a sibling's task refuses it; read from the code, not observed. An agent that writes a handoff file and ends before a long wait is refused. And a harness that re-invokes a sub-agent when its own background task completes makes a plain turn end with that task live its supported wait: an adopter's log-only run refused 14 of 24 firings, each such a wait, none a true positive. No payload key tells a final hand-back from a stop the harness will resume, so only a marker the agent declares can.
+
+**Direction (operator direction 2026-11-14, lead-relayed, not a ruling, against scope's recommendation to keep the rule):** the waiting rule becomes a policy-as-choice set, today's refusal its default. A `resume-wait` member allows a plain turn end while the agent's own task is live, and still refuses when the declared hand-back marker is present and the stop is the hand-back, or when the live task has no completion path. Its honest limit, stated in the SPEC: an undeclared hand-back with its work still running passes. The marker is a launch-record field `handoff=<path>`, read at stop time as a file that exists and is non-empty; the adopter writes no handoff without a record. The waiting rule in §The delegation model and the hook section's narrowing and resumed-harness paragraphs are amended to it.
+
+**Deliverable:** a feature: the set, its knob and default, the marker field and its read, the unreadable-transcript branch reviewed, fixtures per member. Weigh latency beside it: the adopter measured p50 76 ms and p95 182 ms against a 100 ms budget.
+
+**Cost while deferred:** on such a harness the arm cannot be enforced without refusing every supported wait, so an adopter keeps it log-only. Surfaced 2026-11-14 by a production adopter's handoff (asks 9a and 4, and an observe-mode finding), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `resume-wait`, `declared handoff`, `unreadable transcript` in this file and the disposed-findings record, none; the icebox's [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait) is the opposite misuse. Owner delegation-kit/SPEC.md §The turn-end liveness hook.
+
 ## Technical Debt
 
 ### nonutf8-repo-path-reads
@@ -209,18 +221,6 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 **First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
-
-### liveness-hook-false-refusals
-
-[cost: event/high] [surface: delegation-kit]
-
-`subagent-stop-liveness` refuses turn ends a consumer's harness treats as legitimate, three ways (delegation-kit/SPEC.md §The turn-end liveness hook). An absent or unreadable agent transcript counts every running shell task as the agent's own, so a sibling's task refuses it; read from the code, not observed. An agent that writes a handoff file and ends before a long wait is refused. And a harness that re-invokes a sub-agent when its own background task completes makes a plain turn end with that task live its supported wait: an adopter's log-only run refused 14 of 24 firings, each such a wait, none a true positive. No payload key tells a final hand-back from a stop the harness will resume, so only a marker the agent declares can.
-
-**Direction (operator direction 2026-11-14, lead-relayed, not a ruling, against scope's recommendation to keep the rule):** the waiting rule becomes a policy-as-choice set, today's refusal its default. A `resume-wait` member allows a plain turn end while the agent's own task is live, and still refuses when the declared hand-back marker is present and the stop is the hand-back, or when the live task has no completion path. Its honest limit, stated in the SPEC: an undeclared hand-back with its work still running passes. The marker is a launch-record field `handoff=<path>`, read at stop time as a file that exists and is non-empty; the adopter writes no handoff without a record. The waiting rule in §The delegation model and the hook section's narrowing and resumed-harness paragraphs are amended to it.
-
-**Deliverable:** a feature: the set, its knob and default, the marker field and its read, the unreadable-transcript branch reviewed, fixtures per member. Weigh latency beside it: the adopter measured p50 76 ms and p95 182 ms against a 100 ms budget.
-
-**Cost while deferred:** on such a harness the arm cannot be enforced without refusing every supported wait, so an adopter keeps it log-only. Surfaced 2026-11-14 by a production adopter's handoff (asks 9a and 4, and an observe-mode finding), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `resume-wait`, `declared handoff`, `unreadable transcript` in this file and the disposed-findings record, none; the icebox's [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait) is the opposite misuse. Owner delegation-kit/SPEC.md §The turn-end liveness hook.
 
 ### liveness-hook-no-repo-run
 
