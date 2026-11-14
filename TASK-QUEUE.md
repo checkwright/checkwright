@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), [hook-observe-mode](#hook-observe-mode), [hook-only-user-install](#hook-only-user-install), [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) in the no-repo run's batch, [installer-crate-test-gaps](#installer-crate-test-gaps) in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by [hook-only-user-install](#hook-only-user-install), which goes first; [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) reshaped by [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), one batch.
+  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, `liveness-hook-no-repo-run`, [hook-observe-mode](#hook-observe-mode), [hook-only-user-install](#hook-only-user-install), [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: `nonutf8-repo-path-reads` in the no-repo run's batch, [installer-crate-test-gaps](#installer-crate-test-gaps) in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by [hook-only-user-install](#hook-only-user-install), which goes first; `nonutf8-repo-path-reads` reshaped by `liveness-hook-no-repo-run`, one batch.
 
   **Adopter target (lead decision 2026-11-14, operator-delegated):** an adopter running its own work engine is served the checks and the session hooks only, with no lifecycle or queue read adapter, its evidence seam [gate-run-attestation-predicate](#gate-run-attestation-predicate); the absorb candidates rank below the adopter's asks, false refusals first.
 
@@ -15,16 +15,6 @@
 ---
 
 ## New Features
-
-### liveness-hook-no-repo-run
-
-[spec: gate-sdk/SPEC-hook-tree-free.md]
-
-Started with no front end outside any git repository, `--hook` fails open (gate-sdk/SPEC.md §The harness-integration arm): `subagent-stop-liveness` exits 0, its operator notice a `systemMessage` envelope on stdout and stderr carrying only 'not inside a git repository', so a turn end with the agent's own task running goes unguarded and a pipe test reading stderr calls it silent. A harness may fire the child-turn-end event from any cwd, and this arm's inputs (the payload, its log, its liveness reader) can all resolve absolute.
-
-**Deliverable:** design-pending, a feature: which arms run with no repository and how their knobs resolve there, a loud decline where one cannot, and the notice's stream documented. [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) lands in the same batch, since it fixes the same toplevel read.
-
-**Cost while deferred:** an adopter must run the arm inside a scratch repository kept for the purpose, and a harness firing from elsewhere leaves the turn end unguarded. Surfaced 2026-11-14 by a production adopter's handoff (item 10), re-measured at HEAD by the lead, filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `outside any git`, `no repository` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ### hook-observe-mode
 
@@ -44,7 +34,7 @@ A consumer adopting a blocking hook in production wants a log-only period before
 
 One session-hook arm today needs a vendored kit: `subagent-stop-liveness` is wired by hand from delegation-kit/README.md, and the installer's verbs act on a repository (installer/SPEC.md §The verbs). An adopter running its own work engine wants the gate binary placed for the user and the harness settings entry for one chosen arm printed, its scratch and log outside any repository.
 
-**Deliverable:** design-pending, a feature: the verb or flag, where the binary and the arm's scratch and log land, the settings entry it prints and for which harness versions, and how update and uninstall reach it. It builds on [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), and the debt [installer-crate-test-gaps](#installer-crate-test-gaps) rides its batch.
+**Deliverable:** design-pending, a feature: the verb or flag, where the binary and the arm's scratch and log land, the settings entry it prints and for which harness versions, and how update and uninstall reach it. It builds on `liveness-hook-no-repo-run`, and the debt [installer-crate-test-gaps](#installer-crate-test-gaps) rides its batch.
 
 **Cost while deferred:** an adopter vendors a kit into a tree it owns or places the binary by hand. Surfaced 2026-11-14 by a production adopter's handoff (ask 1), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `user install`, `hooks --user` in this file and the disposed-findings record, none; [personal-one-kit-hooks](#personal-one-kit-hooks) is reshaped by it. Owner installer/SPEC.md §The verbs.
 
@@ -59,14 +49,6 @@ A consumer weighing one hook arm reads a SPEC of 0.1-1 MB to learn what it reads
 **Cost while deferred:** each evaluator buys the SPEC read the page would save. Surfaced 2026-11-14 by a production adopter's handoff (ask 8 and item 11), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `adopter page`, `attestation verify` in this file and the disposed-findings record, none; owner docs/site-architecture.md.
 
 ## Technical Debt
-
-### nonutf8-repo-path-reads
-
-Three crate reads decode a repository path that is not UTF-8 lossily, each reproduced from a scratch tree. `walk::toplevel_args`, and `walk::cwd` beside it, read the work tree's own path that way, so `--install-hooks` in such a tree exits 2 with "not inside a git repository", a wrong cause. `hook_launcher::hooks_dir` reads the common git directory that way, so in a UTF-8 linked worktree whose common directory is not UTF-8, `--install-hooks` exits 0, creates a gate-hooks tree under a U+FFFD spelling and points `core.hooksPath` at it, so the prior `pre-commit` stops running. The placed commit-msg launcher then panics in `main`'s `std::env::args` on the non-UTF-8 message-file path git hands it, so every later commit there fails with a Rust panic.
-
-**Deliverable:** a fix with a design choice: one rule for a repository path the crate reads from git or argv and cannot spell, a named refusal or the bytes carried, applied at all three reads, with Linux-only crate cases and the rule in gate-sdk/SPEC.md §The crate's crosser and §git-hook. `hookspath-non-utf8-restore` settled the `core.hooksPath` value alone; the common-directory read was kept out of it by operator direction 2026-10-26.
-
-**Cost while deferred:** only an adopter whose repository path is not UTF-8 hits these, and the common-directory case leaves the clone unable to commit until `core.hooksPath` is unset. Filed 2026-10-26 by installer-review-residue-pass' close, from three spec-stage gap bullets. Owner lookup: `non-UTF`, `lossy`, `utf8`, `toplevel_in`, `hooks_dir`, `common-dir`, `env::args` in this file and the disposed-findings record: only the done `hookspath-non-utf8-restore` and `personal-detect-non-utf8`, each another read.
 
 ### installer-crate-test-gaps
 
@@ -1045,4 +1027,6 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 ## Done
 
 - liveness-hook-false-refusals
+- liveness-hook-no-repo-run
+- nonutf8-repo-path-reads
 

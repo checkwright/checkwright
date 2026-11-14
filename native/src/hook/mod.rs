@@ -42,9 +42,12 @@ pub type HookFn = fn(&Payload) -> i32;
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the member table: the single roster the
 // arm dispatches on and the unknown-member refusal prints. Each row's knob slice is exactly what
-// that member's shell original read, less the knobs a compiled member cannot want; its last column
-// is the owning kit, held to the member module's leading `spec:` binding by a unit test below.
-pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
+// that member's shell original read, less the knobs a compiled member cannot want; then the owning
+// kit, held to the member module's leading `spec:` binding by a unit test below, and the tree-free
+// declaration: every input the member's rule reads can resolve absolute.
+pub type Row = (&'static str, HookFn, &'static [&'static str], &'static str, bool);
+
+pub const HOOKS: &[Row] = &[
     // spec: delegation-kit/SPEC.md §usage-verdict — the rule runs inside the hook process, so the row
     // declares the rule's own reads rather than a path to it, one roster for both callers
     (
@@ -52,6 +55,7 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
         |p| budget::run(p.value()),
         verdict::KNOBS,
         "delegation-kit",
+        false,
     ),
     (
         "agent-dispatch-guard",
@@ -65,6 +69,7 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
             "GATE_SDK_NATIVE_BIN",
         ],
         "delegation-kit",
+        false,
     ),
     (
         "subagent-stop-liveness",
@@ -76,20 +81,23 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
             "GATE_SDK_TMP_DIR",
         ],
         "delegation-kit",
+        true,
     ),
-    ("escalation-guard", |p| escalation::run(p.value()), &[], "guard-kit"),
+    ("escalation-guard", |p| escalation::run(p.value()), &[], "guard-kit", false),
     (
         "session-context",
         session_context::run,
         session_context::KNOBS,
         "context-kit",
+        false,
     ),
-    ("shell-guard", shell_guard::run, crate::guard::host::KNOBS, "guard-kit"),
+    ("shell-guard", shell_guard::run, crate::guard::host::KNOBS, "guard-kit", false),
     (
         "wakeup-guard",
         |p| wakeup::run(p.value()),
         &["GUARD_KIT_WAKEUP_LOG"],
         "guard-kit",
+        false,
     ),
     (
         "workflow-state-guard",
@@ -102,6 +110,7 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
             "GATE_SDK_NATIVE_BIN",
         ],
         "lifecycle-kit",
+        false,
     ),
 ];
 
@@ -111,11 +120,11 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
 pub const EVERY_HOOK_KNOB: &str = "@every-hook-knob";
 
 pub fn members() -> Vec<&'static str> {
-    HOOKS.iter().map(|(n, _, _, _)| *n).collect()
+    HOOKS.iter().map(|(n, _, _, _, _)| *n).collect()
 }
 
 pub fn owner(member: &str) -> Option<&'static str> {
-    HOOKS.iter().find(|(n, _, _, _)| *n == member).map(|(_, _, _, o)| *o)
+    HOOKS.iter().find(|(n, _, _, _, _)| *n == member).map(|(_, _, _, o, _)| *o)
 }
 
 // spec: context-kit/SPEC.md §check-settings-paths — a hook's tokens: `command` split on ASCII
@@ -273,39 +282,70 @@ pub fn field(payload: Option<&Value>, path: &[&str]) -> String {
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the decline for a tree with no repository
 // the arm may read: the front end's notice for that case, a literal with no interpolated value
-const NO_TREE_NOTICE: &str = "checkwright-gates: git refuses or skips the repository this session stands in, or answers none, so every hook guard in this tree is off and each guarded call is allowed. git status prints its reason, or git --git-dir=<that .git> status for a skipped one";
+const NO_TREE_NOTICE: &str = "checkwright-gates: git refuses or skips the repository this session stands in, or answers none, so every hook guard in this tree is off and each guarded call is allowed. git status prints its reason, or git --git-dir=<that .git> status for a skipped one; where git answers none, run the session inside a repository, or register a tree-free member";
 
-// spec: gate-sdk/SPEC.md §The harness-integration arm — the tree the arm runs in: the toplevel of
-// its working directory, asked through the crosser before any knob is read
-fn tree() -> Result<String, String> {
-    match crate::walk::toplevel_opt() {
-        Ok(Some(top)) => Ok(top),
-        Ok(None) => Err("checkwright-gates: not inside a git repository".to_string()),
-        Err(e) => Err(format!("checkwright-gates: {}", e)),
+thread_local! {
+    static TREE_FREE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the tree-free mark: set where a tree-free
+// member runs in place with no repository, read by the knob layers and the member's path checks
+pub fn tree_free() -> bool {
+    TREE_FREE.with(std::cell::Cell::get)
+}
+
+#[cfg(test)]
+pub fn set_tree_free(on: bool) {
+    TREE_FREE.with(|m| m.set(on));
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — a path-valued knob under the mark must be
+// absolute; a relative value, a default included, is the member's decline reason
+pub fn tree_free_path(name: &str, value: &str) -> Result<(), String> {
+    if !tree_free() || crate::walk::path_root(value).is_some() {
+        return Ok(());
     }
+    Err(format!(
+        "{} is '{}', and a run with no repository takes absolute paths only — set it to an absolute path",
+        name, value
+    ))
+}
+
+fn no_tree(line: &str) -> i32 {
+    eprintln!("{}", line);
+    println!("{}", binding::notice_envelope(NO_TREE_NOTICE));
+    0
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's dispatch: the member name is argv, never the
 // hook event name, so the port is a one-for-one substitution of a `command` value and every
 // `matcher` in the consumer's settings is left untouched.
 pub fn run(args: &[String]) -> i32 {
-    let entered = tree().and_then(|top| {
-        // spec: gate-sdk/SPEC.md §Fail-closed contract — cwd-write-exempt: the arm's own process
-        // enters the tree it guards, and no test reaches `run()`
-        std::env::set_current_dir(&top)
-            .map_err(|e| format!("checkwright-gates: cannot enter the work tree at {}: {}", top, e))
-    });
-    if let Err(line) = entered {
-        eprintln!("{}", line);
-        println!("{}", binding::notice_envelope(NO_TREE_NOTICE));
-        return 0;
+    let row = args.first().and_then(|m| HOOKS.iter().find(|r| r.0 == m));
+    let rest = args.get(1..).unwrap_or_default();
+    match crate::walk::toplevel_opt() {
+        Ok(Some(top)) => {
+            // spec: gate-sdk/SPEC.md §Fail-closed contract — cwd-write-exempt: the arm's own process
+            // enters the tree it guards, and no test reaches `run()`
+            if let Err(e) = std::env::set_current_dir(&top) {
+                return no_tree(&format!("checkwright-gates: cannot enter the work tree at {}: {}", top, e));
+            }
+        }
+        Ok(None) => match row {
+            Some(&(_, f, _, _, true)) if binding_operand(rest) == Ok(None) => {
+                TREE_FREE.with(|m| m.set(true));
+                return f(&read_input());
+            }
+            _ => return no_tree("checkwright-gates: not inside a git repository"),
+        },
+        Err(e) => return no_tree(&format!("checkwright-gates: {}", e)),
     }
     let Some(member) = args.first() else {
         eprintln!("checkwright-gates: --hook needs a member name — the hook could not run");
         eprintln!("  help: this binary carries: {}", members().join(", "));
         return 2;
     };
-    let Some((_, f, _, _)) = HOOKS.iter().find(|(n, _, _, _)| n == member) else {
+    let Some(&(_, f, _, _, _)) = row else {
         eprintln!(
             "checkwright-gates: no such hook member: {} — the hook could not run",
             member
@@ -313,7 +353,7 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("  help: this binary carries: {}", members().join(", "));
         return 2;
     };
-    match binding_operand(&args[1..]) {
+    match binding_operand(rest) {
         Ok(None) => f(&read_input()),
         Ok(Some(_)) => antigravity::run(member, read_input().bytes()),
         Err(given) => {
@@ -431,6 +471,28 @@ mod tests {
         assert_eq!(decline("m", "r", None), 0);
     }
 
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — the tree-free column holds one member
+    // until the filed follow-on weighs the rest
+    #[test]
+    fn only_the_turn_end_liveness_member_is_tree_free() {
+        let free: Vec<&str> = HOOKS.iter().filter(|r| r.4).map(|r| r.0).collect();
+        assert_eq!(free, ["subagent-stop-liveness"]);
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — under the mark a relative path-valued
+    // knob is the decline reason, naming the knob and its value; with no mark any value passes
+    #[test]
+    fn a_relative_path_knob_is_refused_under_the_mark_alone() {
+        assert_eq!(tree_free_path("GATE_SDK_TMP_DIR", ".tmp"), Ok(()));
+        set_tree_free(true);
+        let relative = tree_free_path("GATE_SDK_TMP_DIR", ".tmp");
+        let absolute = tree_free_path("GATE_SDK_TMP_DIR", "/var/scratch");
+        set_tree_free(false);
+        let e = relative.expect_err("a relative value under the mark");
+        assert!(e.contains("GATE_SDK_TMP_DIR is '.tmp'") && e.contains("absolute paths only"), "{}", e);
+        assert_eq!(absolute, Ok(()));
+    }
+
     // spec: gate-sdk/SPEC.md §The harness-integration arm — the owner column is checked against the
     // member module rather than transcribed: each row's owner is the kit its module's leading
     // `spec:` binding names, and a member missing from this module list fails rather than passes
@@ -446,7 +508,7 @@ mod tests {
             ("wakeup-guard", include_str!("wakeup.rs")),
             ("workflow-state-guard", include_str!("workflow_state.rs")),
         ];
-        for (name, _, _, owner) in HOOKS {
+        for (name, _, _, owner, _) in HOOKS {
             let src = modules
                 .iter()
                 .find(|(m, _)| m == name)

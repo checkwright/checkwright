@@ -46,7 +46,7 @@ The envelopes are read through `native/src/hook/binding.rs`, the one copy that b
 
 **The knob.** `GATE_SDK_HOOK_OBSERVE_LOG`, a derived scalar row in gate-sdk's table, default `${GATE_SDK_TMP_DIR:-.tmp}/hook-observe.log`. The `--hook` arm's declared roster carries it beside `EVERY_HOOK_KNOB`, because the dispatcher reads it, not a member (§The non-gate arm, *a dispatching arm declares its callee's reads beside its own*). §Layout and configuration gains its bullet after `GATE_SDK_TMP_DIR`'s.
 
-**The path.** The value is read through `walk::capture_path`, as the turn-end hook's log is, so a session in a linked worktree logs into the main checkout's file rather than a worktree that is removed with the trial's record. Under the tree-free mark (gate-sdk/SPEC-hook-tree-free.md delta 2) it passes `hook::tree_free_path`, so a relative value declines there.
+**The path.** The value is read through `walk::capture_path`, as the turn-end hook's log is, so a session in a linked worktree logs into the main checkout's file rather than a worktree that is removed with the trial's record. Under the tree-free mark (gate-sdk/SPEC.md §The harness-integration arm) it passes `hook::tree_free_path`, so a relative value declines there.
 
 **The line.** One line per observed call, appended as one write of the whole line on an append-mode handle, so concurrent hooks interleave whole lines:
 

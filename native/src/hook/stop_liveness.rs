@@ -82,6 +82,9 @@ pub fn run(payload: Option<&Value>) -> i32 {
         Ok(_) => Wait::Refuse,
         Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
     };
+    if let Err(e) = tree_free_inputs(&run_dir, &log, &liveness_cmd) {
+        return hook::decline("subagent-stop-liveness", &e, payload);
+    }
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set is the main
     // checkout's: from a linked worktree a relative scratch dir resolves there, where an isolated
     // session's launch records are written and the shell guard reads them
@@ -349,6 +352,17 @@ fn top_level_keys(payload: Option<&Value>) -> String {
         .and_then(Value::as_object)
         .map(|m| m.keys().cloned().collect::<Vec<_>>().join(","))
         .unwrap_or_default()
+}
+
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — with no repository the scratch dir and
+// the log are absolute, and an override head with a separator is rooted, or the firing declines
+fn tree_free_inputs(run_dir: &str, log: &str, cmd: &[String]) -> Result<(), String> {
+    hook::tree_free_path("GATE_SDK_TMP_DIR", run_dir)?;
+    hook::tree_free_path("DELEGATION_KIT_STOP_LOG", log)?;
+    match cmd.first() {
+        Some(head) if head.contains(['/', '\\']) => hook::tree_free_path("DELEGATION_KIT_LIVENESS_CMD", head),
+        _ => Ok(()),
+    }
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the reader argv, resolved once for

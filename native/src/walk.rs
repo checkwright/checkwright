@@ -451,12 +451,57 @@ pub fn self_exempt_paths(resolved: &[String], starter: &str) -> Result<Vec<Strin
 // spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::env::current_dir()`, and
 // the crossing itself: the producer's answer converts here, once, so no reader downstream has to
 pub fn cwd() -> Result<String, String> {
-    Ok(normalize_abs(
-        &std::env::current_dir()
-            .map_err(|e| format!("cannot read the current directory: {}", e))?
-            .display()
-            .to_string(),
-    ))
+    let here = std::env::current_dir().map_err(|e| format!("cannot read the current directory: {}", e))?;
+    let text = here.to_str().ok_or_else(|| not_utf8("the current directory", &escaped_os(here.as_os_str())))?;
+    Ok(normalize_abs(text))
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — a repository path with no UTF-8 spelling is refused
+// by name: the read, the escaped path and the remedy, never a lossy decode
+pub fn not_utf8(read: &str, escaped: &str) -> String {
+    format!(
+        "{} is '{}', which is not UTF-8, and this binary reads a repository path in UTF-8 alone — nothing was read there\n  help: rename the directory to a UTF-8 name, or run from one whose path is UTF-8",
+        read, escaped
+    )
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — bytes escaped for a message alone, each byte that is
+// not UTF-8 as `\xNN`
+pub fn escaped_bytes(mut b: &[u8]) -> String {
+    let mut out = String::new();
+    loop {
+        match std::str::from_utf8(b) {
+            Ok(s) => return out + s,
+            Err(e) => {
+                let (good, rest) = b.split_at(e.valid_up_to());
+                out.push_str(std::str::from_utf8(good).unwrap_or_default());
+                let bad = e.error_len().unwrap_or(rest.len());
+                for byte in &rest[..bad] {
+                    out.push_str(&format!("\\x{:02x}", byte));
+                }
+                b = &rest[bad..];
+            }
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — an OS string's own units, escaped for a message
+// alone: its bytes on POSIX, each unpaired surrogate of its UTF-16 on Windows
+#[cfg(not(windows))]
+pub fn escaped_os(s: &std::ffi::OsStr) -> String {
+    use std::os::unix::ffi::OsStrExt;
+    escaped_bytes(s.as_bytes())
+}
+
+#[cfg(windows)]
+pub fn escaped_os(s: &std::ffi::OsStr) -> String {
+    use std::os::windows::ffi::OsStrExt;
+    char::decode_utf16(s.encode_wide())
+        .map(|c| match c {
+            Ok(c) => c.to_string(),
+            Err(e) => format!("\\u{{{:04x}}}", e.unpaired_surrogate()),
+        })
+        .collect()
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `git rev-parse --show-toplevel`
@@ -489,8 +534,9 @@ fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
     args.extend_from_slice(&["rev-parse", "--show-toplevel", "--show-prefix"]);
     let c = crate::proc::run(&programs::GIT, &args)?;
     let Some(out) = c.stdout() else { return refused_or_absent(dir) };
-    let out = String::from_utf8_lossy(out);
-    let (top, prefix) = split_answer(&out);
+    let out = std::str::from_utf8(out)
+        .map_err(|_| not_utf8("the work tree git answers", &escaped_bytes(split_answer_bytes(out))))?;
+    let (top, prefix) = split_answer(out);
     let Some(top) = Some(top.trim()).filter(|s| !s.is_empty()).map(normalize_abs) else {
         return Ok(None);
     };
@@ -508,6 +554,10 @@ fn toplevel_args(dir: Option<&str>) -> Result<Option<String>, String> {
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — git ends each answer with one newline and quotes
 // neither, so the toplevel ends at the first and the prefix, last, runs to its own terminator
+fn split_answer_bytes(out: &[u8]) -> &[u8] {
+    out.split(|b| *b == b'\n').next().unwrap_or(out)
+}
+
 fn split_answer(out: &str) -> (&str, &str) {
     let (top, rest) = out.split_once('\n').unwrap_or((out, ""));
     let rest = rest.strip_suffix('\n').unwrap_or(rest);
@@ -535,9 +585,8 @@ fn selected_repository(dir: Option<&str>, mark: &Path) -> bool {
     let mut args: Vec<&str> = dir.map(|d| vec!["-C", d]).unwrap_or_default();
     args.extend_from_slice(&["rev-parse", "--absolute-git-dir"]);
     let Ok(c) = crate::proc::run(&programs::GIT, &args) else { return false };
-    let Some(out) = c.stdout() else { return false };
-    let out = String::from_utf8_lossy(out);
-    let selected = out.strip_suffix('\n').unwrap_or(&out);
+    let Some(Ok(out)) = c.stdout().map(std::str::from_utf8) else { return false };
+    let selected = out.strip_suffix('\n').unwrap_or(out);
     let target = match fs::read_to_string(mark) {
         Ok(text) => match gitfile_target(&text) {
             Some(t) if path_root(t).is_some() => PathBuf::from(t),
@@ -559,7 +608,11 @@ fn gitfile_target(text: &str) -> Option<&str> {
 // spec: gate-sdk/SPEC.md §The crate's crosser — git's stderr cannot tell a broken repository from
 // none, so a non-zero exit is classified by the mark at the anchor alone
 fn refused_or_absent(dir: Option<&str>) -> Result<Option<String>, String> {
-    let Ok(here) = cwd() else { return Ok(None) };
+    let here = match cwd() {
+        Ok(here) => here,
+        Err(unspelled) if std::env::current_dir().is_ok() => return Err(unspelled),
+        Err(_) => return Ok(None),
+    };
     let operand = dir.unwrap_or(".");
     let Some(start) = physical(operand).filter(|p| Path::new(p).is_dir()) else { return Ok(None) };
     let anchor = match operand {
@@ -660,7 +713,7 @@ pub fn physical_against_strict(here: &str, p: &str) -> Result<String, PathBuf> {
 // is a linked worktree whose common dir's leaf is `.git`; none anywhere else, a failed spawn included
 pub fn main_checkout_root() -> Option<String> {
     let c = crate::proc::run(&programs::GIT, &["rev-parse", "--git-dir", "--git-common-dir"]).ok()?;
-    let out = String::from_utf8_lossy(c.stdout()?).into_owned();
+    let out = std::str::from_utf8(c.stdout()?).ok()?;
     let here = cwd().ok()?;
     let mut lines = out.lines();
     let git_dir = canonicalize(abs_against(&here, lines.next()?))?;
@@ -679,6 +732,11 @@ fn linked_main(git_dir: &str, common: &str) -> Option<String> {
 // capture path from a linked worktree resolves against the main checkout; any other value is returned
 // as given, for the caller's own resolution
 pub fn capture_path(value: &str) -> String {
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — under the tree-free mark there is no
+    // checkout to rebase onto, and every value is absolute by then
+    if crate::hook::tree_free() {
+        return value.to_string();
+    }
     capture_path_in(value, main_checkout_root().as_deref())
 }
 

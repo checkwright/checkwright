@@ -491,11 +491,10 @@ fn report(root: &Path, clone: &Path, manifest: &lock::Manifest, door: &str, pers
         }
     }
 
-    let hooks = crate::emit::hook_launcher::hooks_dir(root);
-    let opted = hooks.as_deref().is_some_and(|d| crate::emit::hook_launcher::opted_in(root, d));
-    let gone = hooks.as_deref().map(crate::emit::hook_launcher::missing).unwrap_or_default();
+    let read = doctor::hooks_reading(root);
+    let opted = read.as_ref().is_ok_and(|(opted, _)| *opted);
     out.push_str("enforced\n");
-    let _ = writeln!(out, "  {:<12} {}", "at commit", doctor::hooks_line(opted, &gone));
+    let _ = writeln!(out, "  {:<12} {}", "at commit", doctor::hooks_finding(&read));
     let ci = if clone.join(workflow::PATH).is_file() { workflow::PATH } else { "none seeded" };
     let _ = writeln!(out, "  {:<12} {}", "in CI", ci);
 

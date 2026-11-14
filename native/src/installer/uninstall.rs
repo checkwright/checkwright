@@ -211,8 +211,18 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
 
     // spec: installer/SPEC.md §uninstall — the placed hooks directory is this tool's own and is
     // removed; the opt-in is reported, not rewritten, git config being outside the ownership roster
-    let hooks_dir = crate::emit::hook_launcher::hooks_dir(&root).filter(|d| d.is_dir());
-    let hooks_line = hooks_line(&root, hooks_dir.as_deref());
+    // spec: installer/SPEC.md §uninstall — a common directory or `core.hooksPath` git spells outside
+    // UTF-8 refuses here, before the first removal
+    let unspelled = |cause: String| {
+        refuse(
+            cause.lines().next().unwrap_or_default().to_string(),
+            "nothing was removed. Rename the directory to a UTF-8 name, or point core.hooksPath at a directory whose path is UTF-8, then re-run.",
+            2,
+        )
+    };
+    let root_s = root.to_string_lossy();
+    let hooks_dir = crate::emit::hook_launcher::hooks_dir(&root_s).map_err(unspelled)?.filter(|d| d.is_dir());
+    let hooks_line = hooks_line(&root_s, hooks_dir.as_deref()).map_err(unspelled)?;
 
     // spec: installer/SPEC.md §uninstall — a run with nothing to remove says so and exits 0: the
     // install is still there, so narrowing the manifest here would disown an install that has not
@@ -495,13 +505,15 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
 // spec: installer/SPEC.md §uninstall — read before the directory's removal: the line restoring the
 // prior `core.hooksPath` from the chain record, or unsetting it where none was set; a record that
 // cannot be read is its own outcome, since no line is known to restore what it held
-fn hooks_line(root: &std::path::Path, hooks_dir: Option<&std::path::Path>) -> Option<Result<String, String>> {
+type HooksLine = Option<Result<String, String>>;
+
+fn hooks_line(root: &str, hooks_dir: Option<&std::path::Path>) -> Result<HooksLine, String> {
     use crate::emit::hook_launcher;
     match hooks_dir {
-        Some(d) if hook_launcher::opted_in(root, d) => {
-            Some(hook_launcher::read_chain(d).map(|c| hook_launcher::restore_line(c.as_ref())))
+        Some(d) if hook_launcher::opted_in(root, d)? => {
+            Ok(Some(hook_launcher::read_chain(d).map(|c| hook_launcher::restore_line(c.as_ref()))))
         }
-        _ => None,
+        _ => Ok(None),
     }
 }
 
@@ -633,18 +645,18 @@ mod tests {
         let _ = std::fs::remove_dir_all(&d);
         std::fs::create_dir_all(d.join("repo")).expect("scratch");
         let top = walk::normalize_abs(&d.join("repo").display().to_string());
-        let root = std::path::Path::new(&top);
+        let root = top.as_str();
         proc::run(&programs::GIT, &["-C", &top, "init", "-q"]).expect("git init");
-        let hooks = hook_launcher::hooks_dir(root).expect("a hooks directory");
+        let hooks = hook_launcher::hooks_dir(root).expect("a hooks directory read").expect("a hooks directory");
         std::fs::create_dir_all(&hooks).expect("hooks dir");
-        let unopted = hooks_line(root, Some(&hooks));
+        let unopted = hooks_line(root, Some(&hooks)).expect("a hooks reading");
         proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &hooks.display().to_string()]).expect("git config");
-        let bare = hooks_line(root, Some(&hooks));
+        let bare = hooks_line(root, Some(&hooks)).expect("a hooks reading");
         let theirs = d.join("husky").display().to_string();
         std::fs::write(hooks.join(hook_launcher::CHAIN), format!("dir={}\nrestore=.husky\n", theirs)).expect("record");
-        let restored = hooks_line(root, Some(&hooks));
+        let restored = hooks_line(root, Some(&hooks)).expect("a hooks reading");
         std::fs::write(hooks.join(hook_launcher::CHAIN), "restore=.husky\n").expect("record");
-        let unread = hooks_line(root, Some(&hooks));
+        let unread = hooks_line(root, Some(&hooks)).expect("a hooks reading");
         let _ = std::fs::remove_dir_all(&d);
         assert_eq!(unopted, None);
         assert_eq!(bare, Some(Ok("git config --unset core.hooksPath".to_string())));

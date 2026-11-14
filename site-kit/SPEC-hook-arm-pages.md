@@ -25,7 +25,7 @@ Pairs `hook-arm-adopter-page`. A consumer weighing one session-hook arm today re
 5. Installing it alone: `init --user <member>`, the settings block it prints, and the `--observe` trial before enforcing (installer/SPEC-user-install.md, gate-sdk/SPEC-hook-observe.md). The manual path links docs/manual-install.md and its verify step (delta 4), and is not restated.
 6. Removing it: `uninstall --user`, and the settings entry to delete.
 
-**Which arms owe a page.** A page is owed for every member whose `HOOKS` tree-free column is true, the set an adopter can run on its own (gate-sdk/SPEC-hook-tree-free.md). Today that is `subagent-stop-liveness` alone. A page for a tree-bound member is allowed and not owed, and a widening of the column brings its page in the commit that widens it (delta 2's gate). **Not yet applied.**
+**Which arms owe a page.** A page is owed for every member whose `HOOKS` tree-free column is true, the set an adopter can run on its own (gate-sdk/SPEC.md §The harness-integration arm). Today that is `subagent-stop-liveness` alone. A page for a tree-bound member is allowed and not owed, and a widening of the column brings its page in the commit that widens it (delta 2's gate). **Not yet applied.**
 
 **Grounds.** A page per arm, rather than one page for all arms, keeps each evaluator's read to the arm being weighed, and gives each a stable URL to link from an adopter's own runbook. Hand-writing the prose and generating only the knob table follows where drift lands. A knob's name and default change with the crate and are mechanically derivable. The prose describes behaviour the SPEC owns and no generator can summarise.
 

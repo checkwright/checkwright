@@ -345,6 +345,22 @@ pub(super) fn hooks_line(opted_in: bool, missing: &[String]) -> String {
     }
 }
 
+// spec: installer/SPEC.md §doctor — the hooks reading: opted in and the missing hooks, or the cause
+// the read refused on, which stays a finding
+pub(super) fn hooks_reading(root: &std::path::Path) -> Result<(bool, Vec<String>), String> {
+    use crate::emit::hook_launcher;
+    let root = root.to_string_lossy();
+    let Some(dir) = hook_launcher::hooks_dir(&root)? else { return Ok((false, Vec::new())) };
+    Ok((hook_launcher::opted_in(&root, &dir)?, hook_launcher::missing(&dir)))
+}
+
+pub(super) fn hooks_finding(read: &Result<(bool, Vec<String>), String>) -> String {
+    match read {
+        Ok((opted, missing)) => hooks_line(*opted, missing),
+        Err(cause) => format!("unread — {}", cause.lines().next().unwrap_or_default()),
+    }
+}
+
 pub fn diagnose(selection: Option<&Selection>, caller: Caller) -> Report {
     let mut out = String::new();
     let mut err = String::new();
@@ -464,10 +480,7 @@ pub fn diagnose(selection: Option<&Selection>, caller: Caller) -> Report {
                 }
             }
 
-            let hooks = crate::emit::hook_launcher::hooks_dir(&root);
-            let opted = hooks.as_deref().is_some_and(|d| crate::emit::hook_launcher::opted_in(&root, d));
-            let gone = hooks.as_deref().map(crate::emit::hook_launcher::missing).unwrap_or_default();
-            let _ = writeln!(out, "  {:<12} {}", "hooks", hooks_line(opted, &gone));
+            let _ = writeln!(out, "  {:<12} {}", "hooks", hooks_finding(&hooks_reading(&root)));
 
             if !list.is_empty() {
                 if let Ok(text) = std::fs::read_to_string(root.join(&list)) {

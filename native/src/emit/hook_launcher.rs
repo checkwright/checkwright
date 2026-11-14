@@ -83,14 +83,18 @@ pub fn file_name(hook: &str) -> String {
     format!("{}{}", hook, std::env::consts::EXE_SUFFIX)
 }
 
-pub fn hooks_dir(root: &Path) -> Option<PathBuf> {
-    let r = root.to_string_lossy().into_owned();
-    let out = proc::run(&programs::GIT, &["-C", &r, "rev-parse", "--git-common-dir"]).ok()?;
-    let dir = String::from_utf8_lossy(out.stdout()?).trim().to_string();
+// spec: gate-sdk/SPEC.md §install-hooks — a common directory git spells outside UTF-8 is the named
+// refusal; a git that cannot answer is no hooks directory
+pub fn hooks_dir(root: &str) -> Result<Option<PathBuf>, String> {
+    let Ok(out) = proc::run(&programs::GIT, &["-C", root, "rev-parse", "--git-common-dir"]) else { return Ok(None) };
+    let Some(raw) = out.stdout() else { return Ok(None) };
+    let dir = std::str::from_utf8(raw)
+        .map_err(|_| walk::not_utf8("git's common directory", walk::escaped_bytes(raw).trim()))?
+        .trim();
     if dir.is_empty() {
-        return None;
+        return Ok(None);
     }
-    Some(PathBuf::from(walk::abs_against(&r, &dir)).join(DIR))
+    Ok(Some(PathBuf::from(walk::abs_against(root, dir)).join(DIR)))
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — two directories are one where both resolve physically to
@@ -101,13 +105,15 @@ pub fn same_dir(a: &Path, b: &Path) -> bool {
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — opted in is `core.hooksPath` naming the hooks directory
-pub fn opted_in(root: &Path, dir: &Path) -> bool {
-    let r = root.to_string_lossy().into_owned();
-    let Ok(out) = proc::run(&programs::GIT, &["-C", &r, "config", "--get", "core.hooksPath"]) else {
-        return false;
+pub fn opted_in(root: &str, dir: &Path) -> Result<bool, String> {
+    let Ok(out) = proc::run(&programs::GIT, &["-C", root, "config", "--get", "core.hooksPath"]) else {
+        return Ok(false);
     };
-    let value = String::from_utf8_lossy(out.stdout().unwrap_or_default()).trim().to_string();
-    !value.is_empty() && same_dir(Path::new(&walk::physical_against(&r, &value)), dir)
+    let raw = out.stdout().unwrap_or_default();
+    let value = std::str::from_utf8(raw)
+        .map_err(|_| walk::not_utf8("core.hooksPath", walk::escaped_bytes(raw).trim()))?
+        .trim();
+    Ok(!value.is_empty() && same_dir(Path::new(&walk::physical_against(root, value)), dir))
 }
 
 pub fn missing(dir: &Path) -> Vec<String> {

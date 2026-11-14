@@ -365,8 +365,9 @@ fn refusing_hook(trace: &str) -> Option<String> {
 // spec: installer/SPEC.md §init — the directory a refusing hook ran from, read as install-hooks
 // reads the prior one; the gate hooks directory, or a read that fails, establishes no adopter's hook
 fn judged_in(root: &Path) -> Option<PathBuf> {
-    let gate = crate::emit::hook_launcher::hooks_dir(root)?;
-    match crate::emit::install_hooks::prior(&root.to_string_lossy(), &gate) {
+    let root = root.to_string_lossy();
+    let gate = crate::emit::hook_launcher::hooks_dir(&root).ok().flatten()?;
+    match crate::emit::install_hooks::prior(&root, &gate) {
         Ok(crate::emit::install_hooks::Prior::Quiet { dir, .. }) | Ok(crate::emit::install_hooks::Prior::Live { dir, .. }) => {
             Some(dir)
         }

@@ -1519,7 +1519,7 @@ mod tests {
         let signed = staged_scratch("signed", &[("commit.gpgSign", "true"), ("gpg.program", "false")]);
         live_hook(&signed.join(".git").join("hooks"), 0);
         let gate = staged_scratch("gate", &[]);
-        let gate_dir = crate::emit::hook_launcher::hooks_dir(&gate).expect("no gate hooks directory");
+        let gate_dir = crate::emit::hook_launcher::hooks_dir(&gate.to_string_lossy()).ok().flatten().expect("no gate hooks directory");
         live_hook(&gate_dir, 1);
         crate::proc::run(
             &programs::GIT,

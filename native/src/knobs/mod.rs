@@ -474,8 +474,10 @@ fn locator(name: &str) -> Option<(Value, Origin)> {
     Some((Value::Scalar(value), origin))
 }
 
+const GATES_DIR_VAR: &str = "GATE_SDK_GATES_DIR";
+
 pub fn gates_dir() -> String {
-    std::env::var("GATE_SDK_GATES_DIR")
+    std::env::var(GATES_DIR_VAR)
         .ok()
         .filter(|v| !v.is_empty())
         .unwrap_or_else(|| GATES_DIR_DEFAULT.to_string())
@@ -502,7 +504,7 @@ struct Layers {
     tracked: Layer,
 }
 
-type CacheKey = (&'static str, String, String, String, String);
+type CacheKey = (&'static str, String, String, String, String, bool);
 type Loaded = Arc<Result<Layers, String>>;
 type Cache = Mutex<Vec<(CacheKey, Loaded)>>;
 
@@ -532,6 +534,7 @@ fn cache_key(kit: &'static Kit) -> CacheKey {
         std::env::var(kit.knob_file_var()).unwrap_or_default(),
         std::env::var(format!("{}CONFIG_FILE", kit.prefix())).unwrap_or_default(),
         std::env::var(kit.local_knob_file_var()).unwrap_or_default(),
+        crate::hook::tree_free(),
     )
 }
 
@@ -556,11 +559,32 @@ fn load(
     local_file: &str,
 ) -> Result<Layers, String> {
     let stem = kit.stem();
+    // spec: gate-sdk/SPEC.md §The knob file — under the tree-free mark a locator opens only where it
+    // is absolute: a default one is skipped unread, a relative one the consumer set is an error
+    let free = crate::hook::tree_free();
+    if free {
+        let set_dir = std::env::var(GATES_DIR_VAR).unwrap_or_default();
+        for (var, value) in [
+            (GATES_DIR_VAR.to_string(), set_dir.as_str()),
+            (kit.knob_file_var(), knob_file),
+            (kit.local_knob_file_var(), local_file),
+        ] {
+            if !value.is_empty() && crate::walk::path_root(value).is_none() {
+                return Err(format!(
+                    "{} is '{}', and a run with no repository takes absolute locators only — set it to an \
+                     absolute path, or unset it",
+                    var, value
+                ));
+            }
+        }
+    }
+    let defaults = !free || crate::walk::path_root(dir).is_some();
+    let read_config = !free || crate::walk::path_root(config_file).is_some();
     for legacy in [
         format!("{}/{}-config.sh", dir, stem),
         format!("{}/{}-config.local.sh", dir, stem),
     ] {
-        if Path::new(&legacy).exists() {
+        if defaults && Path::new(&legacy).exists() {
             return Err(format!(
                 "{} is a shell config, and {}'s knobs are read from a knob file now — rewrite it as \
                  {}/{}-config{}.knobs (`NAME = value`, one `NAME[] = element` line per array \
@@ -573,7 +597,8 @@ fn load(
             ));
         }
     }
-    if !config_file.is_empty()
+    if read_config
+        && !config_file.is_empty()
         && std::fs::metadata(config_file).map(|m| m.len() > 0).unwrap_or(false)
     {
         return Err(format!(
@@ -585,7 +610,11 @@ fn load(
         ));
     }
     let tracked_path = if knob_file.is_empty() {
-        format!("{}/{}-config.knobs", dir, stem)
+        if !defaults {
+            String::new()
+        } else {
+            format!("{}/{}-config.knobs", dir, stem)
+        }
     } else {
         if !Path::new(knob_file).is_file() {
             return Err(format!(
@@ -600,7 +629,11 @@ fn load(
         knob_file.to_string()
     };
     let local_path = if local_file.is_empty() {
-        format!("{}/{}-config.local.knobs", dir, stem)
+        if !defaults {
+            String::new()
+        } else {
+            format!("{}/{}-config.local.knobs", dir, stem)
+        }
     } else {
         if !Path::new(local_file).is_file() {
             return Err(format!(
@@ -633,7 +666,7 @@ pub fn check_seam(file_name: &str, text: &str) -> Result<(), String> {
 }
 
 fn read_layer(kit: &'static Kit, path: &str) -> Result<Layer, String> {
-    if !Path::new(path).is_file() {
+    if path.is_empty() || !Path::new(path).is_file() {
         return Ok(Layer::new());
     }
     let text = std::fs::read_to_string(path).map_err(|e| format!("cannot read {}: {}", path, e))?;

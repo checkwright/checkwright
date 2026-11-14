@@ -190,11 +190,44 @@ fn adopter_usage() {
     println!("\nhttps://checkwright.dev");
 }
 
+// spec: gate-sdk/SPEC.md §The crate's crosser — an argument with no UTF-8 spelling, the start name
+// included, is refused before any arm is chosen, naming its position and escaped bytes; under a git
+// hook's start name the refusal adds the remedies for a clone hooked before this rule
+fn utf8_args(raw: Vec<std::ffi::OsString>) -> Result<Vec<String>, String> {
+    let Some((at, bad)) = raw.iter().enumerate().find(|(_, a)| a.to_str().is_none()) else {
+        return Ok(raw.into_iter().filter_map(|a| a.into_string().ok()).collect());
+    };
+    let start = raw.first().map(std::path::Path::new);
+    let hook = match start.and_then(|s| s.to_str()) {
+        Some(s) => emit::hook_launcher::served(s).is_some() || emit::hook_launcher::forward(s).is_some(),
+        None => start
+            .and_then(std::path::Path::file_name)
+            .and_then(std::ffi::OsStr::to_str)
+            .is_some_and(emit::hook_launcher::git_hook_named),
+    };
+    let mut text = format!(
+        "checkwright-gates: argument {} is '{}', which is not UTF-8, and this binary reads its arguments in UTF-8 alone — nothing ran",
+        at,
+        walk::escaped_os(bad)
+    );
+    if hook {
+        text.push_str("\n  help: git started this binary as a hook; bypass once with 'git commit --no-verify', or unset core.hooksPath at the scope that set it ('git config --show-origin --get core.hooksPath' names it)");
+    }
+    Err(text)
+}
+
 fn main() {
     // spec: gate-sdk/SPEC.md §git-hook — the start name is read ahead of the argument parse: under
     // a served hook's name the process is that hook's launcher and git's operands are not arms, and
     // under any other git hook's name with the chain record beside it a forwarding hook
-    let mut started = std::env::args();
+    let all = match utf8_args(std::env::args_os().collect()) {
+        Ok(a) => a,
+        Err(refusal) => {
+            eprintln!("{}", refusal);
+            exit(2);
+        }
+    };
+    let mut started = all.clone().into_iter();
     let start_name = started.next().unwrap_or_default();
     if let Some(hook) = emit::hook_launcher::served(&start_name) {
         exit(emit::hook_launcher::launch(hook, &start_name, &started.collect::<Vec<String>>()));
@@ -203,7 +236,7 @@ fn main() {
         exit(emit::hook_launcher::forward_run(hook, &start_name, &started.collect::<Vec<String>>()));
     }
 
-    let argv: Vec<String> = normalize(std::env::args().skip(1).collect());
+    let argv: Vec<String> = normalize(all.into_iter().skip(1).collect());
 
     let first = match argv.first() {
         Some(a) => a.as_str(),
