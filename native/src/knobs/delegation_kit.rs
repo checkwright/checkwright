@@ -66,6 +66,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("DELEGATION_KIT_ACCOUNT_CONFIG", ""),
         Row::scalar("DELEGATION_KIT_USAGE_ENDPOINT", "https://api.anthropic.com/api/oauth/usage"),
         Row::derived("DELEGATION_KIT_STOP_LOG", Shape::Scalar, stop_log, &["GATE_SDK_WORKFLOW_DIR"]),
+        Row::scalar("DELEGATION_KIT_STOP_WAIT", "refuse"),
         Row::indexed("DELEGATION_KIT_LIVENESS_CMD", &[]),
         Row::indexed("DELEGATION_KIT_READONLY_TYPES", &[]),
         Row::indexed("DELEGATION_KIT_MUTATING_TYPES", &[]),
@@ -153,6 +154,9 @@ fn validate(v: &Values) -> Vec<String> {
     }
     if let Some(s) = scalar(v, "DELEGATION_KIT_REQUIRE_TIER").filter(|s| !matches!(*s, "on" | "off")) {
         errs.push(format!("DELEGATION_KIT_REQUIRE_TIER must be on|off (got '{}')", s));
+    }
+    if let Some(s) = scalar(v, "DELEGATION_KIT_STOP_WAIT").filter(|s| !matches!(*s, "refuse" | "resume-wait")) {
+        errs.push(format!("DELEGATION_KIT_STOP_WAIT must be refuse|resume-wait (got '{}')", s));
     }
     if scalar(v, "DELEGATION_KIT_AGENT_DIR").is_some_and(str::is_empty) {
         errs.push("DELEGATION_KIT_AGENT_DIR is empty".to_string());
@@ -328,6 +332,28 @@ mod tests {
         for (want, elems) in cases {
             let errs = binding(elems);
             assert!(errs.iter().any(|e| e.contains(want)), "{:?} did not refuse with '{}': {:?}", elems, want, errs);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — the stop-wait set is its two members
+    // spelled exactly, with no off member
+    #[test]
+    fn the_stop_wait_knob_admits_only_its_two_members() {
+        let run = |s: &str| {
+            let mut v: Values = Values::new();
+            v.insert("DELEGATION_KIT_STOP_WAIT", (Value::Scalar(s.to_string()), Origin::Tracked));
+            validate(&v)
+        };
+        assert!(run("refuse").is_empty());
+        assert!(run("resume-wait").is_empty());
+        for bad in ["off", "", "Refuse", "resume_wait"] {
+            let errs = run(bad);
+            assert!(
+                errs.len() == 1 && errs[0].contains("must be refuse|resume-wait"),
+                "'{}' must refuse: {:?}",
+                bad,
+                errs
+            );
         }
     }
 

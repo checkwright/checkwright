@@ -1,6 +1,7 @@
 // spec: guard-kit/SPEC.md §Layout and configuration — what the rules read beside the command: the
 // guard's knobs, resolved in process, and the working tree they are asked about.
 use super::engine::Shell;
+use crate::evidence::{lock_read, LockRead};
 use crate::knobs::{self, Value};
 use crate::{proc, programs, walk};
 use std::cell::OnceCell;
@@ -279,14 +280,12 @@ impl Host {
             let Ok(entries) = walk::list_dir(std::path::Path::new(&d)) else { continue };
             for (n, _) in entries.into_iter().filter(|(n, _)| n.ends_with(".run")) {
                 let rec = format!("{}/{}", d, n);
-                if !std::path::Path::new(&rec).is_file() {
+                let LockRead::Held { pid, run_key, .. } = lock_read(std::path::Path::new(&rec))
+                else {
                     continue;
-                }
-                let Ok(body) = std::fs::read_to_string(&rec) else { continue };
-                let Some((line, _)) = body.split_once('\n') else { continue };
-                let Some((pid, key)) = parse_record(line) else { continue };
-                if matches!(crate::evidence::pid_alive(pid), Ok(true)) {
-                    out.push((rec.clone(), pid.to_string(), key.to_string()));
+                };
+                if matches!(crate::evidence::pid_alive(&pid), Ok(true)) {
+                    out.push((rec, pid, run_key));
                 }
             }
         }
@@ -309,25 +308,6 @@ impl Host {
             let _ = writeln!(f, "{}", line);
         }
     }
-}
-
-// spec: guard-kit/SPEC.md §The generic ruleset — `^pid=([1-9][0-9]*)[[:space:]]run=([^[:space:]]+)$`
-fn parse_record(line: &str) -> Option<(&str, &str)> {
-    let rest = line.strip_prefix("pid=")?;
-    let n = rest.bytes().take_while(u8::is_ascii_digit).count();
-    let (pid, rest) = rest.split_at(n);
-    if pid.is_empty() || pid.starts_with('0') {
-        return None;
-    }
-    let mut chars = rest.chars();
-    if !chars.next().is_some_and(|c| c.is_ascii_whitespace() || c == '\x0b') {
-        return None;
-    }
-    let key = chars.as_str().strip_prefix("run=")?;
-    if key.is_empty() || key.bytes().any(super::text::is_space) {
-        return None;
-    }
-    Some((pid, key))
 }
 
 pub fn under(a: &str, b: &str) -> bool {
@@ -384,15 +364,6 @@ pub fn same_file(a: &str, b: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn a_record_line_parses_only_in_its_one_grammar() {
-        assert_eq!(parse_record("pid=12 run=k"), Some(("12", "k")));
-        assert_eq!(parse_record("pid=012 run=k"), None);
-        assert_eq!(parse_record("pid=12  run=k"), None);
-        assert_eq!(parse_record("pid=12 run=k x"), None);
-        assert_eq!(parse_record("garbage"), None);
-    }
 
     #[test]
     fn containment_is_by_whole_component() {

@@ -26,6 +26,9 @@ DELEGATION_KIT_TIER_MODEL[] = judgment=opus,high
 DELEGATION_KIT_TIER_MODEL[] = mechanical=sonnet,high
 DELEGATION_KIT_TIER_MODEL[] = trivial=haiku,medium
 
+# spec: delegation-kit/SPEC.md §Layout and configuration — the turn-end wait set bound explicitly: this repo's sessions wait in-turn, so a turn end over a live producer refuses
+DELEGATION_KIT_STOP_WAIT = refuse
+
 # spec: delegation-kit/SPEC.md §usage-verdict — sample the footprint per verdict into the gitignored measurement dir; --emit-usage-trend reports the evolution
 DELEGATION_KIT_USAGE_HISTORY = .metric/usage-history.log
 

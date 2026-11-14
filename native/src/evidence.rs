@@ -234,7 +234,11 @@ pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &s
 pub enum LockRead {
     Absent,
     Corrupt,
-    Held { pid: String, run_key: String },
+    Held {
+        pid: String,
+        run_key: String,
+        handoff: Option<String>,
+    },
 }
 
 // spec: evidence-kit/SPEC.md §The producer-liveness lock — the record is one newline-terminated
@@ -250,13 +254,17 @@ pub fn lock_read(path: &std::path::Path) -> LockRead {
         return LockRead::Corrupt;
     };
     match parse_lock_line(&bytes[..nl]) {
-        Some((pid, run_key)) => LockRead::Held { pid, run_key },
+        Some((pid, run_key, handoff)) => LockRead::Held {
+            pid,
+            run_key,
+            handoff,
+        },
         None => LockRead::Corrupt,
     }
 }
 
 // spec: evidence-kit/SPEC.md §The producer-liveness lock — the record grammar, matched whole
-fn parse_lock_line(line: &[u8]) -> Option<(String, String)> {
+fn parse_lock_line(line: &[u8]) -> Option<(String, String, Option<String>)> {
     let rest = line.strip_prefix(b"pid=")?;
     let digits = rest
         .iter()
@@ -270,14 +278,30 @@ fn parse_lock_line(line: &[u8]) -> Option<(String, String)> {
     if !is_posix_space(sep) {
         return None;
     }
-    let key = rest[1..].strip_prefix(b"run=")?;
-    if key.is_empty() || key.iter().any(|b| is_posix_space(*b)) {
+    let rest = rest[1..].strip_prefix(b"run=")?;
+    let n = rest.iter().take_while(|b| !is_posix_space(**b)).count();
+    if n == 0 {
         return None;
     }
+    let (key, rest) = rest.split_at(n);
+    let handoff = match rest.split_first() {
+        None => None,
+        Some((_, field)) => Some(parse_handoff(field.strip_prefix(b"handoff=")?)?),
+    };
     Some((
         String::from_utf8_lossy(pid).into_owned(),
         String::from_utf8_lossy(key).into_owned(),
+        handoff,
     ))
+}
+
+// spec: evidence-kit/SPEC.md §The producer-liveness lock — the optional third field's value
+fn parse_handoff(path: &[u8]) -> Option<String> {
+    if path.is_empty() || path.iter().any(|b| is_posix_space(*b)) {
+        return None;
+    }
+    let path = std::str::from_utf8(path).ok()?;
+    crate::walk::path_root(path).map(|_| path.to_string())
 }
 
 fn is_posix_space(b: u8) -> bool {
@@ -442,6 +466,44 @@ mod tests {
         assert!(diff(base, "s", "a pass\n", "s a\n").new_failure);
         assert!(diff(base, "s", "a pass\n", "s a").new_failure);
         assert!(diff(base, "s", "a pass\nb fail", "").new_failure);
+    }
+
+    #[cfg(unix)]
+    const ABS: &str = "/x/h";
+    #[cfg(windows)]
+    const ABS: &str = "C:\\x\\h";
+
+    // spec: evidence-kit/SPEC.md §The producer-liveness lock — the record grammar, the optional
+    // handoff field in its one place and form, and every other shape no record
+    #[test]
+    fn a_record_line_parses_only_in_its_one_grammar() {
+        let parse = |s: &str| parse_lock_line(s.as_bytes());
+        let held = |k: &str, h: Option<&str>| Some(("12".into(), k.into(), h.map(String::from)));
+        assert_eq!(parse("pid=12 run=k"), held("k", None));
+        assert_eq!(parse("pid=12\trun=k"), held("k", None));
+        assert_eq!(parse(&format!("pid=12 run=k handoff={}", ABS)), held("k", Some(ABS)));
+        assert_eq!(parse(&format!("pid=12 run=k\thandoff={}", ABS)), held("k", Some(ABS)));
+        for bad in [
+            "pid=012 run=k".to_string(),
+            "pid=12  run=k".into(),
+            "pid=12 run=k x".into(),
+            "pid=12 run=k ".into(),
+            "garbage".into(),
+            "pid=12 run=k handoff=".into(),
+            "pid=12 run=k handoff=rel/h".into(),
+            format!("pid=12 run=k  handoff={}", ABS),
+            format!("pid=12 run=k handoff={} ", ABS),
+            format!("pid=12 run=k handoff={} handoff={}", ABS, ABS),
+            format!("pid=12 handoff={} run=k", ABS),
+            format!("pid=12 run=k run=k handoff={}", ABS),
+            format!("pid=12 run=k owner={}", ABS),
+        ] {
+            assert_eq!(parse(&bad), None, "the record grammar admitted {:?}", bad);
+        }
+        let mut raw = b"pid=12 run=k handoff=".to_vec();
+        raw.extend_from_slice(ABS.as_bytes());
+        raw.push(0xff);
+        assert_eq!(parse_lock_line(&raw), None, "a non-UTF-8 handoff path parsed");
     }
 
     // spec: evidence-kit/SPEC.md §The producer-liveness lock — the native leg answers the Windows

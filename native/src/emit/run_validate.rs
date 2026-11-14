@@ -269,7 +269,7 @@ fn claim(cfg: &Cfg, key: &str) -> Result<Claimed, Refusal> {
         match evidence::lock_read(Path::new(&cfg.lock)) {
             LockRead::Corrupt => {
                 return Err(refuse(format!(
-                    "the lock {} carries no readable 'pid=<n> run=<key>' record — refusing to \
+                    "the lock {} carries no readable 'pid=<n> run=<key>[ handoff=<path>]' record — refusing to \
                      start; delete it if no producer is running",
                     cfg.lock
                 )))
@@ -277,6 +277,7 @@ fn claim(cfg: &Cfg, key: &str) -> Result<Claimed, Refusal> {
             LockRead::Held {
                 pid: holder,
                 run_key,
+                ..
             } => match evidence::pid_alive(&holder) {
                 Ok(true) => {
                     return Err(refuse(format!(

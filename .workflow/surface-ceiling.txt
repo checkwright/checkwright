@@ -22,7 +22,7 @@
 29066cp companion/SPEC.md
 118460cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-259941cp delegation-kit/SPEC.md
+270325cp delegation-kit/SPEC.md
 40545cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 3468cp docs/agent-index.md
@@ -99,13 +99,13 @@
 146124cp drift-kit/SPEC.md
 2698cp drift-kit/templates/close-knowledge.md
 4680cp drift-kit/templates/economics.md
-85219cp evidence-kit/SPEC.md
+86089cp evidence-kit/SPEC.md
 1063376cp gate-sdk/SPEC.md
 3130cp gate-sdk/templates/adopt.md
-355499cp guard-kit/SPEC.md
+355765cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
 314170cp installer/SPEC.md
-398026cp lifecycle-kit/SPEC.md
+398071cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1902cp lifecycle-kit/templates/frames/stage-contract-sweep.md

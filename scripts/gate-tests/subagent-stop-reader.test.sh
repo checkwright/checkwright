@@ -36,7 +36,7 @@ fire() {
     local name="$1" rundir="$2" want_rc="$3" log rc
     shift 3
     log="$tmp/$name.log"
-    printf '%s' "$PAYLOAD" | env "$@" DELEGATION_KIT_STOP_LOG="$log" GATE_SDK_TMP_DIR="$rundir" \
+    printf '%s' "${payload:-$PAYLOAD}" | env "$@" DELEGATION_KIT_STOP_LOG="$log" GATE_SDK_TMP_DIR="$rundir" \
         "${HOOK_CMD[@]}" >/dev/null 2>"$tmp/$name.err"
     rc=$?
     [[ "$rc" -eq "$want_rc" ]] || { echo "  FAIL: $name exited $rc, want $want_rc"; fails=$((fails + 1)); }
@@ -58,7 +58,7 @@ cd "$ROOT" || { echo "  FAIL: cannot reach the repo root"; exit 1; }
 #     against by name — and under enforcement it would also silently allow every turn end.
 empty="$tmp/empty"; mkdir -p "$empty"
 line="$(fire clean "$empty" 0)"
-want clean "$line" "verdict=green" "live=no" "records=0" "runs=-" "decision=allow"
+want clean "$line" "verdict=green" "live=no" "records=0" "runs=-" "wait=refuse" "decision=allow"
 
 # B — one record naming a PID that is always alive: the reader reaches the gate's own liveness
 #     predicate rather than merely resolving, so a reader that resolved and answered nothing
@@ -67,7 +67,7 @@ want clean "$line" "verdict=green" "live=no" "records=0" "runs=-" "decision=allo
 live="$tmp/live"; mkdir -p "$live"
 printf 'pid=1 run=k\n' >"$live/k.run"
 line="$(fire live "$live" 2)"
-want live "$line" "verdict=red" "live=yes" "records=1" "runs=k" "decision=refuse"
+want live "$line" "verdict=red" "live=yes" "records=1" "runs=k" "wait=refuse" "decision=refuse"
 want live-message "$(cat "$tmp/live.err")" "turn-end refused" "delete the record once the producer has exited" "runs=k" \
     "check-producer-liveness $live"
 
@@ -116,9 +116,33 @@ line="$(fire main-checkout .tmp 2)"
 want main-checkout "$line" "verdict=red" "records=1" "runs=iso" "decision=refuse"
 cd "$ROOT" || { echo "  FAIL: cannot reach the repo root"; exit 1; }
 
+# E — under resume-wait, a record carrying `handoff=` is read by the real reader as `red`, not
+#     `corrupt`, and a non-empty handoff file is a declared hand-back over a live producer: refused.
+marked="$tmp/marked"; mkdir -p "$marked"
+printf 'report\n' >"$tmp/handoff"
+printf 'pid=1 run=k handoff=%s\n' "$tmp/handoff" >"$marked/k.run"
+line="$(fire marked "$marked" 2 DELEGATION_KIT_STOP_WAIT=resume-wait)"
+want marked "$line" "verdict=red" "live=yes" "records=1" "wait=resume-wait" "decision=refuse"
+want marked-message "$(cat "$tmp/marked.err")" "declares a hand-back" "delete a record whose producer has exited"
+
+# F — the same record with its handoff file emptied, beside an own running shell task the
+#     transcript shows: the own task is the completion path, so the turn end is allowed.
+: >"$tmp/handoff"
+printf '{"toolUseResult":{"backgroundTaskId":"t1"}}\n' >"$tmp/agent.jsonl"
+payload="{\"session_id\":\"s-1\",\"hook_event_name\":\"SubagentStop\",\"agent_transcript_path\":\"$tmp/agent.jsonl\",\"background_tasks\":[{\"id\":\"t1\",\"type\":\"shell\",\"status\":\"running\"}]}"
+line="$(fire resumed "$marked" 0 DELEGATION_KIT_STOP_WAIT=resume-wait)"
+want resumed "$line" "verdict=red" "records=1" "wait=resume-wait" "decision=allow"
+unset payload
+
+# G — a malformed wait member declines: the turn end goes unguarded, no record is written, and the
+#     operator notice names the knob.
+line="$(fire bad-wait "$marked" 0 DELEGATION_KIT_STOP_WAIT=Refuse)"
+[[ -z "$line" ]] || { echo "  FAIL: a malformed wait member still wrote a record: $line"; fails=$((fails + 1)); }
+want bad-wait-message "$(cat "$tmp/bad-wait.err")" "DELEGATION_KIT_STOP_WAIT"
+
 if [[ "$fails" -gt 0 ]]; then
     echo "subagent-stop-reader.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "subagent-stop-reader.test: ok (the resolved reader answers and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason naming the argv the hook spawned, an absent dispatch binary declining open with no record, an override that produces no reading unresolved and refused rather than reported unavailable, a firing from a linked worktree reading the main checkout record set)"
+echo "subagent-stop-reader.test: ok (the resolved reader answers and its verdict reaches the exit: clean scratch dir green and allowed, live producer red and refused with a reason naming the argv the hook spawned, an absent dispatch binary declining open with no record, an override that produces no reading unresolved and refused rather than reported unavailable, a firing from a linked worktree reading the main checkout record set, a handoff-bearing record read red and refused under resume-wait, the same record emptied beside an own task allowed, a malformed wait member declining)"
 exit 0

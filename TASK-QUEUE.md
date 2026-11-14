@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: [liveness-hook-false-refusals](#liveness-hook-false-refusals), [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), [hook-observe-mode](#hook-observe-mode), [hook-only-user-install](#hook-only-user-install), [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) in the no-repo run's batch, [installer-crate-test-gaps](#installer-crate-test-gaps) in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by [hook-only-user-install](#hook-only-user-install), which goes first; [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) reshaped by [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), one batch.
+  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), [hook-observe-mode](#hook-observe-mode), [hook-only-user-install](#hook-only-user-install), [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) in the no-repo run's batch, [installer-crate-test-gaps](#installer-crate-test-gaps) in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by [hook-only-user-install](#hook-only-user-install), which goes first; [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) reshaped by [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), one batch.
 
   **Adopter target (lead decision 2026-11-14, operator-delegated):** an adopter running its own work engine is served the checks and the session hooks only, with no lifecycle or queue read adapter, its evidence seam [gate-run-attestation-predicate](#gate-run-attestation-predicate); the absorb candidates rank below the adopter's asks, false refusals first.
 
@@ -15,18 +15,6 @@
 ---
 
 ## New Features
-
-### liveness-hook-false-refusals
-
-[spec: delegation-kit/SPEC-resume-wait.md]
-
-`subagent-stop-liveness` refuses turn ends a consumer's harness treats as legitimate, three ways (delegation-kit/SPEC.md §The turn-end liveness hook). An absent or unreadable agent transcript counts every running shell task as the agent's own, so a sibling's task refuses it; read from the code, not observed. An agent that writes a handoff file and ends before a long wait is refused. And a harness that re-invokes a sub-agent when its own background task completes makes a plain turn end with that task live its supported wait: an adopter's log-only run refused 14 of 24 firings, each such a wait, none a true positive. No payload key tells a final hand-back from a stop the harness will resume, so only a marker the agent declares can.
-
-**Direction (operator direction 2026-11-14, lead-relayed, not a ruling, against scope's recommendation to keep the rule):** the waiting rule becomes a policy-as-choice set, today's refusal its default. A `resume-wait` member allows a plain turn end while the agent's own task is live, and still refuses when the declared hand-back marker is present and the stop is the hand-back, or when the live task has no completion path. Its honest limit, stated in the SPEC: an undeclared hand-back with its work still running passes. The marker is a launch-record field `handoff=<path>`, read at stop time as a file that exists and is non-empty; the adopter writes no handoff without a record. The waiting rule in §The delegation model and the hook section's narrowing and resumed-harness paragraphs are amended to it.
-
-**Deliverable:** a feature: the set, its knob and default, the marker field and its read, the unreadable-transcript branch reviewed, fixtures per member. Weigh latency beside it: the adopter measured p50 76 ms and p95 182 ms against a 100 ms budget.
-
-**Cost while deferred:** on such a harness the arm cannot be enforced without refusing every supported wait, so an adopter keeps it log-only. Surfaced 2026-11-14 by a production adopter's handoff (asks 9a and 4, and an observe-mode finding), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `resume-wait`, `declared handoff`, `unreadable transcript` in this file and the disposed-findings record, none; the icebox's [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait) is the opposite misuse. Owner delegation-kit/SPEC.md §The turn-end liveness hook.
 
 ### liveness-hook-no-repo-run
 
@@ -1055,4 +1043,6 @@ The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened t
 Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs alone (skill load, Cursor's Bash-to-Shell hook mapping, Muse's hook payload) until a machine carrying either CLI turns them from read to run, and no build machine carries one.
 
 ## Done
+
+- liveness-hook-false-refusals
 

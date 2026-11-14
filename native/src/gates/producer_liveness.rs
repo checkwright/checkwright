@@ -30,7 +30,7 @@ fn verdict(path: &std::path::Path) -> Result<Verdict, PidProbe> {
     match evidence::lock_read(path) {
         LockRead::Corrupt => Ok(Verdict::Corrupt),
         LockRead::Absent => Ok(Verdict::Free),
-        LockRead::Held { pid, run_key } => {
+        LockRead::Held { pid, run_key, .. } => {
             match evidence::pid_held_through(&pid)? {
                 Some(leg) => Ok(Verdict::Live { pid, run_key, leg }),
                 None => Ok(Verdict::Dead { pid, run_key }),
@@ -99,7 +99,7 @@ fn set_mode(lock: &str) -> i32 {
     if !corrupt.is_empty() {
         for rec in &corrupt {
             eprintln!(
-                "{}: {} carries no readable 'pid=<n> run=<key>' record",
+                "{}: {} carries no readable 'pid=<n> run=<key>[ handoff=<path>]' record",
                 NAME, rec
             );
         }
@@ -136,7 +136,7 @@ fn path_mode(lock: &str) -> i32 {
         Err(e) => probe_failed(e),
         Ok(Verdict::Corrupt) => {
             eprintln!(
-                "{}: {} carries no readable 'pid=<n> run=<key>' record",
+                "{}: {} carries no readable 'pid=<n> run=<key>[ handoff=<path>]' record",
                 NAME, lock
             );
             2
@@ -226,7 +226,18 @@ mod tests {
             ("empty-run-key", "pid=1234 run=\n", false),
             ("trailing-space", "pid=1234 run=alpha \n", false),
             ("carriage-return", "pid=1234 run=alpha\r\n", false),
+            ("handoff-relative", "pid=1234 run=alpha handoff=h\n", false),
+            ("handoff-empty", "pid=1234 run=alpha handoff=\n", false),
         ];
+        let abs = d.join("h");
+        let abs = abs.to_str().expect("the scratch dir is not UTF-8");
+        let handoff = format!("pid=1234 run=alpha handoff={}\n", abs);
+        let unterminated = format!("pid=1234 run=alpha handoff={}", abs);
+        let owned: Vec<(&str, &str, bool)> = vec![
+            ("handoff-absolute", handoff.as_str(), true),
+            ("handoff-unterminated", unterminated.as_str(), false),
+        ];
+        let cases: Vec<&(&str, &str, bool)> = cases.iter().chain(owned.iter()).collect();
         for (name, body, wellformed) in cases {
             let p = d.join(name);
             std::fs::write(&p, body).expect("cannot write the case");

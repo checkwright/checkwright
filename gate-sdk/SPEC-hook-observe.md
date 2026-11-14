@@ -72,7 +72,7 @@ The envelopes are read through `native/src/hook/binding.rs`, the one copy that b
 
 delegation-kit/SPEC.md §The turn-end liveness hook's "**There is no knob, and unwiring the hook is the valve.**" is re-phrased. What it protects stays: no knob turns a refusal off for a dispatch, and no per-dispatch override exists. The line names the two consumer-side levers, each a registration or configuration choice that binds every turn end alike: the wait set (`DELEGATION_KIT_STOP_WAIT`), and the `--observe` registration, a trial that enforces nothing until it is removed. Unwiring stays the valve that removes the hook. The act depends on whether `liveness-hook-false-refusals` lands in the same build batch. Each **Not yet applied.**
 
-- **With it in the batch:** this delta writes the observe half into the line that entry's amendment re-phrases (delegation-kit/SPEC-resume-wait.md delta 8), so the line lands once, naming both levers.
+- **With it in the batch:** this delta writes the observe half into the line that entry re-phrased, merged as delegation-kit/SPEC.md §The turn-end liveness hook's "**No knob turns the refusal off, and unwiring the hook is the valve.**", which names the wait set; so the line lands once, naming both levers.
 - **Without it:** the line names `--observe` alone beside unwiring. That entry's later landing adds the wait set.
 
 §The delegation model's D1 paragraph, "the valve is **unwiring the hook**, never a knob", gains one clause: a registration under `--observe` is a trial of the whole guard, not an override of one dispatch, so it is not the honour system the paragraph refuses. delegation-kit/README.md step 6's "There is no knob: unwiring is the valve" is re-phrased as the line is, naming `--observe` and the log's knob.

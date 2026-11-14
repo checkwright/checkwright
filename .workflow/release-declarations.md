@@ -1,7 +1,12 @@
 # contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's declaration-bearing sections in the note's grammar, Platforms excepted since composition derives it, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
 
+## Knob changes
+
+- `DELEGATION_KIT_STOP_WAIT` — new: the turn-end hook's waiting policy, `refuse` or `resume-wait`, defaulting to `refuse`, which is the hook's behavior unchanged. Any other value fails the knob table at exit 2 and makes the hook decline with an operator notice. Nothing to do; bind `resume-wait` only where your harness gives a session a new turn when its own background task completes.
+
 ## Behavior changes
 
+- **`subagent-stop-liveness`** — under `DELEGATION_KIT_STOP_WAIT=resume-wait`, allows a turn end over a live producer while a running shell task of the session's own will resume it, and refuses one whose launch record declares a hand-back. The launch record takes an optional third field, `handoff=<path>`, which `check-producer-liveness` and the shell guard read as the same live producer where they read such a record as corrupt or skipped it. Its log line gains a `wait=` field before `decision=`. Nothing to do under the default.
 - **`--install-hooks`** — refuses at exit 2, placing nothing, a `core.hooksPath` that is not UTF-8 at the effective or the local scope, or a set value whose prior hooks directory resolves to a path that is not UTF-8, as through a link, where it chained that directory as one holding no hook and advised a restore line naming another value. It also keeps a line break the value ends in, so the line-break refusal now meets it, where it trimmed the break and chained a different directory. Rename the directory or respell the value, then re-run.
 - **`--emit env-probe`** — refuses at exit 2 a profile file whose markers do not pair around an unchanged block, where it reported `unchanged` at exit 0; the file is untouched either way. Repair the markers, then re-run.
 - **`init`, `update` and `uninstall`** — refuse at exit 1 before any write where git has no identity to commit with, the author or the committer, where they wrote and staged everything first and left git's failed commit as the only account. A run that would commit nothing refuses too, and `--no-commit`, a personal install and `--dry-run` waive the check. Set `user.name` and `user.email`, or pass `--no-commit` and commit yourself.

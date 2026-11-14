@@ -103,6 +103,16 @@ if ! grep -qF "validate-batch" "$tmp/err" || ! grep -qF "$live" "$tmp/err"; then
     fails=$((fails + 1))
 fi
 
+# --- a live record carrying the optional `handoff=` field is the same live producer: it parses
+#     through the one grammar, so the guard blocks on it rather than skipping it
+rm -f "$tmp/scratch/validate-batch.run"
+printf 'pid=%s run=handoff-batch handoff=%s/handoff\n' "$live" "$tmp" >"$tmp/scratch/handoff-batch.run"
+want "handoff-record-commit" "git commit -m done" 2
+checks=$((checks + 1))
+grep -qF "handoff-batch" "$tmp/err" || { echo "  FAIL [handoff-names-the-run]: $(cat "$tmp/err")"; fails=$((fails + 1)); }
+rm -f "$tmp/scratch/handoff-batch.run"
+printf 'pid=%s run=validate-batch\n' "$live" >"$tmp/scratch/validate-batch.run"
+
 # --- a PowerShell call meets the rule too: git's argv and the record are the same
 #     under both tools, and its expansion decline is the PowerShell reader's any `$`
 want "powershell-commit"    "git commit -m done" 2 "" PowerShell
@@ -188,5 +198,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "git-mutation-under-producer.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record on a Bash or a PowerShell call however git and its subcommand are spelled, read-only git and every conservative direction decline, rule \`bounded_write\` withholds a removal of a live record, and rule \`wait_no_producer\` blocks a backgrounded file-test wait, bare or behind a banner, until a record names a live pid)"
+echo "git-mutation-under-producer.test: ok ($checks assertions; the write set blocks under a live record, a handoff-bearing one included, on a Bash or a PowerShell call however git and its subcommand are spelled, read-only git and every conservative direction decline, rule \`bounded_write\` withholds a removal of a live record, and rule \`wait_no_producer\` blocks a backgrounded file-test wait, bare or behind a banner, until a record names a live pid)"
 exit 0

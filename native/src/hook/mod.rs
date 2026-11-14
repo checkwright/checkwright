@@ -71,6 +71,7 @@ pub const HOOKS: &[(&str, HookFn, &[&str], &str)] = &[
         |p| stop_liveness::run(p.value()),
         &[
             "DELEGATION_KIT_STOP_LOG",
+            "DELEGATION_KIT_STOP_WAIT",
             "DELEGATION_KIT_LIVENESS_CMD",
             "GATE_SDK_TMP_DIR",
         ],
