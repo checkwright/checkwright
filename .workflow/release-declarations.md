@@ -6,11 +6,15 @@
 - `check-settings-paths` — reds a hook registration whose `--knobs` names a relative path, which it read as clean before; the arm declines such a registration on every firing. Write the file's absolute path.
 - `check-hook-knobs-fresh` — new, off until `GATE_SDK_HOOK_PAGES_DIR` is set: holds each hook-arm page's knob block to its member's knob table, and reds a page naming no member and a tree-free member with no page. Nothing to do unless you publish a page per hook arm; register it with the knob, then run `--emit hook-knobs --write`.
 - `check-gate-substrate-parity` — assertion I reds on `check-hook-knobs-fresh`, a new gate-sdk gate the binary carries, until your `gates.list` registers it or declares `# unregistered: check-hook-knobs-fresh — <reason>`. It reads clean while `GATE_SDK_HOOK_PAGES_DIR` is empty, so register it.
+- `check-docs-since` — new, off until `SITE_KIT_SINCE_PAGES` is set: holds each declared page to a `since:` front-matter key, `unreleased` or `vX.Y.Z`. With `SITE_KIT_RELEASE_NOTES_DIR` set, it also reds a page saying `unreleased` while a release note is untagged. Nothing to do unless your pages state a release status; register it with the knobs, then run `--emit docs-since --write` in each note-authoring commit.
+- `check-gate-substrate-parity` — assertion I reds on `check-docs-since`, a new site-kit gate the binary carries, until your `gates.list` registers it or declares `# unregistered: check-docs-since — <reason>`. It reads clean while `SITE_KIT_SINCE_PAGES` is empty, so register it.
 
 ## Knob changes
 
 - `GATE_SDK_HOOK_OBSERVE_LOG` — new: the log an observed hook appends its would-be decision to, default `<GATE_SDK_TMP_DIR>/hook-observe.log`. Nothing to do unless you register a hook under `--observe`; outside any repository, set it absolute.
 - `GATE_SDK_HOOK_PAGES_DIR` — new: a word list of the directories whose hook-arm pages `--emit hook-knobs` writes and `check-hook-knobs-fresh` holds, default empty, which governs no page. Nothing to do unless you publish a page per hook arm.
+- `SITE_KIT_SINCE_PAGES` — new: the page globs `check-docs-since` and `--emit docs-since` govern, default empty, which governs no page. Nothing to do unless your pages state a release status.
+- `SITE_KIT_RELEASE_NOTES_DIR` — new: the directory of release notes the `since:` note rule and its rewrite read for the untagged note, default empty, which turns both off. Nothing to do unless you set `SITE_KIT_SINCE_PAGES`.
 - `DELEGATION_KIT_STOP_WAIT` — new: the turn-end hook's waiting policy, `refuse` or `resume-wait`, defaulting to `refuse`, which is the hook's behavior unchanged. Any other value fails the knob table at exit 2 and makes the hook decline with an operator notice. Nothing to do; bind `resume-wait` only where your harness gives a session a new turn when its own background task completes.
 
 ## Behavior changes

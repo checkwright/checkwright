@@ -66,6 +66,7 @@ pub mod queue_verbs;
 pub mod reads_census;
 pub mod release_table;
 pub mod hook_knobs;
+pub mod docs_since;
 pub mod rewrite;
 pub mod scan_prompts;
 pub mod selection_probe;
@@ -346,6 +347,18 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-hook-knobs",
         Arm::Emit(hook_knobs::emit, Grammar::Flags(&["--write"])),
         &[hook_knobs::PAGES_KNOB],
+    ),
+    // spec: site-kit/SPEC.md §check-docs-since — the release note's commit writes the untagged
+    // note's version over every governed page saying `unreleased`
+    (
+        "--emit-docs-since",
+        Arm::Emit(docs_since::emit, Grammar::Flags(&["--write"])),
+        &[
+            docs_since::PAGES_KNOB,
+            docs_since::NOTES_KNOB,
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+        ],
     ),
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
     // tracked tree rather than enumerated, so the configured values are the blob ref, the mirror

@@ -4,7 +4,7 @@ use crate::declaration;
 use crate::declaration::{SectionVerdict, TokenRule};
 use crate::gates::install_docs;
 use crate::gates::install_platforms::{declarations, platforms_page, Decl, State};
-use crate::gates::release_bump::{front_matter_release, parse_version, read_text, Version};
+use crate::gates::release_bump::{self, parse_version, read_text, Version};
 use crate::release_sections::{self, Role, Section};
 use crate::{proc, programs};
 use crate::walk;
@@ -165,23 +165,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("posts dir not found: {}", posts));
     }
 
-    // spec: gate-sdk/SPEC.md §lib/declaration.sh — the note set is the posts dir filtered by the
-    // `release:` key; the tag probe's non-zero status is the *no such tag* verdict rather than a
-    // failure, so it is read through the exit code (§Fail-closed contract).
-    let mut untagged: Vec<(String, String)> = Vec::new();
-    for f in walk::glob_files(Path::new(posts), &["*.md".to_string()])? {
-        let path = f.display().to_string();
-        let text = read_text(&path)?;
-        let v = match front_matter_release(&text) {
-            Some(v) if !v.is_empty() => v,
-            _ => continue,
-        };
-        let tag = format!("refs/tags/{}", v);
-        if proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0) {
-            untagged.push((v, path));
-        }
-    }
-
+    let untagged = release_bump::untagged_notes(Path::new(posts))?;
     if untagged.len() > 1 {
         eprintln!("{}: {} carries more than one untagged release note, a state the release choreography does not admit:", NAME, posts);
         for (v, f) in &untagged {

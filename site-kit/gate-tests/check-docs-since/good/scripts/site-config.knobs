@@ -1,0 +1,3 @@
+# spec: site-kit/SPEC.md §check-docs-since — fixture consumer config: the pages under site/ are governed, and notes/ holds no untagged note
+SITE_KIT_SINCE_PAGES[] = site/*.md
+SITE_KIT_RELEASE_NOTES_DIR = notes

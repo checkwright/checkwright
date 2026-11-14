@@ -57,6 +57,7 @@ pub mod docs_kit_parity;
 pub mod docs_mirror_fresh;
 pub mod docs_collapsible;
 pub mod docs_render_fidelity;
+pub mod docs_since;
 pub mod docs_nav_reachable;
 pub mod enforcement_fresh;
 pub mod evidence_baseline;
@@ -1669,7 +1670,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-declaration-parity",
         release_declaration_parity::run,
-        &[("?", "", "", "dynamic@src/gates/release_declaration_parity.rs:172")],
+        &[("?", "", "", "dynamic@src/gates/release_bump.rs:357 via gates::release_bump::untagged_notes")],
         &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES", "GATE_LOCAL_INSTALL_DOCS"],
         "-",
         &[("git", "")],
@@ -2491,6 +2492,23 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "site-kit",
         &[("git", ""), ("?", "SITE_KIT_LIQUID_PARSER")],
+    ),
+    (
+        "check-docs-since",
+        docs_since::run,
+        &[
+            (".", "glob:knob:SITE_KIT_SINCE_PAGES", "", ""),
+            ("?", "", "", "dynamic@src/gates/release_bump.rs:357 via emit::docs_since::note"),
+        ],
+        &[
+            "SITE_KIT_SINCE_PAGES",
+            "SITE_KIT_RELEASE_NOTES_DIR",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_NATIVE_BIN",
+        ],
+        "site-kit",
+        &[("git", "")],
     ),
     (
         "check-identity",

@@ -12,6 +12,8 @@ Deployment-truth governance for a docs site served from the repo (GitHub Pages a
 
 `check-docs-highlight-coverage` holds a layout that restyles code highlighting to the theme it restyles: every token class a tracked snapshot says the theme colours must have an override rule, or it keeps the theme's colour — black on a dark code background, for one. It is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS` names the snapshot.
 
+`check-docs-since` holds the pages you declare to a `since:` front-matter key, `unreleased` or the first release that carries what the page says, so a reader can tell a page about master from one about a release. While a release note is untagged it reds every page still saying `unreleased`, and `--emit docs-since --write` writes the note's version in the note's commit. It is disarmed until `SITE_KIT_SINCE_PAGES` names pages, and its note rule is off until `SITE_KIT_RELEASE_NOTES_DIR` names your notes.
+
 The template — `templates/site-health.yml` — is a scheduled probe of the live site (apex/www/http HTTPS, redirects, certificate expiry, release-body note pointers, and theme highlight-class drift against that snapshot). It verifies a *deployment*, not a tree, so it ships as a workflow a consumer copies, never a gate: the line is where the asserted object lives, and none of what it asserts is in any checkout. See [SPEC.md](SPEC.md#the-monitor-boundary) for why that boundary is load-bearing.
 
 This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload).
@@ -29,6 +31,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    check-docs-render-fidelity
    check-docs-collapsible
    check-docs-liquid-parse
+   check-docs-since
    ```
    <!-- gate-roster:end -->
 

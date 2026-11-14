@@ -349,6 +349,26 @@ fn table_findings(
     out
 }
 
+// spec: gate-sdk/SPEC.md §lib/declaration.sh — the untagged notes: each note in the posts dir whose
+// `release:` version has no tag, as (version, path). The tag probe's non-zero status is the *no
+// such tag* verdict rather than a failure, so it is read through the exit code (§Fail-closed
+pub fn untagged_notes(posts: &Path) -> Result<Vec<(String, String)>, String> {
+    let mut untagged: Vec<(String, String)> = Vec::new();
+    for f in walk::glob_files(posts, &["*.md".to_string()])? {
+        let path = f.display().to_string();
+        let text = read_text(&path)?;
+        let v = match front_matter_release(&text) {
+            Some(v) if !v.is_empty() => v,
+            _ => continue,
+        };
+        let tag = format!("refs/tags/{}", v);
+        if proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0) {
+            untagged.push((v, path));
+        }
+    }
+    Ok(untagged)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

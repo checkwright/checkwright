@@ -9,3 +9,7 @@ SITE_KIT_ALIASES[] = checkwright.github.io
 
 # spec: site-kit/SPEC.md §check-docs-highlight-coverage — this repo's snapshot of the classes the Pages theme's highlight CSS colours, which the site-health theme-drift arm holds to the live stylesheet
 SITE_KIT_HIGHLIGHT_TOKENS = scripts/highlight-tokens.list
+
+# spec: site-kit/SPEC.md §check-docs-since — the hook pages are the governed set, and the notes are the posts this repo's release gates read
+SITE_KIT_SINCE_PAGES[] = docs/hooks/*.md
+SITE_KIT_RELEASE_NOTES_DIR = docs/posts

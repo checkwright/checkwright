@@ -158,6 +158,11 @@
     .site-content .markdown-body .highlight .gd { color: var(--ck-tok-kw); background: transparent; }
     .site-content .markdown-body .highlight .gi { color: var(--ck-tok-name); background: transparent; }
     .site-content .markdown-body .highlight .ge { color: inherit; }
+    .site-content .markdown-body .since-banner { margin: 0 0 1rem; padding: 0.5rem 0.75rem;
+      border-left: 4px solid var(--ck-border); background: var(--ck-sidebar);
+      color: var(--ck-muted); font-size: 0.9rem; }
+    .site-content .markdown-body .since-unreleased { border-left-color: var(--ck-accent);
+      color: var(--ck-fg); }
     .site-footer { border-top: 1px solid var(--ck-border); color: var(--ck-muted);
       padding: 1.5rem 2rem; max-width: 1180px; margin: 0 auto; font-size: 0.85rem; }
     .site-footer a { color: var(--ck-muted); }
@@ -192,6 +197,11 @@
     </aside>
     <main class="site-content">
       <article class="markdown-body">
+        {%- if page.since == "unreleased" %}
+        <p class="since-banner since-unreleased" role="note"><strong>Unreleased.</strong> This page describes behavior on master that no published release carries yet; the <a href="{{ '/releases.html' | relative_url }}">releases page</a> lists what each release does carry.</p>
+        {%- elsif page.since %}
+        <p class="since-banner" role="note">Since {{ page.since }}: the first release that carries what this page describes (<a href="{{ '/releases.html' | relative_url }}">releases</a>).</p>
+        {%- endif %}
         {{ content }}
       </article>
     </main>

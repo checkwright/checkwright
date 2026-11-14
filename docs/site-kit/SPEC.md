@@ -25,6 +25,7 @@ The kit is vendored beside gate-sdk (conventionally at `site-kit/`). Its gates r
 - `check-docs-render-fidelity` and `check-docs-collapsible` — where a docs site built by the Pages parser exists.
 - `check-docs-liquid-parse` — where a docs site is built by Jekyll; a consumer whose host runs no Liquid omits it.
 - `check-docs-highlight-coverage` — anywhere. It is disarmed until `SITE_KIT_HIGHLIGHT_TOKENS` names a snapshot, and a site whose layout restyles code highlighting arms it.
+- `check-docs-since` — anywhere. It is disarmed until `SITE_KIT_SINCE_PAGES` names pages, and a site whose pages must say which release carries what they describe arms it.
 
 Config is a **knob file**: write a `site-config.knobs` in the gates dir, or point `SITE_KIT_KNOB_FILE` elsewhere, setting any knob [§Knob defaults](#knob-defaults) lists. Defaults fill what the file leaves unset. [gate-sdk/SPEC.md §The knob file](../gate-sdk/SPEC.md#the-knob-file) owns the grammar, the `.local` overlay, the environment-over-file precedence for a scalar, and the refusals: a set `SITE_KIT_KNOB_FILE` that does not exist, a left-behind `site-config.sh`, and a non-empty file named by the retired `SITE_KIT_CONFIG_FILE`.
 
@@ -50,6 +51,8 @@ site-kit's knobs are **static**: the binary resolves them in process from its ow
   Default: the batch form of `SITE_KIT_RENDERER`'s default, a `ruby -e` loop splitting stdin on `NUL` and writing one `NUL`-terminated HTML document per input. It is filled **only when `SITE_KIT_RENDERER` is itself still at its kit default.** Filled unconditionally it would defeat a deliberate pin. A consumer who pointed `SITE_KIT_RENDERER` at the version-locked bundle below would have that pinned oracle replaced by this unpinned one, and the gate would report clean against a parser build they rejected. Under the rule they keep the per-document path at its own cost and semantics, and opt in by pointing this knob at the batch form of their own pinned renderer. "Pinned" means set in a knob file, tracked or overlay: an indexed knob takes no environment override, so a file is the only place `SITE_KIT_RENDERER` is set from.
 - `SITE_KIT_LIQUID_PARSER` — array, the batch Liquid-parse command `check-docs-liquid-parse` streams its corpus through, on the verdict contract specified in [§check-docs-liquid-parse](#check-docs-liquid-parse). Default: a `ruby -e` loop that requires `liquid`, splits stdin on `NUL` and parses each document with `Liquid::Template.parse` under Jekyll's own settings, writing one `NUL`-terminated verdict per input. **Its value is also a port blocker**, on `SITE_KIT_RENDERER`'s terms: the first element is an external program the gate requires, which `--emit port-blockers` derives by resolving this knob.
 - `SITE_KIT_LIQUID_TEMPLATES` — array of repo-relative pathspecs naming the tracked files `check-docs-liquid-parse` reads as Liquid templates, default `("docs/_layouts/*" "docs/_includes/*" "docs/_posts/*")`, Jekyll's three template directories under the default docs dir. A site that renames them in its Jekyll config, or moves its docs dir, sets this beside `SITE_KIT_DOCS_DIR`.
+- `SITE_KIT_SINCE_PAGES` — array of page globs relative to the work-tree top, naming the pages `check-docs-since` and `--emit docs-since` govern, default empty, which disarms both. Which pages promise a release status is one site's content, so the set is consumer config.
+- `SITE_KIT_RELEASE_NOTES_DIR` — the directory of release notes, relative to the work-tree top, that the note rule and the rewrite read for the untagged note, default empty, which turns both off while the key's presence rule still runs ([§check-docs-since](#check-docs-since)). A consumer gate's `GATE_LOCAL_` knob resolves for that gate's descriptor alone, so this kit gate takes its own.
 
 ## check-docs-cname-parity
 
@@ -240,6 +243,31 @@ Findings, each on its own line:
 - a snapshot line that is not one class.
 
 The clean line counts snapshot classes, override files and covering rules. Exit 2 when the snapshot is named but does not exist or cannot be read, and when `git ls-files` fails. The remedy for an uncovered class is an override taking its token family's colour, and for a stale snapshot the monitor's printed list. The window the split leaves open is stated with the monitor's arm ([§templates/site-health.yml](#templatessite-healthyml), the theme-drift arm).
+
+## check-docs-since
+
+`checks/check-docs-since.gate` (`precommit`, binary-dispatched, `install: zero-config`, armed by `SITE_KIT_SINCE_PAGES`), its rule in `native/src/gates/docs_since.rs`. A docs site served from master describes master, so a reader running a published release cannot tell a page about behaviour it has from one about behaviour it lacks. The gate holds a declared set of pages to saying which.
+
+**The key.** A governed page carries `since:` in its front matter, valued `unreleased` or `vX.Y.Z`: the first release whose binary does what the page says. A page landing with unreleased behaviour says `unreleased`, and a page edited to describe new unreleased behaviour goes back to it. The value is unquoted, and the first `since:` line inside the front-matter span is the key.
+
+**The banner.** The key is for the site's layout to render above the page's body. `unreleased` renders as a notice that no published release carries the behaviour yet, linking the site's releases page. A version renders as a one-line note naming the first release that carries it. A page without the key renders neither. The kit ships no layout, so the banner is the consumer's. A site with no stylesheet of its own keeps the banner's style in the layout's `<style>` block beside its other overrides, and `check-docs-liquid-parse` holds the layout edit.
+
+**The rewrite.** `bash gate-sdk/bin/run-gates.sh --emit docs-since --write` rewrites every governed page's `since: unreleased` line to the untagged release note's version, keeping the line's ending, and touches nothing else. Without `--write` it lists each line it would rewrite. It runs in the note-authoring commit, the release procedure's note step, so a minor release rewrites as surely as a major one. The note is found by the untagged-note reader `check-release-declaration-parity` arms on ([gate-sdk/SPEC.md §upgrade-smoke](../gate-sdk/SPEC.md#upgrade-smoke)): a `*.md` under `SITE_KIT_RELEASE_NOTES_DIR` whose front-matter `release:` names a version no `v*` tag carries. With no untagged note the arm refuses at exit 2, naming the missing note, since there is no version to write. With the notes knob empty it prints that the rewrite is off.
+
+**Assertions**, one finding each:
+
+- every governed page carries `since:`, valued `unreleased` or `vX.Y.Z`;
+- while an untagged release note exists, a governed page saying `unreleased` reds, and the `help:` line prints the rewrite command.
+
+The note is untagged from its authoring commit through the stamp commit the tag names. So the tag lands on a tree where no governed page says `unreleased`, and the battery refuses the commit the tag would name. With the notes knob empty only the first assertion runs.
+
+**Clean** counts the governed pages and states the note rule's standing: off, no untagged note, or the untagged note's version. An empty match is clean, saying no page is governed. **Exit 2:** an unreadable page, a front matter whose opening `---` nothing closes (read as [canon-kit/SPEC.md §The shared spec adapters](../canon-kit/SPEC.md#the-shared-spec-adapters) reads the span), a named notes dir that does not exist, and two untagged notes, since then the version to write is ambiguous. **No valve:** a page in the declared set that cannot say its release status has no legitimate case; it leaves the set.
+
+**Honest limits.**
+
+- Whether a page's behaviour is in fact unreleased is the author's judgment. The gate holds the key's presence and its rule at the cut, not its truth.
+- An iteration that closes without a release, or defers one, keeps `unreleased` until a later note.
+- The banner reaches the governed pages alone. Every other page on the site still describes master.
 
 ## templates/site-health.yml
 

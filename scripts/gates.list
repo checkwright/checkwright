@@ -103,6 +103,7 @@ check-docs-highlight-coverage
 check-docs-render-fidelity
 check-docs-collapsible
 check-docs-liquid-parse
+check-docs-since
 check-docs-cmd
 check-docs-restatement-parity
 check-docs-page-repeat

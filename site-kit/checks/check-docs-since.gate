@@ -1,0 +1,4 @@
+# graph: couples=knob:SITE_KIT_SINCE_PAGES,knob:SITE_KIT_RELEASE_NOTES_DIR/*.md dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: SITE_KIT_SINCE_PAGES
+# spec: site-kit/SPEC.md §check-docs-since — every page SITE_KIT_SINCE_PAGES declares carries a since: key, unreleased or vX.Y.Z, and none says unreleased while the release notes dir holds an untagged note

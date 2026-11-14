@@ -10,6 +10,7 @@ cat >> scripts/gates.list <<'EOF'
 # site-kit
 check-docs-cname-parity
 check-docs-highlight-coverage
+check-docs-since
 check-docs-render-fidelity
 check-docs-collapsible
 check-docs-liquid-parse

@@ -117,6 +117,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [site-kit](site-kit/index.md) | check-docs-render-fidelity | precommit |
 | [site-kit](site-kit/index.md) | check-docs-collapsible | precommit |
 | [site-kit](site-kit/index.md) | check-docs-liquid-parse | precommit |
+| [site-kit](site-kit/index.md) | check-docs-since | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-restatement-parity | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-page-repeat | precommit |

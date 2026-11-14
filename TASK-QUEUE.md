@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, `liveness-hook-no-repo-run`, `hook-observe-mode`, `hook-only-user-install`, [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: `nonutf8-repo-path-reads` in the no-repo run's batch, `installer-crate-test-gaps` in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by `hook-only-user-install`, which goes first; `nonutf8-repo-path-reads` reshaped by `liveness-hook-no-repo-run`, one batch.
+  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, `liveness-hook-no-repo-run`, `hook-observe-mode`, `hook-only-user-install`, `hook-arm-adopter-page`. Debt: `nonutf8-repo-path-reads` in the no-repo run's batch, `installer-crate-test-gaps` in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by `hook-arm-adopter-page`, which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by `hook-only-user-install`, which goes first; `nonutf8-repo-path-reads` reshaped by `liveness-hook-no-repo-run`, one batch.
 
   **Adopter target (lead decision 2026-11-14, operator-delegated):** an adopter running its own work engine is served the checks and the session hooks only, with no lifecycle or queue read adapter, its evidence seam [gate-run-attestation-predicate](#gate-run-attestation-predicate); the absorb candidates rank below the adopter's asks, false refusals first.
 
@@ -15,16 +15,6 @@
 ---
 
 ## New Features
-
-### hook-arm-adopter-page
-
-[spec: site-kit/SPEC-hook-arm-pages.md]
-
-A consumer weighing one hook arm reads a SPEC of 0.1-1 MB to learn what it reads, its exit codes, its knobs and its settings entry. And an adopter told to run `gh attestation verify` on the release tarball saw nothing on stdout or stderr at exit 0, so could not tell what was verified (reported, not reproduced here).
-
-**Deliverable:** design-pending, a feature: a page per hook arm, `subagent-stop-liveness` first, held to its SPEC (what it reads, exit codes, knobs, settings entry, the payload keys it relies on, where the operator notice lands), and the verify step's expected output or its `--format json` form. It settles [site-documents-unreleased](#site-documents-unreleased) for its own pages, since a page served from master describes master.
-
-**Cost while deferred:** each evaluator buys the SPEC read the page would save. Surfaced 2026-11-14 by a production adopter's handoff (ask 8 and item 11), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `adopter page`, `attestation verify` in this file and the disposed-findings record, none; owner docs/site-architecture.md.
 
 ## Technical Debt
 
@@ -1002,4 +992,5 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 - hook-observe-mode
 - hook-only-user-install
 - installer-crate-test-gaps
+- hook-arm-adopter-page
 
