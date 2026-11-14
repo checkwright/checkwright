@@ -2,18 +2,18 @@
 # Columns are USD per single token (a $/MTok price / 1,000,000), tab-separated.
 # One row per model id and effective date (`effective_from`, empty for an open start), the id as it appears in a transcript's message.model.
 #
-# priced-as-of: 2026-10-23 — transcribed from the published Anthropic model-pricing
+# priced-as-of: 2026-11-14 — transcribed from the published Anthropic model-pricing
 # table. Prices are a dated literal with no machine-readable feed to derive them from,
 # so nothing but this date says when it was last checked; re-verify against the
 # published table when kpi-price-table-age raises it. Every row below was re-verified
 # against the published table on this date.
-# price-page-hash: 33e7e4e045d7e534bb441ba0249156748b9f21ed — the page section's hash
+# price-page-hash: f1586bbfa61c067a5bd8967db19ce8cab0557bfc — the page section's hash
 # --price-coverage printed when the rows above were re-verified (drift-kit/SPEC.md
 # §The price-coverage arm); transcribe the new one with priced-as-of:.
 #
 # cache_read is NOT always 0.1x input: the published table prices it at 0.025x on
-# claude-fable-5-1 and 0.05x on claude-opus-5-5 and claude-sonnet-5-5, so never derive
-# the column from input.
+# claude-fable-5-2 and claude-fable-5-1 and 0.05x on claude-opus-5-5 and
+# claude-sonnet-5-5, so never derive the column from input.
 #
 # prices-valid-through: 2026-11-30 — and the field's meaning is weaker here than its
 # wording, which is worth stating rather than leaving to be inferred. It normally names
@@ -47,7 +47,8 @@
 # A longer prompt bills at five times that row, so its turns also price as a floor.
 #
 # model	input	output	cache_read	cache_creation	effective_from
-claude-fable-5-1	0.00001	0.00005	0.00000025	0.00002
+claude-fable-5-2	0.000008	0.00004	0.0000002	0.000016
+claude-fable-5-10.00001	0.00005	0.00000025	0.00002
 claude-fable-5	0.00001	0.00005	0.000001	0.00002
 claude-opus-5-5	0.000004	0.00002	0.0000002	0.000008
 claude-opus-5	0.000005	0.000025	0.0000005	0.00001

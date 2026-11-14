@@ -1,14 +1,38 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: liveness-arm-adoption-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: [liveness-hook-false-refusals](#liveness-hook-false-refusals), [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), [hook-observe-mode](#hook-observe-mode), [hook-only-user-install](#hook-only-user-install), [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) in the no-repo run's batch, [installer-crate-test-gaps](#installer-crate-test-gaps) in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by [hook-only-user-install](#hook-only-user-install), which goes first; [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) reshaped by [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), one batch.
+
+  **Adopter target (lead decision 2026-11-14, operator-delegated):** an adopter running its own work engine is served the checks and the session hooks only, with no lifecycle or queue read adapter, its evidence seam [gate-run-attestation-predicate](#gate-run-attestation-predicate); the absorb candidates rank below the adopter's asks, false refusals first.
+
+  **Push need (operator direction 2026-11-14, inside the budget):** 2 against 2: the closing push, and a release tag push that no one entry's landing spends, since the adopter's pilot enforces only on a published tag; a tag-candidate pre-release serves its log-only run. Windows installer paths a local run cannot reach ride the closing push.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### nonutf8-repo-path-reads
+
+Three crate reads decode a repository path that is not UTF-8 lossily, each reproduced from a scratch tree. `walk::toplevel_args`, and `walk::cwd` beside it, read the work tree's own path that way, so `--install-hooks` in such a tree exits 2 with "not inside a git repository", a wrong cause. `hook_launcher::hooks_dir` reads the common git directory that way, so in a UTF-8 linked worktree whose common directory is not UTF-8, `--install-hooks` exits 0, creates a gate-hooks tree under a U+FFFD spelling and points `core.hooksPath` at it, so the prior `pre-commit` stops running. The placed commit-msg launcher then panics in `main`'s `std::env::args` on the non-UTF-8 message-file path git hands it, so every later commit there fails with a Rust panic.
+
+**Deliverable:** a fix with a design choice: one rule for a repository path the crate reads from git or argv and cannot spell, a named refusal or the bytes carried, applied at all three reads, with Linux-only crate cases and the rule in gate-sdk/SPEC.md §The crate's crosser and §git-hook. `hookspath-non-utf8-restore` settled the `core.hooksPath` value alone; the common-directory read was kept out of it by operator direction 2026-10-26.
+
+**Cost while deferred:** only an adopter whose repository path is not UTF-8 hits these, and the common-directory case leaves the clone unable to commit until `core.hooksPath` is unset. Filed 2026-10-26 by installer-review-residue-pass' close, from three spec-stage gap bullets. Owner lookup: `non-UTF`, `lossy`, `utf8`, `toplevel_in`, `hooks_dir`, `common-dir`, `env::args` in this file and the disposed-findings record: only the done `hookspath-non-utf8-restore` and `personal-detect-non-utf8`, each another read.
+
+### installer-crate-test-gaps
+
+Two test gaps on the installer's commit path. The `git()` setup and assertion helper in native/tests/installer_commit.rs spawns `git -C <scratch>` with the environment inherited, so an exported `GIT_DIR` or `GIT_WORK_TREE` aims its writes and reads at another repository; only `verb()` scrubs `GIT_*`, and `installer::tests::the_identity_precondition_refuses_what_gits_strict_read_refuses` fails with `GIT_AUTHOR_*` and `GIT_COMMITTER_*` exported (ran). And installer/SPEC.md §init's identity precondition and §uninstall's restore line carry untested promises: every refusal case empties `user.name`, so neither the author nor the committer half is tested alone; no case covers the `--no-commit`, personal or `--dry-run` waivers, an identity-less run with nothing to change, the refusal through update, or a `git var` read that cannot spawn; the restore line is tested only on a failed commit with an unset value. gate-sdk/SPEC.md §install-hooks' Windows unpaired-surrogate escape has no case either.
+
+**Deliverable:** a fix: the helper scrubs `GIT_*` as `verb()` does, and one case per untested promise, each shown able to fail.
+
+**Cost while deferred:** the suite passes or fails by the invoking shell, and a regression in either half of the precondition passes. Surfaced 2026-10-26 by installer-review-residue-pass' close (its second-vendor review) as two gap bullets; filed at liveness-arm-adoption-pass' scope. Owner lookup: `GIT_DIR`, `identity precondition` in this file and the disposed-findings record, none; owner installer/SPEC.md §init.
 
 ## Deferred
 
@@ -138,7 +162,7 @@ Codex keys an installed plugin at version `1.0.0`, since neither manifest carrie
 
 [cost: event/low] [surface: installer]
 
-the workflow half of `personal-adoption`: a developer runs the stage machine on a personal branch or fork of a project that does not adopt it, `init` as today, plus an export keeping commits that touch only lock-roster and workflow paths out of an upstream pull request. Untracked workflow state was refused on consult advice, since every stamp is committed and names its commit (lifecycle-kit/SPEC.md §Multi-operator semantics).
+the workflow half of `personal-adoption`: a developer runs the stage machine on a personal branch or fork of a project that does not adopt it, `init` as today, plus an export keeping commits that touch only lock-roster and workflow paths out of an upstream pull request. Untracked workflow state was refused on consult advice, since every stamp is committed and names its commit (lifecycle-kit/SPEC.md §The state machine and §check-stage-evidence).
 
 **Deliverable:** design-pending, a feature: the export arm's shape (a path-filtered branch rewrite or a patch series), how it reads the lock roster and the workflow paths without a kit literal naming a layout, and what it refuses.
 
@@ -182,17 +206,153 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 
 **Deliverable:** design-pending, a feature: the predicate type's name and schema, the manifest fields it carries, whether the kits emit the Statement for a signer to wrap or sign it themselves, and its versioning rule.
 
+**First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
+
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
 
-### nonutf8-repo-path-reads
+### liveness-hook-false-refusals
 
-[cost: event/low] [surface: native]
+[cost: event/high] [surface: delegation-kit]
 
-Three crate reads decode a repository path that is not UTF-8 lossily, each reproduced from a scratch tree. `walk::toplevel_args`, and `walk::cwd` beside it, read the work tree's own path that way, so `--install-hooks` in such a tree exits 2 with "not inside a git repository", a wrong cause. `hook_launcher::hooks_dir` reads the common git directory that way, so in a UTF-8 linked worktree whose common directory is not UTF-8, `--install-hooks` exits 0, creates a gate-hooks tree under a U+FFFD spelling and points `core.hooksPath` at it, so the prior `pre-commit` stops running. The placed commit-msg launcher then panics in `main`'s `std::env::args` on the non-UTF-8 message-file path git hands it, so every later commit there fails with a Rust panic.
+`subagent-stop-liveness` refuses turn ends a consumer's harness treats as legitimate, three ways (delegation-kit/SPEC.md §The turn-end liveness hook). An absent or unreadable agent transcript counts every running shell task as the agent's own, so a sibling's task refuses it; read from the code, not observed. An agent that writes a handoff file and ends before a long wait is refused. And a harness that re-invokes a sub-agent when its own background task completes makes a plain turn end with that task live its supported wait: an adopter's log-only run refused 14 of 24 firings, each such a wait, none a true positive. No payload key tells a final hand-back from a stop the harness will resume, so only a marker the agent declares can.
 
-**Deliverable:** a fix with a design choice: one rule for a repository path the crate reads from git or argv and cannot spell, a named refusal or the bytes carried, applied at all three reads, with Linux-only crate cases and the rule in gate-sdk/SPEC.md §The crate's crosser and §git-hook. `hookspath-non-utf8-restore` settled the `core.hooksPath` value alone; the common-directory read was kept out of it by operator direction 2026-10-26.
+**Direction (operator direction 2026-11-14, lead-relayed, not a ruling, against scope's recommendation to keep the rule):** the waiting rule becomes a policy-as-choice set, today's refusal its default. A `resume-wait` member allows a plain turn end while the agent's own task is live, and still refuses when the declared hand-back marker is present and the stop is the hand-back, or when the live task has no completion path. Its honest limit, stated in the SPEC: an undeclared hand-back with its work still running passes. The marker is a launch-record field `handoff=<path>`, read at stop time as a file that exists and is non-empty; the adopter writes no handoff without a record. The waiting rule in §The delegation model and the hook section's narrowing and resumed-harness paragraphs are amended to it.
 
-**Cost while deferred:** only an adopter whose repository path is not UTF-8 hits these, and the common-directory case leaves the clone unable to commit until `core.hooksPath` is unset. Filed 2026-10-26 by installer-review-residue-pass' close, from three spec-stage gap bullets. Owner lookup: `non-UTF`, `lossy`, `utf8`, `toplevel_in`, `hooks_dir`, `common-dir`, `env::args` in this file and the disposed-findings record: only the done `hookspath-non-utf8-restore` and `personal-detect-non-utf8`, each another read.
+**Deliverable:** a feature: the set, its knob and default, the marker field and its read, the unreadable-transcript branch reviewed, fixtures per member. Weigh latency beside it: the adopter measured p50 76 ms and p95 182 ms against a 100 ms budget.
+
+**Cost while deferred:** on such a harness the arm cannot be enforced without refusing every supported wait, so an adopter keeps it log-only. Surfaced 2026-11-14 by a production adopter's handoff (asks 9a and 4, and an observe-mode finding), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `resume-wait`, `declared handoff`, `unreadable transcript` in this file and the disposed-findings record, none; the icebox's [turn-end-refusal-used-as-a-busy-wait](#turn-end-refusal-used-as-a-busy-wait) is the opposite misuse. Owner delegation-kit/SPEC.md §The turn-end liveness hook.
+
+### liveness-hook-no-repo-run
+
+[cost: event/high] [surface: gate-sdk]
+
+Started with no front end outside any git repository, `--hook` fails open (gate-sdk/SPEC.md §The harness-integration arm): `subagent-stop-liveness` exits 0, its operator notice a `systemMessage` envelope on stdout and stderr carrying only 'not inside a git repository', so a turn end with the agent's own task running goes unguarded and a pipe test reading stderr calls it silent. A harness may fire the child-turn-end event from any cwd, and this arm's inputs (the payload, its log, its liveness reader) can all resolve absolute.
+
+**Deliverable:** design-pending, a feature: which arms run with no repository and how their knobs resolve there, a loud decline where one cannot, and the notice's stream documented. [nonutf8-repo-path-reads](#nonutf8-repo-path-reads) lands in the same batch, since it fixes the same toplevel read.
+
+**Cost while deferred:** an adopter must run the arm inside a scratch repository kept for the purpose, and a harness firing from elsewhere leaves the turn end unguarded. Surfaced 2026-11-14 by a production adopter's handoff (item 10), re-measured at HEAD by the lead, filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `outside any git`, `no repository` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
+### hook-observe-mode
+
+[cost: event/high] [surface: gate-sdk]
+
+A consumer adopting a blocking hook in production wants a log-only period before enforcing it, and none ships: delegation-kit/SPEC.md §The turn-end liveness hook names unwiring the hook as the only valve, so the adopter wrapped the arm to run it log-only.
+
+**Direction (operator direction 2026-11-14, lead-relayed, not a ruling; the operator was shown it reverses the hook section's no-knob line):** one `--observe` flag where `--hook` dispatches, for every blocking arm: the arm decides, logs its verdict and exits 0. It rides the registration argv, the consumer's settings surface, which is the surface unwiring edits. Fixtures cover `subagent-stop-liveness` and one other blocking arm.
+
+**Deliverable:** a feature: the flag's grammar, where each arm logs an observed verdict, and the no-knob line amended.
+
+**Cost while deferred:** every production adopter writes its own wrapper or enforces with no trial, and [reader-handback-head-line](#reader-handback-head-line) waits on it. Surfaced 2026-11-14 by a production adopter's handoff (ask 2), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `observe mode`, `log-only` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
+### hook-only-user-install
+
+[cost: event/high] [surface: installer]
+
+One session-hook arm today needs a vendored kit: `subagent-stop-liveness` is wired by hand from delegation-kit/README.md, and the installer's verbs act on a repository (installer/SPEC.md §The verbs). An adopter running its own work engine wants the gate binary placed for the user and the harness settings entry for one chosen arm printed, its scratch and log outside any repository.
+
+**Deliverable:** design-pending, a feature: the verb or flag, where the binary and the arm's scratch and log land, the settings entry it prints and for which harness versions, and how update and uninstall reach it. It builds on [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), and the debt [installer-crate-test-gaps](#installer-crate-test-gaps) rides its batch.
+
+**Cost while deferred:** an adopter vendors a kit into a tree it owns or places the binary by hand. Surfaced 2026-11-14 by a production adopter's handoff (ask 1), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `user install`, `hooks --user` in this file and the disposed-findings record, none; [personal-one-kit-hooks](#personal-one-kit-hooks) is reshaped by it. Owner installer/SPEC.md §The verbs.
+
+### hook-arm-adopter-page
+
+[cost: event/low] [surface: docs]
+
+A consumer weighing one hook arm reads a SPEC of 0.1-1 MB to learn what it reads, its exit codes, its knobs and its settings entry. And an adopter told to run `gh attestation verify` on the release tarball saw nothing on stdout or stderr at exit 0, so could not tell what was verified (reported, not reproduced here).
+
+**Deliverable:** design-pending, a feature: a page per hook arm, `subagent-stop-liveness` first, held to its SPEC (what it reads, exit codes, knobs, settings entry, the payload keys it relies on, where the operator notice lands), and the verify step's expected output or its `--format json` form. It settles [site-documents-unreleased](#site-documents-unreleased) for its own pages, since a page served from master describes master.
+
+**Cost while deferred:** each evaluator buys the SPEC read the page would save. Surfaced 2026-11-14 by a production adopter's handoff (ask 8 and item 11), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `adopter page`, `attestation verify` in this file and the disposed-findings record, none; owner docs/site-architecture.md.
+
+### liveness-reader-template
+
+[cost: event/low] [surface: delegation-kit]
+
+`DELEGATION_KIT_LIVENESS_CMD` lets a consumer read liveness beyond PIDs, and only the SPEC explains it: no template shows a reader over a batch-scheduler job or a remote CI run. Joined to it, on consult advice of 2026-11-14: a reader that ran and did not answer allows the turn end today, so the template's failure contract states the exit classes the hook reads and reports a failed sample as a tool error, never as nothing running. An adopter's reader maps exit code and first output token to live, dead or unknown, unknown refusing, and reads a CI run with `gh run view <id> --json status`. Refused there: a heartbeat grammar and a stale-watcher audit, since an age policy on a liveness record is refused where the record is defined (evidence-kit/SPEC.md §The producer-liveness lock).
+
+**Deliverable:** design-pending, a feature: the template, its failure contract and the hook's read of an unanswered reader.
+
+**Cost while deferred:** a consumer whose work runs off-host either writes its reader from the SPEC or leaves the hook blind to that work. Surfaced 2026-11-14 by a production adopter's handoff (ask 3); filed at liveness-arm-adoption-pass' scope. Owner lookup: `adapter template`, `LIVENESS_CMD` in this file, none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
+
+### turn-end-context-size-check
+
+[cost: event/low] [surface: delegation-kit]
+
+No check holds an agent to handing off past a context size: an adopter measured code agents at 144k tokens per turn on average, 86% of agent tokens, and its rule goes unenforced. Joined, on consult advice of 2026-11-14: token and wall time per task at hand-back is the same read, since the child-turn-end payload names the agent's transcript and model-verdict already reads its newest usage record (delegation-kit/SPEC.md §model-verdict), and the stage-economics meter carries no dispatch dimension. Refused for now: a per-task spend throttle, as agent-budget-guard blocks on the account window and a per-task budget is a work engine's figure.
+
+**Deliverable:** design-pending, a feature: the threshold's knob, the check's verdict and a per-dispatch measurement line.
+
+**Cost while deferred:** an over-full agent keeps working past the size its consumer's rule sets. Surfaced 2026-11-14 by a production adopter's handoff (ask 5); filed at liveness-arm-adoption-pass' scope. Owner lookup: `context-size`, `per-task` in this file, none; owner delegation-kit/SPEC.md §model-verdict.
+
+### personal-one-kit-hooks
+
+[cost: event/low] [surface: installer]
+
+`--personal` installs every selected kit's hooks, and its exclude block and hooks sit in the common git directory, so they reach every linked worktree (installer/SPEC.md §The personal install). An adopter asks for one kit's hooks alone and a per-worktree opt-out.
+
+**Deliverable:** design-pending, a feature: a one-kit personal selection and a worktree opt-out, or a refusal recorded. Reshaped by [hook-only-user-install](#hook-only-user-install), which goes first.
+
+**Cost while deferred:** a personal install takes kits and worktrees its owner did not choose. Surfaced 2026-11-14 by a production adopter's handoff (ask 7); filed at liveness-arm-adoption-pass' scope. Owner lookup: `one kit`, `per-worktree` in this file, none; owner installer/SPEC.md §The personal install.
+
+### meta-gate-ownership-scope
+
+[cost: event/low] [surface: gate-sdk]
+
+An adopter predicts, from reading rather than a firing, that meta-gates will read files it does not own, such as upstream-owned `.github/workflows` and commit subjects, and asks that they be scoped to paths it declares.
+
+**Deliverable:** design-pending, a feature: an ownership scope for the meta-gates, or the existing knob that already gives one, named.
+
+**Cost while deferred:** a red on a file the adopter cannot change reads as a false positive and invites a bypass. Surfaced 2026-11-14 by a production adopter's handoff (ask 9b); filed at liveness-arm-adoption-pass' scope. Owner lookup: `ownership scope` in this file, none; owner gate-sdk/SPEC.md.
+
+### hook-double-registration
+
+[cost: event/low] [surface: plugin]
+
+An adopter reads from the docs, unobserved, that a hook fires twice where the plugin's hooks and a hand-wired entry for the same arm coexist; `subagent-stop-liveness` itself is not plugin-wired (delegation-kit/README.md).
+
+**Deliverable:** design-pending: detect or dedupe a double registration, or state it as a limit.
+
+**Cost while deferred:** a doubled firing doubles a refusal's log line and its latency. Surfaced 2026-11-14 by a production adopter's handoff (ask 9c); filed at liveness-arm-adoption-pass' scope. Owner lookup: `double regist`, `double fir` in this file, none; owner plugin/SPEC.md §The harnesses.
+
+### recorded-test-mutation-control
+
+[cost: event/low] [surface: evidence-kit]
+
+The fixture pair proves a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipline), and nothing shipped proves it of a test a suite records, so a recorded run of a test that cannot fail still supports a done claim. Consult advice of 2026-11-14: off unless a consumer selects it, a declared control (an adopter's form is an environment flag re-introducing the defect and naming the test it must fail), its run recorded as a witnessed red beside the suite's line, and a gate that a new test carries one. doctrine-kit/DOCTRINE.md's mutation corollary names that check buildable and unbuilt, and [installer-crate-test-gaps](#installer-crate-test-gaps)' two-halves case is an instance.
+
+**Deliverable:** design-pending, a feature: how a control is stated in no consumer's vocabulary, where the witnessed red is recorded, and what counts as a new test.
+
+**Cost while deferred:** a test that cannot fail reads as evidence. Surfaced 2026-11-14 by a production adopter's handoff, ranked first of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `mutation control` in this file, none; owner evidence-kit/SPEC.md.
+
+### outbound-public-text-lint
+
+[cost: event/low] [surface: guard-kit]
+
+check-commit-msg and check-tree-terms hold a commit message and the tracked files to the leak patterns (gate-sdk/SPEC.md §check-commit-msg), and no shipped rule reads the text of an issue comment, a review or a release note an agent posts, though the scope binding's boundary sweep posts the first two. Consult advice of 2026-11-14: a consumer-selectable shell-guard rule holding a public-write command's body to the commit-message gate's pattern files; the exact-text approval half is the harness's permission prompt, owing at most a line in guard-kit/SPEC.md §The recommended allowlist.
+
+**Deliverable:** design-pending, a feature: the commands and body carriers it reaches, its verdict on an unreadable body, and its honest limit.
+
+**Cost while deferred:** a leak in a posted body passes every gate. Surfaced 2026-11-14 by a production adopter's handoff, ranked second of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `outbound` in this file, none; owner guard-kit/SPEC.md.
+
+### reader-handback-head-line
+
+[cost: event/low] [surface: delegation-kit]
+
+No shipped return contract names the commit a reviewing agent read, so a review of a stale tree reads like any other. Consult advice of 2026-11-14: an opt-in turn-end check that the report names the head it read, resolving and matching the dispatch's base; the child-turn-end payload carries the final message, which no hook member reads today (gate-sdk/SPEC.md §The hook contract). Kept out: a closed verdict set and any classing of a report. One family with the icebox's unattested-completion and unverified-base entries, re-filing neither.
+
+**Deliverable:** design-pending, a feature, after [hook-observe-mode](#hook-observe-mode), since it adds a refusing hook.
+
+**Cost while deferred:** a stale-tree review passes as current. Surfaced 2026-11-14 by a production adopter's handoff, ranked third of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `head line`, `hand-back` in this file, none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
+
+### readonly-child-gate-arms
+
+[cost: event/low] [surface: delegation-kit]
+
+A read-only audit child cannot run the gate binary: agent-dispatch-guard isolates a `DELEGATION_KIT_READONLY_TYPES` dispatch in a worktree, which carries no built binary, and one child reported the shell guard refusing the main checkout's binary, so it derived the command-knob roster by grep where `--emit knob-roster` is the oracle; its dispatcher's later run agreed. The refusal text was not read.
+
+**Deliverable:** design-pending: a route for an isolated read-only child to the non-writing arms, or a dispatch brief that carries the arm's output.
+
+**Cost while deferred:** an isolated reader emulates an oracle it cannot run (Oracle-first). Surfaced 2026-11-14 by a consultation's dispatcher, held in its journal; filed at liveness-arm-adoption-pass' scope. Owner lookup: `READONLY`, `isolated` in this file, none; owner delegation-kit/SPEC.md.
 
 ## Icebox
 
