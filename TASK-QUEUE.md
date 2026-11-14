@@ -50,6 +50,16 @@ A consumer adopting a blocking hook in production wants a log-only period before
 
 **Cost while deferred:** every production adopter writes its own wrapper or enforces with no trial, and [reader-handback-head-line](#reader-handback-head-line) waits on it. Surfaced 2026-11-14 by a production adopter's handoff (ask 2), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `observe mode`, `log-only` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
+### hook-only-user-install
+
+[spec: installer/SPEC-user-install.md]
+
+One session-hook arm today needs a vendored kit: `subagent-stop-liveness` is wired by hand from delegation-kit/README.md, and the installer's verbs act on a repository (installer/SPEC.md §The verbs). An adopter running its own work engine wants the gate binary placed for the user and the harness settings entry for one chosen arm printed, its scratch and log outside any repository.
+
+**Deliverable:** design-pending, a feature: the verb or flag, where the binary and the arm's scratch and log land, the settings entry it prints and for which harness versions, and how update and uninstall reach it. It builds on [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), and the debt [installer-crate-test-gaps](#installer-crate-test-gaps) rides its batch.
+
+**Cost while deferred:** an adopter vendors a kit into a tree it owns or places the binary by hand. Surfaced 2026-11-14 by a production adopter's handoff (ask 1), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `user install`, `hooks --user` in this file and the disposed-findings record, none; [personal-one-kit-hooks](#personal-one-kit-hooks) is reshaped by it. Owner installer/SPEC.md §The verbs.
+
 ## Technical Debt
 
 ### nonutf8-repo-path-reads
@@ -243,16 +253,6 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 **First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
-
-### hook-only-user-install
-
-[cost: event/high] [surface: installer]
-
-One session-hook arm today needs a vendored kit: `subagent-stop-liveness` is wired by hand from delegation-kit/README.md, and the installer's verbs act on a repository (installer/SPEC.md §The verbs). An adopter running its own work engine wants the gate binary placed for the user and the harness settings entry for one chosen arm printed, its scratch and log outside any repository.
-
-**Deliverable:** design-pending, a feature: the verb or flag, where the binary and the arm's scratch and log land, the settings entry it prints and for which harness versions, and how update and uninstall reach it. It builds on [liveness-hook-no-repo-run](#liveness-hook-no-repo-run), and the debt [installer-crate-test-gaps](#installer-crate-test-gaps) rides its batch.
-
-**Cost while deferred:** an adopter vendors a kit into a tree it owns or places the binary by hand. Surfaced 2026-11-14 by a production adopter's handoff (ask 1), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `user install`, `hooks --user` in this file and the disposed-findings record, none; [personal-one-kit-hooks](#personal-one-kit-hooks) is reshaped by it. Owner installer/SPEC.md §The verbs.
 
 ### hook-arm-adopter-page
 
