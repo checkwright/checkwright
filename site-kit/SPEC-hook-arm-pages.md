@@ -38,7 +38,7 @@ Pairs `hook-arm-adopter-page`. A consumer weighing one session-hook arm today re
 - its shape (scalar, indexed or keyed);
 - its default, as the owning kit's table resolves it with no file layer. A derived default renders as the value it derives to, and an empty default renders as `(empty)`.
 
-`--write` rewrites each page's block and touches nothing else. Without `--write` the arm prints the blocks, which is the byte-fresh projection. **Not yet applied.**
+The block lists the member's own knob slice, so the dispatcher's `GATE_SDK_HOOK_OBSERVE_LOG` (gate-sdk/SPEC-hook-observe.md delta 2) is not a row. The page's prose names it and its default beside the `--observe` trial. `--write` rewrites each page's block and touches nothing else. Without `--write` the arm prints the blocks, which is the byte-fresh projection. **Not yet applied.**
 
 **The gate.** `check-hook-knobs-fresh` (gate-sdk, born native: a Rust module, a `.gate` descriptor and a `good/`+`bad/` fixture pair) byte-gates each block against the arm's projection, printing the `--write` command on red. It also reds:
 

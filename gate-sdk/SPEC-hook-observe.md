@@ -91,7 +91,10 @@ Each **Not yet applied.**
   - Under the tree-free mark: an absolute log, logged; the default log, declining.
   - The decision table's rows, each through a stub child in the unit lane.
 - **The readers' cases**: the parser's `Member` and `Malformed` answers; `check-settings-paths`' fixture pair (delta 3); the enforcement map's Observed hooks section and its taxonomy bullet; the plugin rendering's carried flag and its `Malformed` refusal.
-- **The release declaration** (`.workflow/release-declarations.md`), under `## Behavior changes`: `--hook` refuses a trailing token outside `--hook <member> [--observe] [--binding <name>]` at exit 2, where it ignored the token and ran the member enforcing.
+- **The release declaration** (`.workflow/release-declarations.md`):
+  - Under `## Behavior changes`: `--hook` takes `--observe`, which logs the member's would-be decision and exits 0, and refuses a trailing token outside `--hook <member> [--observe] [--binding <name>]` at exit 2, where it ignored the token and ran the member enforcing.
+  - Under `## Knob changes`: `GATE_SDK_HOOK_OBSERVE_LOG`, default under the scratch dir.
+  - Under `## New and tightened gates`: `check-settings-paths` and `check-plugin-parity` red a registration outside the `--hook` grammar, which they read as clean before.
 - **The regenerated surfaces**: `docs/enforcement.md`, and the mirrors `docs/gate-sdk/SPEC.md`, `docs/delegation-kit/SPEC.md`, `docs/delegation-kit/README.md`, `docs/context-kit/SPEC.md` and `docs/plugin/SPEC.md`, each by the command docs/generated-projections.md rosters for it.
 
 ## Producers and consumers

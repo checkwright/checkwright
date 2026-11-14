@@ -116,7 +116,7 @@ Each **Not yet applied.**
 - **The real-reader lane** (`scripts/gate-tests/subagent-stop-reader.test.sh`): a record carrying `handoff=` naming a non-empty file, read by the real reader as `red` and not `corrupt`, refused under `resume-wait`. The same record with its file emptied, beside an own running task in the payload, allowed.
 - **The grammar's cases.** `evidence.rs` and `producer_liveness.rs` gain parse cases: a third field accepted, and a relative path, an empty path, an unknown field, a repeated field, a reordered field and two separators refused. guard-kit's `a_record_line_parses_only_in_its_one_grammar` moves to the shared parser's cases. `git-mutation-under-producer.test.sh` gains a handoff-bearing live record that blocks.
 - **The knob's cases.** The validator refuses `off`, an empty value and a mixed-case `Refuse`. The hook declines on a malformed value with the operator notice.
-- **The release declaration** (`.workflow/release-declarations.md`, `## Behavior changes`): `subagent-stop-liveness` takes `DELEGATION_KIT_STOP_WAIT=resume-wait`, which allows a turn end whose own background task the harness will resume, and the launch record takes an optional `handoff=<path>` field.
+- **The release declaration** (`.workflow/release-declarations.md`): under `## Behavior changes`, `subagent-stop-liveness` takes `DELEGATION_KIT_STOP_WAIT=resume-wait`, which allows a turn end whose own background task the harness will resume, and the launch record takes an optional `handoff=<path>` field; under `## Knob changes`, `DELEGATION_KIT_STOP_WAIT`, default `refuse`.
 - **The mirrors**: `docs/delegation-kit/SPEC.md`, `docs/evidence-kit/SPEC.md` and `docs/guard-kit/SPEC.md`, regenerated with `bash gate-sdk/bin/run-gates.sh --emit docs-mirror --write`.
 
 ## Producers and consumers
@@ -133,7 +133,7 @@ The grammar's readers and writers were found by `grep -rn "run=" --include=*.sh 
 
 - `delegation-kit/SPEC.md` §The delegation model (deltas 3 and 7), §The turn-end liveness hook (deltas 2 to 8), §Attribution was weighed and is not available (delta 7), §bin/wait-probe's record-shape paragraph (delta 3), §Layout and configuration (delta 1).
 - `delegation-kit/README.md` step 6 (delta 8).
-- `evidence-kit/SPEC.md` §The producer-liveness lock, §check-producer-liveness (delta 3).
+- `evidence-kit/SPEC.md` §The producer-liveness lock, §check-producer-liveness, and §Producers and consumers' producer-liveness-lock bullet, whose "Both fields have named readers at named transitions" list names the third field's reader beside `pid` and `run key` (delta 3).
 - `guard-kit/SPEC.md` §The generic ruleset's kit-owned-artifact bullet and §The rule roster's `git_mutation_under_producer` (delta 3).
 - `native/src/guard/host.rs`, `parse_record` and its test, replaced by the shared parser (deltas 3 and 9).
 - `native/src/evidence.rs`, `native/src/gates/producer_liveness.rs`, `native/src/emit/run_validate.rs` (delta 3); `native/src/hook/stop_liveness.rs` (deltas 2, 4 and 6); `native/src/knobs/delegation_kit.rs`, `native/src/hook/mod.rs` (delta 1); and their unit tests (delta 9).
