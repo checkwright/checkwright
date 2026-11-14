@@ -1877,7 +1877,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-plugin-parity",
         plugin_parity::run,
-        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:257")],
+        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:269")],
         &[
             "LIFECYCLE_KIT_SKILLS_DIR",
             "QUEUE_KIT_QUEUE_FILE",
@@ -1929,7 +1929,7 @@ pub const REGISTRY: &[GateEntry] = &[
         value_rollup_fresh::run,
         &[
             (".", "glob:lit:*/SPEC.md", "", ""),
-            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:362 via emit::value_rollup::emit"),
+            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:375 via emit::value_rollup::emit"),
             ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::value_rollup::emit"),
         ],
         &[
@@ -2025,7 +2025,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-enforcement-fresh",
         enforcement_fresh::run,
-        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:362 via emit::enforcement_map::emit")],
+        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:375 via emit::enforcement_map::emit")],
         &[
             "GATE_SDK_ENFORCEMENT_FILE",
             "GATE_SDK_GATES_DIR",

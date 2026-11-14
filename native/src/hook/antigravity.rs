@@ -113,9 +113,19 @@ pub fn translate_verdict(status: Option<i32>, stderr: &str) -> String {
     }
 }
 
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the child's argv: the member, observed
+// where the registration observes it, so one site logs whichever binding reached it
+pub fn child_args(member: &str, observe: bool) -> Vec<&str> {
+    let mut args = vec!["--hook", member];
+    if observe {
+        args.push(super::OBSERVE_FLAG);
+    }
+    args
+}
+
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the adapter: the member runs as a child of
 // this binary on the translated payload, and the adapter exits 0 whatever the child did
-pub fn run(member: &str, payload: &[u8]) -> i32 {
+pub fn run(member: &str, observe: bool, payload: &[u8]) -> i32 {
     let parsed = if payload.iter().all(u8::is_ascii_whitespace) {
         None
     } else {
@@ -131,7 +141,7 @@ pub fn run(member: &str, payload: &[u8]) -> i32 {
         .and_then(|exe| {
             proc::run_with_stdin(
                 &programs::CHECKWRIGHT_GATES.at(exe.display().to_string()),
-                &["--hook", member],
+                &child_args(member, observe),
                 &input,
             )
         })
@@ -298,6 +308,18 @@ mod tests {
             assert!(!shipped.is_empty());
             assert_eq!(translate_verdict(Some(0), &shipped), "", "an exit-0 envelope is no decision");
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — an observed registration's child observes,
+    // and its silent exit 0 is no decision to the adapter
+    #[test]
+    fn an_observed_adapters_child_observes_and_answers_no_decision() {
+        assert_eq!(child_args("agent-dispatch-guard", false), ["--hook", "agent-dispatch-guard"]);
+        assert_eq!(
+            child_args("agent-dispatch-guard", true),
+            ["--hook", "agent-dispatch-guard", "--observe"]
+        );
+        assert_eq!(translate_verdict(Some(0), ""), "");
     }
 
     // spec: gate-sdk/SPEC.md §The hook contract — the shipped tools map onto this binding's, and a

@@ -853,6 +853,7 @@ Every governed surface in the repository this map is generated from is held by o
 - A **session warning** surfaces context when a session opens. Owner: [`context-kit/SPEC.md` §The session-context hook](https://github.com/checkwright/checkwright/blob/master/context-kit/SPEC.md#the-session-context-hook).
 - A **validate suite** holds a test baseline that a per-run evidence manifest attests. Owner: [`evidence-kit/SPEC.md` §Baseline manifest](https://github.com/checkwright/checkwright/blob/master/evidence-kit/SPEC.md#baseline-manifest).
 - A **monitor** watches deployment truth rather than tree truth, so it reds a scheduled run, never a merge. Owner: [`site-kit/SPEC.md` §The monitor boundary](https://github.com/checkwright/checkwright/blob/master/site-kit/SPEC.md#the-monitor-boundary).
+- An **observed hook** is a registered hook run under `--observe`, which logs the decision it would have made and refuses nothing. Owner: [`gate-sdk/SPEC.md` §The harness-integration arm](https://github.com/checkwright/checkwright/blob/master/gate-sdk/SPEC.md#the-harness-integration-arm).
 
 The rows below derive from the class registries — the gate registry, the KPI registry, the harness settings hooks, the evidence-suite config, and the `# enforce:` markers a non-gate surface declares itself with — so this map cannot drift from what actually runs. A registry a consumer has not adopted leaves its section absent. A surface that lives under no kit directory, the repository's own rather than a kit's, is grouped as `(consumer)`.
 

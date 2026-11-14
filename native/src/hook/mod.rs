@@ -9,6 +9,7 @@ pub mod budget;
 pub mod dispatch;
 pub mod escalation;
 pub mod model_verdict;
+pub mod observe;
 pub mod patch;
 pub mod poll;
 pub mod session_context;
@@ -175,8 +176,51 @@ const WINDOWS_EXE: &str = ".exe";
 #[derive(Debug, PartialEq)]
 pub enum Registration<'a> {
     NotAMember,
-    Member(&'a str),
+    Member {
+        name: &'a str,
+        observe: bool,
+        binding: Option<&'a str>,
+    },
+    Malformed {
+        name: &'a str,
+        token: &'a str,
+    },
     NoOperand,
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the arm's grammar, printed by every refusal
+// of a token outside it
+pub const GRAMMAR: &str = "--hook <member> [--observe] [--binding <name>]";
+pub const OBSERVE_FLAG: &str = "--observe";
+pub const BINDING_FLAG: &str = "--binding";
+
+#[derive(Debug, PartialEq)]
+pub struct Tail<'a> {
+    pub observe: bool,
+    pub binding: Option<&'a str>,
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the one parser of the tokens after the
+// member, for the arm and every registration reader: each optional token in order, at most once,
+// and the first token past them is the refusal's. A `--binding` naming nothing reads as empty.
+pub fn tail<'a>(rest: &[&'a str]) -> Result<Tail<'a>, &'a str> {
+    let observe = rest.first() == Some(&OBSERVE_FLAG);
+    let mut i = usize::from(observe);
+    let mut binding = None;
+    if rest.get(i) == Some(&BINDING_FLAG) {
+        binding = Some(rest.get(i + 1).copied().unwrap_or(""));
+        i += 2;
+    }
+    match rest.get(i) {
+        Some(token) => Err(token),
+        None => Ok(Tail { observe, binding }),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — a registration's argv ends where the shell
+// syntax its command carries begins, a redirection, a pipe, a list operator or a comment
+fn shell_syntax(token: &str) -> bool {
+    token.starts_with(['#', ')']) || token.contains([';', '|', '&', '<', '>'])
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the three command-token spellings: a front
@@ -190,7 +234,7 @@ fn names_the_arm(base: &str) -> bool {
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the registration grammar's one parser: a
-// command token whose file name is one of the three spellings, then `--hook`, then the member
+// command token whose file name is one of the three spellings, `--hook`, the member, then its tail
 pub fn registration<'a>(tok: &[&'a str]) -> Registration<'a> {
     let Some(i) = command_index(tok) else {
         return Registration::NotAMember;
@@ -203,9 +247,13 @@ pub fn registration<'a>(tok: &[&'a str]) -> Registration<'a> {
     if !names_the_arm(base) || tok.get(i + 1) != Some(&"--hook") {
         return Registration::NotAMember;
     }
-    match tok.get(i + 2) {
-        Some(m) => Registration::Member(m),
-        None => Registration::NoOperand,
+    let Some(&name) = tok.get(i + 2) else {
+        return Registration::NoOperand;
+    };
+    let rest: Vec<&'a str> = tok[i + 3..].iter().copied().take_while(|t| !shell_syntax(t)).collect();
+    match tail(&rest) {
+        Ok(Tail { observe, binding }) => Registration::Member { name, observe, binding },
+        Err(token) => Registration::Malformed { name, token },
     }
 }
 
@@ -322,7 +370,8 @@ fn no_tree(line: &str) -> i32 {
 // `matcher` in the consumer's settings is left untouched.
 pub fn run(args: &[String]) -> i32 {
     let row = args.first().and_then(|m| HOOKS.iter().find(|r| r.0 == m));
-    let rest = args.get(1..).unwrap_or_default();
+    let rest: Vec<&str> = args.get(1..).unwrap_or_default().iter().map(String::as_str).collect();
+    let parsed = tail(&rest);
     match crate::walk::toplevel_opt() {
         Ok(Some(top)) => {
             // spec: gate-sdk/SPEC.md §Fail-closed contract — cwd-write-exempt: the arm's own process
@@ -331,10 +380,10 @@ pub fn run(args: &[String]) -> i32 {
                 return no_tree(&format!("checkwright-gates: cannot enter the work tree at {}: {}", top, e));
             }
         }
-        Ok(None) => match row {
-            Some(&(_, f, _, _, true)) if binding_operand(rest) == Ok(None) => {
+        Ok(None) => match (row, &parsed) {
+            (Some(&(name, f, _, _, true)), Ok(Tail { observe, binding: None })) => {
                 TREE_FREE.with(|m| m.set(true));
-                return f(&read_input());
+                return if *observe { observe::run(name, &read_input()) } else { f(&read_input()) };
             }
             _ => return no_tree("checkwright-gates: not inside a git repository"),
         },
@@ -353,9 +402,21 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("  help: this binary carries: {}", members().join(", "));
         return 2;
     };
-    match binding_operand(rest) {
+    let Tail { observe, binding } = match parsed {
+        Ok(t) => t,
+        Err(token) => {
+            eprintln!(
+                "checkwright-gates: token outside the --hook grammar: {} — the hook could not run",
+                token
+            );
+            eprintln!("  help: the grammar: {}", GRAMMAR);
+            return 2;
+        }
+    };
+    match binding_of(binding) {
+        Ok(None) if observe => observe::run(member, &read_input()),
         Ok(None) => f(&read_input()),
-        Ok(Some(_)) => antigravity::run(member, read_input().bytes()),
+        Ok(Some(_)) => antigravity::run(member, observe, read_input().bytes()),
         Err(given) => {
             eprintln!(
                 "checkwright-gates: no such hook binding: {} — the hook could not run",
@@ -371,13 +432,10 @@ pub fn run(args: &[String]) -> i32 {
 // speaks, a closed set
 pub const BINDINGS: &[&str] = &[antigravity::NAME];
 
-// spec: gate-sdk/SPEC.md §The harness-integration arm — the token after the member: absent is the
-// shipped binding, and a `--binding` naming nothing in the set, or nothing at all, is refused
-fn binding_operand(rest: &[String]) -> Result<Option<&'static str>, String> {
-    if rest.first().map(String::as_str) != Some("--binding") {
-        return Ok(None);
-    }
-    let given = rest.get(1).map(String::as_str).unwrap_or("");
+// spec: gate-sdk/SPEC.md §The harness-integration arm — absent is the shipped binding, and a
+// `--binding` naming nothing in the set, or nothing at all, is refused naming what was given
+fn binding_of(given: Option<&str>) -> Result<Option<&'static str>, String> {
+    let Some(given) = given else { return Ok(None) };
     BINDINGS
         .iter()
         .find(|b| **b == given)
@@ -539,7 +597,7 @@ mod tests {
             let hook = exec(&format!(r#"{{"command":"{}","args":["--hook","wakeup-guard"]}}"#, command));
             assert_eq!(
                 registration(&command_tokens(&hook)),
-                Registration::Member("wakeup-guard"),
+                member("wakeup-guard"),
                 "{}",
                 command
             );
@@ -552,11 +610,11 @@ mod tests {
         let t = |s: &'static str| s.split_ascii_whitespace().collect::<Vec<_>>();
         assert_eq!(
             registration(&t("bash gate-sdk/bin/run-gates.sh --hook shell-guard")),
-            Registration::Member("shell-guard")
+            member("shell-guard")
         );
         assert_eq!(
             registration(&t("env A=1 bash \"${CLAUDE_PROJECT_DIR}/gate-sdk/bin/run-gates.sh\" --hook x")),
-            Registration::Member("x")
+            member("x")
         );
         assert_eq!(
             registration(&t("bash gate-sdk/bin/run-gates.sh --hook")),
@@ -564,7 +622,7 @@ mod tests {
         );
         assert_eq!(
             registration(&t("bash \"$r/gate-sdk/bin/run-gates.sh\" --hook shell-guard --binding antigravity")),
-            Registration::Member("shell-guard")
+            Registration::Member { name: "shell-guard", observe: false, binding: Some("antigravity") }
         );
         assert_eq!(
             registration(&t("bash gate-sdk/bin/run-gates.sh --run")),
@@ -579,18 +637,73 @@ mod tests {
             r#"{"command":"bash","args":["gate-sdk/bin/run-gates.sh","--hook","a b"]}"#,
         )
         .unwrap();
-        assert_eq!(registration(&command_tokens(&exec)), Registration::Member("a b"));
+        assert_eq!(registration(&command_tokens(&exec)), member("a b"));
+    }
+
+    fn member(name: &str) -> Registration<'_> {
+        Registration::Member { name, observe: false, binding: None }
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — a registration's tail is the arm's
+    // grammar: the observe flag, the binding, a token outside both, and the shell syntax after argv
+    #[test]
+    fn a_registrations_tail_reads_through_the_arms_grammar() {
+        let read = |tail: &str| -> Vec<String> {
+            format!("bash gate-sdk/bin/run-gates.sh --hook shell-guard {}", tail)
+                .split_ascii_whitespace()
+                .map(String::from)
+                .collect()
+        };
+        let reg = |toks: &[String]| -> String {
+            format!("{:?}", registration(&toks.iter().map(String::as_str).collect::<Vec<_>>()))
+        };
+        let shown = |r: Registration| format!("{:?}", r);
+        assert_eq!(
+            reg(&read("--observe")),
+            shown(Registration::Member { name: "shell-guard", observe: true, binding: None })
+        );
+        assert_eq!(
+            reg(&read("--observe --binding antigravity")),
+            shown(Registration::Member { name: "shell-guard", observe: true, binding: Some("antigravity") })
+        );
+        assert_eq!(
+            reg(&read("--obsrve")),
+            shown(Registration::Malformed { name: "shell-guard", token: "--obsrve" })
+        );
+        assert_eq!(
+            reg(&read("--binding antigravity --observe")),
+            shown(Registration::Malformed { name: "shell-guard", token: "--observe" })
+        );
+        assert_eq!(
+            reg(&read("--observe 2>/dev/null || true")),
+            shown(Registration::Member { name: "shell-guard", observe: true, binding: None })
+        );
+        assert_eq!(reg(&read("; echo x")), shown(member("shell-guard")));
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — no token is the shipped binding, a set
     // member is its adapter, and an unknown or missing name is refused naming what was given
     #[test]
     fn the_binding_token_selects_an_adapter_from_the_closed_set() {
-        let v = |s: &[&str]| s.iter().map(|x| x.to_string()).collect::<Vec<_>>();
-        assert_eq!(binding_operand(&v(&[])), Ok(None));
-        assert_eq!(binding_operand(&v(&["--binding", "antigravity"])), Ok(Some("antigravity")));
-        assert_eq!(binding_operand(&v(&["--binding", "cursor"])), Err("cursor".to_string()));
-        assert_eq!(binding_operand(&v(&["--binding"])), Err("(none named)".to_string()));
+        let of = |s: &[&'static str]| tail(s).map(|t| binding_of(t.binding));
+        assert_eq!(of(&[]), Ok(Ok(None)));
+        assert_eq!(of(&["--binding", "antigravity"]), Ok(Ok(Some("antigravity"))));
+        assert_eq!(of(&["--binding", "cursor"]), Ok(Err("cursor".to_string())));
+        assert_eq!(of(&["--binding"]), Ok(Err("(none named)".to_string())));
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — each optional token in its place, at
+    // most once; the first token past them is the one the refusal names
+    #[test]
+    fn the_tail_takes_each_token_once_and_in_order() {
+        assert_eq!(tail(&["--observe"]), Ok(Tail { observe: true, binding: None }));
+        assert_eq!(
+            tail(&["--observe", "--binding", "antigravity"]),
+            Ok(Tail { observe: true, binding: Some("antigravity") })
+        );
+        assert_eq!(tail(&["--observe", "--observe"]), Err("--observe"));
+        assert_eq!(tail(&["--binding", "antigravity", "--observe"]), Err("--observe"));
+        assert_eq!(tail(&["--verbose"]), Err("--verbose"));
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the computed stamp is the one

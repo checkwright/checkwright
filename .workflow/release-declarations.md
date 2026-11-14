@@ -1,11 +1,17 @@
 # contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's declaration-bearing sections in the note's grammar, Platforms excepted since composition derives it, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
 
+## New and tightened gates
+
+- `check-settings-paths` and `check-plugin-parity` — red a hook registration whose tokens after the member leave `--hook <member> [--observe] [--binding <name>]`, which they read as clean before; the arm now refuses such a registration at run time. Fix the misspelled or misordered token.
+
 ## Knob changes
 
+- `GATE_SDK_HOOK_OBSERVE_LOG` — new: the log an observed hook appends its would-be decision to, default `<GATE_SDK_TMP_DIR>/hook-observe.log`. Nothing to do unless you register a hook under `--observe`; outside any repository, set it absolute.
 - `DELEGATION_KIT_STOP_WAIT` — new: the turn-end hook's waiting policy, `refuse` or `resume-wait`, defaulting to `refuse`, which is the hook's behavior unchanged. Any other value fails the knob table at exit 2 and makes the hook decline with an operator notice. Nothing to do; bind `resume-wait` only where your harness gives a session a new turn when its own background task completes.
 
 ## Behavior changes
 
+- **`--hook`** — takes `--observe` after the member, under which any member's would-be decision is logged to `GATE_SDK_HOOK_OBSERVE_LOG` and the call proceeds at exit 0 with nothing said; an observed `shell-guard` grants nothing, so a trial may show permission prompts. It refuses at exit 2 a trailing token outside `--hook <member> [--observe] [--binding <name>]`, where it ignored the token and ran the member enforcing. Fix any such registration; add `--observe` to trial a hook before it enforces.
 - **`subagent-stop-liveness`** — under `DELEGATION_KIT_STOP_WAIT=resume-wait`, allows a turn end over a live producer while a running shell task of the session's own will resume it, and refuses one whose launch record declares a hand-back. The launch record takes an optional third field, `handoff=<path>`, which `check-producer-liveness` and the shell guard read as the same live producer where they read such a record as corrupt or skipped it. Its log line gains a `wait=` field before `decision=`. Nothing to do under the default.
 - **`--install-hooks`** — refuses at exit 2, placing nothing, a `core.hooksPath` that is not UTF-8 at the effective or the local scope, or a set value whose prior hooks directory resolves to a path that is not UTF-8, as through a link, where it chained that directory as one holding no hook and advised a restore line naming another value. It also keeps a line break the value ends in, so the line-break refusal now meets it, where it trimmed the break and chained a different directory. Rename the directory or respell the value, then re-run.
 - **`--emit env-probe`** — refuses at exit 2 a profile file whose markers do not pair around an unchanged block, where it reported `unchanged` at exit 0; the file is untouched either way. Repair the markers, then re-run.

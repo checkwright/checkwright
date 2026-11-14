@@ -97,20 +97,12 @@ pub(crate) fn render_hooks(template: &Value) -> Result<Value, String> {
         for block in list.as_array_mut().into_iter().flatten() {
             let hooks = block.get_mut("hooks").and_then(Value::as_array_mut);
             for hook in hooks.into_iter().flatten() {
-                let member = match crate::hook::registration(&crate::hook::command_tokens(hook)) {
-                    crate::hook::Registration::Member(m) => m.to_string(),
-                    _ => {
-                        return Err(format!(
-                            "{} carries a hook that is no member registration, which the plugin has no command for: {}",
-                            HOOKS_TEMPLATE, hook
-                        ))
-                    }
-                };
+                let (member, observe) = template_member(hook)?;
                 if let Some(fields) = hook.as_object_mut() {
                     fields.remove(WIRING_ARGS);
                     fields.insert(
                         COMMAND.to_string(),
-                        Value::String(format!("{}{}{}", fail_open(), front_end_call(), member)),
+                        Value::String(format!("{}{}{}{}", fail_open(), front_end_call(), member, observed(observe))),
                     );
                 }
             }
@@ -122,9 +114,37 @@ pub(crate) fn render_hooks(template: &Value) -> Result<Value, String> {
     Ok(Value::Object(root))
 }
 
-// spec: plugin/SPEC.md §The guards — the composed Antigravity command for one member
-pub(crate) fn antigravity_command(member: &str) -> String {
-    format!("{}{}{}{}", CMD_COMMENT, antigravity_prefix(), member, antigravity_suffix())
+// spec: plugin/SPEC.md §The guards — the member and the `--observe` flag a template registration
+// carries; a hook that is no member registration, or one outside the --hook grammar, has no command
+fn template_member(hook: &Value) -> Result<(String, bool), String> {
+    match crate::hook::registration(&crate::hook::command_tokens(hook)) {
+        crate::hook::Registration::Member { name, observe, .. } => Ok((name.to_string(), observe)),
+        crate::hook::Registration::Malformed { token, .. } => Err(format!(
+            "{} carries a hook registration outside the --hook grammar ({}), at the token {}: {}",
+            HOOKS_TEMPLATE,
+            crate::hook::GRAMMAR,
+            token,
+            hook
+        )),
+        _ => Err(format!(
+            "{} carries a hook that is no member registration, which the plugin has no command for: {}",
+            HOOKS_TEMPLATE, hook
+        )),
+    }
+}
+
+fn observed(observe: bool) -> String {
+    if observe {
+        format!(" {}", crate::hook::OBSERVE_FLAG)
+    } else {
+        String::new()
+    }
+}
+
+// spec: plugin/SPEC.md §The guards — the composed Antigravity command for one member, the
+// `--observe` flag after the member and before the binding
+pub(crate) fn antigravity_command(member: &str, observe: bool) -> String {
+    format!("{}{}{}{}{}", CMD_COMMENT, antigravity_prefix(), member, observed(observe), antigravity_suffix())
 }
 
 // spec: plugin/SPEC.md §The guards — one hook named for the package, one before-tool-call group per
@@ -153,18 +173,10 @@ pub(crate) fn render_antigravity_hooks(template: &Value, package: &str) -> Resul
             fields.insert("matcher".to_string(), Value::String(tools.join("|")));
         }
         for hook in group.get_mut("hooks").and_then(Value::as_array_mut).into_iter().flatten() {
-            let member = match crate::hook::registration(&crate::hook::command_tokens(hook)) {
-                crate::hook::Registration::Member(m) => m.to_string(),
-                _ => {
-                    return Err(format!(
-                        "{} carries a hook that is no member registration, which the plugin has no command for: {}",
-                        HOOKS_TEMPLATE, hook
-                    ))
-                }
-            };
+            let (member, observe) = template_member(hook)?;
             if let Some(fields) = hook.as_object_mut() {
                 fields.remove(WIRING_ARGS);
-                fields.insert(antigravity::WIRING_COMMAND.to_string(), Value::String(antigravity_command(&member)));
+                fields.insert(antigravity::WIRING_COMMAND.to_string(), Value::String(antigravity_command(&member, observe)));
             }
         }
         out.push(group);
@@ -527,19 +539,25 @@ mod tests {
     use super::*;
 
     // spec: plugin/SPEC.md §The guards — each command composed from the member, exec form and shell
-    // form alike, blocks in order, the note dropped; a hook that is no member registration refused
+    // form alike, blocks in order, the note dropped, `--observe` carried; a hook that is no member
+    // registration refused, and one outside the --hook grammar
     #[test]
     fn the_hooks_rendering_composes_each_command_from_its_member_and_drops_the_note() {
         let t: Value = serde_json::from_str(
-            r#"{"//":"merge advice","hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","a"]}]},{"matcher":"Write","hooks":[{"type":"command","command":"bash x/run-gates.sh --hook b"}]}]}}"#,
+            r#"{"//":"merge advice","hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","a"]}]},{"matcher":"Write","hooks":[{"type":"command","command":"bash x/run-gates.sh --hook b"},{"type":"command","command":"bash x/run-gates.sh --hook c --observe"}]}]}}"#,
         )
         .unwrap();
         let call = |m: &str| format!("{}{}{}", fail_open(), front_end_call(), m);
         let want = serde_json::json!({"hooks":{"PreToolUse":[
             {"matcher":"Bash","hooks":[{"type":"command","command":call("a")}]},
-            {"matcher":"Write","hooks":[{"type":"command","command":call("b")}]}
+            {"matcher":"Write","hooks":[{"type":"command","command":call("b")},{"type":"command","command":call("c --observe")}]}
         ]}});
         assert_eq!(render_hooks(&t).unwrap(), want);
+        let malformed: Value = serde_json::from_str(
+            r#"{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash x/run-gates.sh --hook c --obsrve"}]}]}}"#,
+        )
+        .unwrap();
+        assert!(render_hooks(&malformed).unwrap_err().contains("outside the --hook grammar"));
         let stray: Value = serde_json::from_str(
             r#"{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash scripts/x.sh"}]}]}}"#,
         )
@@ -554,20 +572,22 @@ mod tests {
             r#"{"//":"note","hooks":{"PreToolUse":[
                 {"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","shell-guard"]}]},
                 {"matcher":"ScheduleWakeup|CronCreate","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","wakeup-guard"]}]},
-                {"matcher":"Write|Edit","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","workflow-state-guard"]}]}
+                {"matcher":"Write|Edit","hooks":[{"type":"command","command":"${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@","args":["--hook","workflow-state-guard","--observe"]}]}
             ]}}"#,
         )
         .unwrap();
         let want = serde_json::json!({"pkg":{"PreToolUse":[
-            {"matcher":"run_command","hooks":[{"type":"command","command":antigravity_command("shell-guard")}]},
+            {"matcher":"run_command","hooks":[{"type":"command","command":antigravity_command("shell-guard", false)}]},
             {"matcher":"write_file|edit_file|write_to_file|replace_file_content|multi_replace_file_content",
-             "hooks":[{"type":"command","command":antigravity_command("workflow-state-guard")}]}
+             "hooks":[{"type":"command","command":antigravity_command("workflow-state-guard", true)}]}
         ]}});
         assert_eq!(render_antigravity_hooks(&t, "pkg").unwrap(), want);
-        let c = antigravity_command("shell-guard");
+        let c = antigravity_command("shell-guard", false);
         assert!(c.starts_with("rem=1; p=$(cat); "), "{}", c);
         assert!(c.contains("--hook shell-guard --binding antigravity"), "{}", c);
         assert!(c.ends_with("exit 0"), "{}", c);
+        let o = antigravity_command("workflow-state-guard", true);
+        assert!(o.contains("--hook workflow-state-guard --observe --binding antigravity"), "{}", o);
     }
 
     // spec: plugin/SPEC.md §The guards — under `sh` the command never fails a call: a payload whose
@@ -581,7 +601,7 @@ mod tests {
             "toolCall":{"name":"run_command","args":{"CommandLine":"ls"}}});
         let mut child = std::process::Command::new("sh")
             .arg("-c")
-            .arg(antigravity_command("shell-guard"))
+            .arg(antigravity_command("shell-guard", false))
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
             .spawn()
@@ -642,7 +662,7 @@ mod tests {
         let payload = r#"{"workspacePaths":["C:\\w"],"toolCall":{"name":"run_command","args":{"CommandLine":"dir"}}}"#;
         let mut child = std::process::Command::new(antigravity::WINDOWS_SHELL)
             .raw_arg(antigravity::WINDOWS_SHELL_RUN)
-            .raw_arg(go_escape_arg(&antigravity_command("shell-guard")))
+            .raw_arg(go_escape_arg(&antigravity_command("shell-guard", false)))
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
             .spawn()

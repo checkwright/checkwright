@@ -209,8 +209,8 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    let (mut hooks_checked, mut hooks_skipped, mut bad_member, mut unresolved) =
-        (0usize, 0usize, false, false);
+    let (mut hooks_checked, mut hooks_skipped, mut bad_member, mut unresolved, mut malformed) =
+        (0usize, 0usize, false, false, false);
     for h in hook_entries(&doc) {
         if let Some(cand) = command_token(&h.tokens) {
             match hook_path(cand) {
@@ -235,9 +235,15 @@ pub fn run(args: &[String]) -> i32 {
             }
         }
         match hook::registration(&h.tokens) {
-            Registration::Member(m) if !hook::members().contains(&m) => {
+            Registration::Member { name, .. } | Registration::Malformed { name, .. }
+                if !hook::members().contains(&name) =>
+            {
                 bad_member = true;
-                dead.push(format!("{}: {} — no such hook member: {}", h.at, h.shown, m));
+                dead.push(format!("{}: {} — no such hook member: {}", h.at, h.shown, name));
+            }
+            Registration::Malformed { token, .. } => {
+                malformed = true;
+                dead.push(format!("{}: {} — hook registration outside the --hook grammar: {}", h.at, h.shown, token));
             }
             Registration::NoOperand => {
                 bad_member = true;
@@ -274,6 +280,9 @@ pub fn run(args: &[String]) -> i32 {
         }
         if bad_member {
             println!("  help: this binary carries: {}", hook::members().join(", "));
+        }
+        if malformed {
+            println!("  help: the grammar: {}", hook::GRAMMAR);
         }
         return 1;
     }

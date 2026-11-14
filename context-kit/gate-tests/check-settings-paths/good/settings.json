@@ -57,6 +57,15 @@
               "--hook",
               "wakeup-guard"
             ]
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/tools/checkwright-gates",
+            "args": [
+              "--hook",
+              "shell-guard",
+              "--observe"
+            ]
           }
         ]
       }

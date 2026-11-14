@@ -332,7 +332,7 @@ fn append_record(log: &str, stamp: &str, values: &[&str]) {
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — every value is one whitespace-free
 // token, so a payload string can never split the space-delimited line
-fn sanitize(v: &str) -> String {
+pub(super) fn sanitize(v: &str) -> String {
     let out: String = v
         .chars()
         .map(|c| if c.is_whitespace() { '_' } else { c })

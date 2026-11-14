@@ -798,7 +798,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     (
         "--hook",
         Arm::Run(crate::hook::run),
-        &[crate::hook::EVERY_HOOK_KNOB],
+        &[crate::hook::EVERY_HOOK_KNOB, crate::hook::observe::LOG_KNOB],
     ),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the two harness-integration arms that are not
     // members of `--hook`: neither speaks the hook protocol, so each names its own caller and

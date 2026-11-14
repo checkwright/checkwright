@@ -23,7 +23,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --only <name> -- <arg>...               run one named gate, forwarding <arg>...
        --for <path> [<path>...]                run only gates coupling to those paths
        --emit <arm> [args...]                  dispatch a ported non-gate emitter arm
-       --hook <member>                         dispatch a harness hook member, payload on stdin
+       --hook <member> [--observe] [--binding <name>]  dispatch a harness hook member, payload on stdin
        --statusline                            render the harness status line, payload on stdin
        --usage-poll                            refresh the usage snapshot from its source
        --usage-verdict [paths]                 budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
@@ -65,7 +65,10 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           comes back on stdout, and the exit status is the harness's own
           allow/block signal. Where the binary is absent or its configuration
           cannot be resolved, this arm declines through a hook envelope and
-          exit 0 rather than blocking every guarded tool call.
+          exit 0 rather than blocking every guarded tool call. With --observe
+          it runs the member as a child, logs the decision it would have made
+          to GATE_SDK_HOOK_OBSERVE_LOG, and exits 0 with nothing said; any
+          other trailing token outside the grammar is refused at exit 2.
   --statusline  renders the status line for the harness's statusLine hook and
           rewrites the usage snapshot; declines like --hook when unavailable.
           Takes no argument, and names one on stderr and ignores it.

@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, `liveness-hook-no-repo-run`, [hook-observe-mode](#hook-observe-mode), [hook-only-user-install](#hook-only-user-install), [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: `nonutf8-repo-path-reads` in the no-repo run's batch, [installer-crate-test-gaps](#installer-crate-test-gaps) in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by [hook-only-user-install](#hook-only-user-install), which goes first; `nonutf8-repo-path-reads` reshaped by `liveness-hook-no-repo-run`, one batch.
+  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, `liveness-hook-no-repo-run`, `hook-observe-mode`, [hook-only-user-install](#hook-only-user-install), [hook-arm-adopter-page](#hook-arm-adopter-page). Debt: `nonutf8-repo-path-reads` in the no-repo run's batch, [installer-crate-test-gaps](#installer-crate-test-gaps) in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by [hook-arm-adopter-page](#hook-arm-adopter-page), which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by [hook-only-user-install](#hook-only-user-install), which goes first; `nonutf8-repo-path-reads` reshaped by `liveness-hook-no-repo-run`, one batch.
 
   **Adopter target (lead decision 2026-11-14, operator-delegated):** an adopter running its own work engine is served the checks and the session hooks only, with no lifecycle or queue read adapter, its evidence seam [gate-run-attestation-predicate](#gate-run-attestation-predicate); the absorb candidates rank below the adopter's asks, false refusals first.
 
@@ -15,18 +15,6 @@
 ---
 
 ## New Features
-
-### hook-observe-mode
-
-[spec: gate-sdk/SPEC-hook-observe.md]
-
-A consumer adopting a blocking hook in production wants a log-only period before enforcing it, and none ships: delegation-kit/SPEC.md §The turn-end liveness hook names unwiring the hook as the only valve, so the adopter wrapped the arm to run it log-only.
-
-**Direction (operator direction 2026-11-14, lead-relayed, not a ruling; the operator was shown it reverses the hook section's no-knob line):** one `--observe` flag where `--hook` dispatches, for every blocking arm: the arm decides, logs its verdict and exits 0. It rides the registration argv, the consumer's settings surface, which is the surface unwiring edits. Fixtures cover `subagent-stop-liveness` and one other blocking arm.
-
-**Deliverable:** a feature: the flag's grammar, where each arm logs an observed verdict, and the no-knob line amended.
-
-**Cost while deferred:** every production adopter writes its own wrapper or enforces with no trial, and [reader-handback-head-line](#reader-handback-head-line) waits on it. Surfaced 2026-11-14 by a production adopter's handoff (ask 2), filed to the gap inbox after installer-review-residue-pass' close; filed at liveness-arm-adoption-pass' scope. Owner lookup: `observe mode`, `log-only` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ### hook-only-user-install
 
@@ -310,7 +298,7 @@ check-commit-msg and check-tree-terms hold a commit message and the tracked file
 
 No shipped return contract names the commit a reviewing agent read, so a review of a stale tree reads like any other. Consult advice of 2026-11-14: an opt-in turn-end check that the report names the head it read, resolving and matching the dispatch's base; the child-turn-end payload carries the final message, which no hook member reads today (gate-sdk/SPEC.md §The hook contract). Kept out: a closed verdict set and any classing of a report. One family with the icebox's unattested-completion and unverified-base entries, re-filing neither.
 
-**Deliverable:** design-pending, a feature, after [hook-observe-mode](#hook-observe-mode), since it adds a refusing hook.
+**Deliverable:** design-pending, a feature, after `hook-observe-mode`, since it adds a refusing hook.
 
 **Cost while deferred:** a stale-tree review passes as current. Surfaced 2026-11-14 by a production adopter's handoff, ranked third of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `head line`, `hand-back` in this file, none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
 
@@ -1029,4 +1017,5 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 - liveness-hook-false-refusals
 - liveness-hook-no-repo-run
 - nonutf8-repo-path-reads
+- hook-observe-mode
 

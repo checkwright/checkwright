@@ -10,6 +10,11 @@ fn in_gates_dir(resolve: Resolve, base: &str) -> Result<Value, String> {
     input_scalar(resolve, "GATE_SDK_GATES_DIR").map(|d| Value::Scalar(format!("{}/{}", d, base)))
 }
 
+// spec: gate-sdk/SPEC.md §Layout and configuration — the observe log defaults under the scratch dir
+fn hook_observe_log(resolve: Resolve) -> Result<Value, String> {
+    input_scalar(resolve, "GATE_SDK_TMP_DIR").map(|d| Value::Scalar(format!("{}/hook-observe.log", d)))
+}
+
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the crate root is normalized where the row resolves, once
 fn crate_root(resolve: Resolve) -> Result<String, String> {
     input_scalar(resolve, "GATE_SDK_NATIVE_CRATE").map(|c| c.trim_end_matches('/').to_string())
@@ -128,6 +133,7 @@ pub const KIT: Kit = Kit {
     rows: &[
         Row::scalar("GATE_SDK_WORKFLOW_DIR", ".workflow"),
         Row::scalar("GATE_SDK_TMP_DIR", ".tmp"),
+        Row::derived("GATE_SDK_HOOK_OBSERVE_LOG", Shape::Scalar, hook_observe_log, &["GATE_SDK_TMP_DIR"]),
         Row::scalar("GATE_SDK_QUEUE_FILE", "TASK-QUEUE.md"),
         Row::scalar("GATE_SDK_AGENT_FILE", "CLAUDE.md"),
         Row::scalar("GATE_SDK_REGISTRY_DOC", "README.md"),

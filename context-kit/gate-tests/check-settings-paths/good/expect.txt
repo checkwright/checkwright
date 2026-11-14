@@ -1,2 +1,2 @@
-SETTINGS-PATHS: clean (4 literal .sh grant(s) and 6 hook path(s)
+SETTINGS-PATHS: clean (4 literal .sh grant(s) and 7 hook path(s)
 2 hook(s) skipped for a `$` root or an absolute path

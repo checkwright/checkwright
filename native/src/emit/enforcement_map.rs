@@ -236,27 +236,28 @@ fn kpi_section(gates_dir: &str) -> Result<Option<Section>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §enforcement-map — a member registration is rowed under its member and
-// credited to the member table's owner; any other hook, an unknown operand's included, by its path
-fn hook_row(tokens: &[&str]) -> (String, String) {
-    if let crate::hook::Registration::Member(m) = crate::hook::registration(tokens) {
-        if let Some(owner) = crate::hook::owner(m) {
-            return (owner.to_string(), m.to_string());
+// credited to the member table's owner, observed or not; any other hook, an unknown operand's or a
+// malformed registration's included, by its path
+fn hook_row(tokens: &[&str]) -> (String, String, bool) {
+    if let crate::hook::Registration::Member { name, observe, .. } = crate::hook::registration(tokens) {
+        if let Some(owner) = crate::hook::owner(name) {
+            return (owner.to_string(), name.to_string(), observe);
         }
     }
     let path = command_path(&tokens.join(" "));
-    (attribute_kit(&path), path)
+    (attribute_kit(&path), path, false)
 }
 
-// spec: gate-sdk/SPEC.md §enforcement-map — Session warnings from the `SessionStart` command hooks
-// and Guards from every other event's, events sorted and hooks in registration order. This is the
-// `jq` dependency's retirement: the rows come from serde_json, so the battery needs no non-floor program.
-fn hook_sections(settings: &str, set: bool) -> Result<Vec<Section>, String> {
+// spec: gate-sdk/SPEC.md §enforcement-map — Session warnings from the `SessionStart` command hooks,
+// Guards from every other event's, and Observed hooks apart whatever their event; events sorted and
+// hooks in registration order, the rows read with serde_json so the battery needs no non-floor program
+fn hook_sections(settings: &str, set: bool) -> Result<(Vec<Section>, Option<Section>), String> {
     if settings.is_empty() || !Path::new(settings).is_file() {
-        return Ok(Vec::new());
+        return Ok((Vec::new(), None));
     }
     let doc: Value = match serde_json::from_str(&read_file(settings)?) {
         Ok(v) => v,
-        Err(_) if !set => return Ok(Vec::new()),
+        Err(_) if !set => return Ok((Vec::new(), None)),
         Err(e) => {
             return Err(format!(
                 "CONTEXT_KIT_SETTINGS_FILE unparseable: {}: {}",
@@ -265,7 +266,8 @@ fn hook_sections(settings: &str, set: bool) -> Result<Vec<Section>, String> {
         }
     };
     let mut out: Vec<Section> = Vec::new();
-    let (mut guards, mut warnings): (Vec<Row>, Vec<Row>) = (Vec::new(), Vec::new());
+    let (mut guards, mut warnings, mut observed): (Vec<Row>, Vec<Row>, Vec<Row>) =
+        (Vec::new(), Vec::new(), Vec::new());
     let empty = serde_json::Map::new();
     let events = doc.get("hooks").and_then(Value::as_object).unwrap_or(&empty);
     for (event, groups) in events {
@@ -280,8 +282,13 @@ fn hook_sections(settings: &str, set: bool) -> Result<Vec<Section>, String> {
                 if h.get("type").and_then(Value::as_str) != Some("command") {
                     continue;
                 }
-                let (kit, surface) = hook_row(&crate::hook::command_tokens(h));
-                if event == crate::hook::binding::EVENT_SESSION_START {
+                let (kit, surface, observe) = hook_row(&crate::hook::command_tokens(h));
+                if observe {
+                    observed.push(Row {
+                        kit,
+                        cells: vec![surface, event.clone(), matcher.clone()],
+                    });
+                } else if event == crate::hook::binding::EVENT_SESSION_START {
                     warnings.push(Row { kit, cells: vec![surface] });
                 } else {
                     guards.push(Row {
@@ -307,7 +314,13 @@ fn hook_sections(settings: &str, set: bool) -> Result<Vec<Section>, String> {
             rows: warnings,
         });
     }
-    Ok(out)
+    let observed = (!observed.is_empty()).then(|| Section {
+        // consumer-value-exempt: the emitter's own section title, which the page it writes carries
+        title: "Observed hooks".into(),
+        columns: vec!["surface".into(), "event".into(), "intercepts".into()],
+        rows: observed,
+    });
+    Ok((out, observed))
 }
 
 // spec: gate-sdk/SPEC.md §enforcement-map — Validate suites: evidence-kit's suite registry. The
@@ -417,7 +430,7 @@ fn monitor_surface(line: &str) -> Option<String> {
 
 // spec: gate-sdk/SPEC.md §check-enforcement-fresh — the owner sections, in class order: a fixture
 // case must carry none of these paths, or its projection links through the enclosing repo's origin
-const CLASS_OWNERS: [(&str, &str, &str); 6] = [
+const CLASS_OWNERS: [(&str, &str, &str); 7] = [
     // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("gate-sdk/SPEC.md", "enforcement-tiers", "Enforcement tiers"),
     // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
@@ -430,6 +443,8 @@ const CLASS_OWNERS: [(&str, &str, &str); 6] = [
     ("evidence-kit/SPEC.md", "baseline-manifest", "Baseline manifest"),
     // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
     ("site-kit/SPEC.md", "the-monitor-boundary", "The monitor boundary"),
+    // consumer-value-exempt: a kit SPEC's own section title, the class owner's citation
+    ("gate-sdk/SPEC.md", "the-harness-integration-arm", "The harness-integration arm"),
 ];
 
 // spec: gate-sdk/SPEC.md §enforcement-map — the enforcement-class taxonomy, ordered hardest to
@@ -451,8 +466,10 @@ fn class_roster(prefix: &str) -> String {
          - A **validate suite** holds a test baseline that a per-run evidence manifest \
          attests. Owner: {}.\n\
          - A **monitor** watches deployment truth rather than tree truth, so it reds a \
-         scheduled run, never a merge. Owner: {}.\n",
-        r[0], r[1], r[2], r[3], r[4], r[5],
+         scheduled run, never a merge. Owner: {}.\n\
+         - An **observed hook** is a registered hook run under `--observe`, which logs \
+         the decision it would have made and refuses nothing. Owner: {}.\n",
+        r[0], r[1], r[2], r[3], r[4], r[5], r[6],
     )
 }
 
@@ -470,13 +487,15 @@ pub fn measure() -> Result<EnforcementMap, String> {
         sections.push(s);
     }
     let (_, settings_origin) = crate::knobs::resolve(SETTINGS_KNOB)?;
-    sections.extend(hook_sections(&settings, settings_origin.is_set())?);
+    let (hooks, observed) = hook_sections(&settings, settings_origin.is_set())?;
+    sections.extend(hooks);
     if let Some(s) = suite_section()? {
         sections.push(s);
     }
     if let Some(s) = monitor_section(&scan)? {
         sections.push(s);
     }
+    sections.extend(observed);
     Ok(EnforcementMap {
         sections,
         classes: class_roster(&self_repo_prefix(&blob_ref)),
@@ -620,11 +639,12 @@ mod tests {
         assert!(
             hook_sections(&missing.display().to_string(), false)
                 .expect("an absent settings file must not refuse")
+                .0
                 .is_empty(),
             "not adopted: an absent settings file drops both hook sections"
         );
         assert!(
-            hook_sections("", false).expect("an empty knob must not refuse").is_empty(),
+            hook_sections("", false).expect("an empty knob must not refuse").0.is_empty(),
             "an empty settings knob is the same not-adopted case"
         );
         let bad = dir.join("bad-settings.json");
@@ -632,6 +652,7 @@ mod tests {
         assert!(
             hook_sections(&bad.display().to_string(), false)
                 .expect("an unparseable default-path file must not refuse")
+                .0
                 .is_empty(),
             "a stray default-path file degrades to the not-adopted case"
         );
@@ -644,7 +665,8 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §enforcement-map — every event is read, a member row is headed by its
-    // operand and credited to its owner, and an unknown operand keeps the path attribution
+    // operand and credited to its owner, an unknown operand or a malformed registration keeps the
+    // path attribution, and an observed member rows apart under Observed hooks whatever its event
     #[test]
     fn every_hook_event_is_rowed_and_a_member_is_credited_to_its_owner() {
         let dir = std::env::temp_dir().join(format!("enfmap-events-{}", std::process::id()));
@@ -654,14 +676,17 @@ mod tests {
             &f,
             r#"{"hooks":{
                 "SubagentStop":[{"hooks":[{"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook subagent-stop-liveness"}]}],
-                "SessionStart":[{"hooks":[{"type":"command","command":"bash scripts/s.sh"}]}],
+                "SessionStart":[{"hooks":[{"type":"command","command":"bash scripts/s.sh"},
+                    {"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook session-context --observe"}]}],
                 "PreToolUse":[{"matcher":"Write|Edit","hooks":[
                     {"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook workflow-state-guard"},
-                    {"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook no-such-member"},
+                    {"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook no-such-member --observe"},
+                    {"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook shell-guard --obsrve"},
+                    {"type":"command","command":"bash gate-sdk/bin/run-gates.sh --hook agent-dispatch-guard --observe 2>/dev/null"},
                     {"type":"command","command":"bash guard-kit/bin/g.sh"}]}]}}"#,
         )
         .expect("write");
-        let s = hook_sections(&f.display().to_string(), true).expect("parses");
+        let (s, observed) = hook_sections(&f.display().to_string(), true).expect("parses");
         let rows = |i: usize| -> Vec<(String, Vec<String>)> {
             s[i].rows.iter().map(|r| (r.kit.clone(), r.cells.clone())).collect()
         };
@@ -672,12 +697,24 @@ mod tests {
             vec![
                 ("lifecycle-kit".into(), v(&["workflow-state-guard", "PreToolUse", "Write\\|Edit"])),
                 ("gate-sdk".into(), v(&["gate-sdk/bin/run-gates.sh", "PreToolUse", "Write\\|Edit"])),
+                ("gate-sdk".into(), v(&["gate-sdk/bin/run-gates.sh", "PreToolUse", "Write\\|Edit"])),
                 ("guard-kit".into(), v(&["guard-kit/bin/g.sh", "PreToolUse", "Write\\|Edit"])),
                 ("delegation-kit".into(), v(&["subagent-stop-liveness", "SubagentStop", "*"])),
             ]
         );
         assert_eq!(s[1].title, "Session warnings");
         assert_eq!(rows(1), vec![("(consumer)".into(), v(&["scripts/s.sh"]))]);
+        let observed = observed.expect("the observed registrations row apart");
+        assert_eq!(observed.title, "Observed hooks");
+        let o: Vec<(String, Vec<String>)> =
+            observed.rows.iter().map(|r| (r.kit.clone(), r.cells.clone())).collect();
+        assert_eq!(
+            o,
+            vec![
+                ("delegation-kit".into(), v(&["agent-dispatch-guard", "PreToolUse", "Write\\|Edit"])),
+                ("context-kit".into(), v(&["session-context", "SessionStart", "*"])),
+            ]
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
