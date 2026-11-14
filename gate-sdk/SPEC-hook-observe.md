@@ -12,7 +12,7 @@ Pairs `hook-observe-mode`. A consumer adopting a blocking hook in production wan
 
 ## What changes
 
-### (1) The grammar and the observed run {design-bearing} {user-facing: operator direction 2026-11-14, lead-relayed (not a ruling): one `--observe` flag, `--hook <member> [--observe] [--binding <name>]`; under it the arm is silent and exits 0}
+### (1) The grammar and the observed run {design-bearing} {user-facing: operator direction 2026-11-14, lead-relayed (not a ruling): one `--observe` flag, `--hook <member> [--observe] [--binding <name>]`; under it the arm is silent and exits 0. Widened from "every blocking arm" to every member, the operator shown that an observed `shell-guard` withholds its grants, so a trial may show permission prompts}
 
 **The grammar.** `--hook <member> [--observe] [--binding <name>]`, in that order, each at most once. One parser reads the trailing tokens for the arm and for the registration readers (delta 3). A token outside the grammar is refused where and as an unknown member is refused: exit 2 naming the token and printing the grammar, and under §The harness-integration arm's no-tree decline, the no-tree notice. A misspelled flag therefore blocks loudly rather than enforcing in silence, and `check-settings-paths` catches it at the commit (delta 3).
 
