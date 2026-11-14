@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: installer-review-residue-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-10-25, lead-relayed, not a ruling; the iteration opened undirected):** option A, six debt units and two features. Debt, the six gap bullets install-commit-hooks-pass' close carried: `uninstall-lost-restore-line`, `personal-detect-non-utf8`, `init-attribution-read-order`, `init-refusing-hook-witness`, `hookspath-line-break-trim`, `env-probe-unchanged-markers`. Features, promoted by spec with their amendments: `init-identity-precondition`, `hookspath-non-utf8-restore`. Stages scope, spec, build, validate, close, with align where check-stage-entry assertion C demands it. Composition: bundled, the carried bullets joining both pool entries on init and uninstall's commit path (installer) and `--install-hooks`' `core.hooksPath` read (gate-sdk); drain 8 (6 taken at intake, 2 from the pool) against inflow 2.4. Supersession: `hookspath-line-break-trim` reshaped by `hookspath-non-utf8-restore`, the same decode line in `prior`, so the two land in one batch with the trim made over bytes; `uninstall-lost-restore-line` independent of `init-identity-precondition`.
-
-  **Push need (operator direction 2026-10-25, inside the budget):** 1 against 2, the closing push alone; no entry is observed by a remote run, and every fix is host-neutral code a local run reaches.
 
 ---
 
