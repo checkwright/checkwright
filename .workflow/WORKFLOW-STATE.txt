@@ -5,3 +5,4 @@
 ---
 
 liveness-arm-adoption-pass scope a5ef297b 2026-11-14 54dccd322
+liveness-arm-adoption-pass spec a081c78b 2026-11-14 f104622aa
