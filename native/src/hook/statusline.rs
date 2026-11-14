@@ -5,6 +5,7 @@ use crate::emit::kpi;
 use crate::hook::{self, usage};
 use crate::hook::usage::Snapshot;
 use crate::walk;
+use serde_json::Value;
 
 // spec: delegation-kit/SPEC.md §The statusline arm — the arm's declared reads. NOT
 // `DELEGATION_KIT_USAGE_HISTORY`: the shipped producer calls `usage-verdict` nowhere, so the knob
@@ -46,23 +47,13 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("statusline: {}", line);
     }
     let payload = hook::read_payload();
-    let usage::Paths { usage_file, cred_file, account_config } = usage::paths().unwrap_or_default();
+    record(payload.as_ref(), &usage::paths().unwrap_or_default());
 
     let at = |path: &[&str]| hook::field(payload.as_ref(), path);
     let five = at(&["rate_limits", "five_hour", "used_percentage"]);
     let five_resets = at(&["rate_limits", "five_hour", "resets_at"]);
     let seven = at(&["rate_limits", "seven_day", "used_percentage"]);
     let seven_resets = at(&["rate_limits", "seven_day", "resets_at"]);
-
-    Snapshot {
-        five_hour_used_pct: five.clone(),
-        five_hour_resets_at: five_resets.clone(),
-        seven_day_used_pct: seven.clone(),
-        seven_day_resets_at: seven_resets.clone(),
-        account: usage::json_field(&account_config, &["oauthAccount", "accountUuid"]),
-        tier: usage::json_field(&cred_file, &["claudeAiOauth", "subscriptionType"]),
-    }
-    .write(&usage_file);
 
     let model = slug(&at(&["model", "display_name"]));
     let effort = at(&["effort", "level"]);
@@ -110,6 +101,27 @@ pub fn run(args: &[String]) -> i32 {
     }
     println!("{}", bar);
     0
+}
+
+// spec: delegation-kit/SPEC.md §The usage.txt contract — a payload carrying no rate-limit window
+// writes nothing and leaves `updated_at` where the last carrying render put it, so the last good
+// reading survives and still ages into STALE; `true` only for a completed write.
+fn record(payload: Option<&Value>, paths: &usage::Paths) -> bool {
+    let at = |path: &[&str]| hook::field(payload, path);
+    let five = at(&["rate_limits", "five_hour", "used_percentage"]);
+    let seven = at(&["rate_limits", "seven_day", "used_percentage"]);
+    if five.is_empty() && seven.is_empty() {
+        return false;
+    }
+    Snapshot {
+        five_hour_used_pct: five,
+        five_hour_resets_at: at(&["rate_limits", "five_hour", "resets_at"]),
+        seven_day_used_pct: seven,
+        seven_day_resets_at: at(&["rate_limits", "seven_day", "resets_at"]),
+        account: usage::json_field(&paths.account_config, &["oauthAccount", "accountUuid"]),
+        tier: usage::json_field(&paths.cred_file, &["claudeAiOauth", "subscriptionType"]),
+    }
+    .write(&paths.usage_file)
 }
 
 // spec: delegation-kit/SPEC.md §The statusline arm — the model's first word, lowercased, with
@@ -358,6 +370,50 @@ mod tests {
         assert_eq!(slug("Opus 5 (1M context)"), "opus");
         assert_eq!(slug("claude-3.5"), "claude35");
         assert_eq!(slug(""), "");
+    }
+
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — a render carrying a window rewrites
+    // the snapshot, a weekly-only one with the five-hour pair empty; a render carrying none, or no
+    // payload at all, leaves the last good snapshot byte-identical, `updated_at` included
+    #[test]
+    fn a_render_without_rate_limits_keeps_the_last_snapshot() {
+        let dir = std::env::temp_dir().join(format!("checkwright-statusline.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("the scratch config home must be creatable");
+        let file = |name: &str| dir.join(name).display().to_string();
+        let paths = usage::Paths {
+            usage_file: file("usage.txt"),
+            cred_file: file("absent-credentials.json"),
+            account_config: file("absent-account.json"),
+        };
+        let read = || std::fs::read_to_string(&paths.usage_file).expect("the snapshot must exist");
+
+        let weekly_only = serde_json::json!({
+            "rate_limits": {"seven_day": {"used_percentage": 91, "resets_at": 1756656000}}
+        });
+        assert!(record(Some(&weekly_only), &paths));
+        let good = read();
+        assert!(good.starts_with("five_hour_used_pct=\nfive_hour_resets_at=\nupdated_at="));
+        assert!(good.contains("\nseven_day_used_pct=91\nseven_day_resets_at=1756656000\n"));
+
+        for bare in [
+            serde_json::json!({"model": {"display_name": "Opus"}}),
+            serde_json::json!({"rate_limits": null}),
+            serde_json::json!({"rate_limits": {}}),
+        ] {
+            assert!(!record(Some(&bare), &paths), "{} must not write", bare);
+            assert_eq!(read(), good, "{} rewrote the last good snapshot", bare);
+        }
+        assert!(!record(None, &paths));
+        assert_eq!(read(), good);
+
+        let both = serde_json::json!({
+            "rate_limits": {"five_hour": {"used_percentage": 12.5, "resets_at": 1756600000}}
+        });
+        assert!(record(Some(&both), &paths));
+        assert!(read().starts_with("five_hour_used_pct=12.5\nfive_hour_resets_at=1756600000\n"));
+        assert!(!read().contains("seven_day"), "an absent weekly window must not be carried over");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — an empty argv names nothing, and a surplus one,
