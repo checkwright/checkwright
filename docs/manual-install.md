@@ -19,11 +19,14 @@ cw="$(mktemp -d)" \
   && curl -fsSLo "$cw/checkwright-$v.tgz.sha256" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz.sha256"
 ```
 
-Where `gh` is installed and signed in, check the build attestation too; a release older than attestation fails it:
+Where `gh` and `jq` are installed and `gh` is signed in, check the build attestation too; a release older than attestation fails it:
 
 ```sh
-gh attestation verify "$cw/checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v"
+gh attestation verify "$cw/checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v" --format json > "$cw/attestation.json" \
+  && jq -r '.[] | .verificationResult | "verified \(.statement.subject[0].name) sha256:\(.statement.subject[0].digest.sha256) signed by \(.signature.certificate.buildSignerURI)"' "$cw/attestation.json"
 ```
+
+A passing check prints one line, `verified`, then the tarball's name, its digest, and the release workflow that signed it, `publish.yml` at the version's tag. A failing one prints its error and stops with a non-zero exit. Asked for JSON, `gh` prints its result to a pipe too; without it, `gh` prints only to a terminal, so an agent sees nothing at all.
 
 Then verify, extract and run `init` from your repository root:
 
@@ -66,10 +69,21 @@ Download the release, in PowerShell. Each block here stops at its first error, t
 
 <!-- windows-fetch:end -->
 
-Check the attestation as on macOS and Linux:
+Check the attestation as on macOS and Linux, printing the same line without `jq`:
 
 ```powershell
-gh attestation verify "$cw\checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v"
+. {
+  $keep = $ErrorActionPreference
+  try {
+    $ErrorActionPreference = 'Stop'
+    $json = gh attestation verify "$cw\checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v" --format json
+    if ($LASTEXITCODE -ne 0) { throw 'the attestation check failed: read the error above' }
+    foreach ($a in (($json -join "`n") | ConvertFrom-Json)) {
+      $r = $a.verificationResult
+      "verified $($r.statement.subject[0].name) sha256:$($r.statement.subject[0].digest.sha256) signed by $($r.signature.certificate.buildSignerURI)"
+    }
+  } finally { $ErrorActionPreference = $keep }
+}
 ```
 
 Then check the digest, unpack, and run `init`, still from your repository root:

@@ -65,6 +65,7 @@ pub mod queue_migrate;
 pub mod queue_verbs;
 pub mod reads_census;
 pub mod release_table;
+pub mod hook_knobs;
 pub mod rewrite;
 pub mod scan_prompts;
 pub mod selection_probe;
@@ -338,6 +339,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
             crate::release_sections::SECTIONS_KNOB,
             crate::release_sections::ALIASES_KNOB,
         ],
+    ),
+    // spec: gate-sdk/SPEC.md §check-hook-knobs-fresh — each row's default is the roster's, so the
+    // pages dir is the one knob whose value it reads
+    (
+        "--emit-hook-knobs",
+        Arm::Emit(hook_knobs::emit, Grammar::Flags(&["--write"])),
+        &[hook_knobs::PAGES_KNOB],
     ),
     // spec: canon-kit/SPEC.md §The reference-link grammar — the source set is derived from the
     // tracked tree rather than enumerated, so the configured values are the blob ref, the mirror

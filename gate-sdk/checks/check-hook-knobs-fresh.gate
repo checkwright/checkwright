@@ -1,0 +1,5 @@
+# graph: couples=knob:GATE_SDK_HOOK_PAGES_DIR/*.md,native/src/hook/mod.rs,native/src/emit/hook_knobs.rs,native/src/knobs/*.rs dir=one valve=none tier=precommit
+# projection: knob:GATE_SDK_HOOK_PAGES_DIR/*.md
+# install: zero-config
+# armed-by: GATE_SDK_HOOK_PAGES_DIR
+# spec: gate-sdk/SPEC.md §check-hook-knobs-fresh — each hook page's hook-knobs block is the byte-fresh table of its member's knob slice, every page names a member, and every tree-free member has a page

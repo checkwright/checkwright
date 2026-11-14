@@ -134,6 +134,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_WORKFLOW_DIR", ".workflow"),
         Row::scalar("GATE_SDK_TMP_DIR", ".tmp"),
         Row::derived("GATE_SDK_HOOK_OBSERVE_LOG", Shape::Scalar, hook_observe_log, &["GATE_SDK_TMP_DIR"]),
+        Row::scalar("GATE_SDK_HOOK_PAGES_DIR", "").words(),
         Row::scalar("GATE_SDK_QUEUE_FILE", "TASK-QUEUE.md"),
         Row::scalar("GATE_SDK_AGENT_FILE", "CLAUDE.md"),
         Row::scalar("GATE_SDK_REGISTRY_DOC", "README.md"),

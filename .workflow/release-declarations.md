@@ -4,10 +4,12 @@
 
 - `check-settings-paths` and `check-plugin-parity` — red a hook registration whose tokens after the member leave `--hook <member> [--observe] [--binding <name>] [--knobs <absolute file>]`, which they read as clean before; the arm now refuses such a registration at run time. Fix the misspelled or misordered token.
 - `check-settings-paths` — reds a hook registration whose `--knobs` names a relative path, which it read as clean before; the arm declines such a registration on every firing. Write the file's absolute path.
+- `check-hook-knobs-fresh` — new, off until `GATE_SDK_HOOK_PAGES_DIR` is set: holds each hook-arm page's knob block to its member's knob table, and reds a page naming no member and a tree-free member with no page. Nothing to do unless you publish a page per hook arm; register it with the knob, then run `--emit hook-knobs --write`.
 
 ## Knob changes
 
 - `GATE_SDK_HOOK_OBSERVE_LOG` — new: the log an observed hook appends its would-be decision to, default `<GATE_SDK_TMP_DIR>/hook-observe.log`. Nothing to do unless you register a hook under `--observe`; outside any repository, set it absolute.
+- `GATE_SDK_HOOK_PAGES_DIR` — new: a word list of the directories whose hook-arm pages `--emit hook-knobs` writes and `check-hook-knobs-fresh` holds, default empty, which governs no page. Nothing to do unless you publish a page per hook arm.
 - `DELEGATION_KIT_STOP_WAIT` — new: the turn-end hook's waiting policy, `refuse` or `resume-wait`, defaulting to `refuse`, which is the hook's behavior unchanged. Any other value fails the knob table at exit 2 and makes the hook decline with an operator notice. Nothing to do; bind `resume-wait` only where your harness gives a session a new turn when its own background task completes.
 
 ## Behavior changes

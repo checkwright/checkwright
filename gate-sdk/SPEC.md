@@ -66,6 +66,7 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_AGENT_FILE` (default `CLAUDE.md`): the always-loaded agent file a consumer's harness reads. Set it to `AGENTS.md` under an agent-file harness, and `check-root-tiering`'s built-in allowlist accepts that file at root.
 - `GATE_SDK_ENFORCEMENT_FILE` (default `docs/enforcement.md`): the committed enforcement-map page §check-enforcement-fresh compares; an explicit positional still wins.
 - `GATE_SDK_ENFORCE_SCAN_DIR` (default `.`): the enforcement map's monitor-marker scan root (§enforcement-map).
+- `GATE_SDK_HOOK_PAGES_DIR` (default **empty**): a word list of the directories holding hook-arm pages, each relative to the work-tree top, whose knob blocks `--emit hook-knobs` writes and §check-hook-knobs-fresh holds. Empty is the off member: the arm and the gate govern no page, the gate printing its skip line, for a consumer with no docs site to hold. It is a word list rather than a scalar so that the gate's rooted `# graph:` token expands an empty value to no root (§The `# graph:` manifest).
 - `GATE_SDK_CORE_FILES_FILE` (default `<gates-dir>/core-files.list`), `GATE_SDK_IDENTITY_FILE` (default `<gates-dir>/identity.conf`) and `GATE_SDK_ROOT_ALLOWLIST` (default `<gates-dir>/root-allowlist.list`).
 - `GATE_SDK_REGISTRY_DOC` (default `README.md`) and `GATE_SDK_RUNNER_DOC` (default `README.md`), for `check-kit-registration` (see there).
 - `GATE_SDK_PROJECTION_ROSTER` (default **empty**): the consumer's roster file of generated projections that `check-projection-roster` holds to the gates declaring `# projection:`. Empty disarms that gate, since the kit cannot know where any consumer keeps its roster (see there). `GATE_SDK_PROJECTION_ROSTER_SECTION` (default **empty**, meaning the whole file) is the heading text of the section holding that roster's rows.
@@ -3775,6 +3776,23 @@ Each enforcement class reads one registry, every registry defaulting to this rep
 Invariant: the committed enforcement-map page (`GATE_SDK_ENFORCEMENT_FILE`) byte-matches the enforcement-map emitter, the check-graph byte-compare pattern. Bare, it runs the emitter and compares the committed page. Given two arguments (`projection-file emit-file`) it compares pre-baked files, the hermetic mode the `bad/` fixture case drives off the live registries. `good/` exercises the live emitter on its default branch over a staged synthetic registry set. That case is hermetic only while it carries none of the class roster's owner SPEC paths: the emitter links an owner section through the enclosing repo's origin whenever that path is tracked, and a committed case file is tracked. An emitter unit test holds the case to that. Fail-closed: a missing projection, a missing emit source, or a failed emit is a red (exit 2), never a false clean.
 
 **It is a registry member of the gate binary, and calls the emitter module's `emit()` in-process**, as §check-footprint-fresh does. It declares every registry knob the emitter reads, the `EVIDENCE_KIT_RUN_` **prefix family** included. The `bad/` case bypasses the emitter and the `good/` case stages no suite roster, so in a fixture run those knobs are resolved but unread, which is why an empty family must resolve rather than refuse (§lib/gate.sh). Its `# graph:` manifest couples every class registry beside the artifact itself, so any registry change re-runs the compare: the gate sources (so a `tier=` edit re-fires), `kpis.list`, the settings file, and every file the monitor walk reads, through `knob:GATE_SDK_ENFORCE_SCAN_DIR/*`. Its help text names the regeneration command, reachable because the gate rides the pre-commit hook, as check-graph does.
+
+### check-hook-knobs-fresh
+
+`checks/check-hook-knobs-fresh.gate` (`precommit`, binary-dispatched). An adopter weighing one session-hook arm reads a hand-written page per arm, `<member>.md` directly under a directory `GATE_SDK_HOOK_PAGES_DIR` names, its file name the `HOOKS` member (§The harness-integration arm). The prose is the page author's, since it summarises behaviour the owning SPEC states. The knob table is derived, since a knob's name and default change with the crate.
+
+**The arm.** `--emit hook-knobs` renders, for each page, the block between `<!-- hook-knobs:begin -->` and `<!-- hook-knobs:end -->` from the member's own `HOOKS` knob slice. It renders one row per knob in slice order, with four columns:
+
+- the knob;
+- its owning kit;
+- its shape (scalar, indexed or keyed);
+- its default, as the owning kit's table resolves it with no file layer.
+
+A derived default renders as the value it derives to, an empty one as `(empty)`, and a `|` in a value is escaped. The dispatcher's `GATE_SDK_HOOK_OBSERVE_LOG` belongs to no member's slice, so it is no row, and a page names it in its prose beside the `--observe` trial. Bare, the arm prints each page's block. `--write` rewrites each block and touches nothing else, and refuses a page that names no member.
+
+**Invariant.** Each page's block byte-matches the arm's rendering, compared in process, and the gate prints the `--write` command on a stale block. It also reds a page whose file name is no `HOOKS` member, a page with no marker pair or more than one, and a tree-free member with no page. So a page is owed for every member whose tree-free column is true, the set an adopter can run alone, and a widening of the column brings its page in the commit that widens it. A page for a tree-bound member is allowed and not owed. Fail-closed: a named pages directory that does not exist, or an unreadable page, refuses at exit 2. An explicit positional names the directory in place of the knob, the mode a crate unit test drives to hold the tree-free-member red and the missing-directory refusal, since a fixture case can stage no tree-free member out of the binary's own table.
+
+**Its `# graph:` manifest couples** the pages through `knob:GATE_SDK_HOOK_PAGES_DIR/*.md`, the hook table's module, the arm's and every kit's knob table under native/src/knobs, so a knob slice, a default or a page edit re-fires the compare at commit.
 
 ### check-kit-enum
 

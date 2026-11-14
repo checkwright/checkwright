@@ -351,7 +351,7 @@ An install needs a supported system and a few tools, and [What an install requir
 
 ## Install
 
-Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree, and that commit runs your own hooks, so one judging every file must let the kit directories pass. The line downloads the newest Release tarball, verifies its digest and, where `gh` is signed in, its build attestation, then runs `init` from outside your repository, with no runtime to install first. The recommended path starts with `demo`, to see the guarantee. Install with your line and run the commands `init` prints; `checkwright prove` then shows the guarantee on your tree ([Prove it on your tree](https://checkwright.dev/install.html#prove-it-on-your-tree)).
+Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree, and that commit runs your own hooks, so one judging every file must let the kit directories pass. The line downloads the newest Release tarball, verifies its digest and, where `gh` is signed in, its build attestation, then runs `init` from outside your repository, with no runtime to install first. Start with `demo` to see the guarantee, then install and run the commands `init` prints; `checkwright prove` shows the guarantee on your tree ([Prove it on your tree](https://checkwright.dev/install.html#prove-it-on-your-tree)).
 
 Pick your route:
 
@@ -420,7 +420,7 @@ To run each step yourself on Windows: [Installing step by step](https://checkwri
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation ([installer/SPEC.md](https://checkwright.dev/installer/SPEC.html#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first, which puts the `sh` npm starts it with on your `PATH`.
+`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation ([installer/SPEC.md](https://checkwright.dev/installer/SPEC.html#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first: it puts the `sh` npm needs on your `PATH`.
 
 ### From a plugin marketplace
 
@@ -483,6 +483,7 @@ Its last line is the verdict, and its exit status says the same: `PROVE: held`, 
 - **What a commit costs**, measured: [the pre-commit figure](https://checkwright.dev/requirements.html#what-a-commit-costs).
 - **Every step of the install**, run by hand: [Manual steps](https://checkwright.dev/manual-install.html).
 - **Managing, uninstalling and upgrading**: [Maintenance](https://checkwright.dev/maintenance.html).
+- **One session hook alone**, with no repository: [the turn-end hook](https://checkwright.dev/hooks/subagent-stop-liveness.html).
 
 Back to the [kit map](https://checkwright.dev/#the-kits) or [why Checkwright](https://checkwright.dev/methodology.html).
 
@@ -530,6 +531,7 @@ The install itself and the optional docs gates need these as well. `doctor` does
 | `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
 | Git for Windows | `git` at the floor above | required to install on Windows | it supplies `git`, and once the install page's `PATH` block has run, the `sh` and `sha256sum` `npx` runs the bootstrap with; `bash` only where a row above owes it |
 | `gh` | any carrying `gh attestation` | optional: to check the build attestation | the one-line install runs `gh attestation verify` when `gh` is signed in, and says so when it is not |
+| `jq` | any | optional: to read the attestation check by hand on Linux and macOS | the manual verify step prints what `gh` verified through `jq`; the Windows block reads it without `jq` |
 | Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
 | Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |
 | `kramdown-parser-gfm` | any | optional: only if you register site-kit's docs gates | `check-docs-render-fidelity` re-renders every page through it |
@@ -576,11 +578,14 @@ cw="$(mktemp -d)" \
   && curl -fsSLo "$cw/checkwright-$v.tgz.sha256" "https://github.com/checkwright/checkwright/releases/download/v$v/checkwright-$v.tgz.sha256"
 ```
 
-Where `gh` is installed and signed in, check the build attestation too; a release older than attestation fails it:
+Where `gh` and `jq` are installed and `gh` is signed in, check the build attestation too; a release older than attestation fails it:
 
 ```sh
-gh attestation verify "$cw/checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v"
+gh attestation verify "$cw/checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v" --format json > "$cw/attestation.json" \
+  && jq -r '.[] | .verificationResult | "verified \(.statement.subject[0].name) sha256:\(.statement.subject[0].digest.sha256) signed by \(.signature.certificate.buildSignerURI)"' "$cw/attestation.json"
 ```
+
+A passing check prints one line, `verified`, then the tarball's name, its digest, and the release workflow that signed it, `publish.yml` at the version's tag. A failing one prints its error and stops with a non-zero exit. Asked for JSON, `gh` prints its result to a pipe too; without it, `gh` prints only to a terminal, so an agent sees nothing at all.
 
 Then verify, extract and run `init` from your repository root:
 
@@ -615,10 +620,21 @@ Download the release, in PowerShell. Each block here stops at its first error, t
 }
 ```
 
-Check the attestation as on macOS and Linux:
+Check the attestation as on macOS and Linux, printing the same line without `jq`:
 
 ```powershell
-gh attestation verify "$cw\checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v"
+. {
+  $keep = $ErrorActionPreference
+  try {
+    $ErrorActionPreference = 'Stop'
+    $json = gh attestation verify "$cw\checkwright-$v.tgz" --repo checkwright/checkwright --source-ref "refs/tags/v$v" --format json
+    if ($LASTEXITCODE -ne 0) { throw 'the attestation check failed: read the error above' }
+    foreach ($a in (($json -join "`n") | ConvertFrom-Json)) {
+      $r = $a.verificationResult
+      "verified $($r.statement.subject[0].name) sha256:$($r.statement.subject[0].digest.sha256) signed by $($r.signature.certificate.buildSignerURI)"
+    }
+  } finally { $ErrorActionPreference = $keep }
+}
 ```
 
 Then check the digest, unpack, and run `init`, still from your repository root:
@@ -673,6 +689,81 @@ An upgrade has two phases:
 Every release note opens with **In brief**: a table linking each section below with its entry count and who acts on it, then a few plain bullets on what you get and whether you must act. Its **New and tightened gates**, **Knob changes**, **Gate-authoring changes**, **Platforms** and **Behavior changes** sections list what you reconcile. Each says "None." when there is nothing. The [releases page](https://checkwright.dev/releases.html) tabulates every note, with whether each needs action on upgrade. The bump rules and the note grammar: [Versioning](https://checkwright.dev/installer/SPEC.html#versioning) and [The upgrade contract](https://checkwright.dev/installer/SPEC.html#the-upgrade-contract).
 
 An installed tree checks for a newer release once a week with `git ls-remote`, which shows the upstream host your IP address, and `doctor` and the session-context hook say when one exists. Set `GATE_SDK_UPDATE_CHECK = off` in your gates directory's `gate-sdk-config.knobs` to turn it off.
+
+Source: https://checkwright.dev/hooks/subagent-stop-liveness.html
+
+# The `subagent-stop-liveness` hook
+
+This is one session hook you can run on its own, without adopting a kit: you install it for your user and add one entry to your coding agent's settings. This page tells you what it does and how to try it; each section links the specification that owns the detail. The other ways to install are on the [install page](https://checkwright.dev/install.html).
+
+## What it refuses
+
+A coding agent can dispatch a session to do a piece of work. That session can start a command in the background and end its turn while the command still runs, so its report reaches its caller while the command keeps writing files nobody is watching. This hook runs when a dispatched session ends its turn, the `SubagentStop` event in Claude Code, and refuses the turn end while either of these holds:
+
+- a launch record in its scratch directory names a process that is still running;
+- the agent's task list shows a background shell command the session started, still running.
+
+The refused session reads why, and what it may do: wait on the work's own output, or delete a record whose process has exited. The main session's turn end is never refused. Its readings, its wait modes and its limits are [delegation-kit/SPEC.md §The turn-end liveness hook](https://checkwright.dev/delegation-kit/SPEC.html#the-turn-end-liveness-hook).
+
+## What it reads
+
+- **The event's payload**, on standard input: which session stopped, whether the agent is already continuing after a refusal, its list of running tasks, and the session's transcript, which it reads only to tell the tasks the session launched from its siblings'.
+- **Launch records**: files named `<key>.run` in the scratch directory, each one line `pid=<n> run=<key>`. Whatever launches long-running work writes one, your work engine or a session following the waiting rule, and deletes it once the process has exited. A record whose line does not parse refuses too, until it is fixed or deleted. The line's grammar is [evidence-kit/SPEC.md §The producer-liveness lock](https://checkwright.dev/evidence-kit/SPEC.html#the-producer-liveness-lock).
+- **Its knob file**, named in the settings entry after `--knobs`. It reads no repository, so it runs from whatever directory the agent starts it in.
+
+## How it exits
+
+- **Allowed**: exit 0, with nothing on standard output.
+- **Refused**: exit 2, the reason on standard error, which the agent shows the session as the reason its turn did not end.
+- **A knob it cannot use**, such as a relative path: it allows the turn end and prints a notice for you, naming the knob, so an unguarded turn end is never silent.
+- **Every firing** appends one line to the stop log, `DELEGATION_KIT_STOP_LOG`: the time, the event, the session, the reading, the decision, and the names of the payload's keys, never their values.
+- **On trial**, every call appends one line to the observe log instead, and nothing is enforced.
+
+The dispatch, the notice and the trial are [gate-sdk/SPEC.md §The harness-integration arm](https://checkwright.dev/gate-sdk/SPEC.html#the-harness-integration-arm).
+
+## Its knobs
+
+| Knob | Kit | Shape | Default |
+| --- | --- | --- | --- |
+| `DELEGATION_KIT_STOP_LOG` | delegation-kit | scalar | `.workflow/subagent-stop-liveness.log` |
+| `DELEGATION_KIT_STOP_WAIT` | delegation-kit | scalar | `refuse` |
+| `DELEGATION_KIT_LIVENESS_CMD` | delegation-kit | indexed | (empty) |
+| `GATE_SDK_TMP_DIR` | gate-sdk | scalar | `.tmp` |
+
+The defaults are the in-repository ones. Run outside a repository, the hook needs both paths absolute and declines on a relative one, so the install below writes absolute paths into the knob file. `DELEGATION_KIT_STOP_WAIT` takes `refuse` or `resume-wait`, the second for an agent that gives a session a new turn when its own background command completes. `DELEGATION_KIT_LIVENESS_CMD` replaces the process check, which by default is the installed binary itself. No knob turns the refusal off: removing the settings entry does.
+
+## Installing it alone
+
+On macOS and Linux:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh -s -- init --user subagent-stop-liveness
+```
+
+On Windows, in PowerShell:
+
+```powershell
+& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --user subagent-stop-liveness
+```
+
+It needs no repository and writes into none. It places the binary and the knob file in your per-user data directory, makes the scratch directory under your per-user state directory, and prints a `settings:` block holding:
+
+- the agent and version the entry needs, Claude Code 2.1.139 or later, and the settings file to merge it into, `~/.claude/settings.json` or the one under `CLAUDE_CONFIG_DIR`;
+- one JSON line, the entry for the file's `hooks` object, which runs the placed binary on `SubagentStop` with `--hook subagent-stop-liveness --knobs <the knob file>`;
+- a `trial:` line, for the step below;
+- a `launch records:` line, naming the scratch directory.
+
+The install never writes your settings: merging the entry is yours to do. `--dry-run` prints the plan and the block and writes nothing, and `update --user` places a newer binary and prints the block again. The directories and the knob file are [installer/SPEC.md §The user install](https://checkwright.dev/installer/SPEC.html#the-user-install), and the record the install keeps of itself is [§The user manifest](https://checkwright.dev/installer/SPEC.html#the-user-manifest).
+
+**Try it before it enforces.** Put `--observe` after `subagent-stop-liveness` in the entry's `args`. The hook then allows every turn end and logs the decision it would have taken, one `would=` line per call, to the observe log `GATE_SDK_HOOK_OBSERVE_LOG` names, which sits in the scratch directory unless you set it ([gate-sdk/SPEC.md §Layout and configuration](https://checkwright.dev/gate-sdk/SPEC.html#layout-and-configuration)). Once the log shows the refusals you want, take `--observe` out.
+
+**Point your launch records at the scratch directory**, or set `GATE_SDK_TMP_DIR` in the knob file to the directory your engine writes them to. A later install keeps a knob file you edited.
+
+To check the release before anything runs, download and verify it by hand, the attestation included, as [Installing step by step](https://checkwright.dev/manual-install.html) shows, then run `init --user subagent-stop-liveness` from the unpacked package in place of `init`.
+
+## Removing it
+
+Run the install line with `uninstall --user` in place of `init --user subagent-stop-liveness`. It removes the binary, the user manifest and every knob file you left unedited, and keeps one you edited unless you pass `--force`. It keeps the state directory, since the logs and launch records there are your evidence. It then prints a `settings:` reminder: delete the `SubagentStop` entry from your settings file yourself. What it removes and keeps is [installer/SPEC.md §uninstall](https://checkwright.dev/installer/SPEC.html#uninstall).
 
 Source: https://checkwright.dev/spec-toolkits.html
 
@@ -829,7 +920,7 @@ _Generated by `bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`; do n
 | doctrine-kit | 1 | — | — | — | — | — | ~520t | — |
 | drift-kit | — | 15 | — | — | — | — | — | ~1863t |
 | evidence-kit | 3 | — | — | — | — | — | — | — |
-| gate-sdk | 39 | — | — | — | 20 | — | — | ~787t |
+| gate-sdk | 40 | — | — | — | 20 | — | — | ~787t |
 | guard-kit | 1 | — | 1 | — | — | — | — | ~1125t |
 | installer | — | — | — | — | — | — | — | — |
 | lifecycle-kit | 16 | — | 1 | — | — | — | ~76t | ~36102t |
@@ -837,7 +928,7 @@ _Generated by `bash gate-sdk/bin/run-gates.sh --emit value-rollup --write`; do n
 | queue-kit | 10 | — | — | — | — | — | — | ~359t |
 | site-kit | 5 | — | — | — | — | — | — | — |
 | (consumer) | 35 | — | — | — | 1 | 1 | — | — |
-| **total** | 156 | 15 | 5 | 1 | 21 | 1 | ~596t | ~53423t |
+| **total** | 157 | 15 | 5 | 1 | 21 | 1 | ~596t | ~53423t |
 
 Source: https://checkwright.dev/enforcement.html
 
@@ -896,6 +987,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | (consumer) | check-docs-mirror-fresh | precommit |
 | [gate-sdk](https://checkwright.dev/gate-sdk/) | check-enforcement-fresh | precommit |
 | (consumer) | check-value-rollup-fresh | precommit |
+| [gate-sdk](https://checkwright.dev/gate-sdk/) | check-hook-knobs-fresh | precommit |
 | (consumer) | check-product-statement-fresh | precommit |
 | (consumer) | check-llms-fresh | precommit |
 | (consumer) | check-license-line | precommit |

@@ -38,6 +38,7 @@ CANON_KIT_MANIFEST_FILES[] = reserve/*/README.md
 CANON_KIT_MANIFEST_FILES[] = companion/*/README.md
 CANON_KIT_MANIFEST_FILES[] = doctrine-kit/DOCTRINE.md
 CANON_KIT_MANIFEST_FILES[] = docs/*.md
+CANON_KIT_MANIFEST_FILES[] = docs/hooks/*.md
 CANON_KIT_MANIFEST_FILES[] = docs/*/index.md
 CANON_KIT_MANIFEST_FILES[] = docs/posts/*.md
 
@@ -76,6 +77,7 @@ CANON_KIT_RESTATEMENT_PAGES[] = docs/*/index.md
 # comment-tier-exempt: the site's hand-authored pages held to one statement per fact within a page (docs/page-authoring.md §Page-authoring rules); the dated posts and the generated SPEC and README mirrors stay out, since a mirror's links are its source's
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*.md
 CANON_KIT_PAGE_REPEAT_PAGES[] = docs/*/index.md
+CANON_KIT_PAGE_REPEAT_PAGES[] = docs/hooks/*.md
 
 # comment-tier-exempt: the site's one layout and its include render around every declared page, so a page restating them states the fact twice to its reader
 CANON_KIT_PAGE_REPEAT_CHROME[] = docs/_layouts/*.html
@@ -84,6 +86,7 @@ CANON_KIT_PAGE_REPEAT_CHROME[] = docs/_includes/*.html
 # comment-tier-exempt: the same hand-authored pages held to a word bound (docs/page-authoring.md §Page-authoring rules); the generated pages stay out, a generated page's length being its source's, and the number is this site's calibration
 CANON_KIT_PAGE_LENGTH_PAGES[] = docs/*.md
 CANON_KIT_PAGE_LENGTH_PAGES[] = docs/*/index.md
+CANON_KIT_PAGE_LENGTH_PAGES[] = docs/hooks/*.md
 CANON_KIT_PAGE_LENGTH_EXCLUDE[] = docs/evidence-data.md
 CANON_KIT_PAGE_LENGTH_EXCLUDE[] = docs/enforcement.md
 CANON_KIT_PAGE_LENGTH_EXCLUDE[] = docs/footprint.md
@@ -93,6 +96,7 @@ CANON_KIT_PAGE_LENGTH_MAX_WORDS = 1500
 # comment-tier-exempt: the hand-authored pages whose section citations are links (docs/page-authoring.md §Page-authoring rules): the site pages, the front door, the top-level READMEs and the other root documents GitHub renders; CLAUDE.md and the queue stay out as agent-loaded working surfaces, where links grow every session's read, and the dated posts and generated mirrors stay out
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*.md
 CANON_KIT_CITATION_LINK_PAGES[] = docs/*/index.md
+CANON_KIT_CITATION_LINK_PAGES[] = docs/hooks/*.md
 CANON_KIT_CITATION_LINK_PAGES[] = */README.md
 CANON_KIT_CITATION_LINK_PAGES[] = README.md
 CANON_KIT_CITATION_LINK_PAGES[] = CONTRIBUTING.md
@@ -105,6 +109,7 @@ CANON_KIT_CITATION_LINK_PAGES[] = ROADMAP.md
 # comment-tier-exempt: the site's hand-authored pages, whose code blocks a reader copies whole (docs/page-authoring.md §Page-authoring rules); the generated mirrors stay out, their fences being their kit sources'
 CANON_KIT_FENCE_PASTE_PAGES[] = docs/*.md
 CANON_KIT_FENCE_PASTE_PAGES[] = docs/*/index.md
+CANON_KIT_FENCE_PASTE_PAGES[] = docs/hooks/*.md
 
 # comment-tier-exempt: this repo's measured-claim oracle and the surface its markers are read from — the keys and the facts behind them are consumer config for the same provenance-seam reason the transport and payload vocabularies are, and the surface is the governed manifest set widened by the stage-skill shims, which carry governed prose no other surface reaches (the prose surface excludes them by an ownership decision about copy shape, which is not the ownership this gate's rule needs), and by the work queue, which takes the marker without taking the manifest tier's bare-cardinal ban (canon-kit/SPEC.md §check-manifest-count)
 CANON_KIT_MEASURED_CLAIMS_CMD[] = bash
@@ -155,18 +160,20 @@ CANON_KIT_COMMENT_ACTIONS = on
 # spec: docs/page-authoring.md §Page-authoring rules
 CANON_KIT_SPEC_POINTER_TITLE_ONCE = on
 
-# comment-tier-exempt: the programs this repo's shell fences name beyond the bundled generic utility set — the crate toolchain its contributor battery runs, the fetch, checksum and attestation tools its install recipes use, and the package manager one platform's install recipe names, the npm runner the one-command install uses, and the Spec Kit CLI the companion extension installs through; a tree's toolchain is its own vocabulary, never a kit literal (the provenance seam)
+# comment-tier-exempt: the programs this repo's shell fences name beyond the bundled generic utility set — the crate toolchain its contributor battery runs, the fetch, checksum and attestation tools its install recipes use and the JSON reader that prints the attestation result, and the package manager one platform's install recipe names, the npm runner the one-command install uses, and the Spec Kit CLI the companion extension installs through; a tree's toolchain is its own vocabulary, never a kit literal (the provenance seam)
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = cargo
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = curl
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = sha256sum
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = shasum
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = gh
+CANON_KIT_FENCE_PROGRAMS_EXTRA[] = jq
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = brew
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = npx
 CANON_KIT_FENCE_PROGRAMS_EXTRA[] = specify
 
 # comment-tier-exempt: this repo's reader-facing prose surfaces for check-prose-tells — the hand-authored top-level docs living pages only; the single-level docs/*.md glob deliberately excludes the generated kit mirror (docs/<kit>/) and the immutable dated posts (docs/posts/), since a prose gate forcing edits to generated or immutable pages contradicts them; consumer editorial scope, never a kit literal (the provenance seam)
 CANON_KIT_PROSE_TELL_GLOBS[] = docs/*.md
+CANON_KIT_PROSE_TELL_GLOBS[] = docs/hooks/*.md
 
 # comment-tier-exempt: this repo's hand prose held to check-prose-tells' absence section, where a heading alone shows an empty section; the queue stays out because its one-sentence entry bodies describe gaps and check-task-names' placeholder arm holds it, and amendments stay out because their Retired spellings token is a declaration a reader needs
 CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = */SPEC.md
@@ -174,6 +181,7 @@ CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = */README.md
 CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = README.md
 CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = doctrine-kit/DOCTRINE.md
 CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = docs/*.md
+CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = docs/hooks/*.md
 CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = CLAUDE.md
 CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = TRAJECTORY.md
 CANON_KIT_PROSE_TELL_ABSENCE_GLOBS[] = ROADMAP.md

@@ -87,6 +87,7 @@ check-gate-exemption-tasks
 check-graph
 check-reads-couples
 check-enforcement-fresh
+check-hook-knobs-fresh
 check-kit-enum
 check-kit-registration
 check-readme-roster

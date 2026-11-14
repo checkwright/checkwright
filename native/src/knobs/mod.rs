@@ -1229,17 +1229,26 @@ fn render(out: &mut String, row: &'static Row, v: Value) {
     }
 }
 
+fn defaults_only(name: &str) -> Result<(Value, Origin), String> {
+    if locator(name).is_some() {
+        return Ok((Value::Scalar(format!("${{{}}}", name)), Origin::Placeholder));
+    }
+    let (_, row) = static_row(name)?;
+    Ok((default_value(row, &defaults_only)?, Origin::Default))
+}
+
+// spec: gate-sdk/SPEC.md §check-hook-knobs-fresh — a knob's owning kit, shape word and the default
+// `--emit knob-roster` renders for it
+pub fn default_of(name: &str) -> Result<(&'static str, &'static str, Value), String> {
+    let (kit, row) = static_row(name)?;
+    let (v, _) = defaults_only(name)?;
+    Ok((kit.root, row.shape.word(), v))
+}
+
 // spec: gate-sdk/SPEC.md §The non-gate arm — `--emit knob-roster`: every statically owned knob with
 // its shape and default, the default rendered with every sibling at its own default and a locator
 // input as `${NAME}`, because a locator's value is the invoking environment's
 pub fn roster() -> Result<String, String> {
-    fn defaults_only(name: &str) -> Result<(Value, Origin), String> {
-        if locator(name).is_some() {
-            return Ok((Value::Scalar(format!("${{{}}}", name)), Origin::Placeholder));
-        }
-        let (_, row) = static_row(name)?;
-        Ok((default_value(row, &defaults_only)?, Origin::Default))
-    }
     let mut out = String::new();
     for kit in STATIC_KITS {
         for row in kit.rows {

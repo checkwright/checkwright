@@ -252,6 +252,10 @@ pub fn tree_free_members() -> Vec<&'static str> {
     HOOKS.iter().filter(|r| r.4).map(|r| r.0).collect()
 }
 
+pub fn knobs(member: &str) -> Option<&'static [&'static str]> {
+    HOOKS.iter().find(|r| r.0 == member).map(|r| r.2)
+}
+
 pub fn event(member: &str) -> Option<&'static str> {
     HOOKS.iter().find(|r| r.0 == member).map(|r| r.5)
 }

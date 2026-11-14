@@ -38,6 +38,7 @@ check-kit-enum
 check-path-dialect
 check-pipe-membership
 check-front-end-fail-open
+check-hook-knobs-fresh
 check-readme-roster
 check-reads-couples
 check-smoke-entry-guard

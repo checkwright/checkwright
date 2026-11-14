@@ -1,0 +1,5 @@
+check-hook-knobs-fresh: hooks/not-a-hook.md names no hook member
+check-hook-knobs-fresh: hooks/shell-guard.md: needs exactly one <!-- hook-knobs:begin --> … <!-- hook-knobs:end --> pair, in order (0 begin, 0 end)
+check-hook-knobs-fresh: stale block — hooks/subagent-stop-liveness.md:3 differs from the table subagent-stop-liveness's knobs derive:
+< | `DELEGATION_KIT_STOP_WAIT` | delegation-kit | scalar | `wait` |
+> | `DELEGATION_KIT_STOP_WAIT` | delegation-kit | scalar | `refuse` |

@@ -120,6 +120,7 @@ pub mod readme_roster;
 pub mod reads_couples;
 pub mod release_bump;
 pub mod release_table_fresh;
+pub mod hook_knobs_fresh;
 pub mod roadmap_fresh;
 pub mod root_tiering;
 pub mod rule_citation;
@@ -1986,6 +1987,14 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_RELEASE_SECTION_ALIASES",
         ],
         "-",
+        &[],
+    ),
+    (
+        "check-hook-knobs-fresh",
+        hook_knobs_fresh::run,
+        &[("?", "", "", "dynamic@src/emit/hook_knobs.rs:55 via emit::hook_knobs::pages")],
+        &["GATE_SDK_NATIVE_BIN", "GATE_SDK_HOOK_PAGES_DIR"],
+        "gate-sdk",
         &[],
     ),
     (

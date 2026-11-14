@@ -17,7 +17,7 @@ An install needs a supported system and a few tools, and [What an install requir
 
 <!-- install-primary: tarball -->
 
-Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree, and that commit runs your own hooks, so one judging every file must let the kit directories pass. The line downloads the newest Release tarball, verifies its digest and, where `gh` is signed in, its build attestation, then runs `init` from outside your repository, with no runtime to install first. The recommended path starts with `demo`, to see the guarantee. Install with your line and run the commands `init` prints; `checkwright prove` then shows the guarantee on your tree ([Prove it on your tree](#prove-it-on-your-tree)).
+Run the one line for your system from your repository's root, in a new project or an existing one with every change committed: `init` makes one commit and refuses a dirty worktree, and that commit runs your own hooks, so one judging every file must let the kit directories pass. The line downloads the newest Release tarball, verifies its digest and, where `gh` is signed in, its build attestation, then runs `init` from outside your repository, with no runtime to install first. Start with `demo` to see the guarantee, then install and run the commands `init` prints; `checkwright prove` shows the guarantee on your tree ([Prove it on your tree](#prove-it-on-your-tree)).
 
 Pick your route:
 
@@ -94,7 +94,7 @@ To run each step yourself on Windows: [Installing step by step](manual-install.m
 
 ### With Node
 
-`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first, which puts the `sh` npm starts it with on your `PATH`.
+`npx checkwright init` runs the same `init` from the npm package, which carries npm's provenance attestation ([installer/SPEC.md](installer/SPEC.md#the-dependency-boundary)). The package's command is a shell script, so on Windows run the `PATH` block above first: it puts the `sh` npm needs on your `PATH`.
 
 ### From a plugin marketplace
 
@@ -157,5 +157,6 @@ Its last line is the verdict, and its exit status says the same: `PROVE: held`, 
 - **What a commit costs**, measured: [the pre-commit figure](requirements.md#what-a-commit-costs).
 - **Every step of the install**, run by hand: [Manual steps](manual-install.md).
 - **Managing, uninstalling and upgrading**: [Maintenance](maintenance.md).
+- **One session hook alone**, with no repository: [the turn-end hook](hooks/subagent-stop-liveness.md).
 
 Back to the [kit map](index.md#the-kits) or [why Checkwright](methodology.md).

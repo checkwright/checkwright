@@ -56,6 +56,7 @@ The install itself and the optional docs gates need these as well. `doctor` does
 | `tar.exe` | Windows 10 version 1803 | required to install on Windows | the install block unpacks the tarball with `System32\tar.exe` |
 | Git for Windows | `git` at the floor above | required to install on Windows | it supplies `git`, and once the install page's `PATH` block has run, the `sh` and `sha256sum` `npx` runs the bootstrap with; `bash` only where a row above owes it |
 | `gh` | any carrying `gh attestation` | optional: to check the build attestation | the one-line install runs `gh attestation verify` when `gh` is signed in, and says so when it is not |
+| `jq` | any | optional: to read the attestation check by hand on Linux and macOS | the manual verify step prints what `gh` verified through `jq`; the Windows block reads it without `jq` |
 | Node | 8.2 | optional: only to install with npx | the first Node to bundle an npm carrying `npx` |
 | Ruby | 2.3 | optional: only if you register site-kit's docs gates | the two gems below need it |
 | `kramdown-parser-gfm` | any | optional: only if you register site-kit's docs gates | `check-docs-render-fidelity` re-renders every page through it |

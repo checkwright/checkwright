@@ -39,6 +39,7 @@ check-footprint-fresh
 check-docs-mirror-fresh
 check-enforcement-fresh
 check-value-rollup-fresh
+check-hook-knobs-fresh
 check-product-statement-fresh
 check-llms-fresh
 check-license-line
