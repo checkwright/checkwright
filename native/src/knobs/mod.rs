@@ -504,7 +504,7 @@ struct Layers {
     tracked: Layer,
 }
 
-type CacheKey = (&'static str, String, String, String, String, bool);
+type CacheKey = (&'static str, String, String, String, String, bool, Option<String>);
 type Loaded = Arc<Result<Layers, String>>;
 type Cache = Mutex<Vec<(CacheKey, Loaded)>>;
 
@@ -535,6 +535,7 @@ fn cache_key(kit: &'static Kit) -> CacheKey {
         std::env::var(format!("{}CONFIG_FILE", kit.prefix())).unwrap_or_default(),
         std::env::var(kit.local_knob_file_var()).unwrap_or_default(),
         crate::hook::tree_free(),
+        crate::hook::knob_file(),
     )
 }
 
@@ -558,6 +559,10 @@ fn load(
     config_file: &str,
     local_file: &str,
 ) -> Result<Layers, String> {
+    if let Some(file) = crate::hook::knob_file() {
+        let text = std::fs::read_to_string(&file).map_err(|e| format!("cannot read {}: {}", file, e))?;
+        return Ok(Layers { local: Layer::new(), tracked: hook_layer(kit, &file, &text)? });
+    }
     let stem = kit.stem();
     // spec: gate-sdk/SPEC.md §The knob file — under the tree-free mark a locator opens only where it
     // is absolute: a default one is skipped unread, a relative one the consumer set is an error
@@ -663,6 +668,32 @@ pub fn check_seam(file_name: &str, text: &str) -> Result<(), String> {
         return Ok(());
     };
     layer(kit, file_name, text).map(|_| ())
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — the `--knobs` file checked whole before the member runs:
+// absolute, readable, every line in the grammar and owned by a kit, and each kit's lines its own
+pub fn check_hook_file(path: &str) -> Result<(), String> {
+    if crate::walk::path_root(path).is_none() {
+        return Err(format!("names a relative path: {}, and takes an absolute file only", path));
+    }
+    let text = std::fs::read_to_string(path).map_err(|e| format!("cannot read {}: {}", path, e))?;
+    if let Some(e) = knobfile::parse(&text, path)?.into_iter().find(|e| owner(&e.name).is_none()) {
+        return Err(format!("{}:{}: {} is not a knob any kit declares", path, e.lno, e.name));
+    }
+    STATIC_KITS.iter().try_for_each(|kit| hook_layer(kit, path, &text).map(|_| ()))
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — one kit's layer of the `--knobs` file: every line another
+// kit owns blanked in place, so a refusal still names its own line
+fn hook_layer(kit: &'static Kit, path: &str, text: &str) -> Result<Layer, String> {
+    let theirs: Vec<usize> = knobfile::parse(text, path)?
+        .into_iter()
+        .filter(|e| !owner(&e.name).is_some_and(|k| std::ptr::eq(k, kit)))
+        .map(|e| e.lno)
+        .collect();
+    let mine: Vec<&str> =
+        text.lines().enumerate().map(|(i, l)| if theirs.contains(&(i + 1)) { "" } else { l }).collect();
+    layer(kit, path, &mine.join("\n"))
 }
 
 fn read_layer(kit: &'static Kit, path: &str) -> Result<Layer, String> {

@@ -45,8 +45,9 @@ pub type HookFn = fn(&Payload) -> i32;
 // arm dispatches on and the unknown-member refusal prints. Each row's knob slice is exactly what
 // that member's shell original read, less the knobs a compiled member cannot want; then the owning
 // kit, held to the member module's leading `spec:` binding by a unit test below, and the tree-free
-// declaration: every input the member's rule reads can resolve absolute.
-pub type Row = (&'static str, HookFn, &'static [&'static str], &'static str, bool);
+// declaration: every input the member's rule reads can resolve absolute; last, the event the member
+// registers under, a binding spelling.
+pub type Row = (&'static str, HookFn, &'static [&'static str], &'static str, bool, &'static str);
 
 pub const HOOKS: &[Row] = &[
     // spec: delegation-kit/SPEC.md §usage-verdict — the rule runs inside the hook process, so the row
@@ -57,6 +58,7 @@ pub const HOOKS: &[Row] = &[
         verdict::KNOBS,
         "delegation-kit",
         false,
+        binding::EVENT_BEFORE_TOOL_CALL,
     ),
     (
         "agent-dispatch-guard",
@@ -71,6 +73,7 @@ pub const HOOKS: &[Row] = &[
         ],
         "delegation-kit",
         false,
+        binding::EVENT_BEFORE_TOOL_CALL,
     ),
     (
         "subagent-stop-liveness",
@@ -83,22 +86,39 @@ pub const HOOKS: &[Row] = &[
         ],
         "delegation-kit",
         true,
+        binding::EVENT_CHILD_TURN_END,
     ),
-    ("escalation-guard", |p| escalation::run(p.value()), &[], "guard-kit", false),
+    (
+        "escalation-guard",
+        |p| escalation::run(p.value()),
+        &[],
+        "guard-kit",
+        false,
+        binding::EVENT_BEFORE_TOOL_CALL,
+    ),
     (
         "session-context",
         session_context::run,
         session_context::KNOBS,
         "context-kit",
         false,
+        binding::EVENT_SESSION_START,
     ),
-    ("shell-guard", shell_guard::run, crate::guard::host::KNOBS, "guard-kit", false),
+    (
+        "shell-guard",
+        shell_guard::run,
+        crate::guard::host::KNOBS,
+        "guard-kit",
+        false,
+        binding::EVENT_BEFORE_TOOL_CALL,
+    ),
     (
         "wakeup-guard",
         |p| wakeup::run(p.value()),
         &["GUARD_KIT_WAKEUP_LOG"],
         "guard-kit",
         false,
+        binding::EVENT_BEFORE_TOOL_CALL,
     ),
     (
         "workflow-state-guard",
@@ -112,6 +132,7 @@ pub const HOOKS: &[Row] = &[
         ],
         "lifecycle-kit",
         false,
+        binding::EVENT_BEFORE_TOOL_CALL,
     ),
 ];
 
@@ -121,11 +142,11 @@ pub const HOOKS: &[Row] = &[
 pub const EVERY_HOOK_KNOB: &str = "@every-hook-knob";
 
 pub fn members() -> Vec<&'static str> {
-    HOOKS.iter().map(|(n, _, _, _, _)| *n).collect()
+    HOOKS.iter().map(|r| r.0).collect()
 }
 
 pub fn owner(member: &str) -> Option<&'static str> {
-    HOOKS.iter().find(|(n, _, _, _, _)| *n == member).map(|(_, _, _, o, _)| *o)
+    HOOKS.iter().find(|r| r.0 == member).map(|r| r.3)
 }
 
 // spec: context-kit/SPEC.md §check-settings-paths — a hook's tokens: `command` split on ASCII
@@ -180,6 +201,7 @@ pub enum Registration<'a> {
         name: &'a str,
         observe: bool,
         binding: Option<&'a str>,
+        knobs: Option<&'a str>,
     },
     Malformed {
         name: &'a str,
@@ -190,31 +212,48 @@ pub enum Registration<'a> {
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the arm's grammar, printed by every refusal
 // of a token outside it
-pub const GRAMMAR: &str = "--hook <member> [--observe] [--binding <name>]";
+pub const GRAMMAR: &str = "--hook <member> [--observe] [--binding <name>] [--knobs <absolute file>]";
 pub const OBSERVE_FLAG: &str = "--observe";
 pub const BINDING_FLAG: &str = "--binding";
+pub const KNOBS_FLAG: &str = "--knobs";
 
 #[derive(Debug, PartialEq)]
 pub struct Tail<'a> {
     pub observe: bool,
     pub binding: Option<&'a str>,
+    pub knobs: Option<&'a str>,
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the one parser of the tokens after the
 // member, for the arm and every registration reader: each optional token in order, at most once,
-// and the first token past them is the refusal's. A `--binding` naming nothing reads as empty.
+// and the first token past them is the refusal's. An operand-taking token naming nothing reads empty.
 pub fn tail<'a>(rest: &[&'a str]) -> Result<Tail<'a>, &'a str> {
     let observe = rest.first() == Some(&OBSERVE_FLAG);
     let mut i = usize::from(observe);
-    let mut binding = None;
-    if rest.get(i) == Some(&BINDING_FLAG) {
-        binding = Some(rest.get(i + 1).copied().unwrap_or(""));
+    let mut operand = |flag: &str| {
+        if rest.get(i) != Some(&flag) {
+            return None;
+        }
+        let v = rest.get(i + 1).copied().unwrap_or("");
         i += 2;
-    }
+        Some(v)
+    };
+    let binding = operand(BINDING_FLAG);
+    let knobs = operand(KNOBS_FLAG);
     match rest.get(i) {
         Some(token) => Err(token),
-        None => Ok(Tail { observe, binding }),
+        None => Ok(Tail { observe, binding, knobs }),
     }
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the members a `--knobs` file can serve,
+// derived from the table's tree-free column
+pub fn tree_free_members() -> Vec<&'static str> {
+    HOOKS.iter().filter(|r| r.4).map(|r| r.0).collect()
+}
+
+pub fn event(member: &str) -> Option<&'static str> {
+    HOOKS.iter().find(|r| r.0 == member).map(|r| r.5)
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — a registration's argv ends where the shell
@@ -252,7 +291,10 @@ pub fn registration<'a>(tok: &[&'a str]) -> Registration<'a> {
     };
     let rest: Vec<&'a str> = tok[i + 3..].iter().copied().take_while(|t| !shell_syntax(t)).collect();
     match tail(&rest) {
-        Ok(Tail { observe, binding }) => Registration::Member { name, observe, binding },
+        Ok(Tail { knobs: Some(_), .. }) if HOOKS.iter().any(|r| r.0 == name && !r.4) => {
+            Registration::Malformed { name, token: KNOBS_FLAG }
+        }
+        Ok(Tail { observe, binding, knobs }) => Registration::Member { name, observe, binding, knobs },
         Err(token) => Registration::Malformed { name, token },
     }
 }
@@ -334,6 +376,12 @@ const NO_TREE_NOTICE: &str = "checkwright-gates: git refuses or skips the reposi
 
 thread_local! {
     static TREE_FREE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+    static KNOB_FILE: std::cell::RefCell<Option<String>> = const { std::cell::RefCell::new(None) };
+}
+
+// spec: gate-sdk/SPEC.md §The knob file — the `--knobs` operand, the only file layer while it is set
+pub fn knob_file() -> Option<String> {
+    KNOB_FILE.with(|k| k.borrow().clone())
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the tree-free mark: set where a tree-free
@@ -372,6 +420,9 @@ pub fn run(args: &[String]) -> i32 {
     let row = args.first().and_then(|m| HOOKS.iter().find(|r| r.0 == m));
     let rest: Vec<&str> = args.get(1..).unwrap_or_default().iter().map(String::as_str).collect();
     let parsed = tail(&rest);
+    if let (Some(member), Ok(Tail { observe, binding, knobs: Some(file) })) = (args.first(), &parsed) {
+        return under_knobs(member, row, *observe, *binding, file);
+    }
     match crate::walk::toplevel_opt() {
         Ok(Some(top)) => {
             // spec: gate-sdk/SPEC.md §Fail-closed contract — cwd-write-exempt: the arm's own process
@@ -381,7 +432,7 @@ pub fn run(args: &[String]) -> i32 {
             }
         }
         Ok(None) => match (row, &parsed) {
-            (Some(&(name, f, _, _, true)), Ok(Tail { observe, binding: None })) => {
+            (Some(&(name, f, _, _, true, _)), Ok(Tail { observe, binding: None, knobs: None })) => {
                 TREE_FREE.with(|m| m.set(true));
                 return if *observe { observe::run(name, &read_input()) } else { f(&read_input()) };
             }
@@ -394,15 +445,10 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("  help: this binary carries: {}", members().join(", "));
         return 2;
     };
-    let Some(&(_, f, _, _, _)) = row else {
-        eprintln!(
-            "checkwright-gates: no such hook member: {} — the hook could not run",
-            member
-        );
-        eprintln!("  help: this binary carries: {}", members().join(", "));
-        return 2;
+    let Some(&(_, f, _, _, _, _)) = row else {
+        return no_member(member);
     };
-    let Tail { observe, binding } = match parsed {
+    let Tail { observe, binding, .. } = match parsed {
         Ok(t) => t,
         Err(token) => {
             eprintln!(
@@ -417,15 +463,54 @@ pub fn run(args: &[String]) -> i32 {
         Ok(None) if observe => observe::run(member, &read_input()),
         Ok(None) => f(&read_input()),
         Ok(Some(_)) => antigravity::run(member, observe, read_input().bytes()),
-        Err(given) => {
-            eprintln!(
-                "checkwright-gates: no such hook binding: {} — the hook could not run",
-                given
-            );
-            eprintln!("  help: this binary carries: {}", BINDINGS.join(", "));
-            2
-        }
+        Err(given) => no_binding(&given),
     }
+}
+
+fn no_member(member: &str) -> i32 {
+    eprintln!("checkwright-gates: no such hook member: {} — the hook could not run", member);
+    eprintln!("  help: this binary carries: {}", members().join(", "));
+    2
+}
+
+fn no_binding(given: &str) -> i32 {
+    eprintln!("checkwright-gates: no such hook binding: {} — the hook could not run", given);
+    eprintln!("  help: this binary carries: {}", BINDINGS.join(", "));
+    2
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — `--knobs` puts the arm under the tree-free
+// mark wherever it stands, and a file it cannot use declines rather than refusing the turn end
+fn under_knobs(member: &str, row: Option<&Row>, observe: bool, binding: Option<&str>, file: &str) -> i32 {
+    let Some(&(name, f, _, _, free, _)) = row else {
+        return no_member(member);
+    };
+    if !free {
+        eprintln!(
+            "checkwright-gates: token outside the --hook grammar for a member that reads a repository: {} \
+             on {} — the hook could not run",
+            KNOBS_FLAG, name
+        );
+        eprintln!("  help: {} serves the tree-free members only: {}", KNOBS_FLAG, tree_free_members().join(", "));
+        return 2;
+    }
+    if let Err(given) = binding_of(binding) {
+        return no_binding(&given);
+    }
+    let input = read_input();
+    if binding.is_some() {
+        return decline(
+            name,
+            "a bound call keeps the decline until a binding is shown to run tree-free",
+            input.value(),
+        );
+    }
+    TREE_FREE.with(|m| m.set(true));
+    KNOB_FILE.with(|k| *k.borrow_mut() = Some(file.to_string()));
+    if let Err(e) = crate::knobs::check_hook_file(file) {
+        return decline(name, &format!("{} {}", KNOBS_FLAG, e), input.value());
+    }
+    if observe { observe::run(name, &input) } else { f(&input) }
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the foreign bindings the arm's adapter
@@ -566,7 +651,7 @@ mod tests {
             ("wakeup-guard", include_str!("wakeup.rs")),
             ("workflow-state-guard", include_str!("workflow_state.rs")),
         ];
-        for (name, _, _, owner, _) in HOOKS {
+        for (name, _, _, owner, _, _) in HOOKS {
             let src = modules
                 .iter()
                 .find(|(m, _)| m == name)
@@ -622,7 +707,7 @@ mod tests {
         );
         assert_eq!(
             registration(&t("bash \"$r/gate-sdk/bin/run-gates.sh\" --hook shell-guard --binding antigravity")),
-            Registration::Member { name: "shell-guard", observe: false, binding: Some("antigravity") }
+            Registration::Member { name: "shell-guard", observe: false, binding: Some("antigravity"), knobs: None }
         );
         assert_eq!(
             registration(&t("bash gate-sdk/bin/run-gates.sh --run")),
@@ -641,7 +726,7 @@ mod tests {
     }
 
     fn member(name: &str) -> Registration<'_> {
-        Registration::Member { name, observe: false, binding: None }
+        Registration::Member { name, observe: false, binding: None, knobs: None }
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — a registration's tail is the arm's
@@ -660,11 +745,11 @@ mod tests {
         let shown = |r: Registration| format!("{:?}", r);
         assert_eq!(
             reg(&read("--observe")),
-            shown(Registration::Member { name: "shell-guard", observe: true, binding: None })
+            shown(Registration::Member { name: "shell-guard", observe: true, binding: None, knobs: None })
         );
         assert_eq!(
             reg(&read("--observe --binding antigravity")),
-            shown(Registration::Member { name: "shell-guard", observe: true, binding: Some("antigravity") })
+            shown(Registration::Member { name: "shell-guard", observe: true, binding: Some("antigravity"), knobs: None })
         );
         assert_eq!(
             reg(&read("--obsrve")),
@@ -676,7 +761,7 @@ mod tests {
         );
         assert_eq!(
             reg(&read("--observe 2>/dev/null || true")),
-            shown(Registration::Member { name: "shell-guard", observe: true, binding: None })
+            shown(Registration::Member { name: "shell-guard", observe: true, binding: None, knobs: None })
         );
         assert_eq!(reg(&read("; echo x")), shown(member("shell-guard")));
     }
@@ -696,14 +781,47 @@ mod tests {
     // most once; the first token past them is the one the refusal names
     #[test]
     fn the_tail_takes_each_token_once_and_in_order() {
-        assert_eq!(tail(&["--observe"]), Ok(Tail { observe: true, binding: None }));
+        assert_eq!(tail(&["--observe"]), Ok(Tail { observe: true, binding: None, knobs: None }));
         assert_eq!(
             tail(&["--observe", "--binding", "antigravity"]),
-            Ok(Tail { observe: true, binding: Some("antigravity") })
+            Ok(Tail { observe: true, binding: Some("antigravity"), knobs: None })
         );
         assert_eq!(tail(&["--observe", "--observe"]), Err("--observe"));
         assert_eq!(tail(&["--binding", "antigravity", "--observe"]), Err("--observe"));
         assert_eq!(tail(&["--verbose"]), Err("--verbose"));
+        assert_eq!(
+            tail(&["--observe", "--binding", "antigravity", "--knobs", "/k"]),
+            Ok(Tail { observe: true, binding: Some("antigravity"), knobs: Some("/k") })
+        );
+        assert_eq!(tail(&["--knobs", "/k"]), Ok(Tail { observe: false, binding: None, knobs: Some("/k") }));
+        assert_eq!(tail(&["--knobs", "/k", "--observe"]), Err("--observe"));
+        assert_eq!(tail(&["--knobs", "/k", "--binding", "antigravity"]), Err("--binding"));
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — a registration carries its `--knobs`
+    // path, and `--knobs` on a member that reads a repository is outside the grammar
+    #[test]
+    fn a_registration_carries_its_knob_file_on_a_tree_free_member_alone() {
+        let t = |s: &'static str| s.split_ascii_whitespace().collect::<Vec<_>>();
+        assert_eq!(
+            registration(&t("/u/bin/checkwright-gates --hook subagent-stop-liveness --observe --knobs /u/k")),
+            Registration::Member { name: "subagent-stop-liveness", observe: true, binding: None, knobs: Some("/u/k") }
+        );
+        assert_eq!(
+            registration(&t("/u/bin/checkwright-gates --hook shell-guard --knobs /u/k")),
+            Registration::Malformed { name: "shell-guard", token: KNOBS_FLAG }
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — every tree-free row registers under an
+    // event the binding table names, the one a printed registration takes
+    #[test]
+    fn every_tree_free_row_carries_a_binding_event() {
+        for name in tree_free_members() {
+            assert_eq!(event(name), Some(binding::EVENT_CHILD_TURN_END), "{}", name);
+        }
+        assert_eq!(event("session-context"), Some(binding::EVENT_SESSION_START));
+        assert_eq!(event("no-such-member"), None);
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the computed stamp is the one

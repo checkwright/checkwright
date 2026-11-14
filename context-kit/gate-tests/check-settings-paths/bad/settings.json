@@ -50,6 +50,32 @@
               "shell-guard",
               "--obsrve"
             ]
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/tools/checkwright-gates",
+            "args": [
+              "--hook",
+              "shell-guard",
+              "--knobs",
+              "/opt/checkwright/knobs/shell-guard.knobs"
+            ]
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/tools/checkwright-gates",
+            "args": [
+              "--hook",
+              "subagent-stop-liveness",
+              "--knobs",
+              "knobs/subagent-stop-liveness.knobs"
+            ]
           }
         ]
       }

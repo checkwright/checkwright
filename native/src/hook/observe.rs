@@ -32,10 +32,15 @@ pub fn run(member: &str, payload: &Payload) -> i32 {
         Ok(p) => p,
         Err(e) => return super::decline(member, &e, value),
     };
+    let knobs = super::knob_file();
+    let mut argv = vec!["--hook", member];
+    if let Some(file) = knobs.as_deref() {
+        argv.extend([super::KNOBS_FLAG, file]);
+    }
     let child = proc::self_image().map_err(|e| e.to_string()).and_then(|exe| {
         proc::run_with_stdin(
             &programs::CHECKWRIGHT_GATES.at(exe.display().to_string()),
-            &["--hook", member],
+            &argv,
             payload.bytes(),
         )
     });

@@ -23,7 +23,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --only <name> -- <arg>...               run one named gate, forwarding <arg>...
        --for <path> [<path>...]                run only gates coupling to those paths
        --emit <arm> [args...]                  dispatch a ported non-gate emitter arm
-       --hook <member> [--observe] [--binding <name>]  dispatch a harness hook member, payload on stdin
+       --hook <member> [--observe] [--binding <name>] [--knobs <absolute file>]  dispatch a harness hook member, payload on stdin
        --statusline                            render the harness status line, payload on stdin
        --usage-poll                            refresh the usage snapshot from its source
        --usage-verdict [paths]                 budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE

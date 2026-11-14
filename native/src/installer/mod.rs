@@ -14,6 +14,7 @@ pub mod recipe;
 pub mod selection;
 pub mod uninstall;
 pub mod update;
+pub mod user;
 pub mod workflow;
 
 use crate::programs;
@@ -51,6 +52,7 @@ pub const FLAGS: &[(&str, &[&str])] = &[
     ("--with-gate", &["init", "update"]),
     ("--without-gate", &["init", "update"]),
     ("--no-selection", &["init", "update"]),
+    ("--user", &["init", "update", "uninstall"]),
 ];
 
 // spec: installer/SPEC.md §What init seeds — the consumer-layout names the verbs write against,
@@ -633,6 +635,7 @@ mod tests {
     // parser is init's; `doctor`, `diff`, `demo` and `prove` take no flag and answer only through `run`
     fn refused_at(verb: &str, args: &[String]) -> Option<i32> {
         match verb {
+            "init" | "update" | "uninstall" if user::routes(args) => user::parse(verb, args).err().map(|r| r.code),
             "init" | "update" => init::parse(args, None).err().map(|r| r.code),
             "uninstall" => uninstall::parse(args).err().map(|r| r.code),
             _ => {

@@ -76,6 +76,12 @@ pub(super) const ARMS: &[Row] = &[
     row("bash-less arm", "the profiles owing no bash, bash absent from PATH", super::masked::bash_less, 2),
     row("personal arm", "init --personal at {min}, its hooks, a re-run, prove, four refusals and uninstall", super::personal::personal, 2),
     row(
+        "user-install arm",
+        "init --user outside any repository, its printed entry fired, update --user and uninstall --user",
+        super::user::user_install,
+        2,
+    ),
+    row(
         "upgrade arm",
         "two cross-version hops, {min} profile — the lattice minimum, so the arm is the smallest install that carries the manifest behavior it asserts",
         super::upgrade::upgrade,

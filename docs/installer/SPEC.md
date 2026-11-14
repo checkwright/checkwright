@@ -124,6 +124,8 @@ Every verb answers `-h`/`--help` on its own, before any precondition and from an
 
 The `--dry-run`s do not stand in for it: they answer *what would this payload change*, and an adopter deciding whether to uninstall needs *what have I changed* without running a mutating verb.
 
+**`--user` is a second form of `init`, `update` and `uninstall`**, managing one session-hook arm installed for the user rather than a repository's install ([§The user install](#the-user-install)). Its presence anywhere in argv selects the form before the verb's own parser runs, and the form takes only `--dry-run` and `--force` beside it.
+
 ## init
 
 `checkwright init` vendors the selected kit set, a profile's adjusted by any selection ([§Selecting kits and gates](#selecting-kits-and-gates)), out of this package's own payload into your repository, and commits it. What governs your tree afterwards is committed and auditable on the terms [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload) sets.
@@ -192,6 +194,55 @@ The clean-worktree precondition is waived, because no commit is made. The run se
 **It runs at the inner two tiers only** ([gate-sdk/SPEC.md §Enforcement tiers](../gate-sdk/SPEC.md#enforcement-tiers)). `prove` proves `HEAD` with the install copied into its clone ([§prove](#prove)). `uninstall` removes the files and then the block, or rewrites the block over what it kept ([§uninstall](#uninstall)).
 
 **Honest limits.** `git clean -X` or `-x` deletes the install with every other ignored file, and a re-run restores it. Git reads every worktree's block in every worktree, so one worktree's install hides the same paths in the others, and any block makes each worktree's install personal. The exclude file has one writer at a time: runs in two worktrees read and rewrite it with no lock, so concurrent runs can lose one worktree's block, which that worktree's next run writes again. A block an earlier release wrote from a linked worktree reads as the main worktree's, and goes when the main worktree's `uninstall` runs or by hand. A release built before `--personal` reads a personal install as a tracked one: its `init` refuses at staging, its `uninstall` removes the files and leaves the block behind, inert, and its `prove` refuses as it would on any lockless `HEAD`. On native Windows with a git that cannot chain a clone's existing hooks, `--install-hooks` refuses ([gate-sdk/SPEC.md §install-hooks](../gate-sdk/SPEC.md#install-hooks)), so the install checks at the battery alone there.
+
+### The user install
+
+`init --user <arm>` installs one session-hook arm for the user rather than for a repository: the gate binary placed in a per-user data dir, the arm's knob file beside it, and the harness settings entry for the arm printed. It serves an adopter running its own work engine, who wants one arm and no vendored kit. The arm runs tree-free under the `--knobs` token ([gate-sdk/SPEC.md §The harness-integration arm](../gate-sdk/SPEC.md#the-harness-integration-arm)), so it reads no repository wherever the harness starts it.
+
+**The operand** is a member whose `HOOKS` tree-free column is true, a set derived from the table and never listed. A missing operand, an unknown member or a tree-bound one exits 2 with the tree-free members listed. `init` takes it as `--user <arm>` or `--user=<arm>`; `update` and `uninstall` take none, and refuse `--user=<value>` at exit 2. `--user` given twice is refused at exit 2.
+
+**No repository precondition.** It runs from any directory, inside a repository or not, and never reads or writes one: no work tree, clean-tree, identity or commit precondition. It runs no `doctor` precondition either, because it vendors no battery and the arm spawns only its own image. Every other flag in `FLAGS` ([§The verbs](#the-verbs)) exits 2 with the flag named; `--force` and `--dry-run` keep their `init` meanings, `--dry-run` printing the plan and the settings block and writing nothing. `-h`/`--help` answers first, the user form's usage.
+
+**The per-user dirs.** The **data dir** holds what the install owns, and the **state dir** what the arm writes:
+
+| host | data dir | state dir |
+| --- | --- | --- |
+| POSIX, macOS included | `$XDG_DATA_HOME/checkwright`, else `$HOME/.local/share/checkwright` | `$XDG_STATE_HOME/checkwright`, else `$HOME/.local/state/checkwright` |
+| Windows | `%LOCALAPPDATA%\checkwright` | `%LOCALAPPDATA%\checkwright\state` |
+
+A relative XDG value is ignored, as the XDG base-directory specification requires. macOS takes the POSIX rule: it is a POSIX host to every other part of the installer, and one rule keeps one smoke arm. Windows has no separate state root, and a subdirectory keeps the arm's writes out of the directory the binary is placed in. An unset or relative `HOME` on POSIX or `LOCALAPPDATA` on Windows is refused at exit 2, naming the variable. A resolved dir that is not UTF-8, or that carries a tab or another control character, is refused at exit 2. The first cannot be written into the knob file or the printed JSON, and the knob grammar refuses the second.
+
+```
+<data>/bin/checkwright-gates[.exe]     the placed binary
+<data>/knobs/<member>.knobs            the arm's knob file, the --knobs operand
+<data>/user.lock                       the user manifest (§The manifest)
+```
+
+**The knob file** carries two scalars, `GATE_SDK_TMP_DIR = <state>/tmp` and `DELEGATION_KIT_STOP_LOG = <state>/<member>.log`. The observe log derives under the scratch dir ([gate-sdk/SPEC.md §Layout and configuration](../gate-sdk/SPEC.md#layout-and-configuration)), so a trial needs no third line. It is a file the adopter edits, so it is claimed like [§Placement](#placement)'s seam: written on a first install, rewritten when its hash matches the one `user.lock` records, and left alone and reported when it differs, unless `--force` is given. **The scratch dir is where the arm reads launch records** ([delegation-kit/SPEC.md §The turn-end liveness hook](../delegation-kit/SPEC.md#the-turn-end-liveness-hook)), so an engine that writes launch records points them at `<state>/tmp`, or the adopter edits `GATE_SDK_TMP_DIR` to the directory the engine writes.
+
+**What it does**, in order:
+
+1. Resolves the two dirs and creates `<data>/bin`, `<data>/knobs` and `<state>/tmp`.
+2. Applies [§update](#update)'s downgrade refusal against `user.lock`'s `version`, at exit 1, lifted by `--force`.
+3. Places the payload artifact the bootstrap verified at `<data>/bin`, in-process, with [§Placement](#placement)'s skip-rewrite test against `user.lock`'s `artifact` key and the on-disk digest. The write goes to a sibling temporary file renamed over the target. On Windows a rename over an image in use fails, and the verb refuses at exit 1, naming the file and telling the user to end the sessions running it and re-run.
+4. Writes the member's knob file by its claim.
+5. Writes `user.lock`, the member joining `hooks`, only where its bytes change.
+6. Prints the report.
+
+A bare re-run leaves the data dir byte-identical.
+
+**The report** is one `INIT:` line naming the member, the data dir and the version, and saying whether the binary was placed and the knob file written, unchanged or kept, then a `settings:` block. The block's grammar is the banner line `settings:` then lines indented by two spaces, the JSON fragment alone on its line, so [§The consumer smoke](#the-consumer-smoke) lifts it. It carries:
+
+- a header naming the harness the binding targets, the version from which a registration's `args` array is honoured, the `hooks` object, and the user-scope settings file under the harness's config-dir variable ([gate-sdk/SPEC.md §The harness-integration arm](../gate-sdk/SPEC.md#the-harness-integration-arm)'s binding table owns each value);
+- the JSON fragment for the member's event: the event key, a group whose `hooks` array holds one `command` entry whose `command` is the absolute binary and whose `args` are `--hook`, the member, `--knobs` and the absolute knob file. Paths are JSON-escaped, which is the whole of the Windows spelling, since `args` passes no shell;
+- a `trial:` line naming `--observe` as the token inserted after the member, and the observe log's path;
+- a `launch records:` line naming the scratch dir the arm reads them from, and the knob that moves it.
+
+**The settings entry is printed and never written.** A settings write is a permission-surface write, the user's own act ([delegation-kit/SPEC.md §The turn-end liveness hook](../delegation-kit/SPEC.md#the-turn-end-liveness-hook)).
+
+`update --user` and `uninstall --user` manage the install after it exists ([§update](#update), [§uninstall](#uninstall)).
+
+**Honest limits.** A harness still carrying the entry after `uninstall --user` fails to spawn the hook; that this fails open, without blocking the turn end, is inferred from the harness's documented behavior for a hook that cannot start, and is not probed. A user install gets no update notice ([§The update notice](#the-update-notice) reads a repository's lock), and `doctor` and `diff` read no user install. Two concurrent writers to one data dir are not serialised: the verbs are run by a person, once. On Windows a session running the hook holds the binary, so `update --user` and `uninstall --user` refuse until it ends. A user install serves an arm outside any repository, and is no route to a kit's hooks in one clone, which is the personal install's.
 
 ## What init seeds
 
@@ -535,6 +586,8 @@ It checks existence and no more. An unreadable schema, a stale downgrade and a b
 
 **Most of what you see comes from `init` and says so.** The one refusal `update` owns is prefixed `checkwright update:`. Every other refusal (not a git work tree, a repository git refuses, an unknown schema, a dirty worktree, a missing git identity, a stale downgrade, a below-contract toolchain) arrives prefixed **`checkwright init:`**, and the success path reports `INIT:`, because `init` produced the line. A refusal raised inside a shared module surfaces through the calling verb's refusal shape, carrying that verb's prefix, `help:` line and exit code. So a `checkwright init:` line answering a command typed as `update` is the design, not a bug.
 
+**`update --user`** takes no operand and requires `user.lock` ([§The manifest](#the-manifest)); with none, or one recording no arm, it refuses at exit 1, naming `init --user`. A recorded member that is not tree-free in this release is refused at exit 2. Otherwise it runs `init --user` for each member in `hooks`, so the downgrade refusal reads `user.lock`'s `version`, the new binary is placed once, and each member's settings block is reprinted ([§The user install](#the-user-install)). It forwards `--dry-run` and `--force` with their `init` meanings.
+
 ### The update notice
 
 **An installed tree learns when a newer release exists.** The gate binary's `--emit update-notice` arm compares the release the lock records with the upstream's newest release tag. Bare `doctor` renders the same reading in process, and context-kit's session-context hook runs the arm ([context-kit/SPEC.md §The session-context hook](../context-kit/SPEC.md#the-session-context-hook)). The arm exits 0, or 2 for a usage error, and prints nothing unless all four conditions hold:
@@ -615,6 +668,17 @@ The trim runs through the payload's own copy of doctrine-kit's installer ([doctr
 `--dry-run` prints the plan, writes nothing, and exits 0. The plan is what would be removed, counted by top-level directory with a root file its own key, what would be kept and why, the residual manifest if there is one, and any file of yours left behind inside a vendored directory. It also names the update notice's cache where one exists.
 
 **The commit** is one commit naming the profile and the version, staging the removals and the manifest disposition. Files kept for you are never staged, on the reasoning that keeps `init`'s written set and its recorded roster apart. A run with nothing to remove says so and exits 0 without narrowing the manifest: the install is still there, so disowning it would be false. A failed commit leaves the removal staged and relays git's account, as `init`'s does ([§init](#init)), and names the hook that judged it under the same reads: `the commit failed, and your <hook> hook in <dir> judged it — the removal is staged`. Its help names the removed kit directories and offers no `--no-commit`, since a re-run has nothing left to remove: the manifest is already gone or narrowed to the kept files. It prints no follow-up block. The gate hooks directory is removed before this commit while `core.hooksPath` may still name it, so git runs no hook from it, the trace records none, and the line stays as it is.
+
+**`uninstall --user`** reverses a user install ([§The user install](#the-user-install)) against `user.lock`, and requires it as `update --user` does, at exit 1. It reads no repository and commits nothing. In order, it:
+
+- removes the binary whatever its hash, because the install owns that path and an edited binary is no adopter's work; a removal that fails, as over a running image on Windows, refuses at exit 1 before anything else is removed;
+- removes each knob file whose hash matches `user.lock`, and keeps and names one that differs unless `--force` is given;
+- deletes `user.lock`, or rewrites it over the kept files, its `hooks` emptied, so a later `init --user` still reads them as edited;
+- leaves the state dir, its logs and its launch records, which are the adopter's evidence, not the install's;
+- removes the directories it created where now empty, and names the data dir and the state dir where they remain;
+- prints, for each recorded member, a `settings:` line reminding the user to remove the entry, naming the event, the binary and the settings file.
+
+`--dry-run` prints what would be removed, kept and narrowed, and writes nothing.
 
 ## demo
 
@@ -773,6 +837,10 @@ A new optional top-level key is additive within the versioned wire key: a reader
 **The knob also owns the door a kit's prose and shell name.** Every kit README, template, knob header and stage procedure names the binary through `GATE_SDK_NATIVE_BIN`, and gate-sdk's `gate_native_bin_spelled` owns how that value is spelled as a *command* ([gate-sdk/SPEC.md §lib/gate.sh](../gate-sdk/SPEC.md#libgatesh)). A kit file carrying a resolved location is a seam crossing a gate reds on ([guard-kit/SPEC.md §check-door-binding](../guard-kit/SPEC.md#check-door-binding)). **It does not reach a consumer's settings**: the adopter merges guard-kit's recommended allowlist by hand and resolves its placeholder ([guard-kit/SPEC.md §The recommended allowlist](../guard-kit/SPEC.md#the-recommended-allowlist)).
 
 **The `files` row is not that copy, though it is a path.** It records where `init` wrote, which stays true when the knob is repointed, while the knob records where the battery dispatches. Where the two part, the row is still right about what `uninstall` must reverse.
+
+### The user manifest
+
+`init --user` writes `user.lock` at the root of the per-user data dir ([§The user install](#the-user-install)). It is JSON with schema `checkwright-user-lock v1`, keys sorted, and the keys `version`, `commit` (absent where the package carries no stamp), `artifact` (`target`, `digest`), `hooks` (the installed members), `state` (the absolute state dir) and `files`, keyed by path relative to the data dir. Its hashes are SHA-256, computed in-process by the crate's `sha256` module, not `git hash-object`: a user install runs where git may be absent, and git is the floor only for a repository install. A schema this build does not know is refused at exit 2. It shares no reader with `checkwright.lock`, and no verb reads one where it expects the other. Its residual shape, after an `uninstall --user` that kept a file, keeps `version` and `state`, empties `hooks`, and drops `commit` and `artifact`.
 
 ## The packer
 
@@ -1116,6 +1184,13 @@ A contributor's host carries the toolchain the binary was built with, so no othe
 4. **`prove`** exits 1, its last stdout line `PROVE: not held — this tree keeps no <queue-file> and no task list to claim a task done in`, since the minimum keeps no task list, `<queue-file>` the queue path the run resolves ([§prove](#prove), step 3). Its `help:` line names `CANON_KIT_TASK_LIST_GLOBS` and no `--profile`, and its `configured` block names the minimum profile. `HEAD`, the porcelain and the exclude file are unchanged.
 5. **Refusals**, each in a fresh consumer of the same shape, exiting 2 with the tree object, the porcelain and the exclude file unchanged. `--personal --profile <maximum>` names a kit committing a process record. `--personal` over a tracked `<gates-dir>/gates.list` names that path. `--personal --no-commit` names both flags. `--personal` over an exclude file carrying a begin marker with no end names the missing end marker.
 6. **Reversal.** With the block's end marker deleted, `uninstall` exits 2 naming it and changes nothing. With it restored, `uninstall` exits 0 and makes no commit. The exclude file reads its pre-install bytes, no `checkwright.lock` remains, and the porcelain is empty.
+
+**The user-install arm** holds the user install ([§The user install](#the-user-install)), after the personal arm in the same part. It points `XDG_DATA_HOME` and `XDG_STATE_HOME`, or `LOCALAPPDATA` on native Windows, at scratch dirs, and runs every step from a scratch directory outside any repository, `GIT_CEILING_DIRECTORIES` bounding git's search. Each step is a named failure:
+
+1. **Install.** `init --user subagent-stop-liveness` exits 0 and prints its `INIT:` line. The JSON line of its `settings:` block parses, and its `command` is an absolute path under the data dir.
+2. **Fire.** The entry's command and args run as the harness runs them, a turn-end payload on stdin. With no live task they exit 0 and print nothing; with a running shell task they exit 2 and the state dir's log records a refusal.
+3. **Re-run.** `update --user` exits 0 and leaves the data dir, less the state dir under it on Windows, byte-identical.
+4. **Reversal.** `uninstall --user` exits 0, leaves no file in the data dir outside the state dir, keeps the log, and prints the `settings:` reminder. The working directory is still empty.
 
 **Every arm runs on every leg, through the host's bootstrap.** The arms run in one order under one set of header names on every host, so the baseline rows hold. On a unix host the npm-installed `node_modules/.bin/checkwright` and an extracted package's `sh bin/checkwright.sh` are the entry points. On native Windows the same packages, the npm-installed one included, are driven through their `bin/checkwright.ps1` under `pwsh -NoProfile -File`, so the install arm's `npm install --offline` still runs, and its `.bin` entry is driven by the PowerShell leg's `npx` step instead ([§Layout](#layout)). The documented Windows PowerShell route, `powershell -NoProfile -ExecutionPolicy Bypass -File` ([docs/install.md §Windows](https://github.com/checkwright/checkwright/blob/master/docs/install.md#windows)), stays the Windows leg's page-install step's. A consumer's battery, `--emit kit-roots` and by-name runs go through its vendored front end, `bash gate-sdk/bin/run-gates.sh` on a unix host and `gate-sdk/bin/run-gates.ps1` under `pwsh` on native Windows. The host triple comes from the host bootstrap's own detector: `installer/consumer-smoke/host-target.sh` on a unix host, and on native Windows its detector functions, extracted from `bin/checkwright.ps1` through PowerShell's parser and run by `pwsh`, so neither holds a mapping of its own. Per-host spellings, each the same claim:
 

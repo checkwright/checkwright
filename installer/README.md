@@ -58,6 +58,9 @@ The flags each verb takes, owned by the binary as the verbs are:
 | `--with-gate` | `init`, `update` | register this gate too; repeats |
 | `--without-gate` | `init`, `update` | drop this gate from the registry; repeats |
 | `--no-selection` | `init`, `update` | clear the recorded kit and gate selection |
+| `--user` | `init`, `update`, `uninstall` | manage one session-hook arm installed for you, not for a repository |
+
+`init --user <arm>` installs one session-hook arm with no repository at all: the gate binary and the arm's knob file go in your per-user data dir (`~/.local/share/checkwright`, or `%LOCALAPPDATA%\checkwright`), the arm's scratch and log in your per-user state dir, and the harness settings entry for the arm is printed for you to merge, never written. `update --user` re-places every arm it recorded, and `uninstall --user` removes them, keeping the state dir and any knob file you edited ([`installer/SPEC.md` §The user install](SPEC.md#the-user-install)).
 
 ## Choosing a profile
 

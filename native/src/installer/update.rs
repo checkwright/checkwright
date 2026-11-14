@@ -4,7 +4,7 @@
 use super::{lock, refuse, Refusal};
 
 pub(super) const USAGE: &[&str] = &[
-    "usage: checkwright update [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit] [--personal]",
+    "usage: checkwright update [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit] [--personal] [--user]",
     "",
     "Runs checkwright init with the same arguments, refusing when there is no",
     "existing install for it to update. Every init flag is valid here — see",
@@ -12,6 +12,9 @@ pub(super) const USAGE: &[&str] = &[
 ];
 
 pub fn run(args: &[String]) -> i32 {
+    if super::user::routes(args) {
+        return super::user::run("update", args);
+    }
     // spec: installer/SPEC.md §The verbs — `-h`/`--help` is intercepted first and answers on its
     // own, outside any repository precondition, exactly as every other verb's `--help` does.
     if args.iter().any(|a| a == "-h" || a == "--help") {

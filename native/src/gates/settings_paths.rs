@@ -209,8 +209,8 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    let (mut hooks_checked, mut hooks_skipped, mut bad_member, mut unresolved, mut malformed) =
-        (0usize, 0usize, false, false, false);
+    let (mut hooks_checked, mut hooks_skipped, mut bad_member, mut unresolved, mut malformed, mut relative) =
+        (0usize, 0usize, false, false, false, false);
     for h in hook_entries(&doc) {
         if let Some(cand) = command_token(&h.tokens) {
             match hook_path(cand) {
@@ -244,6 +244,10 @@ pub fn run(args: &[String]) -> i32 {
             Registration::Malformed { token, .. } => {
                 malformed = true;
                 dead.push(format!("{}: {} — hook registration outside the --hook grammar: {}", h.at, h.shown, token));
+            }
+            Registration::Member { knobs: Some(k), .. } if crate::walk::path_root(k).is_none() => {
+                relative = true;
+                dead.push(format!("{}: {} — --knobs names a relative path: {}", h.at, h.shown, k));
             }
             Registration::NoOperand => {
                 bad_member = true;
@@ -283,6 +287,9 @@ pub fn run(args: &[String]) -> i32 {
         }
         if malformed {
             println!("  help: the grammar: {}", hook::GRAMMAR);
+        }
+        if relative {
+            println!("  help: write --knobs <absolute file>; the arm reads no repository to resolve a relative one against");
         }
         return 1;
     }

@@ -24,3 +24,4 @@
 | `--with-gate` | `init`, `update` | add a gate |
 | `--without-gate` | `init`, `update` | drop a gate |
 | `--no-selection` | `init`, `update` | clear the selection |
+| `--user` | `init`, `update`, `uninstall` | install one arm for the user |

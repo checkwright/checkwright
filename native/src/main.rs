@@ -243,7 +243,7 @@ fn main() {
         None => {
             eprintln!("checkwright-gates: no subcommand given");
             eprintln!("  adopter verbs: {}", installer::VERBS.iter().map(|(f, _)| f.trim_start_matches('-')).collect::<Vec<_>>().join(", "));
-            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --source-stamp | --guard-json <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> [--observe] [--binding <name>] | --emit-<arm> | <gate-name> [args...]");
+            eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --source-stamp | --guard-json <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> [--observe] [--binding <name>] [--knobs <absolute file>] | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  arms: {}", emit::arms().join(", "));
             exit(2);
         }

@@ -70,6 +70,23 @@
         ]
       }
     ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/checkwright/bin/checkwright-gates",
+            "args": [
+              "--hook",
+              "subagent-stop-liveness",
+              "--observe",
+              "--knobs",
+              "/opt/checkwright/knobs/subagent-stop-liveness.knobs"
+            ]
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

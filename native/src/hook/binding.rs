@@ -5,6 +5,7 @@ use serde_json::Value;
 
 pub const EVENT_BEFORE_TOOL_CALL: &str = "PreToolUse";
 pub const EVENT_SESSION_START: &str = "SessionStart";
+pub const EVENT_CHILD_TURN_END: &str = "SubagentStop";
 
 pub const TOOL_BASH: &str = "Bash";
 pub const TOOL_POWERSHELL: &str = "PowerShell";
@@ -46,6 +47,11 @@ pub const CONFIG_DIR_VAR: &str = "CLAUDE_CONFIG_DIR";
 pub const CONFIG_HOME_DEFAULT: &str = ".claude";
 
 pub const WIRING_ARGS: &str = "args";
+pub const WIRING_HOOKS: &str = "hooks";
+pub const WIRING_TYPE: &str = "type";
+pub const HARNESS: &str = "Claude Code";
+pub const EXEC_FORM_FLOOR: &str = "2.1.139";
+pub const SETTINGS_FILE: &str = "settings.json";
 
 pub const PROJECTS_DIR: &str = "projects";
 pub const SUBAGENTS_DIR: &str = "subagents";
@@ -74,7 +80,6 @@ pub const TURN_END_REASON: &str = "reason";
 // test can hold those rows whole; read by the test alone
 #[cfg_attr(not(test), allow(dead_code))]
 pub const UNREAD: &[&str] = &[
-    "SubagentStop",
     "Stop",
     "Agent",
     "SendMessage",
@@ -154,6 +159,23 @@ pub fn allow_envelope(reason: &str, rewrite: Option<&str>, context: Option<&str>
 
 pub fn notice_envelope(text: &str) -> String {
     format!(r#"{{"{}":{}}}"#, SYSTEM_MESSAGE, super::quote(text))
+}
+
+// spec: gate-sdk/SPEC.md §The hook contract — one event's exec-form registration, the fragment a
+// user-scope settings file's `hooks` object takes: the event key over one matcher-less group whose
+// `hooks` array holds one command entry
+pub fn wiring_fragment(event: &str, command: &str, args: &[&str]) -> String {
+    format!(
+        r#"{{{}:[{{{}:[{{{}:{},{}:{},{}:[{}]}}]}}]}}"#,
+        super::quote(event),
+        super::quote(WIRING_HOOKS),
+        super::quote(WIRING_TYPE),
+        super::quote(COMMAND),
+        super::quote(COMMAND),
+        super::quote(command),
+        super::quote(WIRING_ARGS),
+        args.iter().map(|a| super::quote(a)).collect::<Vec<_>>().join(",")
+    )
 }
 
 #[cfg(test)]
@@ -263,5 +285,18 @@ mod tests {
             r#"{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","permissionDecisionReason":"r","updatedInput":{"command":"c"},"additionalContext":"f"}}"#
         );
         assert_eq!(notice_envelope("n"), r#"{"systemMessage":"n"}"#);
+    }
+
+    // spec: gate-sdk/SPEC.md §The hook contract — the registration fragment is JSON the harness's
+    // exec form reads, every path escaped, a Windows separator included
+    #[test]
+    fn the_wiring_fragment_is_the_exec_form_registration() {
+        let f = wiring_fragment(EVENT_CHILD_TURN_END, "C:\\u\\b.exe", &["--hook", "m"]);
+        assert_eq!(
+            f,
+            r#"{"SubagentStop":[{"hooks":[{"type":"command","command":"C:\\u\\b.exe","args":["--hook","m"]}]}]}"#
+        );
+        let v: Value = serde_json::from_str(&f).expect("the fragment parses");
+        assert_eq!(v["SubagentStop"][0]["hooks"][0]["command"], "C:\\u\\b.exe");
     }
 }

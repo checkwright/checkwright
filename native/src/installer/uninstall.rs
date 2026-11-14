@@ -5,7 +5,7 @@ use super::{lock, refuse, Refusal, AGENT_FILE, GATES_DIR};
 use std::collections::BTreeSet;
 
 pub(super) const USAGE: &[&str] = &[
-    "usage: checkwright uninstall [--dry-run] [--force] [--no-commit]",
+    "usage: checkwright uninstall [--dry-run] [--force] [--no-commit] [--user]",
     "",
     "Removes the files init recorded in checkwright.lock and commits the removal.",
     "Nothing outside that roster is touched. A file you have edited since",
@@ -42,6 +42,9 @@ pub(super) fn parse(args: &[String]) -> Result<Option<Flags>, Refusal> {
 }
 
 pub fn run(args: &[String]) -> i32 {
+    if super::user::routes(args) {
+        return super::user::run("uninstall", args);
+    }
     super::finish(
         "uninstall",
         parse(args).and_then(|f| match f {

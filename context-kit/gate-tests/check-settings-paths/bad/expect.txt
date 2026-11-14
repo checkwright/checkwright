@@ -6,5 +6,8 @@ hooks.PreToolUse[0].hooks[2]: bash tools/run-gates.sh --hook no-such-guard — n
 hooks.PreToolUse[0].hooks[3]: ${CLAUDE_PROJECT_DIR}/@GATE_SDK_NATIVE_BIN@ --hook shell-guard — unresolved placeholder: @GATE_SDK_NATIVE_BIN@
 hooks.PreToolUse[0].hooks[4]: ${CLAUDE_PROJECT_DIR}/tools/checkwright-gates --hook no-such-exec-guard — no such hook member: no-such-exec-guard
 hooks.PreToolUse[0].hooks[5]: ${CLAUDE_PROJECT_DIR}/tools/checkwright-gates --hook shell-guard --obsrve — hook registration outside the --hook grammar: --obsrve
-help: the grammar: --hook <member> [--observe] [--binding <name>]
+hooks.PreToolUse[0].hooks[6]: ${CLAUDE_PROJECT_DIR}/tools/checkwright-gates --hook shell-guard --knobs /opt/checkwright/knobs/shell-guard.knobs — hook registration outside the --hook grammar: --knobs
+hooks.SubagentStop[0].hooks[0]: ${CLAUDE_PROJECT_DIR}/tools/checkwright-gates --hook subagent-stop-liveness --knobs knobs/subagent-stop-liveness.knobs — --knobs names a relative path: knobs/subagent-stop-liveness.knobs
+help: the grammar: --hook <member> [--observe] [--binding <name>] [--knobs <absolute file>]
+help: write --knobs <absolute file>; the arm reads no repository to resolve a relative one against
 help: a hook merged from a kit template skipped its placeholder step — replace @GATE_SDK_NATIVE_BIN@

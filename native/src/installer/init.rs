@@ -36,12 +36,13 @@ pub(super) struct Flags {
     selection: Option<Selection>,
 }
 
-pub(super) const USAGE: &str = "usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit] [--personal]";
+pub(super) const USAGE: &str = "usage: checkwright init [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit] [--personal] [--user <arm>]";
 
 fn help(pkg: Option<&Package>) {
     println!("{}\n", USAGE);
     println!("Vendors pinned kit source into this repository and commits it.");
-    println!("Nothing is fetched: the source comes from this package.\n");
+    println!("Nothing is fetched: the source comes from this package.");
+    println!("--user <arm> installs one session-hook arm for this user instead; see 'checkwright init --user --help'.\n");
     let names = match pkg {
         Some(p) => profile::names(&p.root).join(" "),
         None => String::new(),
@@ -167,6 +168,9 @@ fn no_commit_beside_personal() -> Refusal {
 }
 
 pub fn run(args: &[String]) -> i32 {
+    if super::user::routes(args) {
+        return super::user::run("init", args);
+    }
     // spec: installer/SPEC.md §The verbs — `--help` answers before every precondition, including
     // the package's own: an adopter asking what the verb takes is not asking for an install.
     let pkg = super::package(
@@ -395,7 +399,7 @@ fn file_name(dest: &str) -> &str {
     dest.rsplit('/').next().unwrap_or(dest)
 }
 
-fn read_package_field(pkg: &Package, path: &[&str]) -> String {
+pub(super) fn read_package_field(pkg: &Package, path: &[&str]) -> String {
     let Ok(text) = std::fs::read_to_string(pkg.root.join("package.json")) else {
         return String::new();
     };

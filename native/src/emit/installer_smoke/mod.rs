@@ -18,6 +18,7 @@ mod report;
 mod roster;
 mod staging;
 mod upgrade;
+mod user;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the declared names; the scratch base, the artifact
 // hand-off and the tarball hand-out are read undeclared, no static kit owning their prefix
