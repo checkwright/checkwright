@@ -16,6 +16,18 @@
 
 ## New Features
 
+### test-control-decl-binding
+
+[spec: SPEC-test-control-binding.md]
+
+`check-test-control` (C) never binds a witness to the control's assignments: native/src/gates/test_control.rs matches `control=`, `scenario=`, `commit=` and `cmd=` only, and the command digest in native/src/evidence.rs hashes the run and parser words alone, so editing a control's `VAR=value` after a red witness keeps that witness passing at close. evidence-kit/SPEC.md §Test controls' honest limits do not state it.
+
+**Fix shape (operator direction 2026-11-15, lead-relayed, not a ruling):** bind the declaration, never state the limit: a digest of the control's assignments rides the control line, and (C) holds it equal to the current declaration's.
+
+**Deliverable:** a feature, designed in the amendment: the control line's `assign=` field, its digest's input, (C)'s check, and no manifest migration, since the control line has no released writer.
+
+**Cost while deferred:** a control re-pointed at another switch after its red witness still discharges its test at close. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading `close_witness`. Owner lookup: `test control`, `control line` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §Test controls.
+
 ## Technical Debt
 
 ### empty-for-selection-sarif-skip
@@ -445,18 +457,6 @@ An observed `session-context` logs `would=error`: the member prints its brief as
 **Deliverable:** a table row reading plain-text stdout on a context-taking event as `advise`, reason withheld, which needs the event `classify` does not take today; or the member emits the context envelope under every binding; or the table names the case as a limit.
 
 **Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
-
-### test-control-decl-binding
-
-[cost: event/low] [surface: evidence-kit]
-
-`check-test-control` (C) never binds a witness to the control's assignments: native/src/gates/test_control.rs matches `control=`, `scenario=`, `commit=` and `cmd=` only, and the command digest in native/src/evidence.rs hashes the run and parser words alone, so editing a control's `VAR=value` after a red witness keeps that witness passing at close. evidence-kit/SPEC.md §Test controls' honest limits do not state it.
-
-**Fix shape (operator direction 2026-11-15, lead-relayed, not a ruling):** bind the declaration, never state the limit: a digest of the control's assignments rides the control line, and (C) holds it equal to the current declaration's.
-
-**Deliverable:** design-pending, a feature: the control-line field, its digest's input, (C)'s check and the manifest's migration, authored at spec as an evidence-kit amendment.
-
-**Cost while deferred:** a control re-pointed at another switch after its red witness still discharges its test at close. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading `close_witness`. Owner lookup: `test control`, `control line` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §Test controls.
 
 ## Icebox
 
