@@ -69,7 +69,7 @@ Roster from `git grep -n "control="`, `git grep -n -i "control line"` and `git g
 
 ## Definition of Done
 
-- [ ] **Causal completeness** — every point of canon-kit/SPEC.md §The causal-completeness check holds for the digest, the field and the finding.
+- [ ] **Causal completeness** — every point of SPEC §The causal-completeness check holds for each new state, event, interface and obligation.
 - [ ] **Instruction surfaces: instruction only** — no template, agent definition or shim is touched.
 - [ ] **Merged with no information lost** — each replacement re-phrases the passage it refines; the merged spec reads as one document.
 - [ ] **Amendment deleted** — this file removed on merge; none remain for the component (`ls evidence-kit/SPEC-*.md`).
