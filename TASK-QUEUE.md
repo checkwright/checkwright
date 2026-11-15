@@ -336,6 +336,56 @@ docs/manual-install.md's PowerShell attestation-verify block, which reads `--for
 
 **Cost while deferred:** every validate pays about three hours of wall-clock. Surfaced 2026-11-14 at liveness-arm-adoption-pass' validate; filed at its close. Owner lookup: `projection_witness`, `projection-witness` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §projection-witness.
 
+### observe-trial-promise-gaps
+
+[cost: event/low] [surface: gate-sdk]
+
+Two gaps between an observed hook trial (`--hook <member> --observe`) and what gate-sdk/SPEC.md §The harness-integration arm promises of it. First, the self-spawned child runs `--hook <member>` unflagged, so a trial still runs the member's own writes: observing `session-context` runs its scratch sweep (`native/src/hook/session_context.rs`), and the section states no rule for a member's own writes beside its withheld advise and grant effects. Second, the observe log's `reason=` is the child's first stderr line, and a shell-guard refusal can echo the command (the prefix rule in `native/src/guard/rules/spelling.rs` prints `Run it without the prefix: <command>`), against the log's 'holds no command text a session typed'.
+
+**Deliverable:** a fix per gap: pass the observe mark to the child so writing members skip their writes, or state the limit beside the shell-guard one; and scrub `reason=` for a command-echoing member, or narrow the promise.
+
+**Cost while deferred:** a trial meant to enforce nothing still deletes scratch, and the log can hold typed command text. **Inferred, not run:** no observed trial of `session-context` was run. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (two bullets, from source); filed at the next scope. Owner lookup: `observe`, `reason=`, `command text` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
+### path-root-context-spellings
+
+[cost: event/low] [surface: gate-sdk]
+
+The tree-free and user-install absolute-path checks accept spellings whose location depends on context: `walk::path_root` (`native/src/walk.rs`) admits a leading backslash, drive-relative on Windows, and a drive spelling such as `C:/x`, relative on POSIX. Its callers: the user roots (`native/src/installer/user.rs`), the tree-free hook paths (`native/src/hook/mod.rs`) and the evidence `handoff=` marker (`native/src/evidence.rs`).
+
+**Deliverable:** a fix: each caller weighed for the host's `Path::is_absolute`, with a case per refused spelling.
+
+**Cost while deferred:** a path the check admits as absolute resolves against an unstated drive or directory. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a pathlib probe; the scope re-read `path_root`); filed at the next scope. Owner lookup: `path_root`, `is_absolute`, `drive-relative` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The path-dialect contract.
+
+### user-lock-key-traversal
+
+[cost: event/low] [surface: installer]
+
+`uninstall --user` removes paths built from `user.lock`'s `files` keys without refusing a parent-dir or absolute component: `UserLock::read` copies the keys and `at_rel` folds them onto the data dir by `split('/')` (`native/src/installer/user.rs`), so a key `../victim` names a file outside the data dir, removed unconditionally under `--force`. The lock is installer-written in the user's own data dir, so this is defence in depth.
+
+**Deliverable:** a fix: refuse such a key as a malformed lock, with its case.
+
+**Cost while deferred:** a corrupted or hand-edited lock can steer an uninstall outside its data dir. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (from source; the scope re-read `at_rel`); filed at the next scope. Owner lookup: `user.lock`, `at_rel`, `uninstall --user` in this file and the disposed-findings record, none; owner installer/SPEC.md §The user install.
+
+### usage-poll-half-weekly-pair
+
+[cost: event/low] [surface: delegation-kit]
+
+`--usage-poll` accepts a half weekly pair: with a complete five-hour pair, `axes()` in `native/src/hook/poll.rs` returns a weekly percentage with an empty reset (`seven_day {utilization:99}`) and the snapshot is written with the weekly axis unarmed, though the poller's step 3 in delegation-kit/SPEC.md reads half of an axis as unparseable. It predates the no-five-hour fix; the v0.36.0 note is worded to the shipped behaviour.
+
+**Deliverable:** a fix: refuse a weekly percentage without a reset, or the reverse, with the unit case.
+
+**Cost while deferred:** a malformed payload leaves the weekly budget verdict unarmed with no refusal. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close, confirmed there and at this scope by reading `axes()`; filed at the next scope. Owner lookup: `usage-poll`, `weekly` in this file and the disposed-findings record, none on this path; owner delegation-kit/SPEC.md §usage-verdict.
+
+### docs-since-duplicate-key
+
+[cost: event/low] [surface: docs]
+
+`check-docs-since` and `--emit docs-since` read the first `since:` line of a page's front matter (`native/src/emit/docs_since.rs`), but a YAML renderer keeps the last duplicate key, so `since: v0.1.0` then `since: unreleased` passes the gate and the rewrite while the site renders the unreleased banner.
+
+**Deliverable:** a fix: refuse a duplicated `since:` key, with its fixture.
+
+**Cost while deferred:** a page can show the unreleased banner the gate reads as released. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a YAML renderer probe); filed at the next scope. Owner lookup: `docs-since`, `duplicat` in this file and the disposed-findings record, none; owner site-kit/SPEC.md §check-docs-since.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
