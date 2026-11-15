@@ -26,6 +26,20 @@ A machine reader of a gate run has only the battery's SARIF 2.1.0 log (gate-sdk/
 
 **Cost while deferred:** an outside caller reimplements the verdict from text a release may reword. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `SARIF`, `--json`, `exit code` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
+### gate-run-attestation-predicate
+
+[spec: evidence-kit/SPEC-gate-run-predicate.md]
+
+the tree-side first unit of [hosted-attestation-service](#hosted-attestation-service): the evidence manifest (evidence-kit/SPEC.md §Evidence manifest) emitted as an in-toto Statement in a DSSE envelope under a Checkwright-owned gate-run predicate type, the versioned wire contract between the kits and any verifier. Unbuilt: in-toto appears only in docs/choosing.md's comparison rows. It needs no demand, since a predicate an adopter's CI signs with off-the-shelf attestation tooling is useful before any service exists.
+
+**Deliverable:** design-pending, a feature: the predicate type's name and schema, the manifest fields it carries, whether the kits emit the Statement for a signer to wrap or sign it themselves, and its versioning rule.
+
+**First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
+
+**Widened (operator direction 2026-11-15, lead-relayed, not a ruling):** a published schema for the predicate, a verify arm that checks a Statement against the tree and its commit, and **imported runs** — a Statement produced on another host or in CI, bound by a hash of the command, the source commit and the counts, verified without re-running. The binding is one manifest major version beside [recorded-test-mutation-control](#recorded-test-mutation-control)'s record, with a migration note. Its provenance block (tool and kit versions, commit) is the one [machine-verdict-contract](#machine-verdict-contract) defines. Honest limit owed: an unsigned imported run proves its binding is consistent, never that the run happened; that is the signer's.
+
+**Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
+
 ## Technical Debt
 
 ### projection-witness-wall-clock
@@ -205,20 +219,6 @@ Only TRAJECTORY.md holds rulings (operator direction, 2026-10-25), yet tracked p
 **Deliverable:** design-pending, a feature: relabel each instance as the direction it is, and a gate that reds a ruling claim on a tracked surface naming no ledger entry (enforcement-first).
 
 **Cost while deferred:** a session reading the label treats a direction as operator-class and escalates what it could decide. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `ruling`, `ruled` in this file, the two instances; owner lifecycle-kit/SPEC.md §The steering vocabulary.
-
-### gate-run-attestation-predicate
-
-[cost: event/low] [surface: evidence-kit]
-
-the tree-side first unit of [hosted-attestation-service](#hosted-attestation-service): the evidence manifest (evidence-kit/SPEC.md §Evidence manifest) emitted as an in-toto Statement in a DSSE envelope under a Checkwright-owned gate-run predicate type, the versioned wire contract between the kits and any verifier. Unbuilt: in-toto appears only in docs/choosing.md's comparison rows. It needs no demand, since a predicate an adopter's CI signs with off-the-shelf attestation tooling is useful before any service exists.
-
-**Deliverable:** design-pending, a feature: the predicate type's name and schema, the manifest fields it carries, whether the kits emit the Statement for a signer to wrap or sign it themselves, and its versioning rule.
-
-**First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
-
-**Widened (operator direction 2026-11-15, lead-relayed, not a ruling):** a published schema for the predicate, a verify arm that checks a Statement against the tree and its commit, and **imported runs** — a Statement produced on another host or in CI, bound by a hash of the command, the source commit and the counts, verified without re-running. The binding is one manifest major version beside [recorded-test-mutation-control](#recorded-test-mutation-control)'s record, with a migration note. Its provenance block (tool and kit versions, commit) is the one [machine-verdict-contract](#machine-verdict-contract) defines. Honest limit owed: an unsigned imported run proves its binding is consistent, never that the run happened; that is the signer's.
-
-**Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
 
 ### liveness-reader-template
 
