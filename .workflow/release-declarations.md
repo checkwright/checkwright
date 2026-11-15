@@ -3,3 +3,4 @@
 ## Behavior changes
 
 - **`--emit trajectory`** — spawns a fixed handful of git processes however long the history, where it spawned one per evidence-manifest revision, one per closed iteration's range and one per close commit's gates roster, so it and a freshness gate over it run several times faster and no longer slow with history or machine load. Its output is byte-identical. Nothing to do.
+- **`init --user`, `update --user` and `uninstall --user`, and a tree-free `--hook <member>`** — read a path as absolute only as the host does, refusing as relative a drive spelling or a leading backslash on POSIX and a lone leading separator on Windows. That covers `HOME`, `LOCALAPPDATA`, the `--knobs` file, the knob-file locators and a member's path knobs under the tree-free mark; an XDG value so spelled is ignored. Where one is refused, set it as an absolute path on its host.

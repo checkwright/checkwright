@@ -402,7 +402,7 @@ pub fn set_tree_free(on: bool) {
 // spec: gate-sdk/SPEC.md §The harness-integration arm — a path-valued knob under the mark must be
 // absolute; a relative value, a default included, is the member's decline reason
 pub fn tree_free_path(name: &str, value: &str) -> Result<(), String> {
-    if !tree_free() || crate::walk::path_root(value).is_some() {
+    if !tree_free() || crate::walk::host_absolute(value) {
         return Ok(());
     }
     Err(format!(
@@ -627,17 +627,23 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — under the mark a relative path-valued
-    // knob is the decline reason, naming the knob and its value; with no mark any value passes
+    // knob is the decline reason, naming the knob and its value, a context-dependent spelling
+    // relative; with no mark any value passes
     #[test]
     fn a_relative_path_knob_is_refused_under_the_mark_alone() {
+        let (host, foreign) = if cfg!(windows) { ("C:/var/scratch", "/var/scratch") } else { ("/var/scratch", "C:/var/scratch") };
         assert_eq!(tree_free_path("GATE_SDK_TMP_DIR", ".tmp"), Ok(()));
         set_tree_free(true);
         let relative = tree_free_path("GATE_SDK_TMP_DIR", ".tmp");
-        let absolute = tree_free_path("GATE_SDK_TMP_DIR", "/var/scratch");
+        let absolute = tree_free_path("GATE_SDK_TMP_DIR", host);
+        let context = [foreign, "\\var\\scratch"].map(|v| tree_free_path("GATE_SDK_TMP_DIR", v));
         set_tree_free(false);
         let e = relative.expect_err("a relative value under the mark");
         assert!(e.contains("GATE_SDK_TMP_DIR is '.tmp'") && e.contains("absolute paths only"), "{}", e);
         assert_eq!(absolute, Ok(()));
+        for r in context {
+            assert!(r.is_err_and(|e| e.contains("absolute paths only")), "a context-dependent spelling passed");
+        }
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — the owner column is checked against the

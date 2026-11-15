@@ -198,18 +198,18 @@ type Env<'a> = &'a dyn Fn(&str) -> Option<OsString>;
 
 fn dirs(env: Env, windows: bool) -> Result<Dirs, Refusal> {
     let (data, state) = if windows {
-        let data = required(env, "LOCALAPPDATA")?.join(APP);
+        let data = required(env, "LOCALAPPDATA", true)?.join(APP);
         let state = data.join(WINDOWS_STATE_DIR);
         (data, state)
     } else {
-        let xdg = |k: &str| env(k).map(PathBuf::from).filter(|p| walk::path_root(&p.to_string_lossy()).is_some());
+        let xdg = |k: &str| env(k).map(PathBuf::from).filter(|p| walk::absolute_on(&p.to_string_lossy(), false));
         let data = match xdg("XDG_DATA_HOME") {
             Some(p) => p,
-            None => required(env, "HOME")?.join(".local").join("share"),
+            None => required(env, "HOME", false)?.join(".local").join("share"),
         };
         let state = match xdg("XDG_STATE_HOME") {
             Some(p) => p,
-            None => required(env, "HOME")?.join(".local").join("state"),
+            None => required(env, "HOME", false)?.join(".local").join("state"),
         };
         (data.join(APP), state.join(APP))
     };
@@ -232,13 +232,13 @@ fn dirs(env: Env, windows: bool) -> Result<Dirs, Refusal> {
     Ok(Dirs { data, state })
 }
 
-fn required(env: Env, var: &str) -> Result<PathBuf, Refusal> {
+fn required(env: Env, var: &str, windows: bool) -> Result<PathBuf, Refusal> {
     let help = format!("the user install derives its directories from {}; set it to an absolute path, then re-run.", var);
     match env(var).filter(|v| !v.is_empty()) {
         None => Err(refuse(format!("{} is unset", var), help, 2)),
         Some(v) => {
             let p = PathBuf::from(v);
-            if walk::path_root(&p.to_string_lossy()).is_some() {
+            if walk::absolute_on(&p.to_string_lossy(), windows) {
                 Ok(p)
             } else {
                 Err(refuse(format!("{} is not an absolute path: {}", var, p.to_string_lossy()), help, 2))
@@ -759,8 +759,29 @@ mod tests {
         let d = dirs(&env_of(&[("HOME", "/h"), ("XDG_DATA_HOME", "rel"), ("XDG_STATE_HOME", "")]), false).expect("home");
         assert_eq!(d.data, Path::new("/h").join(".local").join("share").join(APP));
         assert_eq!(d.state, Path::new("/h").join(".local").join("state").join(APP));
-        let d = dirs(&env_of(&[("LOCALAPPDATA", "/l")]), true).expect("windows");
-        assert_eq!((d.data.clone(), d.state), (Path::new("/l").join(APP), Path::new("/l").join(APP).join("state")));
+        let d = dirs(&env_of(&[("LOCALAPPDATA", "C:/l")]), true).expect("windows");
+        assert_eq!((d.data.clone(), d.state), (Path::new("C:/l").join(APP), Path::new("C:/l").join(APP).join("state")));
+        let d = dirs(&env_of(&[("HOME", "/h"), ("XDG_DATA_HOME", "C:/xd"), ("XDG_STATE_HOME", "\\xs")]), false)
+            .expect("home");
+        assert_eq!(d.data, Path::new("/h").join(".local").join("share").join(APP), "a drive spelling is relative on POSIX");
+        assert_eq!(d.state, Path::new("/h").join(".local").join("state").join(APP), "a backslash is relative on POSIX");
+    }
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — a root spelling whose location depends on the
+    // host's context is refused as relative: a lone leading separator on Windows, a drive spelling
+    // and a leading backslash on POSIX
+    #[test]
+    fn a_context_dependent_root_is_refused_as_relative() {
+        for (var, value, windows) in [
+            ("LOCALAPPDATA", "\\l", true),
+            ("LOCALAPPDATA", "/l", true),
+            ("HOME", "C:/h", false),
+            ("HOME", "\\h", false),
+        ] {
+            let r = dirs(&env_of(&[(var, value)]), windows).expect_err(value);
+            let want = format!("{} is not an absolute path", var);
+            assert!(r.code == 2 && r.message.contains(&want), "{}: {}", value, r.message);
+        }
     }
 
     // spec: installer/SPEC.md §The user install — an unset root variable, a relative one, a tab and

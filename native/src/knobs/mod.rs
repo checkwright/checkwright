@@ -574,7 +574,7 @@ fn load(
             (kit.knob_file_var(), knob_file),
             (kit.local_knob_file_var(), local_file),
         ] {
-            if !value.is_empty() && crate::walk::path_root(value).is_none() {
+            if !value.is_empty() && !crate::walk::host_absolute(value) {
                 return Err(format!(
                     "{} is '{}', and a run with no repository takes absolute locators only — set it to an \
                      absolute path, or unset it",
@@ -583,8 +583,8 @@ fn load(
             }
         }
     }
-    let defaults = !free || crate::walk::path_root(dir).is_some();
-    let read_config = !free || crate::walk::path_root(config_file).is_some();
+    let defaults = !free || crate::walk::host_absolute(dir);
+    let read_config = !free || crate::walk::host_absolute(config_file);
     for legacy in [
         format!("{}/{}-config.sh", dir, stem),
         format!("{}/{}-config.local.sh", dir, stem),
@@ -673,7 +673,7 @@ pub fn check_seam(file_name: &str, text: &str) -> Result<(), String> {
 // spec: gate-sdk/SPEC.md §The knob file — the `--knobs` file checked whole before the member runs:
 // absolute, readable, every line in the grammar and owned by a kit, and each kit's lines its own
 pub fn check_hook_file(path: &str) -> Result<(), String> {
-    if crate::walk::path_root(path).is_none() {
+    if !crate::walk::host_absolute(path) {
         return Err(format!("names a relative path: {}, and takes an absolute file only", path));
     }
     let text = std::fs::read_to_string(path).map_err(|e| format!("cannot read {}: {}", path, e))?;

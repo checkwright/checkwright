@@ -830,6 +830,27 @@ pub fn path_root(p: &str) -> Option<&str> {
     None
 }
 
+// spec: gate-sdk/SPEC.md §The crate's crosser — absolute as the host resolves it, for a value no
+// crosser reaches: `path_root` less the spellings the host reads against an unstated drive or directory
+pub fn host_absolute(p: &str) -> bool {
+    absolute_on(p, cfg!(windows))
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the host test's pure form, the host a parameter so a
+// caller injecting its host for a test answers for both
+pub fn absolute_on(p: &str, windows: bool) -> bool {
+    let sep = |c: u8| c == b'/' || c == b'\\';
+    let b = p.as_bytes();
+    if !windows {
+        return b.first() == Some(&b'/');
+    }
+    match path_root(p) {
+        Some("") => b.len() > 2 && sep(b[1]) && !sep(b[2]),
+        Some(_) => true,
+        None => false,
+    }
+}
+
 // spec: gate-sdk/SPEC.md §The crate's crosser — the pure half: `cwd()` and `toplevel()` are the
 // producers, and these two are functions of their inputs alone.
 // spec: gate-sdk/SPEC.md §lib/gate.sh — a relative root may climb out with `..`, so the
@@ -1998,6 +2019,30 @@ mod tests {
     const ROOTED_CORPUS: &[&str] = &[
         "/x", "\\x", "//srv", "\\\\srv", "C:/x", "c:\\x", "C:", "C:x", "1:/x", "./x", "x", "", "é:/x", "Ä:\\x",
     ];
+
+    // spec: gate-sdk/SPEC.md §The crate's crosser — the host test admits what each host's
+    // `Path::is_absolute` admits, and refuses each spelling `path_root` admits whose location
+    // depends on context
+    #[test]
+    fn the_host_test_refuses_each_context_dependent_spelling() {
+        for (p, windows, posix) in [
+            ("/x", false, true),
+            ("\\x", false, false),
+            ("C:/x", true, false),
+            ("c:\\x", true, false),
+            ("\\\\srv\\share", true, false),
+            ("//srv/share", true, true),
+            ("\\\\?\\C:\\x", true, false),
+            ("\\\\", false, false),
+            ("C:x", false, false),
+            ("x", false, false),
+            ("", false, false),
+        ] {
+            assert_eq!(absolute_on(p, true), windows, "{:?} on Windows", p);
+            assert_eq!(absolute_on(p, false), posix, "{:?} on POSIX", p);
+            assert!(!absolute_on(p, true) || path_root(p).is_some(), "{:?} widens path_root", p);
+        }
+    }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — gate_path_rooted answers path_root's predicate over one
     // corpus, under bash's default range reading and under a locale-collated one
