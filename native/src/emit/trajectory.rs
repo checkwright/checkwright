@@ -1,7 +1,7 @@
 // spec: drift-kit/SPEC.md §The published-evidence extractor — the governed-trajectory table, a
 // pure function of committed history. The stage roster and the evidence-surface pair are the
 // consumer's vocabulary and are knobs; not one stage name is written here.
-use crate::history::Git;
+use crate::history::{Blobs, Git};
 use crate::walk;
 use std::collections::{HashMap, HashSet};
 
@@ -171,39 +171,112 @@ fn harvest_stamps(
     }
 }
 
+// spec: drift-kit/SPEC.md §The published-evidence extractor — HEAD's commit graph from one log walk,
+// each commit's parents and subject, so every range is a set difference taken in process
+#[derive(Default)]
+struct Graph {
+    ids: HashMap<String, usize>,
+    hashes: Vec<String>,
+    subjects: Vec<String>,
+    parents: Vec<Vec<usize>>,
+}
+
+impl Graph {
+    fn parse(log: &str) -> Graph {
+        let mut g = Graph::default();
+        let mut named: Vec<Vec<String>> = Vec::new();
+        for line in log.lines() {
+            let mut f = line.splitn(3, '\x1f');
+            let h = f.next().unwrap_or_default();
+            if h.is_empty() || g.ids.contains_key(h) {
+                continue;
+            }
+            g.ids.insert(h.to_string(), g.hashes.len());
+            g.hashes.push(h.to_string());
+            named.push(f.next().unwrap_or_default().split_whitespace().map(String::from).collect());
+            g.subjects.push(f.next().unwrap_or_default().to_string());
+        }
+        g.parents = named
+            .iter()
+            .map(|ps| ps.iter().filter_map(|p| g.ids.get(p).copied()).collect())
+            .collect();
+        g
+    }
+
+    // spec: drift-kit/SPEC.md §The published-evidence extractor — the commits reachable from `from`
+    // and outside `stop`, which is `git log <prev>..<from>` when `stop` is `<prev>`'s ancestry, and
+    // whether the walk met `mark`
+    fn walk(&self, from: usize, stop: &[bool], mark: Option<usize>) -> (Vec<usize>, bool) {
+        let mut seen = vec![false; self.hashes.len()];
+        let (mut stack, mut out, mut met) = (vec![from], Vec::new(), false);
+        while let Some(i) = stack.pop() {
+            if std::mem::replace(&mut seen[i], true) {
+                continue;
+            }
+            met |= mark == Some(i);
+            if stop[i] {
+                continue;
+            }
+            out.push(i);
+            stack.extend(&self.parents[i]);
+        }
+        (out, met)
+    }
+
+    fn ancestry(&self, from: Option<usize>) -> Vec<bool> {
+        let none = vec![false; self.hashes.len()];
+        let mut set = none.clone();
+        for i in from.map(|c| self.walk(c, &none, None).0).unwrap_or_default() {
+            set[i] = true;
+        }
+        set
+    }
+}
+
 // spec: drift-kit/SPEC.md §The published-evidence extractor — every range-scoped column freezes at
 // (close(N-1), close(N)]; the first row's boundary is the empty one, so it takes every ancestor up
-// to its own close commit.
+// to its own close commit. A boundary this clone cannot resolve leaves the row's range empty.
 fn harvest_ranges(
     git: &Git,
     order: &[String],
     iters: &mut HashMap<String, Iteration>,
 ) -> HashMap<String, String> {
+    let graph = git
+        .read(&["log", "--format=%H%x1f%P%x1f%s", "HEAD"])
+        .map(|l| Graph::parse(&l))
+        .unwrap_or_default();
     let mut owner: HashMap<String, String> = HashMap::new();
     let mut prev: Option<String> = None;
+    let mut below = vec![false; graph.hashes.len()];
     for it in order {
         let close = match iters.get(it).and_then(|e| e.close.clone()) {
             Some(c) => c,
             None => continue,
         };
-        let range = match &prev {
-            Some(p) => format!("{}..{}", p, close),
-            None => close.clone(),
-        };
+        let at = graph.ids.get(&close).copied();
+        let bound = prev.as_ref().map(|p| graph.ids.get(p).copied());
         let (mut feat, mut debt) = (0usize, 0usize);
-        if let Some(log) = git.read(&["log", "--format=%H %s", &range]) {
-            for line in log.lines() {
-                let (h, subj) = match line.split_once(' ') {
-                    Some(v) => v,
-                    None => (line, ""),
-                };
-                owner.insert(h.to_string(), it.clone());
-                if subj.starts_with("feat") {
-                    feat += 1;
-                } else if subj.starts_with("fix") || subj.starts_with("refactor") {
-                    debt += 1;
+        match (at, bound) {
+            (Some(c), None | Some(Some(_))) => {
+                let (range, met) = graph.walk(c, &below, bound.flatten());
+                for &i in &range {
+                    owner.insert(graph.hashes[i].clone(), it.clone());
+                    let subj = &graph.subjects[i];
+                    if subj.starts_with("feat") {
+                        feat += 1;
+                    } else if subj.starts_with("fix") || subj.starts_with("refactor") {
+                        debt += 1;
+                    }
+                }
+                if met || bound.is_none() {
+                    for i in range {
+                        below[i] = true;
+                    }
+                } else {
+                    below = graph.ancestry(at);
                 }
             }
+            _ => below = graph.ancestry(at),
         }
         if let Some(e) = iters.get_mut(it) {
             e.feat = feat;
@@ -283,7 +356,12 @@ fn harvest_amendments(
 // spec: drift-kit/SPEC.md §The published-evidence extractor — validate-attestation harvest: the
 // evidence manifest truncates at scope too, so the union over every committed revision of it is
 // what the whole history attested, deduplicated because a stamp survives across commits.
-fn harvest_validate(git: &Git, evidence_file: &str, iters: &mut HashMap<String, Iteration>) {
+fn harvest_validate(
+    git: &Git,
+    blobs: &mut Option<Blobs>,
+    evidence_file: &str,
+    iters: &mut HashMap<String, Iteration>,
+) {
     if evidence_file.is_empty()
         || !git.has(&["cat-file", "-e", &format!("HEAD:{}", evidence_file)])
     {
@@ -295,7 +373,7 @@ fn harvest_validate(git: &Git, evidence_file: &str, iters: &mut HashMap<String, 
     };
     let mut seen: HashSet<String> = HashSet::new();
     for c in revs.split_whitespace() {
-        let blob = match git.read(&["show", &format!("{}:{}", c, evidence_file)]) {
+        let blob = match blob_at(blobs, c, evidence_file) {
             Some(b) => b,
             None => continue,
         };
@@ -329,6 +407,18 @@ fn harvest_validate(git: &Git, evidence_file: &str, iters: &mut HashMap<String, 
     }
 }
 
+// spec: drift-kit/SPEC.md §The published-evidence extractor — every committed blob the harvest reads
+// through one batched reader; a reader that failed answers nothing from then on, as a failed read does
+fn blob_at(blobs: &mut Option<Blobs>, rev: &str, path: &str) -> Option<String> {
+    match blobs.as_mut()?.at(rev, path) {
+        Ok(b) => b,
+        Err(_) => {
+            *blobs = None;
+            None
+        }
+    }
+}
+
 // spec: drift-kit/SPEC.md §The published-evidence extractor — `^[a-z0-9-]+ [a-z_]+ sha256=`: the
 // attestation grammar, so a comment or a header line in the manifest is not counted as a suite
 fn is_attestation(line: &str) -> bool {
@@ -355,14 +445,13 @@ fn is_attestation(line: &str) -> bool {
 
 // spec: drift-kit/SPEC.md §The published-evidence extractor — gate-roster growth: the registry's
 // member count at the iteration's own close commit, so the column is history and not today's
-fn harvest_gate_counts(git: &Git, gates_file: &str, iters: &mut HashMap<String, Iteration>) {
+fn harvest_gate_counts(blobs: &mut Option<Blobs>, gates_file: &str, iters: &mut HashMap<String, Iteration>) {
     for e in iters.values_mut() {
         let close = match &e.close {
             Some(c) => c.clone(),
             None => continue,
         };
-        e.gates = git
-            .read(&["show", &format!("{}:{}", close, gates_file)])
+        e.gates = blob_at(blobs, &close, gates_file)
             .map(|roster| {
                 roster
                     .lines()
@@ -466,8 +555,9 @@ pub fn harvest() -> Result<Harvest, String> {
     harvest_stamps(&git, &state_file, &roster, &mut order, &mut iters);
     let owner = harvest_ranges(&git, &order, &mut iters);
     harvest_amendments(&git, &owner, &mut iters);
-    harvest_validate(&git, &evidence_file, &mut iters);
-    harvest_gate_counts(&git, &gates_file, &mut iters);
+    let mut blobs = Blobs::open(&git.top).ok();
+    harvest_validate(&git, &mut blobs, &evidence_file, &mut iters);
+    harvest_gate_counts(&mut blobs, &gates_file, &mut iters);
 
     let mut closed = Vec::new();
     if state_present {
@@ -563,5 +653,25 @@ mod tests {
         assert!(!is_attestation("# a comment line"));
         assert!(!is_attestation("my-iter gate_tests md5=abc"));
         assert!(!is_attestation("My-Iter gate_tests sha256=abc"));
+    }
+
+    // spec: drift-kit/SPEC.md §The published-evidence extractor — the in-process range is `git log
+    // <prev>..<close>` over a merge: the side branch joins the range its merge closes, and a walk
+    // from a close off the previous one's line meets no boundary
+    #[test]
+    fn a_range_is_the_ancestry_difference_a_range_log_would_list() {
+        let g = Graph::parse("d\x1fb c\x1fmerge\nc\x1fa\x1ffeat: c\nb\x1fa\x1ffix: b\na\x1f\x1ffeat: a\ne\x1fa\x1fside\n");
+        let names = |ids: Vec<usize>| {
+            let mut v: Vec<&str> = ids.into_iter().map(|i| g.hashes[i].as_str()).collect();
+            v.sort();
+            v
+        };
+        let b = g.ids["b"];
+        let (range, met) = g.walk(g.ids["d"], &g.ancestry(Some(b)), Some(b));
+        assert_eq!((names(range), met), (vec!["c", "d"], true));
+        let (range, met) = g.walk(g.ids["e"], &g.ancestry(Some(b)), Some(b));
+        assert_eq!((names(range), met), (vec!["e"], false));
+        assert_eq!(names(g.walk(b, &g.ancestry(None), None).0), vec!["a", "b"]);
+        assert_eq!(g.subjects[g.ids["c"]], "feat: c");
     }
 }

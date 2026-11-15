@@ -52,14 +52,6 @@ The fixture pair proves a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipl
 
 ## Technical Debt
 
-### projection-witness-wall-clock
-
-`--run-validate`'s projection_witness suite took about 3 of the 4 hours of liveness-arm-adoption-pass' validate. It spawns `check-trajectory-fresh` once per perturbation, up to three per class over about 134 classes, each spawn 15-28s wall at about 2s CPU (gate-sdk/SPEC.md §projection-witness).
-
-**Deliverable:** a fix: a faster trajectory arm, since the wall is mostly not CPU and likely a git-history read it could cache or narrow, or a narrower witness sample for a member whose trigger is wide.
-
-**Cost while deferred:** every validate pays about three hours of wall-clock. Surfaced 2026-11-14 at liveness-arm-adoption-pass' validate; filed at its close. Owner lookup: `projection_witness`, `projection-witness` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §projection-witness.
-
 ### observe-trial-promise-gaps
 
 Two gaps between an observed hook trial (`--hook <member> --observe`) and what gate-sdk/SPEC.md §The harness-integration arm promises of it. First, the self-spawned child runs `--hook <member>` unflagged, so a trial still runs the member's own writes: observing `session-context` runs its scratch sweep (`native/src/hook/session_context.rs`), and the section states no rule for a member's own writes beside its withheld advise and grant effects. Second, the observe log's `reason=` is the child's first stderr line, and a shell-guard refusal can echo the command (the prefix rule in `native/src/guard/rules/spelling.rs` prints `Run it without the prefix: <command>`), against the log's 'holds no command text a session typed'.
@@ -1167,4 +1159,6 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 No arm exports a developer's workflow commits off a vendored tree they do not own, so the workflow half of a personal adoption is stripped by hand before an upstream pull request.
 
 ## Done
+
+- projection-witness-wall-clock
 
