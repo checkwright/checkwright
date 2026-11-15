@@ -26,7 +26,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("not a directory: {}", root));
     }
     if spec::command("CANON_KIT_ENUM_SETS_CMD")?.is_empty() {
-        println!("PROSE-ENUM: clean (CANON_KIT_ENUM_SETS_CMD unset — no declared sets to check)");
+        println!("PROSE-ENUM: clean (not applicable: CANON_KIT_ENUM_SETS_CMD unset — no declared sets to check)");
         return Ok(0);
     }
     let lines = spec::enum_sets()?;

@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "properties": {
+    "verdictContract": "1.0.0"
+  },
+  "runs": [
+    {
+      "properties": {
+        "provenance": {
+          "commit": "89abcdef0123456789abcdef0123456789abcdef",
+          "kits": [
+            {
+              "name": "gate-sdk",
+              "root": "gate-sdk",
+              "version": "1.0.0"
+            },
+            {
+              "name": "canon-kit",
+              "root": "canon-kit",
+              "version": "1.0.0"
+            }
+          ],
+          "tool": {
+            "name": "checkwright-gates",
+            "sourceStamp": "0123456789abcdef0123456789abcdef01234567",
+            "target": "x86_64-unknown-linux-gnu",
+            "version": "1.0.0"
+          },
+          "worktree": "clean"
+        },
+        "results": "all",
+        "scope": "registry"
+      },
+      "results": [
+        {
+          "kind": "pass",
+          "level": "none",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/gates.list"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "CHECK-ALPHA: clean (12 files)"
+          },
+          "ruleId": "check-alpha",
+          "ruleIndex": 0
+        },
+        {
+          "kind": "pass",
+          "level": "none",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/gates.list"
+                },
+                "region": {
+                  "startLine": 2
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "CHECK-BETA: clean (3 sections)"
+          },
+          "ruleId": "check-beta",
+          "ruleIndex": 1
+        },
+        {
+          "kind": "notApplicable",
+          "level": "none",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/gates.list"
+                },
+                "region": {
+                  "startLine": 3
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "CHECK-GAMMA: clean (not applicable: CHECK_GAMMA_GLOBS is unset)"
+          },
+          "ruleId": "check-gamma",
+          "ruleIndex": 2
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "checkwright-gates",
+          "rules": [
+            {
+              "helpUri": "https://example.test/gate-sdk/SPEC#example",
+              "id": "check-alpha",
+              "properties": {
+                "kit": "gate-sdk"
+              },
+              "shortDescription": {
+                "text": "gate-sdk/SPEC.md §Example — every file holds the rule"
+              }
+            },
+            {
+              "id": "check-beta",
+              "properties": {
+                "kit": "canon-kit"
+              }
+            },
+            {
+              "id": "check-gamma",
+              "properties": {
+                "kit": "canon-kit"
+              }
+            }
+          ],
+          "semanticVersion": "1.0.0",
+          "version": "1.0.0"
+        },
+        "extensions": [
+          {
+            "name": "gate-sdk",
+            "version": "1.0.0"
+          },
+          {
+            "name": "canon-kit",
+            "version": "1.0.0"
+          }
+        ]
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

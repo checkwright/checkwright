@@ -88,7 +88,7 @@ pub fn run(args: &[String]) -> i32 {
         Err(e) => return refuse(&[format!("{}: {}", NAME, e)]),
     };
     if host.is_empty() {
-        println!("PSSCRIPTANALYZER: clean (the PowerShell host is off — {} is empty, so no PowerShell is linted)", substrate::KNOB);
+        println!("PSSCRIPTANALYZER: clean (not applicable: the PowerShell host is off — {} is empty, so no PowerShell is linted)", substrate::KNOB);
         return 0;
     }
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the host is probed before the targets are

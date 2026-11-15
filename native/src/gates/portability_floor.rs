@@ -98,7 +98,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     // them apart in the detail line is the whole bound on the degradation
     if paths.is_empty() {
         println!(
-            "PORTABILITY-FLOOR: clean (no install-path corpus configured; both arms are disabled \
+            "PORTABILITY-FLOOR: clean (not applicable: no install-path corpus configured; both arms are disabled \
              and nothing was scanned)"
         );
         return Ok(0);

@@ -163,7 +163,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
     if files.is_empty() {
-        println!("SCRATCH-CITATION: clean (no permanent surface configured — LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS matched nothing)");
+        println!("SCRATCH-CITATION: clean (not applicable: no permanent surface configured — LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS matched nothing)");
         return 0;
     }
 

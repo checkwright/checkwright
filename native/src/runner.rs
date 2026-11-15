@@ -209,7 +209,8 @@ GATE_SDK_VERBOSE (any non-empty value) restores the per-gate banner roll the
 quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
 (default: the machine's parallelism; 1 restores a serial run);
 GATE_SDK_SARIF_FILE names a file the run also writes its verdict to as a SARIF
-2.1.0 log, the exit status unchanged unless that file cannot be written (exit 2).
+2.1.0 log, the exit status unchanged unless that file cannot be written (exit 2);
+GATE_SDK_SARIF_RESULTS selects its results: all (default) or failures.
 Per-gate timings of an unfiltered run land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own reads, plus the sentinel standing for
@@ -725,16 +726,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
 // spec: gate-sdk/SPEC.md §run-gates — a declared omission keeps `All N gates passed.` honest as the
 // roster-collapse tripwire, reported on its own line beside the summary and never inside it
 fn report_omissions(list_text: &str) {
-    let mut reasons: Vec<&str> = list_text
-        .lines()
-        .filter_map(|l| {
-            let mut f = l.split_whitespace();
-            match (f.next(), f.next(), f.next(), f.next()) {
-                (Some("#"), Some("omitted:"), Some(_), Some(r)) => Some(r),
-                _ => None,
-            }
-        })
-        .collect();
+    let mut reasons: Vec<&str> = registry::omissions(list_text).into_iter().map(|(_, _, r)| r).collect();
     reasons.sort_unstable();
     let mut i = 0;
     while i < reasons.len() {
@@ -946,7 +938,20 @@ pub fn run(args: &[String]) -> i32 {
         env: &[],
     };
 
+    // spec: gate-sdk/SPEC.md §run-gates — the selection is read only where a log is written, and a
+    // value it refuses stops the run before the first member
     let sarif_path = std::env::var(sarif::KNOB).unwrap_or_default();
+    let selection = if sarif_path.is_empty() {
+        sarif::Selection::All
+    } else {
+        match sarif::Selection::parse(&std::env::var(sarif::RESULTS_KNOB).unwrap_or_default()) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("{}: {}", TOOL, e);
+                return 2;
+            }
+        }
+    };
     let outcomes = dispatch_all(&d, &selected);
     drop(scratch);
 
@@ -1007,16 +1012,46 @@ pub fn run(args: &[String]) -> i32 {
                 failed: o.failed,
                 tail: &o.tail,
                 output: &o.output,
-                invariant: if o.failed { declared(&d, &s.name) } else { None },
+                invariant: declared(&d, &s.name),
+                kit: member_kit(&s.name, &resolve_dirs, &kit_roots),
             })
             .collect();
-        let body = sarif::render(&list, &members, &|p| Path::new(p).is_file());
+        let (scope, omissions) = if !parsed.only.is_empty() {
+            (sarif::Scope::Only, Vec::new())
+        } else if !parsed.paths.is_empty() {
+            (sarif::Scope::For, Vec::new())
+        } else {
+            let declared = registry::omissions(&list_text);
+            let omissions = declared
+                .into_iter()
+                .map(|(line, name, reason)| sarif::Omission { line, name, reason })
+                .collect();
+            (sarif::Scope::Registry, omissions)
+        };
+        // spec: gate-sdk/SPEC.md §run-gates — the block's kit roots in their repo-relative spelling
+        let roots_here = walk::kit_roots().unwrap_or_default();
+        let provenance = crate::provenance::collect(&roots_here);
+        let run = sarif::Run {
+            registry: &list,
+            provenance: &provenance,
+            scope,
+            selection,
+        };
+        let body = sarif::render(&run, &members, &omissions, &|p| Path::new(p).is_file());
         if let Err(e) = sarif::write(&sarif_path, &body) {
             eprintln!("{}: {}", TOOL, e);
             return 2;
         }
     }
     code
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a rule's `properties.kit`: the kit root its member resolved
+// from, none for the consumer's gates dir at index 0
+fn member_kit(name: &str, resolve_dirs: &[String], kit_roots: &[String]) -> Option<String> {
+    let (i, _) = registry::resolve_at(name, resolve_dirs)?;
+    let root = kit_roots.get(i.checked_sub(1)?)?;
+    Some(crate::provenance::kit_name(root))
 }
 
 pub(crate) fn trim_trailing_newlines(b: &[u8]) -> &[u8] {

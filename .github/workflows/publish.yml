@@ -81,6 +81,8 @@ jobs:
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
+          # spec: gate-sdk/SPEC.md §run-gates — the release stamp, exact from the tag that triggered the build
+          CHECKWRIGHT_BUILD_VERSION: ${{ github.ref_name }}
         run: bash scripts/ci-build-artifact.sh "$TARGET" "$RUNNER_TEMP/artifact"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

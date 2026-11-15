@@ -46,11 +46,15 @@ mod knobs;
 mod listing;
 mod marker;
 mod nav;
+mod output;
 mod proc;
 mod programs;
+mod provenance;
 mod queue;
 mod registry;
 mod release_sections;
+#[cfg(test)]
+mod release_stamp;
 mod runner;
 mod sarif;
 mod section;

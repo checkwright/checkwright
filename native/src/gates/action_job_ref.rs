@@ -104,7 +104,7 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
     if raw.is_empty() {
-        println!("ACTION-JOB-REF: clean ({} is empty — no span is a job reference, 0 checked)", KNOB);
+        println!("ACTION-JOB-REF: clean (not applicable: {} is empty — no span is a job reference, 0 checked)", KNOB);
         return 0;
     }
     let mut pats = Vec::new();

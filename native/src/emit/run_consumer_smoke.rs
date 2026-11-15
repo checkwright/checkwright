@@ -300,7 +300,7 @@ fn pass(sdk: &str, roots: &[String], teardown: &mut Teardown, sink: &Sink, verbo
             step!(restore(scratch));
             return Outcome::Fail(vec![
                 format!(
-                    "{}: FAIL — {} violation fired, but the SARIF log at {} holds no result with rule id {}",
+                    "{}: FAIL — {} violation fired, but the SARIF log at {} holds no fail result with rule id {} under verdict contract 1",
                     VERDICT, kit, log, expected
                 ),
                 "  help: the --run arm writes the log GATE_SDK_SARIF_FILE names; see gate-sdk/SPEC.md §run-gates.".to_string(),
@@ -350,8 +350,8 @@ fn battery_with(scratch: &str, env_extra: &[(String, String)]) -> Result<(i32, S
     ))
 }
 
-// spec: gate-sdk/SPEC.md §Consumer smoke — the violation run's SARIF log holds a result carrying
-// the expected gate's rule id
+// spec: gate-sdk/SPEC.md §Consumer smoke — the violation run's SARIF log is a verdict contract of
+// major 1 holding a `fail` result carrying the expected gate's rule id
 fn sarif_names(log: &str, gate: &str) -> bool {
     let Ok(text) = std::fs::read_to_string(log) else {
         return false;
@@ -359,13 +359,18 @@ fn sarif_names(log: &str, gate: &str) -> bool {
     let Ok(doc) = serde_json::from_str::<serde_json::Value>(&text) else {
         return false;
     };
-    doc["runs"]
-        .as_array()
-        .into_iter()
-        .flatten()
-        .filter_map(|r| r["results"].as_array())
-        .flatten()
-        .any(|r| r["ruleId"] == gate)
+    major_one(&doc)
+        && doc["runs"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|r| r["results"].as_array())
+            .flatten()
+            .any(|r| r["ruleId"] == gate && r["kind"] == "fail")
+}
+
+fn major_one(doc: &serde_json::Value) -> bool {
+    doc["properties"]["verdictContract"].as_str().and_then(|v| v.split('.').next()) == Some("1")
 }
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — the positive green token, matched on the summary line's

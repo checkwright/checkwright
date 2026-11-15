@@ -25,7 +25,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // the clean skip for a consumer that documents no install path
     let section_re = spec::knob_pub("CANON_KIT_INSTALL_SECTION_RE")?;
     if spec::command("CANON_KIT_INSTALL_TRANSPORTS_CMD")?.is_empty() || section_re.is_empty() {
-        println!("INSTALL-CLAIM: clean (no transport vocabulary or install-section regex configured — nothing to hold)");
+        println!("INSTALL-CLAIM: clean (not applicable: no transport vocabulary or install-section regex configured — nothing to hold)");
         return Ok(0);
     }
     let transports = spec::claim_vocabulary("CANON_KIT_INSTALL_TRANSPORTS_CMD")?;

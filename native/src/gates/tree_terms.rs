@@ -56,7 +56,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §check-tree-terms — an empty set leaves the tree unchecked and
     // clean: the fail-closed obligation is on a missing pattern file, never on an empty one
     if patterns.is_empty() {
-        println!("TREE-TERMS: clean (0 banned pattern(s) configured; tree unchecked)");
+        println!("TREE-TERMS: clean (not applicable: 0 banned pattern(s) configured; tree unchecked)");
         return Ok(0);
     }
 

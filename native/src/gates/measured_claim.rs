@@ -32,7 +32,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Err(format!("not a directory: {}", root));
     }
     if spec::command("CANON_KIT_MEASURED_CLAIMS_CMD")?.is_empty() {
-        println!("MEASURED-CLAIM: clean (CANON_KIT_MEASURED_CLAIMS_CMD unset — no oracle, so no marker has anything to disagree with)");
+        println!("MEASURED-CLAIM: clean (not applicable: CANON_KIT_MEASURED_CLAIMS_CMD unset — no oracle, so no marker has anything to disagree with)");
         return Ok(0);
     }
     let globs = spec::knob_array_pub("CANON_KIT_MEASURED_SURFACE_GLOBS")?;

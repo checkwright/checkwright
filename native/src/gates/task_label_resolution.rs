@@ -38,7 +38,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     if families.is_empty() || globs.is_empty() {
         let empty = if families.is_empty() { CITES_KNOB } else { LISTS_KNOB };
         println!(
-            "TASK-LABEL-RESOLUTION: clean (no label family or task list is configured: {} is empty)",
+            "TASK-LABEL-RESOLUTION: clean (not applicable: no label family or task list is configured: {} is empty)",
             empty
         );
         return Ok(0);

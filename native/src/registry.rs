@@ -14,13 +14,29 @@ pub fn members(text: &str) -> Vec<String> {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — each member with its 1-based registry line, the location a
-// red member with no finding line of its own takes in the SARIF log
+// green member's result, and a red member's with no finding line of its own, takes in the SARIF log
 pub fn member_lines(text: &str) -> Vec<(usize, &str)> {
     fresh::file_lines(text)
         .into_iter()
         .enumerate()
         .filter(|(_, l)| !l.trim_start().starts_with('#') && !l.trim().is_empty())
         .map(|(i, l)| (i + 1, l))
+        .collect()
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — each `# omitted: <name> <reason>` line with its own 1-based
+// line, the name and the reason token (the fourth whitespace field)
+pub fn omissions(text: &str) -> Vec<(usize, &str, &str)> {
+    fresh::file_lines(text)
+        .into_iter()
+        .enumerate()
+        .filter_map(|(i, l)| {
+            let mut f = l.split_whitespace();
+            match (f.next(), f.next(), f.next(), f.next()) {
+                (Some("#"), Some("omitted:"), Some(n), Some(r)) => Some((i + 1, n, r)),
+                _ => None,
+            }
+        })
         .collect()
 }
 
@@ -125,11 +141,17 @@ fn registry_heredoc_opener(line: &str) -> Option<(String, bool)> {
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_resolve`: dirs consumer-first, `.sh` beating `.gate`
 // *within* a dir, so a consumer shadowing a ported member with its own shell script still wins
 pub fn resolve(name: &str, dirs: &[String]) -> Option<String> {
-    for d in dirs {
+    resolve_at(name, dirs).map(|(_, p)| p)
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the same resolution answering which dir won, the index a
+// SARIF rule's `properties.kit` is read off: 0 the consumer's gates dir, else a kit root's
+pub fn resolve_at(name: &str, dirs: &[String]) -> Option<(usize, String)> {
+    for (i, d) in dirs.iter().enumerate() {
         for ext in ["sh", "gate"] {
             let p = format!("{}/{}.{}", d, name, ext);
             if Path::new(&p).is_file() {
-                return Some(p);
+                return Some((i, p));
             }
         }
     }

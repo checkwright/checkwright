@@ -47,7 +47,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let path = walk::knob_scalar(PATH_KNOB)?;
     if path.is_empty() {
-        println!("DELTA-AGREEMENT: clean (no delta is configured: {} is empty)", PATH_KNOB);
+        println!("DELTA-AGREEMENT: clean (not applicable: no delta is configured: {} is empty)", PATH_KNOB);
         return Ok(0);
     }
     let cfg = config(

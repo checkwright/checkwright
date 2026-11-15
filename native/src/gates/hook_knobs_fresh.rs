@@ -20,7 +20,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         None => crate::walk::knob_words(hook_knobs::PAGES_KNOB)?,
     };
     if dirs.is_empty() {
-        println!("HOOK-KNOBS-FRESH: clean ({} is empty — no hook page is governed, 0 checked)", hook_knobs::PAGES_KNOB);
+        println!("HOOK-KNOBS-FRESH: clean (not applicable: {} is empty — no hook page is governed, 0 checked)", hook_knobs::PAGES_KNOB);
         return Ok(0);
     }
     let dir = dirs.iter().map(|d| fresh::strip_trailing_slash(d)).collect::<Vec<_>>().join(" ");

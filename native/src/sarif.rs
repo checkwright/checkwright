@@ -1,14 +1,66 @@
 // spec: gate-sdk/SPEC.md §run-gates — `GATE_SDK_SARIF_FILE`: the battery's verdict rendered as a
-// SARIF 2.1.0 log from the runner's in-memory outcomes, one rule per red member
-use serde_json::{json, Value};
+// SARIF 2.1.0 log from the runner's in-memory outcomes, the versioned verdict contract
+use crate::output;
+use crate::provenance::{Provenance, TOOL_NAME};
+use serde_json::{json, Map, Value};
 use std::path::Path;
 
 pub const KNOB: &str = "GATE_SDK_SARIF_FILE";
+pub const RESULTS_KNOB: &str = "GATE_SDK_SARIF_RESULTS";
 
-const TOOL_NAME: &str = "checkwright-gates";
+// spec: gate-sdk/SPEC.md §run-gates — the verdict contract's version, raised by its migration rule
+pub const CONTRACT: &str = "1.0.0";
+
+// spec: gate-sdk/SPEC.md §run-gates — which results the log carries: every member's, or the fail
+// results and the rules they cite
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Selection {
+    All,
+    Failures,
+}
+
+impl Selection {
+    // spec: gate-sdk/SPEC.md §run-gates — unset is `all`; any value but the two is refused
+    pub fn parse(v: &str) -> Result<Selection, String> {
+        match v {
+            "" | "all" => Ok(Selection::All),
+            "failures" => Ok(Selection::Failures),
+            _ => Err(format!(
+                "{}={} is not a selection — it takes `all` (the default) or `failures`",
+                RESULTS_KNOB, v
+            )),
+        }
+    }
+
+    fn word(self) -> &'static str {
+        match self {
+            Selection::All => "all",
+            Selection::Failures => "failures",
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — what the run covers: the registry, an `--only` set or the
+// members `--for` coupled to its paths
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Scope {
+    Registry,
+    Only,
+    For,
+}
+
+impl Scope {
+    fn word(self) -> &'static str {
+        match self {
+            Scope::Registry => "registry",
+            Scope::Only => "only",
+            Scope::For => "for",
+        }
+    }
+}
 
 // spec: gate-sdk/SPEC.md §run-gates — what one member contributes: its name, the registry line
-// naming it, its verdict tail and captured output, and its declared invariant where it carries one
+// naming it, its verdict tail and captured output, its declared invariant and the kit it resolved from
 pub struct Member<'a> {
     pub name: &'a str,
     pub registry_line: Option<usize>,
@@ -16,11 +68,28 @@ pub struct Member<'a> {
     pub tail: &'a str,
     pub output: &'a [u8],
     pub invariant: Option<Invariant>,
+    pub kit: Option<String>,
 }
 
 pub struct Invariant {
     pub text: String,
     pub help_uri: Option<String>,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a declared omission: its registry line, its name and its
+// reason token
+pub struct Omission<'a> {
+    pub line: usize,
+    pub name: &'a str,
+    pub reason: &'a str,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the run-wide inputs, handed in so a test can fix them
+pub struct Run<'a> {
+    pub registry: &'a str,
+    pub provenance: &'a Provenance,
+    pub scope: Scope,
+    pub selection: Selection,
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a finding line opening `<path>:<line>:` or
@@ -65,53 +134,133 @@ fn at(uri: &str, row: Option<u64>, col: Option<u64>) -> Value {
     json!([{ "physicalLocation": physical }])
 }
 
-fn result(rule: usize, name: &str, message: &str, locations: Value) -> Value {
+// spec: gate-sdk/SPEC.md §run-gates — SARIF holds `level` at `none` for every kind but `fail`
+fn result(rule: usize, name: &str, kind: &str, message: &str, locations: Value) -> Value {
     json!({
         "ruleId": name,
         "ruleIndex": rule,
-        "level": "error",
+        "kind": kind,
+        "level": if kind == "fail" { "error" } else { "none" },
         "message": { "text": message },
         "locations": locations,
     })
 }
 
-pub fn render(registry: &str, members: &[Member], is_file: &dyn Fn(&str) -> bool) -> String {
-    let registry = registry.replace('\\', "/");
+fn rule(name: &str, invariant: Option<&Invariant>, kit: Option<&str>) -> Value {
+    let mut rule = json!({ "id": name });
+    if let Some(inv) = invariant {
+        rule["shortDescription"] = json!({ "text": inv.text });
+        if let Some(u) = &inv.help_uri {
+            rule["helpUri"] = json!(u);
+        }
+    }
+    if let Some(k) = kit {
+        rule["properties"] = json!({ "kit": k });
+    }
+    rule
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a green member's kind and message: its last clean line, a
+// `not applicable: ` parenthetical making it `notApplicable`; no clean line is a `pass` carrying
+// its verdict line, since the exit status is the verdict
+fn green(m: &Member) -> (&'static str, String) {
+    let text = String::from_utf8_lossy(m.output);
+    match text.lines().rev().find(|l| output::clean_line(l)) {
+        Some(l) if output::not_applicable(l) => ("notApplicable", l.to_string()),
+        Some(l) => ("pass", l.to_string()),
+        None => ("pass", m.tail.trim().to_string()),
+    }
+}
+
+fn driver(p: &Provenance, rules: Vec<Value>) -> Value {
+    let mut d = Map::new();
+    d.insert("name".into(), json!(TOOL_NAME));
+    if let Some(v) = &p.tool_version {
+        d.insert("version".into(), json!(v));
+    }
+    if let Some(v) = p.semantic_version() {
+        d.insert("semanticVersion".into(), json!(v));
+    }
+    d.insert("rules".into(), json!(rules));
+    Value::Object(d)
+}
+
+fn extensions(p: &Provenance) -> Value {
+    let kits: Vec<Value> = p
+        .kits
+        .iter()
+        .map(|k| match &k.version {
+            Some(v) => json!({ "name": k.name, "version": v }),
+            None => json!({ "name": k.name }),
+        })
+        .collect();
+    json!(kits)
+}
+
+pub fn render(run: &Run, members: &[Member], omissions: &[Omission], is_file: &dyn Fn(&str) -> bool) -> String {
+    let registry = run.registry.replace('\\', "/");
+    let all = run.selection == Selection::All;
     let mut rules: Vec<Value> = Vec::new();
     let mut results: Vec<Value> = Vec::new();
-    for m in members.iter().filter(|m| m.failed) {
-        let idx = rules.len();
-        let mut rule = json!({ "id": m.name });
-        if let Some(inv) = &m.invariant {
-            rule["shortDescription"] = json!({ "text": inv.text });
-            if let Some(u) = &inv.help_uri {
-                rule["helpUri"] = json!(u);
-            }
+    let mut pending = omissions.iter().peekable();
+    let omit = |o: &Omission, rules: &mut Vec<Value>, results: &mut Vec<Value>| {
+        if all {
+            let idx = rules.len();
+            rules.push(rule(o.name, None, None));
+            let loc = at(&registry, Some(o.line as u64), None);
+            results.push(result(idx, o.name, "notApplicable", o.reason, loc));
         }
-        rules.push(rule);
+    };
+    for m in members {
+        // spec: gate-sdk/SPEC.md §run-gates — an omission sits in registry order among the members
+        while let Some(o) = pending.next_if(|o| m.registry_line.is_some_and(|l| o.line < l)) {
+            omit(o, &mut rules, &mut results);
+        }
+        if !m.failed && !all {
+            continue;
+        }
+        let idx = rules.len();
+        rules.push(rule(m.name, m.invariant.as_ref(), m.kit.as_deref()));
+        let row = m.registry_line.map(|n| n as u64);
+        if !m.failed {
+            let (kind, message) = green(m);
+            results.push(result(idx, m.name, kind, &message, at(&registry, row, None)));
+            continue;
+        }
         let text = String::from_utf8_lossy(m.output);
         let mut found = false;
         for line in text.lines() {
-            if let Some((path, row, col)) = location(line, is_file) {
-                results.push(result(idx, m.name, line, at(&path, Some(row), col)));
+            if let Some((path, r, col)) = location(line, is_file) {
+                results.push(result(idx, m.name, "fail", line, at(&path, Some(r), col)));
                 found = true;
             }
         }
         if !found {
             let block = text.trim_end_matches('\n');
             let message = if block.trim().is_empty() { m.tail.trim() } else { block };
-            let row = m.registry_line.map(|n| n as u64);
-            results.push(result(idx, m.name, message, at(&registry, row, None)));
+            results.push(result(idx, m.name, "fail", message, at(&registry, row, None)));
         }
+    }
+    for o in pending {
+        omit(o, &mut rules, &mut results);
+    }
+    let p = run.provenance;
+    let mut tool = Map::new();
+    tool.insert("driver".into(), driver(p, rules));
+    if !p.kits.is_empty() {
+        tool.insert("extensions".into(), extensions(p));
     }
     let log = json!({
         "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
         "version": "2.1.0",
+        "properties": { "verdictContract": CONTRACT },
         "runs": [{
-            "tool": { "driver": {
-                "name": TOOL_NAME,
-                "rules": rules,
-            }},
+            "tool": Value::Object(tool),
+            "properties": {
+                "provenance": p.block(),
+                "scope": run.scope.word(),
+                "results": run.selection.word(),
+            },
             "results": results,
         }],
     });
@@ -127,20 +276,85 @@ pub fn write(path: &str, body: &str) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::provenance::Kit;
 
     fn files(p: &str) -> bool {
         matches!(p, "a/b.md" | "c.rs")
     }
 
-    fn red<'a>(name: &'a str, line: Option<usize>, out: &'a [u8]) -> Member<'a> {
+    fn member<'a>(name: &'a str, line: Option<usize>, failed: bool, out: &'a [u8]) -> Member<'a> {
         Member {
             name,
             registry_line: line,
-            failed: true,
-            tail: "  FAIL: x (exit 1)",
+            failed,
+            tail: if failed { "  FAIL: x (exit 1)" } else { "  PASS: x" },
             output: out,
             invariant: None,
+            kit: None,
         }
+    }
+
+    fn red<'a>(name: &'a str, line: Option<usize>, out: &'a [u8]) -> Member<'a> {
+        member(name, line, true, out)
+    }
+
+    fn pass<'a>(name: &'a str, line: usize, out: &'a [u8]) -> Member<'a> {
+        member(name, Some(line), false, out)
+    }
+
+    fn bare() -> Provenance {
+        Provenance {
+            tool_version: None,
+            exact: false,
+            source_stamp: None,
+            target: None,
+            kits: Vec::new(),
+            commit: None,
+            clean: false,
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the fixed provenance the goldens render, so they carry no
+    // live stamp
+    fn fixed() -> Provenance {
+        Provenance {
+            tool_version: Some("1.0.0".into()),
+            exact: true,
+            source_stamp: Some("0123456789abcdef0123456789abcdef01234567".into()),
+            target: Some("x86_64-unknown-linux-gnu".into()),
+            kits: vec![
+                Kit {
+                    name: "gate-sdk".into(),
+                    root: "gate-sdk".into(),
+                    version: Some("1.0.0".into()),
+                },
+                Kit {
+                    name: "canon-kit".into(),
+                    root: "canon-kit".into(),
+                    version: Some("1.0.0".into()),
+                },
+            ],
+            commit: Some("89abcdef0123456789abcdef0123456789abcdef".into()),
+            clean: true,
+        }
+    }
+
+    fn rendered(p: &Provenance, scope: Scope, selection: Selection, members: &[Member], omissions: &[Omission]) -> String {
+        let run = Run {
+            registry: "scripts/gates.list",
+            provenance: p,
+            scope,
+            selection,
+        };
+        render(&run, members, omissions, &files)
+    }
+
+    fn parse(s: &str) -> Value {
+        serde_json::from_str(s).unwrap()
+    }
+
+    fn all(members: &[Member]) -> Value {
+        parse(&rendered(&bare(), Scope::Registry, Selection::All, members, &[]))
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — both finding shapes place a result at their region, and a
@@ -160,12 +374,9 @@ mod tests {
         assert_eq!(location("help: c.rs", &files), None);
     }
 
-    fn parse(s: &str) -> Value {
-        serde_json::from_str(s).unwrap()
-    }
-
-    // spec: gate-sdk/SPEC.md §run-gates — a red member with finding lines gets one result per line,
-    // and one with none gets one result at its registry line carrying the captured block
+    // spec: gate-sdk/SPEC.md §run-gates — a red member with finding lines gets one `fail` result per
+    // line, one with none gets one at its registry line carrying the captured block, and a green
+    // member between them keeps its rule and its own result
     #[test]
     fn a_red_member_places_its_findings_or_falls_back_to_the_registry_line() {
         let out1 = b"a/b.md:4: wrong\nc.rs:9:2: also\nhelp: fix it\n";
@@ -175,61 +386,207 @@ mod tests {
             text: "x/SPEC.md \u{a7}Y \u{2014} holds".into(),
             help_uri: Some("https://example.test/x/SPEC#y".into()),
         });
-        let green = Member {
-            name: "check-green",
-            registry_line: Some(4),
-            failed: false,
-            tail: "  PASS: check-green",
-            output: b"a/b.md:1: not a finding on green",
-            invariant: None,
-        };
-        let log = parse(&render("scripts/gates.list", &[first, green, red("check-two", Some(7), out2)], &files));
+        first.kit = Some("x-kit".into());
+        let green = pass("check-green", 4, b"a/b.md:1: not a finding on green");
+        let log = all(&[first, green, red("check-two", Some(7), out2)]);
         let run = &log["runs"][0];
         assert_eq!(log["version"], "2.1.0");
         assert_eq!(run["tool"]["driver"]["name"], TOOL_NAME);
         let rules = run["tool"]["driver"]["rules"].as_array().unwrap();
-        assert_eq!(rules.len(), 2);
+        assert_eq!(rules.len(), 3);
         assert_eq!(rules[0]["id"], "check-one");
         assert_eq!(rules[0]["helpUri"], "https://example.test/x/SPEC#y");
-        assert!(rules[1].get("shortDescription").is_none());
+        assert_eq!(rules[0]["properties"]["kit"], "x-kit");
+        assert!(rules[1].get("properties").is_none(), "a consumer gates-dir member names no kit");
+        assert!(rules[2].get("shortDescription").is_none());
         let results = run["results"].as_array().unwrap();
-        assert_eq!(results.len(), 3);
+        assert_eq!(results.len(), 4);
         let loc = |i: usize| &results[i]["locations"][0]["physicalLocation"];
         assert_eq!(loc(0)["artifactLocation"]["uri"], "a/b.md");
         assert_eq!(loc(0)["region"]["startLine"], 4);
+        assert_eq!((results[0]["kind"].as_str(), results[0]["level"].as_str()), (Some("fail"), Some("error")));
         assert_eq!(loc(1)["region"]["startColumn"], 2);
-        assert_eq!(results[2]["ruleId"], "check-two");
-        assert_eq!(results[2]["ruleIndex"], 1);
-        assert_eq!(loc(2)["artifactLocation"]["uri"], "scripts/gates.list");
-        assert_eq!(loc(2)["region"]["startLine"], 7);
-        assert_eq!(results[2]["message"]["text"], "something broke\nhelp: look");
+        assert_eq!(results[2]["ruleId"], "check-green");
+        assert_eq!(results[3]["ruleId"], "check-two");
+        assert_eq!(results[3]["ruleIndex"], 2);
+        assert_eq!(loc(3)["artifactLocation"]["uri"], "scripts/gates.list");
+        assert_eq!(loc(3)["region"]["startLine"], 7);
+        assert_eq!(results[3]["message"]["text"], "something broke\nhelp: look");
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — a member with no registry line (a sole `--only` name) is
     // placed at the registry file with no region, and an empty capture carries the verdict tail
     #[test]
     fn an_unlisted_silent_member_lands_at_the_registry_with_its_tail() {
-        let log = parse(&render("scripts/gates.list", &[red("check-solo", None, b"")], &files));
+        let log = all(&[red("check-solo", None, b"")]);
         let r = &log["runs"][0]["results"][0];
         assert!(r["locations"][0]["physicalLocation"].get("region").is_none());
         assert_eq!(r["message"]["text"], "FAIL: x (exit 1)");
     }
 
-    // spec: gate-sdk/SPEC.md §run-gates — a green run writes the log with an empty result set
+    // spec: gate-sdk/SPEC.md §run-gates — a green member is a `pass` or a `notApplicable` at its
+    // registry line, its last clean line the message, at level `none`; one that printed no clean
+    // line is a `pass` carrying its verdict line
     #[test]
-    fn a_green_run_is_an_empty_result_set() {
-        let g = Member {
-            name: "check-green",
-            registry_line: Some(1),
-            failed: false,
-            tail: "",
-            output: b"",
-            invariant: None,
-        };
-        let log = parse(&render("scripts/gates.list", &[g], &files));
-        assert_eq!(log["runs"].as_array().unwrap().len(), 1);
-        assert!(log["runs"][0]["results"].as_array().unwrap().is_empty());
-        assert!(log["runs"][0]["tool"]["driver"]["rules"].as_array().unwrap().is_empty());
+    fn a_green_member_is_a_pass_or_not_applicable_by_its_clean_line() {
+        let log = all(&[
+            pass("check-a", 1, b"note\nA: clean (3 files)\n"),
+            pass("check-b", 2, b"B: clean (not applicable: B_GLOBS is unset)\n"),
+            pass("check-c", 3, b""),
+        ]);
+        let results = log["runs"][0]["results"].as_array().unwrap();
+        let kinds: Vec<&str> = results.iter().map(|r| r["kind"].as_str().unwrap()).collect();
+        assert_eq!(kinds, ["pass", "notApplicable", "pass"]);
+        assert!(results.iter().all(|r| r["level"] == "none"));
+        assert_eq!(results[0]["message"]["text"], "A: clean (3 files)");
+        assert_eq!(results[1]["locations"][0]["physicalLocation"]["region"]["startLine"], 2);
+        assert_eq!(results[2]["message"]["text"], "PASS: x");
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — a declared omission is a `notApplicable` result at its own
+    // registry line, in registry order, with its reason token and a rule carrying no invariant
+    #[test]
+    fn an_omission_is_a_not_applicable_result_at_its_own_line() {
+        let omitted = [Omission {
+            line: 2,
+            name: "check-off",
+            reason: "toolchain",
+        }];
+        let members = [pass("check-a", 1, b""), pass("check-b", 3, b"")];
+        let log = parse(&rendered(&bare(), Scope::Registry, Selection::All, &members, &omitted));
+        let results = log["runs"][0]["results"].as_array().unwrap();
+        let ids: Vec<&str> = results.iter().map(|r| r["ruleId"].as_str().unwrap()).collect();
+        assert_eq!(ids, ["check-a", "check-off", "check-b"]);
+        assert_eq!(results[1]["kind"], "notApplicable");
+        assert_eq!(results[1]["message"]["text"], "toolchain");
+        assert_eq!(results[1]["locations"][0]["physicalLocation"]["region"]["startLine"], 2);
+        let rules = log["runs"][0]["tool"]["driver"]["rules"].as_array().unwrap();
+        assert_eq!(rules[1], json!({ "id": "check-off" }));
+        assert_eq!(log["runs"][0]["properties"]["scope"], "registry");
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — an `--only` run reports only what it selected, no omission
+    #[test]
+    fn an_only_run_carries_no_omission() {
+        let log = parse(&rendered(&bare(), Scope::Only, Selection::All, &[pass("check-a", 1, b"")], &[]));
+        assert_eq!(log["runs"][0]["results"].as_array().unwrap().len(), 1);
+        assert_eq!(log["runs"][0]["properties"]["scope"], "only");
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — `failures` keeps the fail results and the rules they cite,
+    // so a green run's failures log is an empty result set
+    #[test]
+    fn the_failures_selection_keeps_fail_results_and_their_rules_only() {
+        let omitted = [Omission {
+            line: 2,
+            name: "check-off",
+            reason: "toolchain",
+        }];
+        let members = [pass("check-a", 1, b"A: clean (x)\n"), red("check-b", Some(3), b"broke\n")];
+        let log = parse(&rendered(&bare(), Scope::Registry, Selection::Failures, &members, &omitted));
+        let run = &log["runs"][0];
+        let rules = run["tool"]["driver"]["rules"].as_array().unwrap();
+        assert_eq!(rules.len(), 1);
+        assert_eq!(rules[0]["id"], "check-b");
+        assert_eq!(run["results"][0]["ruleIndex"], 0);
+        assert_eq!(run["results"].as_array().unwrap().len(), 1);
+        assert_eq!(run["properties"]["results"], "failures");
+        let green = parse(&rendered(&bare(), Scope::Registry, Selection::Failures, &[pass("check-a", 1, b"")], &[]));
+        assert!(green["runs"][0]["results"].as_array().unwrap().is_empty());
+        assert_eq!(green["properties"]["verdictContract"], CONTRACT);
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the selection knob takes `all` or `failures`, and refuses
+    // any other value naming itself and both values
+    #[test]
+    fn a_selection_outside_the_two_values_is_refused() {
+        assert_eq!(Selection::parse(""), Ok(Selection::All));
+        assert_eq!(Selection::parse("all"), Ok(Selection::All));
+        assert_eq!(Selection::parse("failures"), Ok(Selection::Failures));
+        let e = Selection::parse("red").unwrap_err();
+        assert!(e.contains(RESULTS_KNOB) && e.contains("`all`") && e.contains("`failures`"), "{}", e);
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — an unfilled provenance leaves the native mirrors absent too
+    #[test]
+    fn an_unfilled_provenance_mirrors_nothing() {
+        let log = all(&[pass("check-a", 1, b"")]);
+        let tool = &log["runs"][0]["tool"];
+        assert!(tool["driver"].get("version").is_none());
+        assert!(tool["driver"].get("semanticVersion").is_none());
+        assert!(tool.get("extensions").is_none());
+        assert_eq!(log["runs"][0]["properties"]["provenance"]["tool"], json!({ "name": TOOL_NAME }));
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the native mirrors: `version` always, `semanticVersion`
+    // only for an exact stamp, one extension per kit
+    #[test]
+    fn the_native_fields_mirror_the_block() {
+        let mut p = fixed();
+        p.tool_version = Some("0.36.0-6-gabc".into());
+        p.exact = false;
+        p.kits[1].version = None;
+        let log = parse(&rendered(&p, Scope::For, Selection::All, &[pass("check-a", 1, b"")], &[]));
+        let tool = &log["runs"][0]["tool"];
+        assert_eq!(tool["driver"]["version"], "0.36.0-6-gabc");
+        assert!(tool["driver"].get("semanticVersion").is_none());
+        assert_eq!(tool["extensions"], json!([{ "name": "gate-sdk", "version": "1.0.0" }, { "name": "canon-kit" }]));
+        p.tool_version = Some("0.36.0".into());
+        p.exact = true;
+        let log = parse(&rendered(&p, Scope::For, Selection::All, &[pass("check-a", 1, b"")], &[]));
+        assert_eq!(log["runs"][0]["tool"]["driver"]["semanticVersion"], "0.36.0");
+        assert_eq!(log["runs"][0]["properties"]["scope"], "for");
+    }
+
+    fn golden_red() -> [Member<'static>; 3] {
+        let mut a = red("check-findings", Some(1), b"a/b.md:4: the rule is broken here\nhelp: fix it\n");
+        a.invariant = Some(Invariant {
+            text: "gate-sdk/SPEC.md \u{a7}Example \u{2014} findings name their line".into(),
+            help_uri: None,
+        });
+        a.kit = Some("gate-sdk".into());
+        let mut b = red("check-silent", Some(2), b"the corpus could not be read\n");
+        b.kit = Some("canon-kit".into());
+        let mut c = pass("check-green", 3, b"CHECK-GREEN: clean (4 files)\n");
+        c.kit = Some("gate-sdk".into());
+        [a, b, c]
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the four published goldens, byte for byte: a renderer
+    // change moving one is a visible contract diff, landed with the golden edited
+    #[test]
+    fn the_goldens_hold_byte_for_byte() {
+        let p = fixed();
+        let mut a = pass("check-alpha", 1, b"CHECK-ALPHA: clean (12 files)\n");
+        a.kit = Some("gate-sdk".into());
+        a.invariant = Some(Invariant {
+            text: "gate-sdk/SPEC.md \u{a7}Example \u{2014} every file holds the rule".into(),
+            help_uri: Some("https://example.test/gate-sdk/SPEC#example".into()),
+        });
+        let mut b = pass("check-beta", 2, b"CHECK-BETA: clean (3 sections)\n");
+        b.kit = Some("canon-kit".into());
+        let mut c = pass("check-gamma", 3, b"CHECK-GAMMA: clean (not applicable: CHECK_GAMMA_GLOBS is unset)\n");
+        c.kit = Some("canon-kit".into());
+        let green = rendered(&p, Scope::Registry, Selection::All, &[a, b, c], &[]);
+        let red = rendered(&p, Scope::Registry, Selection::All, &golden_red(), &[]);
+        let failures = rendered(&p, Scope::Registry, Selection::Failures, &golden_red(), &[]);
+        let mut a = pass("check-alpha", 1, b"CHECK-ALPHA: clean (12 files)\n");
+        a.kit = Some("gate-sdk".into());
+        let omitted = [Omission {
+            line: 2,
+            name: "check-shellcheck",
+            reason: "toolchain",
+        }];
+        let omitted = rendered(&p, Scope::Registry, Selection::All, &[a], &omitted);
+        let goldens = [
+            (green, include_str!("../../docs/contracts/verdict/v1/green.sarif")),
+            (red, include_str!("../../docs/contracts/verdict/v1/red.sarif")),
+            (omitted, include_str!("../../docs/contracts/verdict/v1/omitted.sarif")),
+            (failures, include_str!("../../docs/contracts/verdict/v1/failures.sarif")),
+        ];
+        for (i, (rendered, golden)) in goldens.iter().enumerate() {
+            assert_eq!(rendered, golden, "golden {} moved", i);
+        }
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — an unwritable path is refused naming it

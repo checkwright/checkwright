@@ -25,7 +25,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let globs = spec::knob_array_pub(LISTS_KNOB)?;
     if globs.is_empty() {
         println!(
-            "TASK-PATH-CLAIM: clean (no task list is configured: {} is empty)",
+            "TASK-PATH-CLAIM: clean (not applicable: no task list is configured: {} is empty)",
             LISTS_KNOB
         );
         return Ok(0);

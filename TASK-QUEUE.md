@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, a versioned machine contract for a caller driving the kits from outside):** option A. Debt, promoted here: `projection-witness-wall-clock` leading (the board's only `iteration` row), then `observe-trial-promise-gaps` and `path-root-context-spellings` on its gate-sdk surface. Features, deferred here and promoted by spec with their amendments, in this order: [machine-verdict-contract](#machine-verdict-contract), [gate-run-attestation-predicate](#gate-run-attestation-predicate) as widened, [recorded-test-mutation-control](#recorded-test-mutation-control). Stages scope, spec, align, build, validate, close: the set spans gate-sdk, evidence-kit and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the tier-one lead on the set's gate-sdk surface, and the evidence-kit pair as one manifest major version rather than two; drain 5 against inflow 4.6. Supersession: `gate-run-attestation-predicate` reshaped by `machine-verdict-contract`, whose provenance block goes first; `recorded-test-mutation-control` reshaped by `gate-run-attestation-predicate`, one manifest version, one batch, predicate first.
+  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, a versioned machine contract for a caller driving the kits from outside):** option A. Debt, promoted here: `projection-witness-wall-clock` leading (the board's only `iteration` row), then `observe-trial-promise-gaps` and `path-root-context-spellings` on its gate-sdk surface. Features, deferred here and promoted by spec with their amendments, in this order: `machine-verdict-contract`, [gate-run-attestation-predicate](#gate-run-attestation-predicate) as widened, [recorded-test-mutation-control](#recorded-test-mutation-control). Stages scope, spec, align, build, validate, close: the set spans gate-sdk, evidence-kit and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the tier-one lead on the set's gate-sdk surface, and the evidence-kit pair as one manifest major version rather than two; drain 5 against inflow 4.6. Supersession: `gate-run-attestation-predicate` reshaped by `machine-verdict-contract`, whose provenance block goes first; `recorded-test-mutation-control` reshaped by `gate-run-attestation-predicate`, one manifest version, one batch, predicate first.
 
   **The verdict contract's envelope (operator direction 2026-11-15, lead-relayed, not a ruling):** the SARIF log is the versioned verdict contract; a non-gate arm takes JSON only where a named caller reads it, the rest filed as [non-gate-arm-json](#non-gate-arm-json); no fourth exit code. The remaining asks of that date are filed deferred, and the 2026-11-14 adopter-target lead decision stands ([external-state-owner-mode](#external-state-owner-mode)).
 
@@ -15,16 +15,6 @@
 ---
 
 ## New Features
-
-### machine-verdict-contract
-
-[spec: gate-sdk/SPEC-verdict-contract.md]
-
-A machine reader of a gate run has only the battery's SARIF 2.1.0 log (gate-sdk/SPEC.md §run-gates), which is empty on a green run and carries no tool or kit version and no commit, so a caller driving the battery from outside scrapes human output to learn what passed and on what. Operator direction 2026-11-15, lead-relayed, not a ruling: that log becomes the versioned verdict contract — a tool version and one per kit, the commit, a result for every member (pass, fail or not applicable), a contract version under semver, and golden fixtures — with no fourth exit code, since a hook or CI reader blocks on any non-zero. `--run --only <gate>` is the per-gate form.
-
-**Deliverable:** design-pending, a feature: the provenance block, how a gate signals not applicable, the version marker and its migration rule.
-
-**Cost while deferred:** an outside caller reimplements the verdict from text a release may reword. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `SARIF`, `--json`, `exit code` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
 ### gate-run-attestation-predicate
 
@@ -36,7 +26,7 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 
 **First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
-**Widened (operator direction 2026-11-15, lead-relayed, not a ruling):** a published schema for the predicate, a verify arm that checks a Statement against the tree and its commit, and **imported runs** — a Statement produced on another host or in CI, bound by a hash of the command, the source commit and the counts, verified without re-running. The binding is one manifest major version beside [recorded-test-mutation-control](#recorded-test-mutation-control)'s record, with a migration note. Its provenance block (tool and kit versions, commit) is the one [machine-verdict-contract](#machine-verdict-contract) defines. Honest limit owed: an unsigned imported run proves its binding is consistent, never that the run happened; that is the signer's.
+**Widened (operator direction 2026-11-15, lead-relayed, not a ruling):** a published schema for the predicate, a verify arm that checks a Statement against the tree and its commit, and **imported runs** — a Statement produced on another host or in CI, bound by a hash of the command, the source commit and the counts, verified without re-running. The binding is one manifest major version beside [recorded-test-mutation-control](#recorded-test-mutation-control)'s record, with a migration note. Its provenance block (tool and kit versions, commit) is the one `machine-verdict-contract` defines. Honest limit owed: an unsigned imported run proves its binding is consistent, never that the run happened; that is the signer's.
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
 
@@ -382,7 +372,7 @@ docs/manual-install.md's PowerShell attestation-verify block, which reads `--for
 
 A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`) prints for a person, and no arm offers a machine form. Operator direction 2026-11-15, lead-relayed, not a ruling: a JSON form lands on an arm only where a named caller reads it (gate-sdk/SPEC.md §The non-gate arm), never across every arm at once.
 
-**Deliverable:** design-pending, a feature: per arm a caller names, its JSON form under [machine-verdict-contract](#machine-verdict-contract)'s versioning rule.
+**Deliverable:** design-pending, a feature: per arm a caller names, its JSON form under `machine-verdict-contract`'s versioning rule.
 
 **Cost while deferred:** an outside caller of an arm parses its text. Surfaced 2026-11-15 by an operator-relayed design review, split from the verdict contract at this scope. Owner lookup: `json` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
 
@@ -1147,4 +1137,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - projection-witness-wall-clock
 - path-root-context-spellings
 - observe-trial-promise-gaps
+- machine-verdict-contract
 

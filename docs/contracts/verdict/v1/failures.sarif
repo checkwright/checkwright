@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "properties": {
+    "verdictContract": "1.0.0"
+  },
+  "runs": [
+    {
+      "properties": {
+        "provenance": {
+          "commit": "89abcdef0123456789abcdef0123456789abcdef",
+          "kits": [
+            {
+              "name": "gate-sdk",
+              "root": "gate-sdk",
+              "version": "1.0.0"
+            },
+            {
+              "name": "canon-kit",
+              "root": "canon-kit",
+              "version": "1.0.0"
+            }
+          ],
+          "tool": {
+            "name": "checkwright-gates",
+            "sourceStamp": "0123456789abcdef0123456789abcdef01234567",
+            "target": "x86_64-unknown-linux-gnu",
+            "version": "1.0.0"
+          },
+          "worktree": "clean"
+        },
+        "results": "failures",
+        "scope": "registry"
+      },
+      "results": [
+        {
+          "kind": "fail",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "a/b.md"
+                },
+                "region": {
+                  "startLine": 4
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "a/b.md:4: the rule is broken here"
+          },
+          "ruleId": "check-findings",
+          "ruleIndex": 0
+        },
+        {
+          "kind": "fail",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/gates.list"
+                },
+                "region": {
+                  "startLine": 2
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "the corpus could not be read"
+          },
+          "ruleId": "check-silent",
+          "ruleIndex": 1
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "checkwright-gates",
+          "rules": [
+            {
+              "id": "check-findings",
+              "properties": {
+                "kit": "gate-sdk"
+              },
+              "shortDescription": {
+                "text": "gate-sdk/SPEC.md §Example — findings name their line"
+              }
+            },
+            {
+              "id": "check-silent",
+              "properties": {
+                "kit": "canon-kit"
+              }
+            }
+          ],
+          "semanticVersion": "1.0.0",
+          "version": "1.0.0"
+        },
+        "extensions": [
+          {
+            "name": "gate-sdk",
+            "version": "1.0.0"
+          },
+          {
+            "name": "canon-kit",
+            "version": "1.0.0"
+          }
+        ]
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

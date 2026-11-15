@@ -209,7 +209,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     if !qpath.is_file() {
         if prose.is_empty() && cites.is_empty() {
-            println!("QUEUE-SLUG-LIVENESS: clean (no queue file and no surface configured — nothing to resolve)");
+            println!("QUEUE-SLUG-LIVENESS: clean (not applicable: no queue file and no surface configured — nothing to resolve)");
             return Ok(0);
         }
         return Err(format!("queue file not found: {}", queue_knob));

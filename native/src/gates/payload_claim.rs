@@ -26,7 +26,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // config with no kit default, so an empty command is the clean skip for a tree whose
     // payload discloses one thing only
     if spec::command("CANON_KIT_PAYLOAD_CLAIMS_CMD")?.is_empty() {
-        println!("PAYLOAD-CLAIM: clean (no disclosure vocabulary configured — nothing to hold)");
+        println!("PAYLOAD-CLAIM: clean (not applicable: no disclosure vocabulary configured — nothing to hold)");
         return Ok(0);
     }
     let claims = spec::claim_vocabulary("CANON_KIT_PAYLOAD_CLAIMS_CMD")?;

@@ -533,7 +533,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let files = corpus("CANON_KIT_PROSE_TELL_GLOBS")?;
     let absence = corpus("CANON_KIT_PROSE_TELL_ABSENCE_GLOBS")?;
     if files.is_empty() && absence.is_empty() {
-        println!("PROSE-TELLS: clean (0 configured surface(s); nothing scanned)");
+        println!("PROSE-TELLS: clean (not applicable: 0 configured surface(s); nothing scanned)");
         return Ok(0);
     }
 

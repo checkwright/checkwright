@@ -293,7 +293,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     if files.is_empty() {
         println!(
-            "KIT-REF-LIVENESS: clean (0 tracked file(s) under {} after valves; nothing to resolve)",
+            "KIT-REF-LIVENESS: clean (not applicable: 0 tracked file(s) under {} after valves; nothing to resolve)",
             scanroot
         );
         return Ok(0);

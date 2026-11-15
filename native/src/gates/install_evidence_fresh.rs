@@ -21,7 +21,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let (record, spelled) = crate::emit::install_evidence::record_path()?;
         if record.is_empty() || !Path::new(&record).is_file() {
             println!(
-                "INSTALL-EVIDENCE-FRESH: clean (0 install-observation records — {} names no file, so there is nothing to re-emit from)",
+                "INSTALL-EVIDENCE-FRESH: clean (not applicable: 0 install-observation records — {} names no file, so there is nothing to re-emit from)",
                 spelled
             );
             return Ok(0);

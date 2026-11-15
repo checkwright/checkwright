@@ -22,7 +22,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let markers = spec::knob_array_pub(MARKERS)?;
     if markers.is_empty() {
-        println!("DEPRECATION-TASK: clean (no CANON_KIT_DEPRECATION_MARKERS configured; the deprecation-marker vocabulary is consumer config — nothing to resolve)");
+        println!("DEPRECATION-TASK: clean (not applicable: no CANON_KIT_DEPRECATION_MARKERS configured; the deprecation-marker vocabulary is consumer config — nothing to resolve)");
         return Ok(0);
     }
     let queue = match args.get(1) {

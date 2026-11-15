@@ -85,7 +85,7 @@ pub fn run(args: &[String]) -> i32 {
     // the empty knob, a different sentence from a nothing-found clean
     for (knob, empty) in [(ACTION_KNOB, action.is_empty()), (PROGRAMS_KNOB, programs.is_empty())] {
         if empty {
-            println!("ACTION-STEP-ORDER: clean ({} is empty — no order is declared, so no job is checked)", knob);
+            println!("ACTION-STEP-ORDER: clean (not applicable: {} is empty — no order is declared, so no job is checked)", knob);
             return 0;
         }
     }

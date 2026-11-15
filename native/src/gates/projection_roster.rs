@@ -198,7 +198,7 @@ fn inner(_args: &[String]) -> Result<i32, String> {
     // so, a different sentence from a roster found complete
     if roster.is_empty() {
         println!(
-            "PROJECTION-ROSTER: clean (no roster configured; GATE_SDK_PROJECTION_ROSTER is empty, so nothing was asserted)"
+            "PROJECTION-ROSTER: clean (not applicable: no roster configured; GATE_SDK_PROJECTION_ROSTER is empty, so nothing was asserted)"
         );
         return Ok(0);
     }

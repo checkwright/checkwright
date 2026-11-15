@@ -71,6 +71,8 @@ jobs:
       - name: full battery
         env:
           GATE_SDK_SARIF_FILE: ${{ runner.temp }}/gates.sarif
+          # spec: installer/SPEC.md §The CI action — code scanning is handed the fail results alone
+          GATE_SDK_SARIF_RESULTS: failures
           # spec: gate-sdk/SPEC.md §run-gates — the banner roll, so the log shows a knob-armed gate ran armed
           GATE_SDK_VERBOSE: "1"
         run: |

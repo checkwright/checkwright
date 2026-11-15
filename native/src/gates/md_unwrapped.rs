@@ -314,7 +314,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     } else {
         let include = spec::knob_array_pub("CANON_KIT_UNWRAP_GLOBS")?;
         if include.is_empty() {
-            println!("MD-UNWRAPPED: clean (CANON_KIT_UNWRAP_GLOBS is unset; nothing scanned)");
+            println!("MD-UNWRAPPED: clean (not applicable: CANON_KIT_UNWRAP_GLOBS is unset; nothing scanned)");
             return Ok(0);
         }
         let exclude = spec::knob_array_pub("CANON_KIT_UNWRAP_EXCLUDE")?;

@@ -235,6 +235,7 @@ pub const KIT: Kit = Kit {
         "GATE_SDK_JOBS",
         "GATE_SDK_VERBOSE",
         "GATE_SDK_SARIF_FILE",
+        "GATE_SDK_SARIF_RESULTS",
     ],
 };
 

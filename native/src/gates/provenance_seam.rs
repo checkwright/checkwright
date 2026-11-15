@@ -23,7 +23,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         .filter(|s| !s.is_empty())
         .collect();
     if !kit_on && surface_globs.is_empty() {
-        println!("PROVENANCE-SEAM: clean (CANON_KIT_SCAN_KIT_ROOTS is 0: kit roots are a dependency's, so no kit SPEC is scanned; CANON_KIT_SEAM_SURFACE_GLOBS is empty, so no seam surface is either)");
+        println!("PROVENANCE-SEAM: clean (not applicable: CANON_KIT_SCAN_KIT_ROOTS is 0: kit roots are a dependency's, so no kit SPEC is scanned; CANON_KIT_SEAM_SURFACE_GLOBS is empty, so no seam surface is either)");
         return Ok(0);
     }
     let floor_raw = spec::knob_pub("CANON_KIT_SEAM_SLUG_MIN_LEN")?;

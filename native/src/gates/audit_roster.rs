@@ -198,7 +198,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         None => match walk::knob_scalar("LIFECYCLE_KIT_AUDIT_ROSTER_FILE") {
             Ok(v) if v.is_empty() => {
-                println!("AUDIT-ROSTER: clean (LIFECYCLE_KIT_AUDIT_ROSTER_FILE is empty — no roster configured)");
+                println!("AUDIT-ROSTER: clean (not applicable: LIFECYCLE_KIT_AUDIT_ROSTER_FILE is empty — no roster configured)");
                 return 0;
             }
             Ok(v) => v,

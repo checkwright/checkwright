@@ -27,7 +27,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // default, so an unset command is the clean skip: a tree that declared no class has no
     // sentence falling in one
     if spec::command("CANON_KIT_CLAIM_CLASSES_CMD")?.is_empty() {
-        println!("UNMARKED-CLAIM: clean (CANON_KIT_CLAIM_CLASSES_CMD unset — no declared claim class, so no sentence falls in one)");
+        println!("UNMARKED-CLAIM: clean (not applicable: CANON_KIT_CLAIM_CLASSES_CMD unset — no declared claim class, so no sentence falls in one)");
         return Ok(0);
     }
     let classes = spec::claim_vocabulary("CANON_KIT_CLAIM_CLASSES_CMD")?;

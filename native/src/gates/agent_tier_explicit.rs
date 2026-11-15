@@ -69,7 +69,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if files.is_empty() {
         println!(
-            "AGENT-TIER-EXPLICIT: clean (0 agent definition(s) under {}; nothing to check)",
+            "AGENT-TIER-EXPLICIT: clean (not applicable: 0 agent definition(s) under {}; nothing to check)",
             dir
         );
         return 0;

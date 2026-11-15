@@ -332,7 +332,7 @@ fn check(args: &[String]) -> Result<i32, String> {
 
     if surfaces.is_empty() {
         println!(
-            "SURFACE-DUPLICATION: clean (no configured surface present under {})",
+            "SURFACE-DUPLICATION: clean (not applicable: no configured surface present under {})",
             root
         );
         return Ok(0);

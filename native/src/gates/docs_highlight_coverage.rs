@@ -95,7 +95,7 @@ fn inner(_args: &[String]) -> Result<i32, String> {
     // says so, a different sentence from a snapshot found covered
     if snapshot.is_empty() {
         println!(
-            "DOCS-HIGHLIGHT-COVERAGE: clean (no snapshot configured; SITE_KIT_HIGHLIGHT_TOKENS is empty, so nothing was asserted)"
+            "DOCS-HIGHLIGHT-COVERAGE: clean (not applicable: no snapshot configured; SITE_KIT_HIGHLIGHT_TOKENS is empty, so nothing was asserted)"
         );
         return Ok(0);
     }

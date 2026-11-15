@@ -35,7 +35,7 @@ fn inner() -> Result<i32, String> {
             (true, false) => "no harness literal",
             _ => "no corpus",
         };
-        println!("HARNESS-LITERAL: clean ({} configured; the gate is disabled and nothing was scanned)", absent);
+        println!("HARNESS-LITERAL: clean (not applicable: {} configured; the gate is disabled and nothing was scanned)", absent);
         return Ok(0);
     }
 

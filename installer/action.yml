@@ -34,7 +34,7 @@ runs:
           echo "::error::no checkwright.lock names a version here; set the action's 'version' input to the release to run"
           exit 2
         fi
-        GATE_SDK_SARIF_FILE="$sarif" CHECKWRIGHT_VERSION="$v" sh "$GITHUB_ACTION_PATH/../docs/install.sh" --run
+        GATE_SDK_SARIF_FILE="$sarif" GATE_SDK_SARIF_RESULTS=failures CHECKWRIGHT_VERSION="$v" sh "$GITHUB_ACTION_PATH/../docs/install.sh" --run
     - if: always() && inputs.upload-sarif == 'true'
       uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
       continue-on-error: true

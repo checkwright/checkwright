@@ -1,7 +1,11 @@
-// spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the source stamp's producer; the
-// three git invocations here are the ones gate_native_source_stamp re-runs tree-side
+// spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the source stamp's producer; the source
+// stamp's three git invocations are the ones gate_native_source_stamp re-runs tree-side
 use std::io::Write;
+use std::path::Path;
 use std::process::{Command, Stdio};
+
+#[path = "src/release_stamp.rs"]
+mod release_stamp;
 
 // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — a binary carrying no stamp is
 // exactly the artifact the oracle cannot hold, so the failure lands at build time
@@ -110,7 +114,39 @@ fn main() {
     let gitdir = git(&dir, &["rev-parse", "--absolute-git-dir"], None);
     println!("cargo:rerun-if-changed={}/index", gitdir.trim());
 
+    release(&dir);
     gate_modules(&dir);
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the release stamp and its exactness; a describe that fails
+// on a tagless or shallow checkout empties the stamp and never fails the build
+fn release(dir: &str) {
+    let input = std::env::var("CHECKWRIGHT_BUILD_VERSION").ok();
+    let described = Command::new("git")
+        .arg("-C")
+        .arg(dir)
+        .args(["describe", "--tags", "--match", "v[0-9]*"])
+        .stderr(Stdio::null())
+        .output()
+        .ok()
+        .filter(|o| o.status.success())
+        .and_then(|o| String::from_utf8(o.stdout).ok());
+    let (stamp, exact) = release_stamp::stamp(input.as_deref(), described.as_deref());
+    println!("cargo:rustc-env=CHECKWRIGHT_RELEASE={}", stamp);
+    println!("cargo:rustc-env=CHECKWRIGHT_RELEASE_EXACT={}", if exact { "1" } else { "" });
+    println!("cargo:rerun-if-env-changed=CHECKWRIGHT_BUILD_VERSION");
+
+    // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — tags live under the common git directory,
+    // and a trigger path is emitted only where it exists, since cargo reads a missing one as changed
+    let common = git(dir, &["rev-parse", "--git-common-dir"], None);
+    let common = Path::new(dir).join(common.trim());
+    let tags = common.join("refs").join("tags");
+    let watched = if tags.is_dir() { tags } else { common.join("refs") };
+    for p in [watched, common.join("packed-refs")] {
+        if p.exists() {
+            println!("cargo:rerun-if-changed={}", p.display());
+        }
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the member-to-module map, read off each

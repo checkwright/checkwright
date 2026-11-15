@@ -15,7 +15,7 @@ for knob in GATE_LOCAL_STEP_ORDER_ACTION GATE_LOCAL_STEP_ORDER_PROGRAMS; do
     out="$( cd "$CASE" && gate_env "$knob=" && gate_run check-action-step-order "$DIR" tree 2>&1 )"; rc=$?
     if [[ "$rc" -ne 0 ]]; then
         echo "  FAIL [$knob]: want exit 0 under an empty knob, got $rc -- $out"; fails=$((fails + 1))
-    elif ! grep -qF "ACTION-STEP-ORDER: clean ($knob is empty" <<<"$out"; then
+    elif ! grep -qF "ACTION-STEP-ORDER: clean (not applicable: $knob is empty" <<<"$out"; then
         echo "  FAIL [$knob]: exit 0 but the clean line does not name the empty knob: $out"; fails=$((fails + 1))
     fi
 done

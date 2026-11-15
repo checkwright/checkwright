@@ -98,7 +98,7 @@ pub fn run(args: &[String]) -> i32 {
     };
 
     if patterns.is_empty() {
-        println!("COMMIT-MSG: clean (0 banned pattern(s) configured; message unchecked)");
+        println!("COMMIT-MSG: clean (not applicable: 0 banned pattern(s) configured; message unchecked)");
         return 0;
     }
 
