@@ -1130,10 +1130,3 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 
 ## Done
 
-- projection-witness-wall-clock
-- path-root-context-spellings
-- observe-trial-promise-gaps
-- machine-verdict-contract
-- gate-run-attestation-predicate
-- recorded-test-mutation-control
-
