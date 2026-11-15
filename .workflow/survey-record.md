@@ -13,3 +13,10 @@
 - rev: f63f137e2c030d6f30594c2a8d81ce553bf6cec7
 - finding: candidates (file:line of the early-out clean line): action_job_ref:107 action_step_order:88 agent_tier_explicit:72 audit_roster:201 commit_msg:101 delta_agreement:50 deprecation_task:25 docs_highlight_coverage:98 harness_literal:38 hook_knobs_fresh:23 install_claim:28 install_evidence_fresh:24 kit_ref_liveness:296 md_unwrapped:317 measured_claim:35 payload_claim:29 portability_floor:101 projection_roster:201 prose_enum:29 prose_tells:536 provenance_seam:26 psscriptanalyzer:91 queue_slug_liveness:212 scratch_citation:166 surface_duplication:335 task_label_resolution:41 task_path_claim:28 tree_terms:59 unmarked_claim:30 (29). Excluded as checked-something lines: battery_roster:191, door_binding:461, evidence_baseline:365, evidence_manifest:152, harness_literal:87, portability_floor:207/219, prose_tells:625.
 - inferred: whether each candidate's branch evaluated no instance of its rule; read per branch at build
+
+## 2026-11-15 align — Which gates print a clean line on an early-out that evaluated nothing but that the survey-record not-applicable oracle's lexical pattern does not match?
+- corpus: native/src/gates
+- oracle: read the early-out branch of each named gate; the oracle in the 2026-11-15 spec survey block matches 36 lines, 29 candidates after exclusions
+- rev: 451e14db367fa4677c304284d80dfb9d17b4c9a3
+- finding: unreached by the lexical oracle: action_pinning:85 action_gh_repo:160 action_permissions:196 action_run_path:158 action_run_shell:188 docs_link_convention:140 docs_nav_reachable:123 docs_render_fidelity:154 docs_since:40 core_files:41,55 commit_msg:71 commit_subject:72 dispatch_entry:63 audit_roster:233,291 crate_arms:218 disposed_findings:75 agent_tier_explicit:56
+- inferred: whether each branch below evaluated no instance of its rule; the list is not exhaustive and no branch was read
