@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: machine-verdict-contract-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, a versioned machine contract for a caller driving the kits from outside):** option A. Debt, promoted here: `projection-witness-wall-clock` leading (the board's only `iteration` row), then `observe-trial-promise-gaps` and `path-root-context-spellings` on its gate-sdk surface. Features, deferred here and promoted by spec with their amendments, in this order: `machine-verdict-contract`, `gate-run-attestation-predicate` as widened, `recorded-test-mutation-control`. Stages scope, spec, align, build, validate, close: the set spans gate-sdk, evidence-kit and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the tier-one lead on the set's gate-sdk surface, and the evidence-kit pair as one manifest major version rather than two; drain 5 against inflow 4.6. Supersession: `gate-run-attestation-predicate` reshaped by `machine-verdict-contract`, whose provenance block goes first; `recorded-test-mutation-control` reshaped by `gate-run-attestation-predicate`, one manifest version, one batch, predicate first.
-
-  **The verdict contract's envelope (operator direction 2026-11-15, lead-relayed, not a ruling):** the SARIF log is the versioned verdict contract; a non-gate arm takes JSON only where a named caller reads it, the rest filed as [non-gate-arm-json](#non-gate-arm-json); no fourth exit code. The remaining asks of that date are filed deferred, and the 2026-11-14 adopter-target lead decision stands ([external-state-owner-mode](#external-state-owner-mode)).
-
-  **Push need (operator direction 2026-11-15, inside the budget):** 2 against 2: the closing push, which also first runs `path-root-context-spellings`' Windows-host cases no local run reaches, and a release tag push no one entry's landing spends, publishing the wire contracts on a released binary; close's release policy decides the cut, and 1 fits without it.
 
 ---
 
