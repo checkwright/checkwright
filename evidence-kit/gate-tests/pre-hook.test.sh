@@ -17,7 +17,7 @@ mk_tree() {
     rm -rf "$1"; mkdir -p "$1/.workflow" "$1/scripts" "$1/.tmp"
     ( cd "$1" && git init -q . ) >/dev/null 2>&1
     printf '# baseline\nalpha alpha pass\nbeta beta pass\n' >"$1/.workflow/validate-baseline.txt"
-    printf '# contract: evidence-manifest v1\n' >"$1/.workflow/validate-evidence.txt"
+    printf '# contract: evidence-manifest v2\n' >"$1/.workflow/validate-evidence.txt"
     printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$1" >> .tmp/hook.log\n' >"$1/scripts/hook.sh"
     # The suite exits non-zero unless the hook already ran for it, so ordering is observable as a verdict.
     printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$1" >> .tmp/suite.log\ngrep -qx "$1" .tmp/hook.log\n' >"$1/scripts/suite.sh"
@@ -58,9 +58,25 @@ if grep -q '^hook-test ' "$tmp/b/.workflow/validate-evidence.txt"; then
     echo "  FAIL: a run its hook refused still recorded evidence"; fails=$((fails + 1))
 fi
 
+# C — with a Statement configured, a hook that moves HEAD refuses at exit 2 before
+# its suite runs, naming the suite, and neither the manifest nor the Statement is written.
+mk_tree "$tmp/c" "bash scripts/commit.sh"
+printf '#!/usr/bin/env bash\ngit -c user.name=t -c user.email=t@t commit -q --allow-empty -m "hook $1"\n' >"$tmp/c/scripts/commit.sh"
+printf 'EVIDENCE_KIT_STATEMENT_FILE = .tmp/statement.json\n' >>"$tmp/c/scripts/evidence-config.knobs"
+( cd "$tmp/c" && git -c user.name=t -c user.email=t@t commit -q --allow-empty -m base ) >/dev/null 2>&1
+before="$(cat "$tmp/c/.workflow/validate-evidence.txt")"
+out="$(_rv "$tmp/c")"; rc=$?
+if [[ "$rc" -ne 2 ]] || [[ "$out" != *"'alpha'"* ]]; then
+    echo "  FAIL: a hook that commits must refuse at exit 2 naming its suite (rc=$rc): $out"; fails=$((fails + 1))
+fi
+if [[ -e "$tmp/c/.tmp/suite.log" ]] || [[ -e "$tmp/c/.tmp/statement.json" ]] \
+    || [[ "$(cat "$tmp/c/.workflow/validate-evidence.txt")" != "$before" ]]; then
+    echo "  FAIL: a run refused for a moved HEAD still ran a suite or wrote a file"; fails=$((fails + 1))
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "pre-hook.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "pre-hook.test: ok (per-suite hook in roster order with its operand ahead of the suite, failing hook exit 2 with no suite run and no evidence)"
+echo "pre-hook.test: ok (per-suite hook in roster order with its operand ahead of the suite, failing hook exit 2 with no suite run and no evidence, a HEAD-moving hook under a Statement exit 2 with nothing written)"
 exit 0

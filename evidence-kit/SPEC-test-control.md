@@ -1,6 +1,6 @@
 # SPEC amendment: test-control
 
-Pairs `recorded-test-mutation-control`. The fixture pair proves that a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipline), but nothing shipped proves the same of a test a validate suite records. A recorded run of a test that cannot fail therefore still supports a done claim. This amendment adds a **declared test control**: a consumer names a test and the environment that re-introduces the defect the test exists to catch. The validate spine re-runs the suite under that environment and records whether the test went red. A gate then requires that a newly baselined test carries a control, and that the control was witnessed red before close. It is off unless a consumer declares a control. The record is a line kind in the evidence manifest's second major version, which `gate-run-attestation-predicate` introduces (evidence-kit/SPEC-gate-run-predicate.md, delta 2).
+Pairs `recorded-test-mutation-control`. The fixture pair proves that a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipline), but nothing shipped proves the same of a test a validate suite records. A recorded run of a test that cannot fail therefore still supports a done claim. This amendment adds a **declared test control**: a consumer names a test and the environment that re-introduces the defect the test exists to catch. The validate spine re-runs the suite under that environment and records whether the test went red. A gate then requires that a newly baselined test carries a control, and that the control was witnessed red before close. It is off unless a consumer declares a control. The record is a line kind in the evidence manifest's second major version, which `gate-run-attestation-predicate` introduced (evidence-kit/SPEC.md §Evidence manifest).
 
 **What the tree does today**, read from `native/src/emit/run_validate.rs`, `native/src/evidence.rs`, `native/src/stages.rs`, `native/src/gates/evidence_baseline.rs`, `evidence-kit/SPEC.md`, `scripts/gates.list` and `doctrine-kit/DOCTRINE.md`:
 
@@ -84,7 +84,7 @@ Each **Not yet applied.**
 - **The since commit** (delta 3). Producers: the state file's first data line through `stages::iteration_start`, else `EVIDENCE_KIT_CONTROL_SINCE`. Consumer: `check-test-control` (B), through the baseline-at-a-commit read it shares with `check-evidence-baseline`.
 - **The control run's exit** (delta 2). Producer: the spine. Consumers: its caller, as the existing exit 1 already is.
 
-The spine's spawn sites were found by `git grep -n "spawn(" -- native/src/emit/run_validate.rs`, the iteration-start reader by `git grep -n "iteration_start" -- native/src`, and the registry's unregistered form by `git grep -n "# unregistered:" -- scripts/gates.list`. The manifest's line readers are the ones the predicate amendment probed (evidence-kit/SPEC-gate-run-predicate.md §Producers and consumers).
+The spine's spawn sites were found by `git grep -n "spawn(" -- native/src/emit/run_validate.rs`, the iteration-start reader by `git grep -n "iteration_start" -- native/src`, and the registry's unregistered form by `git grep -n "# unregistered:" -- scripts/gates.list`. The manifest's line readers are the ones evidence-kit/SPEC.md §Producers and consumers rosters.
 
 ## Existing sections updated
 

@@ -3,7 +3,9 @@
 # assertions the one good/bad pair (grammar) cannot hold: (C) a validate stamp
 # demands ≥1 evidence line, disarmed while the cursor is still at validate and
 # re-armed past it; (A) a close-entry cursor demands the full green block over
-# every configured suite; and both no-cursor disarms.
+# every configured suite, imported lines included; both no-cursor disarms; and
+# (B) per major: each v2 field and line kind, a line under the other major's
+# header, a green v1 file and an unknown major.
 #
 # The cursor is the state file's last data line, so every case
 # below drives the stage axis from <state-body> and the header carries the name
@@ -21,11 +23,17 @@ fails=0
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
+# The v2 suite line's four appended fields, for a line otherwise spelled at v1's eight.
+COMMIT=0123456789abcdef0123456789abcdef01234567
+TAIL=" commit=$COMMIT tree=clean cmd=$HASH origin=local"
+MAJOR=v2
+
 # case_run <name> <manifest-body> <header> <state-body> <suites> <want> <expect>
+# (the manifest header's major is $MAJOR)
 case_run() {
     local name="$1" man="$2" hdr="$3" state="$4" suites="$5" want="$6" expect="$7"
     local d="$tmp/$name" out rc; mkdir -p "$d/scripts"
-    printf '# contract: evidence-manifest v1\n%b' "$man" >"$d/man.txt"
+    printf '# contract: evidence-manifest %s\n%b' "$MAJOR" "$man" >"$d/man.txt"
     printf '%s\n' "$hdr" >"$d/queue.md"
     printf '%b' "$state" >"$d/state.txt"
     # shellcheck disable=SC2086  # one element line per space-separated suite
@@ -58,7 +66,7 @@ case_run "C-disarmed-at-validate" \
 # C — close entry with one of two configured suites missing its clean line:
 #     assertion A fires for the missing suite.
 case_run "A-missing-suite" \
-    "it unit sha256=$HASH pass=1 fail=0 ignore=0 verdict=clean 2026-07-06\n" \
+    "it unit sha256=$HASH pass=1 fail=0 ignore=0 verdict=clean 2026-07-06$TAIL\n" \
     '## Iteration: it' \
     'h\n---\nit validate s2 2026-07-05\nit close s3 2026-07-06\n' 'unit extra' \
     1 "no clean evidence line"
@@ -66,17 +74,48 @@ case_run "A-missing-suite" \
 # D — close entry with both suites clean and dated after the validate stamp is
 #     CLEAN (the full green block).
 case_run "A-green-block" \
-    "it unit sha256=$HASH pass=1 fail=0 ignore=0 verdict=clean 2026-07-06\nit extra sha256=$HASH pass=2 fail=0 ignore=0 verdict=clean 2026-07-06\n" \
+    "it unit sha256=$HASH pass=1 fail=0 ignore=0 verdict=clean 2026-07-06$TAIL\nit extra sha256=$HASH pass=2 fail=0 ignore=0 verdict=clean 2026-07-06$TAIL\n" \
     '## Iteration: it' \
     'h\n---\nit validate s2 2026-07-05\nit close s3 2026-07-06\n' 'unit extra' \
     0 "clean"
 
 # E — a clean line dated BEFORE the earliest validate stamp is stale evidence.
 case_run "A-stale-date" \
-    "it unit sha256=$HASH pass=1 fail=0 ignore=0 verdict=clean 2026-07-01\n" \
+    "it unit sha256=$HASH pass=1 fail=0 ignore=0 verdict=clean 2026-07-01$TAIL\n" \
     '## Iteration: it' \
     'h\n---\nit validate s2 2026-07-05\nit close s3 2026-07-06\n' 'unit' \
     1 "before the earliest validate stamp"
+
+# E2 — an imported clean line satisfies the close-entry block like a local one.
+case_run "A-imported-line" \
+    "it unit sha256=$HASH pass=1 fail=0 ignore=0 verdict=clean 2026-07-06${TAIL/origin=local/origin=imported}\n" \
+    '## Iteration: it' \
+    'h\n---\nit validate s2 2026-07-05\nit close s3 2026-07-06\n' 'unit' \
+    0 "clean"
+
+# B — the grammar of each major. A v2 header reds an unknown third field and each
+# malformed appended field; the stage cursor is disarmed so only (B) speaks.
+V1LINE="it unit sha256=$HASH pass=1 fail=0 ignore=0 verdict=clean 2026-07-06"
+case_run "B-unknown-kind" "it unit mutant=x pass=1 fail=0 ignore=0 verdict=clean 2026-07-06$TAIL\n" \
+    '## Iteration: it' 'h\n---\n' '' 1 "unknown line kind"
+case_run "B-v1-line-under-v2" "$V1LINE\n" '## Iteration: it' 'h\n---\n' '' 1 "malformed line"
+case_run "B-bad-commit" "$V1LINE${TAIL/commit=$COMMIT/commit=ABC}\n" \
+    '## Iteration: it' 'h\n---\n' '' 1 "bad commit field"
+case_run "B-bad-tree" "$V1LINE${TAIL/tree=clean/tree=-}\n" \
+    '## Iteration: it' 'h\n---\n' '' 1 "bad tree field"
+case_run "B-bad-cmd" "$V1LINE${TAIL/cmd=$HASH/cmd=xyz}\n" \
+    '## Iteration: it' 'h\n---\n' '' 1 "bad cmd field"
+case_run "B-bad-origin" "$V1LINE${TAIL/origin=local/origin=ci}\n" \
+    '## Iteration: it' 'h\n---\n' '' 1 "bad origin field"
+case_run "B-unborn" "$V1LINE commit=- tree=- cmd=$HASH origin=local\n" \
+    '## Iteration: it' 'h\n---\n' '' 0 "clean"
+# A v1 file whose lines are v1 stays green; a v2 line under a v1 header is red.
+MAJOR=v1
+case_run "B-v1-file" "$V1LINE\n" '## Iteration: it' 'h\n---\n' '' 0 "clean"
+case_run "B-v2-line-under-v1" "$V1LINE$TAIL\n" '## Iteration: it' 'h\n---\n' '' 1 "malformed line"
+MAJOR=v3
+case_run "B-unknown-major" "" '## Iteration: it' 'h\n---\n' '' 1 "not a versioned wire-format header"
+MAJOR=v2
 
 # F — the no-cursor window /scope leaves at the iteration boundary: the state
 #     file exists but is truncated to its preamble + '---', so there is no data
@@ -94,7 +133,7 @@ case_run "no-cursor-window" \
 # G — no lifecycle state file at all: the second no-cursor shape, same early-out.
 _no_state() {
     local d="$tmp/nostate"; mkdir -p "$d"
-    printf '# contract: evidence-manifest v1\n' >"$d/man.txt"
+    printf '# contract: evidence-manifest v2\n' >"$d/man.txt"
     printf '## Iteration: it\n' >"$d/queue.md"
     gate_run check-evidence-manifest "$CHECKS" "$d/man.txt" "$d/queue.md" "$d/absent-state.txt" 2>&1
 }
@@ -106,5 +145,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-evidence-manifest.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-evidence-manifest.test: ok (C recorded-nothing + A missing-suite + A stale-date rejected; C disarmed-at-validate + A green-block + both no-cursor shapes accepted)"
+echo "check-evidence-manifest.test: ok (C recorded-nothing + A missing-suite + A stale-date + each v2 field and kind + a cross-major line + an unknown major rejected; C disarmed-at-validate + A green-block + A imported + a v1 file + an unborn line + both no-cursor shapes accepted)"
 exit 0

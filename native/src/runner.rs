@@ -42,7 +42,9 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --wait-probe <sub> [args]               the wait-primitive probe: 'sweep' is the reproducer
        --run-validate                          run the codified validate spine over the roster
        --diff-baseline <group>...              diff captured logs against the baseline slice
-       --run -h | --help                       this text, on stdout, exit 0
+       --verify-gate-run [<file> | -]          judge a gate-run Statement against this tree
+       --import-gate-run [<file> | -]          verify a Statement and record its suites
+       --run -h | --help                      this text, on stdout, exit 0
 
   --only  runs the named members in registry order whatever order they were
           typed; duplicates collapse. A name unknown to the registry is a
@@ -185,10 +187,13 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           whole roster has run. Takes no argument: the whole input is the
           EVIDENCE_KIT_* configuration. Exit 0 every suite clean, 1 a
           suite recorded new-failures, 2 the run could not start (no suites, no
-          run key, absent manifest, a held or unclaimable lock, a missing suite
-          command, a failing pre-hook, a parser producing no result is 1);
-          unavailable is 2, because a caller that read a silent 0 would believe
-          a run it never got had passed.
+          run key, an absent manifest or one whose header is neither major, a
+          held or unclaimable lock, a missing suite command, a failing
+          pre-hook, a pre-hook that moved HEAD while a Statement is configured;
+          a parser producing no result is 1); unavailable is 2, because a
+          caller that read a silent 0 would believe a run it never got had
+          passed. With EVIDENCE_KIT_STATEMENT_FILE set it also writes one
+          in-toto Statement of the run there.
   --diff-baseline  parses each captured log named on argv and diffs it against
           the baseline's suite slice per-scenario, printing `new-failure` and
           `recovery` findings. Each argument group is `<suite> <logfile>
@@ -198,6 +203,18 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           clean, 1 new failures against the baseline, 2 misuse or an unreadable
           log; unavailable is 2, its one functional caller being a CI leg that
           reads nothing but the status.
+  --verify-gate-run  reads one gate-run Statement, bare or in a DSSE
+          envelope, from <file>, from stdin for `-`, or from the stdout of the
+          EVIDENCE_KIT_STATEMENT_CMD argv, and checks its shape, its subject
+          against HEAD's ancestry, and each suite's binding, command and tree.
+          The DSSE signature is never checked. Exit 0 every check held, 1 a
+          contradiction (one line per finding), 2 a Statement that could not
+          be read or judged; unavailable is 2. Writes nothing.
+  --import-gate-run  takes the same input and checks, then records each suite
+          as an origin=imported manifest line under this tree's run key,
+          under the producer-liveness lock. Refused unless
+          EVIDENCE_KIT_IMPORTED_RUNS is accept. Exit 0 recorded, 1 a
+          contradiction with nothing recorded, 2 a refusal; unavailable is 2.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 

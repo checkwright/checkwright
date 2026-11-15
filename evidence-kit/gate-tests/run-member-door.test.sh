@@ -22,7 +22,7 @@ printf '#!/usr/bin/env bash\ntouch "%s/ran"\n' "$tmp" >"$p/probe-kit/gate-tests/
 printf 'GATE_SDK_KIT_DIRS = probe-kit\nGATE_SDK_NATIVE_BIN = bin/cw\n' >"$p/scripts/gate-sdk-config.knobs"
 printf 'EVIDENCE_KIT_SUITES[] <- EVIDENCE_KIT_FIXTURE_SUITES\nEVIDENCE_KIT_RUN_ID = door-test\n' >"$p/scripts/evidence-config.knobs"
 printf '# baseline\n' >"$p/.workflow/validate-baseline.txt"
-printf '# contract: evidence-manifest v1\n' >"$p/.workflow/validate-evidence.txt"
+printf '# contract: evidence-manifest v2\n' >"$p/.workflow/validate-evidence.txt"
 
 prefix="$(git -C "$p" rev-parse --show-prefix 2>&1)"
 if [[ "$prefix" != "proj/" ]]; then

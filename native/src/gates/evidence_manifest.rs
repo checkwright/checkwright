@@ -12,35 +12,63 @@ fn knob_or(args: &[String], at: usize, knob: &str) -> Result<String, String> {
     }
 }
 
-// spec: evidence-kit/SPEC.md §check-evidence-manifest — (B)'s eight-field shape: a short line leaves
-// the eighth empty and a long one leaves a remainder
-fn fields(line: &str) -> (Vec<String>, String) {
+// spec: evidence-kit/SPEC.md §check-evidence-manifest — (B)'s n-field shape: a short line leaves the
+// last field empty and a long one leaves a remainder
+fn fields(line: &str, n: usize) -> (Vec<String>, String) {
     let f: Vec<&str> = line.split_whitespace().collect();
     let at = |i: usize| f.get(i).copied().unwrap_or("").to_string();
-    ((0..8).map(at).collect(), f[8.min(f.len())..].join(" "))
+    ((0..n).map(at).collect(), f[n.min(f.len())..].join(" "))
 }
 
-fn is_hex64(s: &str) -> bool {
-    s.len() == 64 && s.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
-}
+const V1_SHAPE: &str = "<iteration> <suite> sha256=… pass=… fail=… ignore=… verdict=… <date>";
+const V2_SHAPE: &str =
+    "<run-key> <suite> sha256=… pass=… fail=… ignore=… verdict=… <date> commit=… tree=… cmd=… origin=…";
 
-fn is_digits(s: &str) -> bool {
-    !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit())
-}
-
-// spec: evidence-kit/SPEC.md §Evidence manifest — the date's digit shape, never a calendar parse
-fn is_date(s: &str) -> bool {
-    let b = s.as_bytes();
-    if b.len() != 10 {
-        return false;
+// spec: evidence-kit/SPEC.md §Evidence manifest — a suite line under its major's grammar, each bad
+// field its own finding; `None` when the line is not one
+fn suite_line(line: &str, v2: bool, grammar: &mut Vec<String>) -> Option<Vec<String>> {
+    let (width, shape) = if v2 { (12, V2_SHAPE) } else { (8, V1_SHAPE) };
+    let (f, rest) = fields(line, width);
+    if f[width - 1].is_empty() || !rest.is_empty() {
+        grammar.push(format!("malformed line (want '{}'): {}", shape, line));
+        return None;
     }
-    b.iter().enumerate().all(|(i, c)| {
-        if i == 4 || i == 7 {
-            *c == b'-'
-        } else {
-            c.is_ascii_digit()
+    let before = grammar.len();
+    if !f[2].strip_prefix("sha256=").is_some_and(evidence::is_hex64) {
+        grammar.push(format!("bad sha256 field '{}': {}", f[2], line));
+    }
+    for (i, name) in [(3usize, "pass"), (4, "fail"), (5, "ignore")] {
+        if !f[i].strip_prefix(&format!("{}=", name)).is_some_and(evidence::is_digits) {
+            grammar.push(format!("bad {} field '{}': {}", name, f[i], line));
         }
-    })
+    }
+    if f[6] != "verdict=clean" && f[6] != "verdict=new-failures" {
+        grammar.push(format!("bad verdict field '{}' (want verdict=clean|new-failures): {}", f[6], line));
+    }
+    if !evidence::is_date(&f[7]) {
+        grammar.push(format!("bad date '{}': {}", f[7], line));
+    }
+    if v2 {
+        let commit = f[8].strip_prefix("commit=");
+        if !commit.is_some_and(|c| c == "-" || crate::provenance::object_id(c)) {
+            grammar.push(format!("bad commit field '{}' (want commit=<40|64 lowercase hex>|-): {}", f[8], line));
+        }
+        let tree = f[9].strip_prefix("tree=");
+        let unborn = commit == Some("-");
+        if !tree.is_some_and(|t| if unborn { t == "-" } else { t == "clean" || t == "modified" }) {
+            grammar.push(format!(
+                "bad tree field '{}' (want tree=clean|modified, and tree=- exactly when commit=-): {}",
+                f[9], line
+            ));
+        }
+        if !f[10].strip_prefix("cmd=").is_some_and(evidence::is_hex64) {
+            grammar.push(format!("bad cmd field '{}': {}", f[10], line));
+        }
+        if f[11] != "origin=local" && f[11] != "origin=imported" {
+            grammar.push(format!("bad origin field '{}' (want origin=local|imported): {}", f[11], line));
+        }
+    }
+    (grammar.len() == before).then_some(f)
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -65,15 +93,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(1);
     }
     let mtext = read_or_empty(&manifest);
-    let want_header = format!("# contract: {}", evidence::MANIFEST_CONTRACT);
-    if mtext.lines().next().unwrap_or("") != want_header {
-        println!(
-            "EVIDENCE-MANIFEST: first line is not the versioned wire-format header '{}' in {}",
-            want_header, manifest
-        );
-        println!("  help: the manifest's first line declares the wire contract the attestation payload is versioned by; --run-validate never rewrites it, and the iteration-boundary truncation preserves it");
-        return Ok(1);
-    }
+    let v2 = match evidence::manifest_header(&mtext) {
+        evidence::Header::V2 => true,
+        evidence::Header::V1 => false,
+        evidence::Header::Unknown(found) => {
+            println!(
+                "EVIDENCE-MANIFEST: first line '{}' is not a versioned wire-format header ('# contract: {}', or the legacy '# contract: {}') in {}",
+                found, evidence::MANIFEST_CONTRACT, evidence::MANIFEST_CONTRACT_V1, manifest
+            );
+            println!("  help: the manifest's first line names the major whose grammar its lines follow; --run-validate writes v2 and rewrites a v1 header at its next fold, refuses any other, and the iteration-boundary truncation preserves it");
+            return Ok(1);
+        }
+    };
+    let contract = if v2 { evidence::MANIFEST_CONTRACT } else { evidence::MANIFEST_CONTRACT_V1 };
 
     // spec: evidence-kit/SPEC.md §check-evidence-manifest — a queue naming no iteration and a state
     // file yielding no stage are the empty cursor
@@ -81,46 +113,23 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let stext = read_or_empty(&state);
     let stage = evidence::state_stage(&stext).unwrap_or_default();
 
-    // assertion B: every manifest line carries the version header, the eight-field shape, and
-    // the current iteration
+    // assertion B: every manifest line follows its header's major — v1's eight fields, or v2's
+    // line-kind rule and twelve-field suite line — and carries the current iteration
     let mut grammar: Vec<String> = Vec::new();
     let mut clean_suite_date: Vec<(String, String)> = Vec::new();
     let mut have_line_for_iter = false;
     for line in evidence::data_lines(&mtext) {
-        let (f, rest) = fields(line);
-        if f[7].is_empty() || !rest.is_empty() {
-            grammar.push(format!("malformed line (want '<iteration> <suite> sha256=… pass=… fail=… ignore=… verdict=… <date>'): {}", line));
-            continue;
-        }
-        let mut ok = true;
-        if !f[2].strip_prefix("sha256=").map(is_hex64).unwrap_or(false) {
-            grammar.push(format!("bad sha256 field '{}': {}", f[2], line));
-            ok = false;
-        }
-        for (i, name) in [(3usize, "pass"), (4, "fail"), (5, "ignore")] {
-            if !f[i]
-                .strip_prefix(&format!("{}=", name))
-                .map(is_digits)
-                .unwrap_or(false)
-            {
-                grammar.push(format!("bad {} field '{}': {}", name, f[i], line));
-                ok = false;
-            }
-        }
-        if f[6] != "verdict=clean" && f[6] != "verdict=new-failures" {
+        let third = line.split_whitespace().nth(2).unwrap_or("");
+        if v2 && !third.starts_with("sha256=") {
             grammar.push(format!(
-                "bad verdict field '{}' (want verdict=clean|new-failures): {}",
-                f[6], line
+                "unknown line kind '{}' (a v2 line's third field is sha256=…): {}",
+                third, line
             ));
-            ok = false;
-        }
-        if !is_date(&f[7]) {
-            grammar.push(format!("bad date '{}': {}", f[7], line));
-            ok = false;
-        }
-        if !ok {
             continue;
         }
+        let Some(f) = suite_line(line, v2, &mut grammar) else {
+            continue;
+        };
         if !iter.is_empty() && f[0] != iter {
             grammar.push(format!("foreign iteration '{}' (current is '{}') — the iteration-boundary truncation was skipped: {}", f[0], iter, line));
             continue;
@@ -141,7 +150,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for g in &grammar {
             println!("  {}", g);
         }
-        println!("  help: every line is the eight-field '{}' shape and carries the current iteration; a foreign line means the iteration-boundary truncation (LIFECYCLE_KIT_BOUNDARY_TRUNCATE) did not clear the manifest", evidence::MANIFEST_CONTRACT);
+        println!("  help: every line follows the '{}' grammar its header names and carries the current iteration; a foreign line means the iteration-boundary truncation (LIFECYCLE_KIT_BOUNDARY_TRUNCATE) did not clear the manifest", contract);
         return Ok(1);
     }
 
@@ -225,16 +234,17 @@ mod tests {
 
     #[test]
     fn the_eight_field_shape_rejects_both_a_short_line_and_a_long_one() {
-        let (f, rest) = fields("i s sha256=x pass=1 fail=0 ignore=0 verdict=clean 2026-01-01");
+        let (f, rest) = fields("i s sha256=x pass=1 fail=0 ignore=0 verdict=clean 2026-01-01", 8);
         assert!(rest.is_empty());
         assert_eq!(f[0], "i");
         assert_eq!(f[7], "2026-01-01");
-        assert!(fields("i s c").0[7].is_empty());
-        assert!(!fields("a b c d e f g h i").1.is_empty());
+        assert!(fields("i s c", 8).0[7].is_empty());
+        assert!(!fields("a b c d e f g h i", 8).1.is_empty());
     }
 
     #[test]
     fn the_field_predicates_match_the_shell_character_classes() {
+        use evidence::{is_date, is_digits, is_hex64};
         assert!(is_hex64(&"a".repeat(64)));
         assert!(!is_hex64(&"A".repeat(64)));
         assert!(!is_hex64(&"a".repeat(63)));
@@ -244,5 +254,29 @@ mod tests {
         assert!(is_date("2026-01-01"));
         assert!(!is_date("2026-1-01"));
         assert!(!is_date("2026-01-01x"));
+    }
+
+    // spec: evidence-kit/SPEC.md §Evidence manifest — a v2 suite line's four appended fields, each bad
+    // spelling its own finding, and tree=- bound to commit=-
+    #[test]
+    fn a_v2_suite_line_holds_its_four_appended_fields() {
+        let h = "a".repeat(64);
+        let c = "b".repeat(40);
+        let head = format!("k s sha256={} pass=1 fail=0 ignore=0 verdict=clean 2026-01-01", h);
+        let ok = |tail: &str| {
+            let mut g = Vec::new();
+            suite_line(&format!("{} {}", head, tail), true, &mut g).is_some()
+        };
+        assert!(ok(&format!("commit={} tree=clean cmd={} origin=local", c, h)));
+        assert!(ok(&format!("commit=- tree=- cmd={} origin=imported", h)));
+        assert!(!ok(&format!("commit=- tree=clean cmd={} origin=local", h)));
+        assert!(!ok(&format!("commit={} tree=- cmd={} origin=local", c, h)));
+        assert!(!ok(&format!("commit=XYZ tree=clean cmd={} origin=local", h)));
+        assert!(!ok(&format!("commit={} tree=clean cmd=short origin=local", c)));
+        assert!(!ok(&format!("commit={} tree=clean cmd={} origin=remote", c, h)));
+        let mut g = Vec::new();
+        assert!(suite_line(&head, true, &mut g).is_none(), "an eight-field line passed under v2");
+        let mut g = Vec::new();
+        assert!(suite_line(&head, false, &mut g).is_some(), "a v1 line failed under v1");
     }
 }

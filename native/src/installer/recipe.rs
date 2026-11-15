@@ -224,7 +224,7 @@ fn seed_in(kit: &str, kit_payload: &Path, root: Option<&Path>, dry: bool) -> Res
                 root,
                 // consumer-value-exempt: the layout init writes a new tree against (installer/SPEC.md §What init seeds)
                 ".workflow/validate-evidence.txt",
-                "# contract: evidence-manifest v1\n",
+                "# contract: evidence-manifest v2\n",
                 dry,
                 &mut out,
             )?;

@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, a versioned machine contract for a caller driving the kits from outside):** option A. Debt, promoted here: `projection-witness-wall-clock` leading (the board's only `iteration` row), then `observe-trial-promise-gaps` and `path-root-context-spellings` on its gate-sdk surface. Features, deferred here and promoted by spec with their amendments, in this order: `machine-verdict-contract`, [gate-run-attestation-predicate](#gate-run-attestation-predicate) as widened, [recorded-test-mutation-control](#recorded-test-mutation-control). Stages scope, spec, align, build, validate, close: the set spans gate-sdk, evidence-kit and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the tier-one lead on the set's gate-sdk surface, and the evidence-kit pair as one manifest major version rather than two; drain 5 against inflow 4.6. Supersession: `gate-run-attestation-predicate` reshaped by `machine-verdict-contract`, whose provenance block goes first; `recorded-test-mutation-control` reshaped by `gate-run-attestation-predicate`, one manifest version, one batch, predicate first.
+  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, a versioned machine contract for a caller driving the kits from outside):** option A. Debt, promoted here: `projection-witness-wall-clock` leading (the board's only `iteration` row), then `observe-trial-promise-gaps` and `path-root-context-spellings` on its gate-sdk surface. Features, deferred here and promoted by spec with their amendments, in this order: `machine-verdict-contract`, `gate-run-attestation-predicate` as widened, [recorded-test-mutation-control](#recorded-test-mutation-control). Stages scope, spec, align, build, validate, close: the set spans gate-sdk, evidence-kit and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the tier-one lead on the set's gate-sdk surface, and the evidence-kit pair as one manifest major version rather than two; drain 5 against inflow 4.6. Supersession: `gate-run-attestation-predicate` reshaped by `machine-verdict-contract`, whose provenance block goes first; `recorded-test-mutation-control` reshaped by `gate-run-attestation-predicate`, one manifest version, one batch, predicate first.
 
   **The verdict contract's envelope (operator direction 2026-11-15, lead-relayed, not a ruling):** the SARIF log is the versioned verdict contract; a non-gate arm takes JSON only where a named caller reads it, the rest filed as [non-gate-arm-json](#non-gate-arm-json); no fourth exit code. The remaining asks of that date are filed deferred, and the 2026-11-14 adopter-target lead decision stands ([external-state-owner-mode](#external-state-owner-mode)).
 
@@ -15,20 +15,6 @@
 ---
 
 ## New Features
-
-### gate-run-attestation-predicate
-
-[spec: evidence-kit/SPEC-gate-run-predicate.md]
-
-the tree-side first unit of [hosted-attestation-service](#hosted-attestation-service): the evidence manifest (evidence-kit/SPEC.md §Evidence manifest) emitted as an in-toto Statement in a DSSE envelope under a Checkwright-owned gate-run predicate type, the versioned wire contract between the kits and any verifier. Unbuilt: in-toto appears only in docs/choosing.md's comparison rows. It needs no demand, since a predicate an adopter's CI signs with off-the-shelf attestation tooling is useful before any service exists.
-
-**Deliverable:** design-pending, a feature: the predicate type's name and schema, the manifest fields it carries, whether the kits emit the Statement for a signer to wrap or sign it themselves, and its versioning rule.
-
-**First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
-
-**Widened (operator direction 2026-11-15, lead-relayed, not a ruling):** a published schema for the predicate, a verify arm that checks a Statement against the tree and its commit, and **imported runs** — a Statement produced on another host or in CI, bound by a hash of the command, the source commit and the counts, verified without re-running. The binding is one manifest major version beside [recorded-test-mutation-control](#recorded-test-mutation-control)'s record, with a migration note. Its provenance block (tool and kit versions, commit) is the one `machine-verdict-contract` defines. Honest limit owed: an unsigned imported run proves its binding is consistent, never that the run happened; that is the signer's.
-
-**Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
 
 ### recorded-test-mutation-control
 
@@ -56,7 +42,7 @@ a controlled A/B trial.
 
 [roadmap: later/commercial] [cost: event/low] [surface: evidence-kit] [roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.]
 
-hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. No longer demand-gated: the operator direction of 2026-10-25, lead-relayed (not a ruling), advances the track. Its tree-side first unit is [gate-run-attestation-predicate](#gate-run-attestation-predicate); the service half, outside this tree, stays the operator's. Hosting and sequencing decisions are in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view`, landed at site-health-statistics-pass (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
+hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. No longer demand-gated: the operator direction of 2026-10-25, lead-relayed (not a ruling), advances the track. Its tree-side first unit is `gate-run-attestation-predicate`; the service half, outside this tree, stays the operator's. Hosting and sequencing decisions are in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view`, landed at site-health-statistics-pass (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
 
@@ -382,7 +368,7 @@ A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`)
 
 A declared mode where an outside tool renders the queue file and the iteration header: the gates check consistency and a provenance stamp (generator, version, content hash) instead of hand transitions, a corrective message names the owner's command from config, and stage transitions get verbs with JSON results.
 
-**Conflict, standing:** the lead decision of 2026-11-14 (operator-delegated) serves an adopter running its own work engine the checks and the session hooks only, with no lifecycle or queue read adapter, and [gate-run-attestation-predicate](#gate-run-attestation-predicate) records the refusal's ground: a stamp is worth its being committed and naming HEAD. Operator direction 2026-11-15, lead-relayed, not a ruling: that decision stands. **Reopens** when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
+**Conflict, standing:** the lead decision of 2026-11-14 (operator-delegated) serves an adopter running its own work engine the checks and the session hooks only, with no lifecycle or queue read adapter, and `gate-run-attestation-predicate` records the refusal's ground: a stamp is worth its being committed and naming HEAD. Operator direction 2026-11-15, lead-relayed, not a ruling: that decision stands. **Reopens** when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
 **Deliverable:** design-pending, a feature, on reopening.
 
@@ -1138,4 +1124,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - path-root-context-spellings
 - observe-trial-promise-gaps
 - machine-verdict-contract
+- gate-run-attestation-predicate
 

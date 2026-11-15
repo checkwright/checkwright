@@ -13,7 +13,7 @@ lifecycle-kit's stage evidence proves a stage was *invoked*; it cannot prove the
 - a committed per-run evidence manifest;
 - a codified run contract.
 
-It is a kit of its own, not a lifecycle-kit extension, because the evidence manifest is a wire contract a future external verifier consumes. Its format is versioned, stable and hashable independent of the state machine, and a consumer that runs no iteration lifecycle can adopt the kit. lifecycle-kit integration is optional and arrives through generic knobs on its side of the seam ([§lifecycle-kit integration](#lifecycle-kit-integration)).
+It is a kit of its own, not a lifecycle-kit extension, because its run record is read outside the state machine. The manifest is versioned, stable and hashable on its own, and a run publishes an in-toto Statement ([§The gate-run predicate](#the-gate-run-predicate)) that an attestation verifier or a transparency log reads. Both stand independent of the state machine, and a consumer that runs no iteration lifecycle can adopt the kit. lifecycle-kit integration is optional and arrives through generic knobs on its side of the seam ([§lifecycle-kit integration](#lifecycle-kit-integration)).
 
 ## Layout and configuration
 
@@ -28,7 +28,8 @@ The knobs are **static**: the binary resolves them in process from its own defau
 The kit's table validator refuses at exit 2, so a broken config gates nothing, when:
 
 - `EVIDENCE_KIT_PARSER`, `EVIDENCE_KIT_BASELINE_FILE`, `EVIDENCE_KIT_MANIFEST_FILE`, `EVIDENCE_KIT_QUEUE_FILE` or `EVIDENCE_KIT_DONE_SECTION` is empty;
-- a suite name is not a valid `EVIDENCE_KIT_RUN_<suite>` suffix.
+- a suite name is not a valid `EVIDENCE_KIT_RUN_<suite>` suffix;
+- `EVIDENCE_KIT_IMPORTED_RUNS` is neither `refuse` nor `accept`.
 
 Knobs, this repo's surface names as defaults:
 
@@ -46,6 +47,9 @@ Knobs, this repo's surface names as defaults:
 - `EVIDENCE_KIT_QUEUE_FILE` / `EVIDENCE_KIT_STATE_FILE` — the lifecycle surfaces read for the manifest's optional close-entry and stamp-coupling assertions; defaults `${GATE_SDK_QUEUE_FILE:-TASK-QUEUE.md}` and `${GATE_SDK_WORKFLOW_DIR:-.workflow}/WORKFLOW-STATE.txt`.
 - `EVIDENCE_KIT_RUN_ID` — the evidence-line key when no lifecycle queue header names the iteration; default empty.
 - `EVIDENCE_KIT_PRE_HOOK` — an optional per-suite pre-run command (projection regen, container teardown) kept on the consumer side of the spine; default empty.
+- `EVIDENCE_KIT_STATEMENT_FILE` — where `--run-validate` writes the run's Statement ([§bin/run-validate.sh](#binrun-validatesh), *The Statement*); default empty, which writes none.
+- `EVIDENCE_KIT_STATEMENT_CMD` — the command whose stdout is the Statement the verify and import arms read when given no input ([§verify-gate-run](#verify-gate-run)); default empty, the off. It is the kit's one **command knob** ([gate-sdk/SPEC.md §The knob file](../gate-sdk/SPEC.md#the-knob-file)): an indexed knob holding an argv one element per line, taking no environment override, spawned directly through the crate's program resolver with no shell, unlike the word-split `EVIDENCE_KIT_RUN_<suite>` scalars.
+- `EVIDENCE_KIT_IMPORTED_RUNS` — `refuse` or `accept`, whether `--import-gate-run` may record a Statement ([§import-gate-run](#import-gate-run)); default `refuse`.
 - `EVIDENCE_KIT_PERMANENT_SLUGS` — blocking slugs that satisfy baseline liveness without a live queue task; default empty.
 - `EVIDENCE_KIT_DONE_SECTION` — the queue section whose entries are finished, so a blocking slug found only there is stale; default `Done` (queue-kit's).
 - `EVIDENCE_KIT_RUNNER_DOC` (default `README.md`, resolved against the git toplevel) — the doc whose battery-roster block `check-battery-roster` holds against the suite roster. It is gate-local: nothing in the validate run path reads it. The name mirrors gate-sdk's `GATE_SDK_RUNNER_DOC`, since in a tree vendoring both kits the two name the same physical doc for two different assertions.
@@ -159,10 +163,18 @@ So an observed set carrying no baseline rows and no observed `fail` produces **n
 
 ### Evidence manifest
 
-Committed, written once per run. The file header is a `# contract: evidence-manifest v1` line, the versioned wire format the deferred hosted-attestation service consumes as its attestation payload. Each data line is `<iteration> <suite> sha256=<log-hash> pass=<n> fail=<n> ignore=<n> verdict=<clean|new-failures> <date>`, and a run supersedes that iteration's prior line for every suite it ran. `<log-hash>` is 64 lowercase hex characters, each `<n>` is decimal digits, and `<date>` is the `YYYY-MM-DD` digit shape, held as a shape and never parsed as a calendar date.
+Committed, written once per run. It is the versioned record a run's Statement is built from ([§The gate-run predicate](#the-gate-run-predicate)), and the Statement, not the manifest, is the payload an attestation verifier reads. The file header is `# contract: evidence-manifest v2`; the `v<n>` marker names the major alone, since the manifest has no minor, and a line kind every v2 reader skips can be added without moving it.
 
-- The captured log stays uncommitted under the tmp dir. Its digest pins the log the counts came from, and `<suite>` names the suite. Neither pins the command behind that key, so a payload reader that must bind it owes a new format version, never a reinterpretation of `sha256=`.
-- The iteration key scopes the line, so the boundary-truncate knob can clear the manifest at the start of the next iteration.
+- **The third field names the line's kind.** A field starting `sha256=` makes a **suite line**. Any other third field is a grammar error.
+- **A suite line is twelve fields:** `<run-key> <suite> sha256=<log-hash> pass=<n> fail=<n> ignore=<n> verdict=<clean|new-failures> <date> commit=<hex> tree=<clean|modified> cmd=<command-digest> origin=<local|imported>`. A run supersedes that key's prior line for every suite it ran. `<log-hash>` and `<command-digest>` are 64 lowercase hex characters, each `<n>` is decimal digits, and `<date>` is the `YYYY-MM-DD` digit shape, held as a shape and never parsed as a calendar date. `<hex>` is 40 or 64 lowercase hex characters, or `-` on an unborn branch, and `tree=` is `-` exactly when `commit=` is. `cmd=` is the command digest ([§The gate-run predicate](#the-gate-run-predicate)), and `origin=imported` marks a line [§import-gate-run](#import-gate-run) recorded from a Statement produced elsewhere.
+- **`commit=` and `tree=` are read per suite**, after its pre-hook and before its run, by `git rev-parse HEAD` and `git status --porcelain --untracked-files=no`, the reads the provenance block makes ([gate-sdk/SPEC.md §run-gates](../gate-sdk/SPEC.md#run-gates), *The provenance block*). A pre-hook that rewrites a tracked file therefore shows as `tree=modified` on that suite's line alone.
+- **The first eight fields keep v1's order and spelling on purpose.** The trajectory extractor reads historical manifests of both majors through the `sha256=` third field and the line's last `fail=` ([drift-kit/SPEC.md §The published-evidence extractor](../drift-kit/SPEC.md#the-published-evidence-extractor)), and the appended fields never spell `fail=`.
+- The captured log stays uncommitted under the tmp dir. Its digest pins the log the counts came from; `cmd=` pins the command behind it. The binding digest that joins them is derived from the line's own fields and never stored on it.
+- The run key scopes the line, so the boundary-truncate knob can clear the manifest at the start of the next iteration.
+
+**The migration from v1.** The writer writes v2 only. `--run-validate`, finding a `# contract: evidence-manifest v1` header at its fold, rewrites the header to v2 and drops every v1 data line, since a v1 line carries neither a commit nor a command. A partial run straight after an upgrade therefore leaves the suites it did not run without a line, and [§check-evidence-manifest](#check-evidence-manifest)'s close-entry assertion asks for a full run before close: those suites have no v2 evidence.
+
+**Any other header refuses.** The guard that refuses an absent manifest reads its first line. A v1 header is rewritten at the fold and a v2 header is kept. Anything else refuses at exit 2 before the claim, naming the header it found or its absence: another major, a first line that is no `# contract:` header, an empty file. So no suite runs and nothing is written, since the writer never guesses which grammar a file it cannot name holds. `check-evidence-manifest` reads both majors, each under its own grammar, so a v1 file whose lines are v1 stays green and an adopter upgraded by `init` is not red before its next run. `init` seeds new trees at v2, and the boundary truncation keeps whatever header it finds.
 
 **The spine touches this file only after its last suite has run**, and that is contract. The `--run-validate` arm accumulates its rows in a batch file under the tmp dir and folds them in as a single write. The fold drops this iteration's prior line for each suite the run covered and re-appends the batch in configured-suite order. The write **publishes by rename**, which is what keeps the torn read [§The producer-liveness lock](#the-producer-liveness-lock) calls unreachable out of reach. The lock's destructor claims the batch file too, so an aborted run leaves no orphan under the scratch dir.
 
@@ -174,7 +186,44 @@ The single fold leaves a suite free to sit anywhere in the roster even when its 
 
 **A run killed from outside lands in the same place and prints nothing**: a `timeout`, a SIGTERM, a cancelled session. The fold is the only write, so a kill at the roster's last suite discards every earlier suite's clean row as a kill at its first one does. A caller therefore leaves the spine unbounded, and a deadline short enough to fire is the caller's defect.
 
-**The header is a wire-format version marker, not a doc pointer.** [gate-sdk/SPEC.md §The workflow directory](../gate-sdk/SPEC.md#the-workflow-directory) rules that as one of the two payload forms a checked projection may carry, and this section is the statement that form requires. `check-evidence-manifest` owns it, asserting the first line is `# contract: <version>`. A consumer that also runs canon-kit's `check-spec-pointer` over its workflow dir whitelists **this** file there (`CANON_KIT_COMMENT_WHITELIST`), since a version marker resolves as no path. The baseline is pointer-form and needs no whitelist entry.
+**The header is a wire-format version marker, not a doc pointer.** [gate-sdk/SPEC.md §The workflow directory](../gate-sdk/SPEC.md#the-workflow-directory) rules that as one of the two payload forms a checked projection may carry, and this section is the statement that form requires. `check-evidence-manifest` owns it, reading the header's major and applying that major's grammar. A consumer that also runs canon-kit's `check-spec-pointer` over its workflow dir whitelists **this** file there (`CANON_KIT_COMMENT_WHITELIST`), since a version marker resolves as no path. The baseline is pointer-form and needs no whitelist entry.
+
+### The gate-run predicate
+
+The one definition of the Statement this kit writes and reads, so a validate run is readable by an attestation verifier or a transparency log, tied to the commit it tested and the command that produced its counts.
+
+**The Statement** is an in-toto Statement v1, with `_type` `https://in-toto.io/Statement/v1` and `predicateType` `https://checkwright.dev/gate-run/v1`. Its `subject` holds one resource descriptor, `{"digest": {"gitCommit": "<hex>"}}`, the commit the run tested, 40 or 64 lowercase hex characters as in-toto's digest set defines `gitCommit`. A Statement serializes as one JSON object with sorted keys and no insignificant whitespace, so the same run gives the same bytes.
+
+**The predicate** carries these fields, each required:
+
+| Field | Holds |
+| --- | --- |
+| `contract` | the predicate's version, a Semantic Versioning 2.0 string, `1.0.0` at this major |
+| `run` | the run key ([§The evidence adapters](#the-evidence-adapters)): the iteration, else `EVIDENCE_KIT_RUN_ID` |
+| `provenance` | the provenance block, [gate-sdk/SPEC.md §run-gates](../gate-sdk/SPEC.md#run-gates)' one definition, embedded whole and never restated here |
+| `suites[]` | one object per suite the run ran, in configured-suite order |
+| `suites[].name` | the suite |
+| `suites[].command.sha256` | the command digest (below) |
+| `suites[].log.sha256` | the captured log's digest, the manifest line's `sha256=` |
+| `suites[].counts` | `{pass, fail, ignore}`, integers |
+| `suites[].verdict` | `clean` or `new-failures` |
+| `suites[].date` | the line's `YYYY-MM-DD` |
+| `suites[].tree` | `clean` or `modified`, the worktree state when the suite started |
+| `suites[].binding.sha256` | the binding digest (below) |
+
+**The command digest** is the SHA-256 of two lines: `run <words>` and `parser <words>`, each newline-terminated. `<words>` is the suite's resolved `EVIDENCE_KIT_RUN_<suite>` value, then its effective parser value, each split on whitespace and re-joined with single spaces, which is the argv the spine spawns. The pre-hook is left out, since it prepares the tree and produces no count. The value is hashed as resolved, so a host that spells the same command differently, such as an absolute `GATE_SDK_NATIVE_BIN`, binds differently, and the verify arm reports that as a command mismatch, never as a pass.
+
+**The binding digest** is the SHA-256 of the newline-terminated lines `gate-run-binding v1`, `<suite>`, `<command digest>`, `<commit>`, `<pass> <fail> <ignore>`, `<verdict>` and `<log digest>`. It joins the command, the source commit and the counts in one value a hash-only log entry can carry. The predicate carries it and the manifest line does not, because every input is already on the line.
+
+**The predicate's version follows the verdict contract's rule** ([gate-sdk/SPEC.md §run-gates](../gate-sdk/SPEC.md#run-gates), *The verdict contract's version*): the same major, minor and patch triggers, and the same reader's half. The major is also spelled in `predicateType`, so a `v2` predicate is a new type URI, which a generic in-toto policy can match without parsing `contract`. A reader refuses a type URI or a `contract` major it does not know, and ignores fields it does not know.
+
+**The published schema and golden.** `docs/contracts/gate-run/v1/` holds `schema.json`, a JSON Schema (draft 2020-12) for the Statement, and `statement.json`, a Statement rendered from a fixed manifest batch and a fixed provenance block. A unit test in the module that renders the Statement byte-compares the golden and holds the schema's predicate and suite property names and `required` sets equal to the fields the renderer writes, so neither file moves without the other. They are fixtures held by a test, never a regenerated projection. The schema is published because any producer may write a Statement ([§verify-gate-run](#verify-gate-run)).
+
+**The kit emits and never signs.** The DSSE envelope, its `payloadType` `application/vnd.in-toto+json`, and the signature are the signer's. A signature the kit made would be made by the same process the committing agent runs, which is exactly the identity an attestation has to be independent of, and holding a key would break the adopter constraints ([gate-sdk/SPEC.md §The adopter constraints](../gate-sdk/SPEC.md#the-adopter-constraints)). A keyless, identity-bound signer in the consumer's CI wraps the Statement as it stands. A signer that builds its own Statement takes the `predicate` member alone *(inferred: the signer side is outside the tree)*.
+
+**The Statement carries no origin.** It is written at run time from the suites that run ran, so each of its suites is the producer's own. Whether a suite line in this tree was run here or imported is the manifest's `origin=`, and the verify arm judges a Statement's fields whoever produced it.
+
+**Honest limits.** An unsigned Statement proves its binding is consistent, never that the run happened: anyone holding the fields can recompute every digest, and that proof is the signer's. A `tree: modified` suite ran on content that is not the subject commit, and the Statement says so rather than hiding it. The command digest binds the argv and not the programs it names, so a binary that changed under the same argv is visible only through `provenance`. It binds the configured parser words and not the log path the spine appends to the parser's argv at spawn, which is the run's own scratch path and no part of the command. And it binds neither the baseline file nor the skip file, though both decide `verdict`: a `clean` verdict is clean against the baseline the producing tree held, which the subject commit carries only where that file is tracked and the suite's `tree` is `clean`.
 
 ### The producer-liveness lock
 
@@ -247,20 +296,27 @@ It is not a gate. It is a tool exercised end-to-end in `smoke/`, with the lock's
 
 - 0, every suite clean;
 - 1, a suite recorded `new-failures`: the verdict;
-- 2, the guards' code: the run could not start at all, which a held or unclaimable lock joins.
+- 2, the guards' code: the run could not start at all, which a held or unclaimable lock, a manifest header that is neither major ([§Evidence manifest](#evidence-manifest)) and a Statement that cannot be staged or published join.
 
 The `--emit-` family maps onto `exit(0)` for a document and `exit(2)` for a failure, so it can never return 1. An `--emit-` spelling would rewrite the verdict to the refusal code, making *a suite regressed* indistinguishable from *the run could not start* on the tool whose product is that distinction, and nothing in the battery would report it. [gate-sdk/SPEC.md §The bin/-tool contract](../gate-sdk/SPEC.md#the-bin-tool-contract) states the rule, and its [§The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm) owns the family test and this member's placement in the class. A refusal is a start-time verdict about the world, not a result, so it takes the guards' code and not the verdict's.
 
 **It takes no positional argument at all.** Its whole input is the resolved `EVIDENCE_KIT_*` knobs, so the argv-shape refusal and the `--` escape have no free text to bind on. The `-h`/`--help` arm lives in the front-end, as it does for every member of the class. Any argument is refused at exit 2 before the lock is claimed, so a `--help` handed to the member starts no run. That settles this one member and rules nothing for another tool taking no positionals.
 
-**The declared knob roster is twelve names:** `EVIDENCE_KIT_SUITES`, `EVIDENCE_KIT_RUN_*`, `EVIDENCE_KIT_PARSER`, `EVIDENCE_KIT_PARSER_*`, `EVIDENCE_KIT_BASELINE_FILE`, `EVIDENCE_KIT_MANIFEST_FILE`, `EVIDENCE_KIT_SKIP_FILE`, `EVIDENCE_KIT_QUEUE_FILE`, `EVIDENCE_KIT_TMP_DIR`, `EVIDENCE_KIT_LOCK_FILE`, `EVIDENCE_KIT_RUN_ID` and `EVIDENCE_KIT_PRE_HOOK`. It is a declared roster rather than a set of hardcoded flags because every value is the kit table's, resolved against the consumer's knob file. A hardcoded flag would resolve platform defaults and silently ignore every consumer override. Two of the names are the kit's declared families ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm)).
+**The declared knob roster** is the run's `EVIDENCE_KIT_SUITES`, `EVIDENCE_KIT_RUN_*`, `EVIDENCE_KIT_PARSER`, `EVIDENCE_KIT_PARSER_*`, `EVIDENCE_KIT_BASELINE_FILE`, `EVIDENCE_KIT_MANIFEST_FILE`, `EVIDENCE_KIT_SKIP_FILE`, `EVIDENCE_KIT_QUEUE_FILE`, `EVIDENCE_KIT_TMP_DIR`, `EVIDENCE_KIT_LOCK_FILE`, `EVIDENCE_KIT_RUN_ID`, `EVIDENCE_KIT_PRE_HOOK` and `EVIDENCE_KIT_STATEMENT_FILE`, with `GATE_SDK_KIT_DIRS`, the gate-sdk row the provenance block reads for the kit roots. It is a declared roster rather than a set of hardcoded flags because every value is the kit table's, resolved against the consumer's knob file. A hardcoded flag would resolve platform defaults and silently ignore every consumer override. Two of the names are the kit's declared families ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm)).
 
 **Two consumer seams word-split and spawn by design, and neither is an implementation detail:**
 
 - A `EVIDENCE_KIT_PARSER_<suite>` value that names neither bundled adapter is a consumer command the arm spawns against the log ([§Layout and configuration](#layout-and-configuration) states why it is never short-circuited).
 - `EVIDENCE_KIT_PRE_HOOK` runs once per suite, before it, with the suite as operand. A failing pre-hook aborts the run at exit 2 with no evidence appended. That ordering is contract, because it keeps a refused run from writing a line.
 
-So the arm's spawned-program set is the consumer's roster and not the arm's: `bash`, each suite's own run command, and whatever the parser and pre-hook values name.
+So the arm's spawned-program set is the consumer's roster and not the arm's: `bash`, `git` for each suite's `commit=` and `tree=` read, each suite's own run command, and whatever the parser and pre-hook values name.
+
+**The Statement.** Where `EVIDENCE_KIT_STATEMENT_FILE` names a path, the run writes one Statement ([§The gate-run predicate](#the-gate-run-predicate)) there, covering the suites it ran; empty, its default, writes none. Writing at run time, rather than from an emitter reading the manifest later, is what lets `provenance` describe the binary, the kits and the tree that actually ran.
+
+- **Its subject is `HEAD` read at the run's start**, after the claim, and its provenance block is read at the same point. A run on an unborn branch writes no Statement and says so on stderr; its exit stays the run's own.
+- **Every suite runs at the subject.** A suite whose `commit=` read differs from the subject, because its pre-hook moved `HEAD`, refuses the run at exit 2 before that suite runs, naming the suite and both commits. The batch is dropped with the claim, so nothing is folded or published, and a Statement never attests a suite at a commit other than its subject.
+- **Built before the fold, published after it, inside the claim.** The Statement is staged under the tmp dir before the manifest fold, so a staging failure aborts at the guards' exit 2 with nothing written. A Statement path whose directory does not exist is such a failure. The manifest publishes first and the Statement second, each by rename. A failed second rename exits 2 and names the published manifest, so a reader knows which of the two exists. The staged file joins the claim's destructor, as the batch file does.
+- **A `new-failures` run still writes its Statement.** It attests what happened, and its verdicts are inside it.
 
 **`sha256sum` is outside the spawn set, and `ps` is outside it on unix.** The per-suite log's digest is computed in-crate (`native/src/sha256.rs`). Its hex encoding is byte-compatible with `sha256sum`'s first field, so a manifest line written from either digest source reads the same. `ps` stays only on a non-unix build, reached through the pid predicate's fallback leg. [§The producer-liveness lock](#the-producer-liveness-lock) rules that leg the content of the rule rather than incidental spelling ([gate-sdk/SPEC.md §The port-candidate criteria](../gate-sdk/SPEC.md#the-port-candidate-criteria), criterion 7).
 
@@ -310,6 +366,32 @@ The optional third token is unambiguous rather than heuristic: a suite name suff
 The ground is the exit 0 [§Baseline manifest](#baseline-manifest)'s rule gives an observed set with no baseline rows and no observed `fail`. A check of arity alone absorbs a first argument of `--help` as a *suite name* and proceeds against whatever the second argument is. The tool then prints `diff-baseline: clean`, and the CI leg that reads its status goes green.
 
 **Two orderings interact, and the naive one breaks the disambiguation.** The shape refusal is applied to a positional **before** the group parser consumes it, so `-x` in a suite slot is refused rather than resolved as a parser name. The all-digit test stays **inside** the group, because a status is not free text and a leading `-` cannot appear in it. The other order would refuse a negative-looking token where a well-formed group was meant.
+
+### verify-gate-run
+
+**`--verify-gate-run [<file> | -]`** judges one Statement against this tree and its commit, dispatched to `native/src/emit/verify_gate_run.rs`. It reads one Statement, or one DSSE envelope whose `payloadType` is `application/vnd.in-toto+json` and whose base64 `payload` is a Statement, from the file or from stdin for `-`. Given no positional, it reads the stdout of the command `EVIDENCE_KIT_STATEMENT_CMD` names, so a Statement stored outside the tree is fetched by a command the consumer owns. With no positional and an empty knob it refuses at exit 2, naming both. A second positional, or one beginning `--`, is refused at exit 2. It checks, in order:
+
+1. **Shape.** `_type`, `predicateType`, a `contract` major this binary knows, one `gitCommit` subject, and every predicate field typed as [§The gate-run predicate](#the-gate-run-predicate) states; a suite named twice or an empty `suites` is no Statement of a run. A failure is exit 2: the input is not a Statement this reader can judge.
+2. **The subject.** The `gitCommit` names a commit in this repository, and it is `HEAD` or an ancestor of it (`git merge-base --is-ancestor`). `provenance.commit` equals it.
+3. **Each suite's binding.** `binding.sha256` recomputes from the suite's own fields and the subject.
+4. **Each suite's command.** `command.sha256` equals the digest of the suite as this tree resolves it. A suite this tree does not configure is a contradiction.
+5. **Each suite's tree.** `tree` is `clean`.
+
+Exit 0 means every check held. Exit 1 means a contradiction, with one line per finding naming the suite and the field. Exit 2 means the Statement could not be read or judged, a `HEAD` naming no commit among the causes. The verdict line names the subject, the suite count, and how many commits `HEAD` is ahead of the subject (`ahead=-` where the subject is no ancestor), so a reader that wants a run of `HEAD` itself reads `ahead=0`. **A DSSE signature is never checked:** the line says `signature not checked`, because a signature is checked by the signer's verifier against the signer's identity policy, which this kit does not hold ([§The gate-run predicate](#the-gate-run-predicate)). The arm writes nothing.
+
+**Any producer may write the Statement.** The arm judges its fields and never asks who wrote it, so a Statement from an external orchestrator, from CI or from another host verifies on the same terms as this tree's own.
+
+**It is an `Arm::Run`** because a contradiction (exit 1) and an unreadable Statement (exit 2) are different answers, which the `--emit-` collapse would merge ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm)). It is a network spawner, since `EVIDENCE_KIT_STATEMENT_CMD` may fetch, and spawns `git` for the subject's lookup, ancestry and distance. **The declared knob roster** is `EVIDENCE_KIT_STATEMENT_CMD`, `EVIDENCE_KIT_SUITES`, `EVIDENCE_KIT_RUN_*`, `EVIDENCE_KIT_PARSER` and `EVIDENCE_KIT_PARSER_*`, the last four for the command digest check 4 resolves.
+
+### import-gate-run
+
+**`--import-gate-run [<file> | -]`** takes the verify arm's input forms and runs its checks, dispatched to `native/src/emit/import_gate_run.rs`. When every check holds it records each suite as a manifest line with `origin=imported`, under this tree's current run key, with the Statement's counts, verdict, date, log digest, commit, tree and command digest. It writes the manifest as the spine does: it claims the producer-liveness lock ([§The producer-liveness lock](#the-producer-liveness-lock)), takes [§Evidence manifest](#evidence-manifest)'s header guard and v1-to-v2 rewrite, folds by the spine's supersede rule and publishes by rename, so an import and a validate run can never race. Exit 0 means recorded. Exit 1 means a verify contradiction, with nothing written. Exit 2 means a refusal, a held lock among them.
+
+**Off unless the consumer selects it.** `EVIDENCE_KIT_IMPORTED_RUNS` takes `refuse`, the default, or `accept`. Under `refuse` the arm exits 2 before reading, naming the knob. An imported line counts toward [§check-evidence-manifest](#check-evidence-manifest)'s close-entry green block like a local one, so a consumer that never selects `accept` never has one, which is why the selection sits on the import and not on the gate.
+
+**Honest limit.** An imported line is as good as the Statement it came from. Unsigned, it proves that its command, commit and counts agree with each other and with this tree's configuration, never that the run happened. A consumer accepting imports verifies the signature with its signer's tooling before it imports, and the line's `origin=imported` keeps the import visible to every later reader.
+
+**It is an `Arm::Run`** because 1 nothing recorded on a contradiction and 2 a refusal are different answers ([gate-sdk/SPEC.md §The non-gate arm](../gate-sdk/SPEC.md#the-non-gate-arm)), and a network spawner on the verify arm's ground. Its declared knob roster is the verify arm's with `EVIDENCE_KIT_IMPORTED_RUNS` and the spine's manifest, queue, tmp-dir, lock and run-id rows.
 
 ### The baseline-claims arm
 
@@ -364,8 +446,8 @@ The early-out is the shape [§check-evidence-manifest](#check-evidence-manifest)
 
 Invariant: the evidence manifest is well-formed and, where lifecycle drives the tree, coupled to the stage machine. `checks/check-evidence-manifest.gate` (`precommit`, binary-dispatched). It owns three assertions:
 
-- **(A) close-entry** — a `close` cursor requires the full green block: a `verdict=clean` line for every configured suite, dated on or after the iteration's earliest validate stamp.
-- **(B) grammar** — every line is the eight-field manifest shape and carries the current iteration. A foreign iteration line means the boundary truncation was skipped.
+- **(A) close-entry** — a `close` cursor requires the full green block: a `verdict=clean` line for every configured suite, dated on or after the iteration's earliest validate stamp, whatever its `origin=`.
+- **(B) grammar** — the header names a major the gate knows, and every line is that major's shape and carries the current iteration. That is v1's eight fields under a v1 header, and under a v2 header the line-kind rule and the twelve-field suite line ([§Evidence manifest](#evidence-manifest)). A foreign iteration line means the boundary truncation was skipped. `evidence::MANIFEST_CONTRACT` is the v2 marker, with the v1 marker kept as the one legacy name the gate accepts.
 - **(C) stamp-coupling** — a validate stamp demands at least one evidence line. It arms only once the cursor has advanced past `validate`, since the entry stamp legitimately precedes the suites.
 
 A red (B) suppresses A and C. An empty cursor disarms A and C entirely, so a consumer running no lifecycle keeps only the grammar floor. The cursor is empty when the queue header names no iteration or the state file yields no stage, and an absent or unreadable file of either reads that way rather than refusing. Both no-cursor shapes ([§The evidence adapters](#the-evidence-adapters)) disarm at a *declared* early-out. An empty stage falling through two live assertions would read as a green gate in exactly the window where the gate has nothing to say.
@@ -511,7 +593,13 @@ The validate stage records evidence on a commit later than the entry stamp (asse
 
 ## Producers and consumers
 
-- **Evidence line** — produced by `--run-validate` per suite verdict; consumed by `check-evidence-manifest` (A/B/C), by close-stage entry via that gate, and, forward, by the hosted-attestation payload. Every field has a reader there: iteration (A/C scoping), suite + verdict + counts (A's green-block test), sha256 (audit pinning of the producing log), date (A's stamp-ordering floor).
+- **Evidence line** (the suite line) — produced by `--run-validate` per suite verdict and by `--import-gate-run` per imported suite. Consumed by `check-evidence-manifest` (A/B/C), by close-stage entry via that gate, by the Statement writer, by the trajectory extractor through its first eight fields, and by the merge-supersede rule. Every field has a reader:
+  - iteration (A/C scoping), suite + verdict + counts (A's green-block test), sha256 (audit pinning of the producing log), date (A's stamp-ordering floor);
+  - `commit=` (the Statement's subject and the import's ancestry check), `tree=` (verify check 5), `cmd=` (verify check 4), and `origin=` (every reader that must not mistake an imported line for a local one).
+- **The Statement** — produced by `--run-validate` under `EVIDENCE_KIT_STATEMENT_FILE`, and by any outside producer that writes the published shape; consumed by `--verify-gate-run`, `--import-gate-run`, a signer, and an attestation verifier or log.
+- **The command digest and the binding digest** — produced by the spine at each suite line and by the Statement writer; consumed by the verify arm's checks 3 and 4, and the import arm through them.
+- **`EVIDENCE_KIT_STATEMENT_CMD`** and **`EVIDENCE_KIT_IMPORTED_RUNS`** — produced by consumer config; consumed by the verify and import arms, and by the import arm alone, respectively.
+- **The schema and the golden** (`docs/contracts/gate-run/v1/`) — produced by the commit that changes the predicate; consumed by the renderer's golden test, and by outside producers and readers through the site.
 - **Suite roster** (`EVIDENCE_KIT_SUITES` + `EVIDENCE_KIT_RUN_<suite>`) — produced by consumer config, with the fixture suites and their run members derived by the kit's table. Consumed by `--run-validate` (what to run), by `check-evidence-manifest` (A's green block), by `check-battery-roster` (the doc-parity compare), and by gate-sdk's enforcement-map emitter, which drops its section on an empty roster so evidence-kit stays optional. Every one of them resolves it through the crate's knob table rather than parsing the file, so a derived suite is visible to all of them with no second parse to keep in step ([gate-sdk/SPEC.md §The knob file](../gate-sdk/SPEC.md#the-knob-file)).
 - **Producer-liveness lock** — produced by `--run-validate` at the claim point, which sits on the ordinary path: the validate stage runs it, and it is the only writer of the manifest. Its enabling config carries a default in the kit's table, so it resolves in every deployed configuration rather than only under a test harness. Consumed by `check-producer-liveness` through the entry-preflight hook and, with no extra wiring, by that hook's read-only simulate mode. Every field has named readers at named transitions:
   - `pid` at three: the gate at the stage-entry transition, `--run-validate` at run start on a failed claim (the refusal), and its destructor at release, compared against its own pid to answer *is this still ours*;

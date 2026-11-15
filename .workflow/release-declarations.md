@@ -3,6 +3,9 @@
 ## Knob changes
 
 - `GATE_SDK_SARIF_RESULTS` — new: which results the SARIF log `GATE_SDK_SARIF_FILE` names carries, `all` or `failures`, defaulting to `all`, environment-only and read only where that log is written. Any other value stops the battery at exit 2 before the first gate runs. Set `failures` wherever the log is uploaded to code scanning.
+- `EVIDENCE_KIT_STATEMENT_FILE` — new: the path `--run-validate` writes a gate-run Statement to whenever it records a run, empty by default, which writes none.
+- `EVIDENCE_KIT_STATEMENT_CMD` — new: an indexed command whose standard output is the Statement `--verify-gate-run` and `--import-gate-run` read when given no operand, empty by default.
+- `EVIDENCE_KIT_IMPORTED_RUNS` — new: `refuse` or `accept`, defaulting to `refuse`, under which `--import-gate-run` exits 2 before reading anything. Any other value is a configuration error. Select `accept` only once your own signer's tooling verifies a Statement's signature before the import reads it.
 
 ## Behavior changes
 
@@ -12,3 +15,10 @@
 - **`init --user`, `update --user` and `uninstall --user`, and a tree-free `--hook <member>`** — read a path as absolute only as the host does, refusing as relative a drive spelling or a leading backslash on POSIX and a lone leading separator on Windows. That covers `HOME`, `LOCALAPPDATA`, the `--knobs` file, the knob-file locators and a member's path knobs under the tree-free mark; an XDG value so spelled is ignored. Where one is refused, set it as an absolute path on its host.
 - **`stop-liveness` under `resume-wait`** — reads a launch record's `handoff=` path as a hand-back marker only where it is absolute on the host, so a drive spelling on POSIX or a driveless rooted one on Windows no longer refuses a turn end. Where a session declares a hand-back, write the path absolute on its host.
 - **`--hook <member> --observe`** — logs `reason=withheld` for a block and an advise in place of the member's first line, so the observe log holds no refusal or context text that can quote a typed command. An observed `session-context` no longer sweeps the scratch dir. A trial reviewer reads the decision from `would=` and `status=`; nothing to do.
+- **The evidence manifest** — moves to `# contract: evidence-manifest v2`: each suite line appends `commit=`, `tree=`, `cmd=` and `origin=` after v1's eight fields, which keep their order. `check-evidence-manifest` reads both majors, each under its own grammar, and `--run-validate` refuses at exit 2 a manifest whose first line names neither. `init` seeds new trees at v2.
+- **`--run-validate`** — can write an in-toto Statement of predicate type `https://checkwright.dev/gate-run/v1` binding each suite's verdict to its commit and command, where `EVIDENCE_KIT_STATEMENT_FILE` names a path. It emits and never signs; sign it with your own CI signer. With a Statement configured, a pre-hook that moves HEAD refuses the run at exit 2.
+- **`--verify-gate-run` and `--import-gate-run`** — new arms. The first judges a Statement's bindings against this tree's history and configuration, exit 1 on a contradiction, and checks no signature; the second records a verified Statement's suites as `origin=imported` lines, refused by default.
+
+## Upgrading
+
+- **Evidence manifest v2** — the next `--run-validate` rewrites a v1 manifest's header to v2 and drops its v1 lines, since they bind no commit or command; run the full suite roster before a close so every suite has a v2 line.

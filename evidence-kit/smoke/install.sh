@@ -22,7 +22,7 @@ mkdir -p .workflow
 [[ -f .workflow/validate-baseline.txt ]] \
     || printf '# contract: evidence-kit/SPEC.md §Baseline manifest — held-constant validate baseline: <suite> <scenario> <status> [<slug> [reproduces-at=<rev>]]\n' > .workflow/validate-baseline.txt
 [[ -f .workflow/validate-evidence.txt ]] \
-    || printf '# contract: evidence-manifest v1\n' > .workflow/validate-evidence.txt
+    || printf '# contract: evidence-manifest v2\n' > .workflow/validate-evidence.txt
 
 bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 
@@ -30,7 +30,7 @@ bash "$SDK/bin/run-gates.sh" --emit graph > scripts/CHECK-GRAPH.html
 es="$PWD/.tmp/run-validate-smoke"
 rm -rf "$es"; mkdir -p "$es/.workflow" "$es/scripts" "$es/.tmp"
 printf '# baseline\ngreen green pass\nuntouched_tree untouched_tree pass\nmulti a pass\nmulti b pass\n' > "$es/.workflow/validate-baseline.txt"
-printf '# contract: evidence-manifest v1\n' > "$es/.workflow/validate-evidence.txt"
+printf '# contract: evidence-manifest v2\n' > "$es/.workflow/validate-evidence.txt"
 printf '#!/usr/bin/env bash\nprintf "a pass\\nb pass\\n"\n' > "$es/scripts/multi-parser.sh"
 # spec: evidence-kit/SPEC.md §Evidence manifest — a suite standing in for one whose precondition is a clean worktree: it reds if the manifest already carries a data line at its turn, which is what an earlier suite's row means. Second in the roster on purpose — first, it would pass under either writer
 printf '#!/usr/bin/env bash\ngrep -qEv "^[[:space:]]*(#|$)" .workflow/validate-evidence.txt \\\n    && { echo "the spine wrote the tracked manifest before this suite ran" >&2; exit 1; }\nexit 0\n' \
@@ -65,4 +65,37 @@ grep -qE '^smoke untouched_tree sha256=[0-9a-f]{64} pass=1 fail=0 ignore=0 verdi
 diff <(grep -v '^#' "$es/.workflow/validate-evidence.txt" | awk '{print $2}') \
      <(printf 'green\nuntouched_tree\nmulti\n') >/dev/null \
     || { echo "smoke(run-validate): the folded rows are not in configured-suite order" >&2; exit 1; }
+rm -rf "$es"
+
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — The Statement: a run on a committed tree writes one Statement, which the verify arm judges clean against that tree, fetched through the command knob, and which the import arm records as an origin=imported line once selected.
+es="$PWD/.tmp/statement-smoke"
+rm -rf "$es"; mkdir -p "$es/.workflow" "$es/scripts" "$es/.tmp"
+printf '# baseline\ngreen green pass\n' > "$es/.workflow/validate-baseline.txt"
+printf '# contract: evidence-manifest v2\n' > "$es/.workflow/validate-evidence.txt"
+cat > "$es/scripts/evidence-config.knobs" <<'EOF'
+EVIDENCE_KIT_SUITES[] = green
+EVIDENCE_KIT_RUN_ID = smoke
+EVIDENCE_KIT_RUN_green = true
+EVIDENCE_KIT_STATEMENT_FILE = .tmp/statement.json
+EVIDENCE_KIT_STATEMENT_CMD[] = cat
+EVIDENCE_KIT_STATEMENT_CMD[] = .tmp/statement.json
+EOF
+printf '.tmp/\n' > "$es/.gitignore"
+( cd "$es" && git init -q . && git add -A && git -c user.name=smoke -c user.email=smoke@example.invalid commit -q -m base ) >/dev/null 2>&1
+_es() { ( cd "$es" && GATE_SDK_GATES_DIR=scripts GATE_SDK_NATIVE_BIN="$spine_bin" bash "$SDK/bin/run-gates.sh" "$@" ); }
+_es --run-validate >/dev/null \
+    || { echo "smoke(statement): the run did not exit 0" >&2; exit 1; }
+grep -q '"predicateType":"https://checkwright.dev/gate-run/v1"' "$es/.tmp/statement.json" \
+    || { echo "smoke(statement): no gate-run Statement written" >&2; exit 1; }
+out="$(_es --verify-gate-run .tmp/statement.json)" && [[ "$out" == *"clean"*"ahead=0"* ]] \
+    || { echo "smoke(statement): the verify arm did not judge the run's own Statement clean: $out" >&2; exit 1; }
+out="$(_es --verify-gate-run)" && [[ "$out" == *"clean"* ]] \
+    || { echo "smoke(statement): the verify arm did not read the Statement through EVIDENCE_KIT_STATEMENT_CMD: $out" >&2; exit 1; }
+rc=0; _es --import-gate-run .tmp/statement.json >/dev/null 2>&1 || rc=$?
+[[ "$rc" -eq 2 ]] || { echo "smoke(statement): an import ran under the default refuse (rc=$rc)" >&2; exit 1; }
+printf 'EVIDENCE_KIT_IMPORTED_RUNS = accept\n' >> "$es/scripts/evidence-config.knobs"
+_es --import-gate-run .tmp/statement.json >/dev/null \
+    || { echo "smoke(statement): the import arm did not record a verified Statement" >&2; exit 1; }
+grep -qE '^smoke green sha256=[0-9a-f]{64} .* origin=imported$' "$es/.workflow/validate-evidence.txt" \
+    || { echo "smoke(statement): no origin=imported line recorded" >&2; exit 1; }
 rm -rf "$es"

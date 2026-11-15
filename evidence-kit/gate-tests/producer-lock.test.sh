@@ -37,7 +37,7 @@ mk_tree() {
     rm -rf "$1"; mkdir -p "$1/.workflow" "$1/scripts" "$1/.tmp"
     ( cd "$1" && git init -q . ) >/dev/null 2>&1
     printf '# baseline\ngreen green pass\n' >"$1/.workflow/validate-baseline.txt"
-    printf '# contract: evidence-manifest v1\n' >"$1/.workflow/validate-evidence.txt"
+    printf '# contract: evidence-manifest v2\n' >"$1/.workflow/validate-evidence.txt"
     printf "EVIDENCE_KIT_SUITES[] = green\nEVIDENCE_KIT_RUN_ID = lock-test\nEVIDENCE_KIT_RUN_green = %s\n" \
         "${2:-true}" >"$1/scripts/evidence-config.knobs"
 }

@@ -7,9 +7,9 @@ generated: true
 <!-- {% raw %} -->
 # evidence-kit
 
-A held-constant test baseline and a committed per-run evidence manifest for the validate stage: a stage stamp proves a stage was *invoked*, evidence-kit proves it produced its green result. The manifest is a versioned, hashable wire contract (`# contract: evidence-manifest v1`) an external verifier can consume, so the kit is adoptable with or without an iteration lifecycle.
+A held-constant test baseline and a committed per-run evidence manifest for the validate stage: a stage stamp proves a stage was *invoked*, evidence-kit proves it produced its green result. The manifest is a versioned, hashable record (`# contract: evidence-manifest v2`), and a run can publish it as an in-toto Statement an attestation verifier reads, so the kit is adoptable with or without an iteration lifecycle.
 
-The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness, scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where lifecycle drives the tree, close-entry green block + validate-stamp coupling), `check-battery-roster` (the runner doc's battery block against the suite roster) and `check-producer-liveness` (no stage entry while the producer is still running). The tools that drive it are non-gate arms of the gate binary, reached through gate-sdk's front end: `--run-validate` (the codified spine that runs the suites and records evidence), `--diff-baseline` (the situational runtime diff) and `--emit baseline-claims` (each baseline row as a `measured:` oracle line, for prose that quotes one). See [SPEC.md](SPEC.md) for the full contracts.
+The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness, scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where lifecycle drives the tree, close-entry green block + validate-stamp coupling), `check-battery-roster` (the runner doc's battery block against the suite roster) and `check-producer-liveness` (no stage entry while the producer is still running). The tools that drive it are non-gate arms of the gate binary, reached through gate-sdk's front end: `--run-validate` (the codified spine that runs the suites and records evidence), `--diff-baseline` (the situational runtime diff), `--verify-gate-run` and `--import-gate-run` (judge a gate-run Statement against the tree, and record a verified one produced elsewhere) and `--emit baseline-claims` (each baseline row as a `measured:` oracle line, for prose that quotes one). See [SPEC.md](SPEC.md) for the full contracts.
 
 This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload).
 
@@ -39,7 +39,7 @@ Vendor the kit beside [gate-sdk](https://github.com/checkwright/checkwright/tree
    and `.workflow/validate-evidence.txt`:
 
    ```text
-   # contract: evidence-manifest v1
+   # contract: evidence-manifest v2
    ```
 
    (override the paths with `EVIDENCE_KIT_BASELINE_FILE` / `EVIDENCE_KIT_MANIFEST_FILE`).

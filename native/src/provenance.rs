@@ -99,7 +99,20 @@ fn git(args: &[&str]) -> Option<String> {
     Some(String::from_utf8_lossy(out.stdout()?).trim().to_string())
 }
 
-fn object_id(s: &str) -> bool {
+// spec: gate-sdk/SPEC.md §run-gates — the block's commit read: `HEAD` as an object id, else nothing
+pub fn head() -> Option<String> {
+    git(&["rev-parse", "--verify", "--quiet", "HEAD"]).filter(|c| object_id(c))
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the block's worktree read, tracked files only; `None` where
+// git could not answer
+pub fn worktree_clean() -> Option<bool> {
+    crate::listing::names(None, &["status", "--porcelain", "-z", "--untracked-files=no"])
+        .ok()
+        .map(|changed| changed.is_empty())
+}
+
+pub fn object_id(s: &str) -> bool {
     matches!(s.len(), 40 | 64) && s.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
 }
 
@@ -130,10 +143,8 @@ pub fn collect(kit_roots: &[String]) -> Provenance {
             }
         })
         .collect();
-    let commit = git(&["rev-parse", "--verify", "--quiet", "HEAD"]).filter(|c| object_id(c));
-    let clean = commit.is_some()
-        && crate::listing::names(None, &["status", "--porcelain", "-z", "--untracked-files=no"])
-            .is_ok_and(|changed| changed.is_empty());
+    let commit = head();
+    let clean = commit.is_some() && worktree_clean() == Some(true);
     Provenance {
         tool_version: present(env!("CHECKWRIGHT_RELEASE")),
         exact: !env!("CHECKWRIGHT_RELEASE_EXACT").is_empty(),

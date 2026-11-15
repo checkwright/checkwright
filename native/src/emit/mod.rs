@@ -33,6 +33,7 @@ pub mod gate_argv;
 pub mod git_hook;
 pub mod hook_launcher;
 pub mod graph;
+pub mod import_gate_run;
 pub mod install_evidence;
 pub mod install_hooks;
 pub mod install_lifecycle;
@@ -94,6 +95,7 @@ pub mod update_notice;
 pub mod upgrade_smoke;
 pub mod usage_trend;
 pub mod value_rollup;
+pub mod verify_gate_run;
 pub mod wait_probe;
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — gate_self_repo_prefix, degrading to nothing on no origin
@@ -989,6 +991,20 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(diff_baseline::run),
         diff_baseline::KNOBS,
     ),
+    // spec: evidence-kit/SPEC.md §verify-gate-run — an `Arm::Run` because 1 is a contradiction and 2
+    // a Statement that could not be read or judged, a difference the `--emit-` collapse would erase
+    (
+        "--verify-gate-run",
+        Arm::Run(verify_gate_run::run),
+        verify_gate_run::KNOBS,
+    ),
+    // spec: evidence-kit/SPEC.md §import-gate-run — an `Arm::Run` because 1 is a contradiction with
+    // nothing recorded and 2 a refusal, a difference the `--emit-` collapse would erase
+    (
+        "--import-gate-run",
+        Arm::Run(import_gate_run::run),
+        import_gate_run::KNOBS,
+    ),
     // spec: gate-sdk/SPEC.md §run-gate-tests — an `Arm::Run` because the contract is a three-valued
     // exit — 0 clean, 1 a logic failure, 2 a harness or fixture error — and a table member because
     // it reads three knobs a hardcoded flag would hide from the knob-file derivation
@@ -1195,6 +1211,8 @@ mod tests {
             "--selection-probe",
             "--foreign-run",
             "--foreign-resume",
+            "--verify-gate-run",
+            "--import-gate-run",
         ];
         for arm in NETWORK_ARMS {
             assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);

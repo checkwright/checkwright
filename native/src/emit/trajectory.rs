@@ -394,17 +394,22 @@ fn harvest_validate(
         let e = iters.entry(it.to_string()).or_default();
         e.val_present = true;
         e.val_suites += 1;
-        if rest.contains("fail=0 ") {
-            continue;
-        }
-        if let Some(at) = rest.rfind("fail=") {
-            let v = &rest[at + 5..];
-            let v = v.split(' ').next().unwrap_or_default();
-            if !v.is_empty() && v.bytes().all(|b| b.is_ascii_digit()) {
-                e.val_fail += v.parse::<i64>().unwrap_or(0);
-            }
-        }
+        e.val_fail += fail_count(rest);
     }
+}
+
+// spec: drift-kit/SPEC.md §The published-evidence extractor — the failures one line attests: the
+// value after its last `fail=`, so the fields a later manifest major appends past the eighth leave it
+fn fail_count(rest: &str) -> i64 {
+    if rest.contains("fail=0 ") {
+        return 0;
+    }
+    let Some(at) = rest.rfind("fail=") else { return 0 };
+    let v = rest[at + 5..].split(' ').next().unwrap_or_default();
+    if v.is_empty() || !v.bytes().all(|b| b.is_ascii_digit()) {
+        return 0;
+    }
+    v.parse::<i64>().unwrap_or(0)
 }
 
 // spec: drift-kit/SPEC.md §The published-evidence extractor — every committed blob the harvest reads
@@ -653,6 +658,19 @@ mod tests {
         assert!(!is_attestation("# a comment line"));
         assert!(!is_attestation("my-iter gate_tests md5=abc"));
         assert!(!is_attestation("My-Iter gate_tests sha256=abc"));
+    }
+
+    // spec: drift-kit/SPEC.md §The published-evidence extractor — a v2 suite line's appended fields
+    // spell no `fail=`, so it is an attestation and its fail sum is the eighth-field reading
+    #[test]
+    fn a_v2_suite_line_reads_as_its_v1_prefix() {
+        let tail = format!("commit={} tree=clean cmd={} origin=imported", "a".repeat(40), "b".repeat(64));
+        let v2 = format!("my-iter unit sha256={} pass=4 fail=3 ignore=0 verdict=new-failures 2026-01-01 {}", "c".repeat(64), tail);
+        assert!(is_attestation(&v2));
+        let rest = v2.splitn(3, ' ').nth(2).unwrap();
+        assert_eq!(fail_count(rest), 3);
+        let clean = v2.replace("fail=3", "fail=0");
+        assert_eq!(fail_count(clean.splitn(3, ' ').nth(2).unwrap()), 0);
     }
 
     // spec: drift-kit/SPEC.md §The published-evidence extractor — the in-process range is `git log

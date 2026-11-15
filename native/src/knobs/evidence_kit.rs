@@ -90,6 +90,9 @@ pub const KIT: Kit = Kit {
         Row::derived("EVIDENCE_KIT_LOCK_FILE", Shape::Scalar, lock_file, &["EVIDENCE_KIT_TMP_DIR"]),
         Row::scalar("EVIDENCE_KIT_RUN_ID", ""),
         Row::scalar("EVIDENCE_KIT_PRE_HOOK", ""),
+        Row::scalar("EVIDENCE_KIT_STATEMENT_FILE", ""),
+        Row::indexed("EVIDENCE_KIT_STATEMENT_CMD", &[]),
+        Row::scalar("EVIDENCE_KIT_IMPORTED_RUNS", "refuse"),
         Row::scalar("EVIDENCE_KIT_RUNNER_DOC", "README.md"),
         Row::keyed("EVIDENCE_KIT_SCENARIO_GLOBS", &[]),
         Row::indexed("EVIDENCE_KIT_PERMANENT_SLUGS", &[]),
@@ -116,7 +119,7 @@ pub const KIT: Kit = Kit {
 };
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — the paths, the parser and the Done section
-// non-empty, and every suite a valid family suffix
+// non-empty, every suite a valid family suffix, and the import selection one of its two words
 fn validate(v: &Values) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for name in [
@@ -134,6 +137,9 @@ fn validate(v: &Values) -> Vec<String> {
         if !is_suffix(s) {
             out.push(format!("suite name '{}' is not a valid EVIDENCE_KIT_RUN_<suite> suffix", s));
         }
+    }
+    if let Some(sel) = scalar(v, "EVIDENCE_KIT_IMPORTED_RUNS").filter(|s| !["refuse", "accept"].contains(s)) {
+        out.push(format!("EVIDENCE_KIT_IMPORTED_RUNS is '{}' (want refuse or accept)", sel));
     }
     out
 }

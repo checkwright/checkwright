@@ -3,8 +3,51 @@
 // lifecycle-kit
 use crate::programs;
 
-// spec: evidence-kit/SPEC.md §Evidence manifest — the versioned wire format the header declares
-pub const MANIFEST_CONTRACT: &str = "evidence-manifest v1";
+// spec: evidence-kit/SPEC.md §Evidence manifest — the major the writer writes, and the one legacy
+// major the gate still reads and the fold rewrites
+pub const MANIFEST_CONTRACT: &str = "evidence-manifest v2";
+pub const MANIFEST_CONTRACT_V1: &str = "evidence-manifest v1";
+
+#[derive(Debug, PartialEq)]
+pub enum Header {
+    V2,
+    V1,
+    Unknown(String),
+}
+
+// spec: evidence-kit/SPEC.md §Evidence manifest — the header names the grammar; a first line naming
+// neither major is no grammar this reader may guess
+pub fn manifest_header(text: &str) -> Header {
+    let first = text.lines().next().unwrap_or("");
+    match first.strip_prefix("# contract: ") {
+        Some(MANIFEST_CONTRACT) => Header::V2,
+        Some(MANIFEST_CONTRACT_V1) => Header::V1,
+        _ => Header::Unknown(first.to_string()),
+    }
+}
+
+pub fn is_hex64(s: &str) -> bool {
+    s.len() == 64 && s.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+}
+
+pub fn is_digits(s: &str) -> bool {
+    !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit())
+}
+
+// spec: evidence-kit/SPEC.md §Evidence manifest — the date's digit shape, never a calendar parse
+pub fn is_date(s: &str) -> bool {
+    let b = s.as_bytes();
+    if b.len() != 10 {
+        return false;
+    }
+    b.iter().enumerate().all(|(i, c)| {
+        if i == 4 || i == 7 {
+            *c == b'-'
+        } else {
+            c.is_ascii_digit()
+        }
+    })
+}
 
 // spec: evidence-kit/SPEC.md §check-evidence-manifest — everything but a comment line and a blank
 // one. Distinct from `crate::stages::data_lines` — same name,
@@ -229,6 +272,282 @@ pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &s
     out
 }
 
+pub const STATEMENT_TYPE: &str = "https://in-toto.io/Statement/v1";
+pub const PREDICATE_TYPE: &str = "https://checkwright.dev/gate-run/v1";
+pub const PREDICATE_CONTRACT: &str = "1.0.0";
+pub const DSSE_PAYLOAD_TYPE: &str = "application/vnd.in-toto+json";
+
+fn words(s: &str) -> String {
+    s.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+// spec: evidence-kit/SPEC.md §The gate-run predicate — the command digest: the spawned argv of the
+// run command and the effective parser, whitespace-normalized, the pre-hook left out
+pub fn command_digest(run: &str, parser: &str) -> String {
+    crate::sha256::hex(format!("run {}\nparser {}\n", words(run), words(parser)).as_bytes())
+}
+
+// spec: evidence-kit/SPEC.md §The gate-run predicate — a suite's command digest as this tree
+// resolves it; `None` for a suite with no run command
+pub fn resolved_command_digest(
+    run_family: &[(String, String)],
+    parser_family: &[(String, String)],
+    global_parser: &str,
+    suite: &str,
+) -> Option<String> {
+    let run = suite_cmd(run_family, suite);
+    if run.trim().is_empty() {
+        return None;
+    }
+    Some(command_digest(&run, &parser_for(parser_family, suite, global_parser)))
+}
+
+// spec: evidence-kit/SPEC.md §The gate-run predicate — the binding digest over the newline-terminated
+// lines that join the command, the source commit and the counts
+pub fn binding_digest(
+    suite: &str,
+    cmd: &str,
+    commit: &str,
+    counts: (u64, u64, u64),
+    verdict: &str,
+    log: &str,
+) -> String {
+    let text = format!(
+        "gate-run-binding v1\n{}\n{}\n{}\n{} {} {}\n{}\n{}\n",
+        suite, cmd, commit, counts.0, counts.1, counts.2, verdict, log
+    );
+    crate::sha256::hex(text.as_bytes())
+}
+
+// spec: evidence-kit/SPEC.md §Evidence manifest — one v2 suite line's fields
+#[derive(Clone, Debug, PartialEq)]
+pub struct SuiteLine {
+    pub key: String,
+    pub suite: String,
+    pub log: String,
+    pub counts: (u64, u64, u64),
+    pub verdict: String,
+    pub date: String,
+    pub commit: String,
+    pub tree: String,
+    pub cmd: String,
+    pub origin: String,
+}
+
+impl SuiteLine {
+    pub fn render(&self) -> String {
+        format!(
+            "{} {} sha256={} pass={} fail={} ignore={} verdict={} {} commit={} tree={} cmd={} origin={}",
+            self.key,
+            self.suite,
+            self.log,
+            self.counts.0,
+            self.counts.1,
+            self.counts.2,
+            self.verdict,
+            self.date,
+            self.commit,
+            self.tree,
+            self.cmd,
+            self.origin
+        )
+    }
+
+    pub fn binding(&self) -> String {
+        binding_digest(&self.suite, &self.cmd, &self.commit, self.counts, &self.verdict, &self.log)
+    }
+}
+
+// spec: evidence-kit/SPEC.md §The gate-run predicate — the Statement, keys sorted by the map itself
+// and no insignificant whitespace, so the same run gives the same bytes
+pub fn statement(run: &str, subject: &str, provenance: serde_json::Value, suites: &[SuiteLine]) -> String {
+    use serde_json::json;
+    let suites: Vec<serde_json::Value> = suites
+        .iter()
+        .map(|s| {
+            json!({
+                "name": s.suite,
+                "command": { "sha256": s.cmd },
+                "log": { "sha256": s.log },
+                "counts": { "pass": s.counts.0, "fail": s.counts.1, "ignore": s.counts.2 },
+                "verdict": s.verdict,
+                "date": s.date,
+                "tree": s.tree,
+                "binding": { "sha256": s.binding() },
+            })
+        })
+        .collect();
+    let v = json!({
+        "_type": STATEMENT_TYPE,
+        "predicateType": PREDICATE_TYPE,
+        "subject": [{ "digest": { "gitCommit": subject } }],
+        "predicate": {
+            "contract": PREDICATE_CONTRACT,
+            "run": run,
+            "provenance": provenance,
+            "suites": suites,
+        },
+    });
+    v.to_string()
+}
+
+// spec: evidence-kit/SPEC.md §verify-gate-run — one suite as a Statement carries it
+#[derive(Debug, PartialEq)]
+pub struct StatementSuite {
+    pub name: String,
+    pub cmd: String,
+    pub log: String,
+    pub counts: (u64, u64, u64),
+    pub verdict: String,
+    pub date: String,
+    pub tree: String,
+    pub binding: String,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Statement {
+    pub subject: String,
+    pub run: String,
+    pub provenance_commit: Option<String>,
+    pub suites: Vec<StatementSuite>,
+}
+
+// spec: evidence-kit/SPEC.md §verify-gate-run — a Statement or a DSSE envelope around one, judged for
+// shape alone: every refusal here is one the verify arm reports at exit 2
+pub fn read_statement(bytes: &[u8]) -> Result<Statement, String> {
+    let v: serde_json::Value =
+        serde_json::from_slice(bytes).map_err(|e| format!("the input is not JSON: {}", e))?;
+    let v = match v.get("payloadType") {
+        None => v,
+        Some(t) => {
+            if t.as_str() != Some(DSSE_PAYLOAD_TYPE) {
+                return Err(format!("a DSSE envelope whose payloadType is not {}", DSSE_PAYLOAD_TYPE));
+            }
+            let payload = v
+                .get("payload")
+                .and_then(|p| p.as_str())
+                .ok_or("a DSSE envelope with no string payload")?;
+            let raw = base64_decode(payload).ok_or("a DSSE payload that is not base64")?;
+            serde_json::from_slice(&raw).map_err(|e| format!("a DSSE payload that is not JSON: {}", e))?
+        }
+    };
+    let text = |v: &serde_json::Value, path: &str| -> Result<String, String> {
+        v.pointer(path)
+            .and_then(|s| s.as_str())
+            .map(String::from)
+            .ok_or_else(|| format!("{} is absent or not a string", path))
+    };
+    if text(&v, "/_type")? != STATEMENT_TYPE {
+        return Err(format!("_type is not {}", STATEMENT_TYPE));
+    }
+    let ptype = text(&v, "/predicateType")?;
+    if ptype != PREDICATE_TYPE {
+        return Err(format!("predicateType '{}' is a type this reader does not know (want {})", ptype, PREDICATE_TYPE));
+    }
+    let contract = text(&v, "/predicate/contract")?;
+    if !crate::provenance::semver(&contract) || contract.split('.').next() != Some("1") {
+        return Err(format!("predicate contract '{}' is no major this reader knows (want 1.x.y)", contract));
+    }
+    let subjects = v.pointer("/subject").and_then(|s| s.as_array()).ok_or("/subject is absent or not an array")?;
+    if subjects.len() != 1 {
+        return Err(format!("/subject holds {} descriptors (want one, the commit)", subjects.len()));
+    }
+    let subject = text(&subjects[0], "/digest/gitCommit")?;
+    if !crate::provenance::object_id(&subject) {
+        return Err(format!("gitCommit '{}' is not 40 or 64 lowercase hex characters", subject));
+    }
+    let run = text(&v, "/predicate/run")?;
+    let provenance = v
+        .pointer("/predicate/provenance")
+        .filter(|p| p.is_object())
+        .ok_or("/predicate/provenance is absent or not an object")?;
+    let provenance_commit = match provenance.get("commit") {
+        None => None,
+        Some(c) => Some(c.as_str().ok_or("/predicate/provenance/commit is not a string")?.to_string()),
+    };
+    let listed = v
+        .pointer("/predicate/suites")
+        .and_then(|s| s.as_array())
+        .ok_or("/predicate/suites is absent or not an array")?;
+    if listed.is_empty() {
+        return Err("/predicate/suites is empty: the Statement covers no suite".to_string());
+    }
+    let mut suites: Vec<StatementSuite> = Vec::new();
+    for (i, s) in listed.iter().enumerate() {
+        let at = |f: &str| format!("/predicate/suites/{}{}", i, f);
+        let field = |f: &str| text(s, f).map_err(|_| format!("{} is absent or not a string", at(f)));
+        let digest = |f: &str| {
+            field(f).and_then(|d| if is_hex64(&d) { Ok(d) } else { Err(format!("{} is not 64 lowercase hex characters", at(f))) })
+        };
+        let count = |f: &str| {
+            s.pointer(f).and_then(|n| n.as_u64()).ok_or_else(|| format!("{} is absent or not a non-negative integer", at(f)))
+        };
+        let name = field("/name")?;
+        if name.is_empty() || name.contains(char::is_whitespace) {
+            return Err(format!("{} '{}' is not a suite name", at("/name"), name));
+        }
+        if suites.iter().any(|x| x.name == name) {
+            return Err(format!("suite '{}' appears twice", name));
+        }
+        let verdict = field("/verdict")?;
+        if verdict != "clean" && verdict != "new-failures" {
+            return Err(format!("{} '{}' is not clean or new-failures", at("/verdict"), verdict));
+        }
+        let date = field("/date")?;
+        if !is_date(&date) {
+            return Err(format!("{} '{}' is not YYYY-MM-DD", at("/date"), date));
+        }
+        let tree = field("/tree")?;
+        if tree != "clean" && tree != "modified" {
+            return Err(format!("{} '{}' is not clean or modified", at("/tree"), tree));
+        }
+        suites.push(StatementSuite {
+            cmd: digest("/command/sha256")?,
+            log: digest("/log/sha256")?,
+            counts: (count("/counts/pass")?, count("/counts/fail")?, count("/counts/ignore")?),
+            binding: digest("/binding/sha256")?,
+            name,
+            verdict,
+            date,
+            tree,
+        });
+    }
+    Ok(Statement { subject, run, provenance_commit, suites })
+}
+
+// spec: evidence-kit/SPEC.md §verify-gate-run — DSSE's payload encoding, the standard and the
+// URL-safe alphabets both read, padding optional
+pub fn base64_decode(s: &str) -> Option<Vec<u8>> {
+    let mut out = Vec::new();
+    let mut acc: u32 = 0;
+    let mut bits = 0;
+    let body = s.trim_end_matches('=');
+    if s.len() - body.len() > 2 {
+        return None;
+    }
+    for c in body.bytes() {
+        let v = match c {
+            b'A'..=b'Z' => c - b'A',
+            b'a'..=b'z' => c - b'a' + 26,
+            b'0'..=b'9' => c - b'0' + 52,
+            b'+' | b'-' => 62,
+            b'/' | b'_' => 63,
+            _ => return None,
+        };
+        acc = (acc << 6) | u32::from(v);
+        bits += 6;
+        if bits >= 8 {
+            bits -= 8;
+            out.push((acc >> bits) as u8);
+            acc &= (1 << bits) - 1;
+        }
+    }
+    if bits >= 6 || acc != 0 {
+        return None;
+    }
+    Some(out)
+}
+
 // spec: evidence-kit/SPEC.md §The producer-liveness lock — three outcomes, never two: an
 // unparseable lock is corruption and fails closed rather than reading free
 pub enum LockRead {
@@ -419,6 +738,192 @@ fn windows_pid_held(pid: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const GOLDEN_SUBJECT: &str = "0123456789abcdef0123456789abcdef01234567";
+
+    fn golden_row(suite: &str, run: &str, counts: (u64, u64, u64), verdict: &str) -> SuiteLine {
+        SuiteLine {
+            key: "golden-run".into(),
+            suite: suite.into(),
+            log: crate::sha256::hex(format!("{} log\n", suite).as_bytes()),
+            counts,
+            verdict: verdict.into(),
+            date: "2026-01-01".into(),
+            commit: GOLDEN_SUBJECT.into(),
+            tree: "clean".into(),
+            cmd: command_digest(run, "libtest"),
+            origin: "local".into(),
+        }
+    }
+
+    fn golden_statement() -> String {
+        let prov = crate::provenance::Provenance {
+            tool_version: Some("1.0.0".into()),
+            exact: true,
+            source_stamp: None,
+            target: Some("x86_64-unknown-linux-gnu".into()),
+            kits: vec![crate::provenance::Kit {
+                name: "evidence-kit".into(),
+                root: "evidence-kit".into(),
+                version: Some("1.0.0".into()),
+            }],
+            commit: Some(GOLDEN_SUBJECT.into()),
+            clean: true,
+        };
+        let rows = [
+            golden_row("unit", "cargo test", (12, 0, 1), "clean"),
+            golden_row("fixtures", "checkwright-gates --run-gate-tests tests", (40, 2, 0), "new-failures"),
+        ];
+        format!("{}\n", statement("golden-run", GOLDEN_SUBJECT, prov.block(), &rows))
+    }
+
+    fn keys(v: &serde_json::Value) -> Vec<String> {
+        let mut k: Vec<String> = v.as_object().map(|o| o.keys().cloned().collect()).unwrap_or_default();
+        k.sort();
+        k
+    }
+
+    fn strings(v: Option<&serde_json::Value>) -> Vec<String> {
+        let mut k: Vec<String> = v
+            .and_then(|a| a.as_array())
+            .map(|a| a.iter().filter_map(|s| s.as_str().map(String::from)).collect())
+            .unwrap_or_default();
+        k.sort();
+        k
+    }
+
+    // spec: evidence-kit/SPEC.md §The gate-run predicate — the published golden is the renderer's
+    // bytes, and the published schema names exactly the fields the renderer writes, required
+    #[test]
+    fn the_published_golden_and_schema_match_the_renderer() {
+        let rendered = golden_statement();
+        assert_eq!(
+            rendered,
+            include_str!("../../docs/contracts/gate-run/v1/statement.json"),
+            "docs/contracts/gate-run/v1/statement.json is stale; the renderer now writes:\n{}",
+            rendered
+        );
+        let st: serde_json::Value = serde_json::from_str(&rendered).expect("the golden is JSON");
+        let schema: serde_json::Value =
+            serde_json::from_str(include_str!("../../docs/contracts/gate-run/v1/schema.json")).expect("the schema is JSON");
+        let pred = schema.pointer("/properties/predicate").expect("the schema describes the predicate");
+        let want = keys(&st["predicate"]);
+        assert_eq!(keys(&pred["properties"]), want);
+        assert_eq!(strings(pred.get("required")), want);
+        let item = pred.pointer("/properties/suites/items").expect("the schema describes a suite");
+        let want = keys(&st["predicate"]["suites"][0]);
+        assert_eq!(keys(&item["properties"]), want);
+        assert_eq!(strings(item.get("required")), want);
+        assert_eq!(strings(schema.get("required")), keys(&st));
+        let read = read_statement(rendered.as_bytes()).expect("the golden reads back");
+        assert_eq!(read.suites.len(), 2);
+        assert_eq!(read.suites[1].binding, golden_row("fixtures", "checkwright-gates --run-gate-tests tests", (40, 2, 0), "new-failures").binding());
+    }
+
+    // spec: evidence-kit/SPEC.md §The gate-run predicate — the command digest hashes the spawned
+    // argv, so whitespace that splits to the same words binds the same, and other words do not
+    #[test]
+    fn the_command_digest_normalizes_whitespace_alone() {
+        let d = command_digest("cargo test", "libtest");
+        assert_eq!(d, command_digest("  cargo\t test \n", " libtest "));
+        assert_eq!(d, crate::sha256::hex(b"run cargo test\nparser libtest\n"));
+        assert_ne!(d, command_digest("cargo test --release", "libtest"));
+        assert_ne!(d, command_digest("cargo test", "exit-code"));
+        assert_eq!(resolved_command_digest(&[], &[], "libtest", "unit"), None);
+        let fam = [("unit".to_string(), "cargo   test".to_string())];
+        let parsers = [("unit".to_string(), "exit-code".to_string())];
+        assert_eq!(resolved_command_digest(&fam, &[], "libtest", "unit"), Some(d));
+        assert_eq!(
+            resolved_command_digest(&fam, &parsers, "libtest", "unit"),
+            Some(command_digest("cargo test", "exit-code"))
+        );
+    }
+
+    // spec: evidence-kit/SPEC.md §The gate-run predicate — the binding digest over a fixed line
+    #[test]
+    fn the_binding_digest_is_its_newline_terminated_lines() {
+        let line = golden_row("unit", "cargo test", (12, 0, 1), "clean");
+        let text = format!(
+            "gate-run-binding v1\nunit\n{}\n{}\n12 0 1\nclean\n{}\n",
+            line.cmd, GOLDEN_SUBJECT, line.log
+        );
+        assert_eq!(line.binding(), crate::sha256::hex(text.as_bytes()));
+        let mut moved = line.clone();
+        moved.counts = (11, 1, 1);
+        assert_ne!(moved.binding(), line.binding());
+        assert_eq!(line.render().split_whitespace().count(), 12);
+    }
+
+    fn base64_encode(b: &[u8]) -> String {
+        const A: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let mut out = String::new();
+        for chunk in b.chunks(3) {
+            let n = chunk.iter().enumerate().fold(0u32, |acc, (i, &c)| acc | (u32::from(c) << (16 - 8 * i)));
+            for i in 0..=chunk.len() {
+                out.push(A[((n >> (18 - 6 * i)) & 63) as usize] as char);
+            }
+            for _ in chunk.len()..3 {
+                out.push('=');
+            }
+        }
+        out
+    }
+
+    // spec: evidence-kit/SPEC.md §verify-gate-run — a DSSE envelope is unwrapped to the Statement
+    // it carries; a payload of another type, or one that is not base64, is a shape refusal
+    #[test]
+    fn a_dsse_envelope_unwraps_to_its_statement() {
+        let st = golden_statement();
+        let env = serde_json::json!({
+            "payloadType": DSSE_PAYLOAD_TYPE,
+            "payload": base64_encode(st.as_bytes()),
+            "signatures": [{ "sig": "c2ln" }],
+        });
+        let read = read_statement(env.to_string().as_bytes()).expect("the envelope unwraps");
+        assert_eq!(read, read_statement(st.as_bytes()).unwrap());
+        let other = serde_json::json!({ "payloadType": "text/plain", "payload": "" });
+        assert!(read_statement(other.to_string().as_bytes()).unwrap_err().contains("payloadType"));
+        let bad = serde_json::json!({ "payloadType": DSSE_PAYLOAD_TYPE, "payload": "!!" });
+        assert!(read_statement(bad.to_string().as_bytes()).unwrap_err().contains("base64"));
+    }
+
+    #[test]
+    fn base64_reads_both_alphabets_with_or_without_padding() {
+        assert_eq!(base64_decode("aGk=").as_deref(), Some(&b"hi"[..]));
+        assert_eq!(base64_decode("aGk").as_deref(), Some(&b"hi"[..]));
+        assert_eq!(base64_decode("-_8=").as_deref(), Some(&[0xfb, 0xff][..]));
+        assert_eq!(base64_decode("+/8=").as_deref(), Some(&[0xfb, 0xff][..]));
+        assert_eq!(base64_decode(""), Some(Vec::new()));
+        assert_eq!(base64_decode("a"), None);
+        assert_eq!(base64_decode("aGl="), None);
+        assert_eq!(base64_decode("aG*="), None);
+        assert_eq!(base64_decode("aGk==="), None);
+    }
+
+    // spec: evidence-kit/SPEC.md §verify-gate-run — a reader refuses a type or a contract major it
+    // does not know, and a Statement whose subject is not one commit
+    #[test]
+    fn the_shape_refusals_name_their_field() {
+        let st: serde_json::Value = serde_json::from_str(&golden_statement()).unwrap();
+        let refuse = |edit: &dyn Fn(&mut serde_json::Value), want: &str| {
+            let mut v = st.clone();
+            edit(&mut v);
+            let e = read_statement(v.to_string().as_bytes()).expect_err(want);
+            assert!(e.contains(want), "want '{}' in: {}", want, e);
+        };
+        refuse(&|v| v["predicateType"] = "https://checkwright.dev/gate-run/v2".into(), "predicateType");
+        refuse(&|v| v["predicate"]["contract"] = "2.0.0".into(), "contract");
+        refuse(&|v| v["_type"] = "x".into(), "_type");
+        refuse(&|v| v["subject"] = serde_json::json!([]), "descriptors");
+        refuse(&|v| v["subject"][0]["digest"]["gitCommit"] = "ABC".into(), "gitCommit");
+        refuse(&|v| v["predicate"]["suites"] = serde_json::json!([]), "empty");
+        refuse(&|v| v["predicate"]["suites"][1]["name"] = "unit".into(), "twice");
+        refuse(&|v| v["predicate"]["suites"][0]["tree"] = "dirty".into(), "tree");
+        refuse(&|v| v["predicate"]["suites"][0]["counts"]["fail"] = (-1).into(), "counts/fail");
+        let mut extra = st.clone();
+        extra["predicate"]["future"] = "ignored".into();
+        assert!(read_statement(extra.to_string().as_bytes()).is_ok(), "an unknown field is ignored");
+    }
 
     #[test]
     fn comments_and_blanks_are_not_data_lines() {
