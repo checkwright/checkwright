@@ -311,3 +311,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | install-commit-hooks-pass | sc sp a b v c | 3f/1d | 2 · ≤0d | 21s clean | 156 |
 | installer-review-residue-pass | sc sp a b v c | 4f/1d | 2 · ≤1d | 21s clean | 156 |
 | liveness-arm-adoption-pass | sc sp a b v c | 11f/2d | 5 · ≤0d | 21s clean | 158 |
+| machine-verdict-contract-pass | sc sp a b v c | 6f/4d | 3 · ≤0d | 21s clean | 158 |

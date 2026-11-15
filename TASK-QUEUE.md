@@ -32,7 +32,7 @@ a controlled A/B trial.
 
 [roadmap: later/commercial] [cost: event/low] [surface: evidence-kit] [roadmap-summary: Gate runs verified by a neutral party no committing agent can touch.]
 
-hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. No longer demand-gated: the operator direction of 2026-10-25, lead-relayed (not a ruling), advances the track. Its tree-side first unit is `gate-run-attestation-predicate`; the service half, outside this tree, stays the operator's. Hosting and sequencing decisions are in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view`, landed at site-health-statistics-pass (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
+hosted attestation. The team/paid rung: gates verified server-side by a party the committing agents cannot touch — hosted gate runs as a neutral attestation, cross-repo drift dashboards, maintained rulesets. A service, not code: cloning the kits does not clone the neutrality or the ops. No longer demand-gated: the operator direction of 2026-10-25, lead-relayed (not a ruling), advances the track. Its tree-side first unit, the gate-run Statement, landed at machine-verdict-contract-pass (evidence-kit/SPEC.md §The gate-run predicate); the service half, outside this tree, stays the operator's. Hosting and sequencing decisions are in the operator's local brief, and its prerequisite mechanism has landed (lifecycle-kit/SPEC.md §Multi-operator semantics). Its single-repo statistics half split off as `iteration-statistics-view`, landed at site-health-statistics-pass (operator direction 2026-10-17, on consult advice, lead-relayed, not a ruling); the cross-repo dashboards stay here. Surfaced 2026-07-07.
 
 **Cost while deferred:** zero — this is a service rather than tree mechanism, so nothing rots; the residue is that gate runs stay self-attested, which binds only when a party the committing agents cannot touch is asked to trust them.
 
@@ -348,7 +348,7 @@ docs/manual-install.md's PowerShell attestation-verify block, which reads `--for
 
 A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`) prints for a person, and no arm offers a machine form. Operator direction 2026-11-15, lead-relayed, not a ruling: a JSON form lands on an arm only where a named caller reads it (gate-sdk/SPEC.md §The non-gate arm), never across every arm at once.
 
-**Deliverable:** design-pending, a feature: per arm a caller names, its JSON form under `machine-verdict-contract`'s versioning rule.
+**Deliverable:** design-pending, a feature: per arm a caller names, its JSON form under the verdict contract's versioning rule (gate-sdk/SPEC.md §run-gates).
 
 **Cost while deferred:** an outside caller of an arm parses its text. Surfaced 2026-11-15 by an operator-relayed design review, split from the verdict contract at this scope. Owner lookup: `json` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
 
@@ -358,7 +358,7 @@ A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`)
 
 A declared mode where an outside tool renders the queue file and the iteration header: the gates check consistency and a provenance stamp (generator, version, content hash) instead of hand transitions, a corrective message names the owner's command from config, and stage transitions get verbs with JSON results.
 
-**Conflict, standing:** the lead decision of 2026-11-14 (operator-delegated) serves an adopter running its own work engine the checks and the session hooks only, with no lifecycle or queue read adapter, and `gate-run-attestation-predicate` records the refusal's ground: a stamp is worth its being committed and naming HEAD. Operator direction 2026-11-15, lead-relayed, not a ruling: that decision stands. **Reopens** when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
+**Conflict, standing:** the lead decision of 2026-11-14 (operator-delegated) serves an adopter running its own work engine the checks and the session hooks only, with no lifecycle or queue read adapter, on the refusal's ground that a stamp is worth its being committed and naming HEAD. Operator direction 2026-11-15, lead-relayed, not a ruling: that decision stands. **Reopens** when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
 **Deliverable:** design-pending, a feature, on reopening.
 
@@ -403,6 +403,26 @@ No check reads an agent brief: one that grants authority the agent must not hold
 **Deliverable:** design-pending, a feature: where a brief is read (a dispatch payload or a file), the config grammar, and its honest limit.
 
 **Cost while deferred:** an over-granting or unquoted brief reaches the agent. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `brief`, `forbidden verb` in this file, none; [outbound-public-text-lint](#outbound-public-text-lint) reads posted text, not briefs; owner delegation-kit/SPEC.md.
+
+### not-applicable-sweep-residue
+
+[cost: event/low] [surface: native]
+
+Bundled gates still print a plain clean line on an early-out that evaluated nothing, beyond the lexical oracle the verdict contract's sweep ran (gate-sdk/SPEC.md §Output contract, its honest limit), so their SARIF result reads `pass` where it should read not-applicable. Sites named, not branch-traced: native/src/gates action_pinning:85, action_gh_repo:160, action_permissions:196, action_run_path:158, action_run_shell:188, docs_link_convention:140, docs_nav_reachable:123, docs_render_fidelity:154, docs_since:40, core_files:41,55, commit_msg:71, commit_subject:72, dispatch_entry:63, audit_roster:233,291, crate_arms:218, disposed_findings:75, agent_tier_explicit:56, measured_claim:40,54, prose_enum:34,54, unmarked_claim:35,43,54.
+
+**Deliverable:** per site, read the branch and judge whether it evaluated nothing or passed over an empty corpus that is a real pass (an absent disposed-findings record is legal and may be one); respell each not-applicable one in the output contract's form, its fixture's `expect.txt` with it, and narrow the honest limit to what stays.
+
+**Cost while deferred:** a SARIF reader takes a vacuous pass from these gates as a real one, paid when a consumer's configuration leaves one with nothing to check. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: measured_claim:40, prose_enum:34, unmarked_claim:35 and :43, action_pinning:85 and docs_since:40 print a plain `clean` with no not-applicable marker. Owner lookup: `not-applicable`, `early-out` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
+
+### observe-plain-text-context
+
+[cost: event/low] [surface: gate-sdk]
+
+An observed `session-context` logs `would=error`: the member prints its brief as plain text on stdout (native/src/hook/session_context.rs), and the would-be decision table reads exit 0 with stdout that is not JSON as `error` (gate-sdk/SPEC.md §The harness-integration arm), so a trial of the session-start member never logs the `advise` its enforcing run gives.
+
+**Deliverable:** a table row reading plain-text stdout on a context-taking event as `advise`, reason withheld, which needs the event `classify` does not take today; or the member emits the context envelope under every binding; or the table names the case as a limit.
+
+**Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ## Icebox
 
