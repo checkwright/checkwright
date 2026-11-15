@@ -326,7 +326,7 @@ docs/manual-install.md's PowerShell attestation-verify block, which reads `--for
 
 [cost: event/low] [surface: delegation-kit]
 
-`--usage-poll` accepts a half weekly pair: with a complete five-hour pair, `axes()` in `native/src/hook/poll.rs` returns a weekly percentage with an empty reset (`seven_day {utilization:99}`) and the snapshot is written with the weekly axis unarmed, though the poller's step 3 in delegation-kit/SPEC.md reads half of an axis as unparseable. It predates the no-five-hour fix; the v0.36.0 note is worded to the shipped behaviour.
+`--usage-poll` accepts a half weekly pair: with a complete five-hour pair, `axes()` in `native/src/hook/poll.rs` returns a weekly percentage with an empty reset (`seven_day {utilization:99}`) and the snapshot is written with the weekly axis unarmed, though the poller's payload-mapping step in delegation-kit/SPEC.md reads half of an axis as unparseable. It predates the no-five-hour fix; the v0.36.0 note is worded to the shipped behaviour.
 
 **Deliverable:** a fix: refuse a weekly percentage without a reset, or the reverse, with the unit case.
 

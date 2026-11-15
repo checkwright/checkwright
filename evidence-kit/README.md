@@ -10,15 +10,15 @@ This file ships in the installer payload; what that payload withholds, and where
 
 Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
-1. Register the gates — add each to your `gates.list` except `check-producer-liveness`, which step 6 wires at stage entry instead, and `check-test-control`, which step 7 selects:
+1. Register the gates — add each to your `gates.list` except `check-producer-liveness`, which you wire at stage entry instead, and `check-test-control`, which the optional test-controls step selects:
 
    <!-- gate-roster:begin -->
    ```
    check-evidence-baseline
    check-evidence-manifest
    check-battery-roster
-   check-test-control        # opt-in — see step 7
-   check-producer-liveness   # entry hook only — never gates.list, see step 6
+   check-test-control        # opt-in, with your first test control
+   check-producer-liveness   # entry hook only — never gates.list
    ```
    <!-- gate-roster:end -->
 
