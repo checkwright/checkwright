@@ -248,22 +248,26 @@ fn own_shell_task_running(payload: Option<&Value>, unknown_is_own: bool) -> bool
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the marker read: each record parsed by
-// the grammar's one parser, and a `handoff=` path that is a non-empty regular file, links followed,
-// marks it. Liveness stays the reader's; this decides none.
+// the grammar's one parser, and a `handoff=` path absolute on this host that is a non-empty regular
+// file, links followed, marks it. Liveness stays the reader's; this decides none.
 fn marked_records(run_dir: &str, run_keys: &[String]) -> Vec<String> {
     run_keys
         .iter()
         .filter(|key| {
             let rec = std::path::Path::new(run_dir).join(format!("{}.run", key));
             match crate::evidence::lock_read(&rec) {
-                crate::evidence::LockRead::Held { handoff: Some(h), .. } => {
-                    std::fs::metadata(h).is_ok_and(|m| m.is_file() && m.len() > 0)
-                }
+                crate::evidence::LockRead::Held { handoff: Some(h), .. } => marks(&h, cfg!(windows)),
                 _ => false,
             }
         })
         .cloned()
         .collect()
+}
+
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — a path this host cannot place is no
+// marker; the host a parameter so a test injecting the other one answers for both
+fn marks(handoff: &str, windows: bool) -> bool {
+    crate::walk::absolute_on(handoff, windows) && std::fs::metadata(handoff).is_ok_and(|m| m.is_file() && m.len() > 0)
 }
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the helper test: all three marks, each
@@ -895,6 +899,26 @@ mod tests {
         Empty,
         Missing,
         Dir,
+        Context,
+    }
+
+    // comment-tier-exempt: a spelling the record's grammar admits and this host cannot place — a drive on POSIX, none on Windows
+    fn context_spelling(abs: &str) -> String {
+        if cfg!(windows) {
+            return abs.get(2..).unwrap_or(abs).to_string();
+        }
+        format!("C:{}", abs)
+    }
+
+    // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the handoff file itself, read as
+    // the other host would, is no marker, while this host's reading marks it
+    #[test]
+    fn a_marker_the_host_cannot_place_marks_nothing() {
+        let s = Scratch::new("marker-host");
+        let handoff = s.at("handoff");
+        std::fs::write(&handoff, "report\n").expect("handoff");
+        assert!(marks(&handoff, cfg!(windows)));
+        assert!(!marks(&handoff, !cfg!(windows)), "{} marked on the other host", handoff);
     }
 
     // comment-tier-exempt: the reader axis beside the exit classes — no reader resolved, or one that cannot start
@@ -921,6 +945,7 @@ mod tests {
             ("rw-marker-missing", 1, true, Mark::Missing, own, mine, false, "red", 0),
             ("rw-marker-empty", 1, true, Mark::Empty, own, mine, false, "red", 0),
             ("rw-marker-dir", 1, true, Mark::Dir, own, mine, false, "red", 0),
+            ("rw-marker-context", 1, true, Mark::Context, own, mine, false, "red", 0),
             ("rw-transcript-unreadable", 1, true, Mark::Unmarked, own, None, false, "red", 2),
             ("rw-id-empty", 1, true, Mark::Unmarked, empty_id, mine, false, "red", 2),
             ("rw-id-absent", 1, true, Mark::Unmarked, no_id, mine, false, "red", 2),
@@ -936,18 +961,24 @@ mod tests {
             let s = Scratch::new(case);
             let handoff = s.at("handoff");
             match mark {
-                Mark::File => std::fs::write(&handoff, "report\n").expect("handoff"),
+                Mark::File | Mark::Context => std::fs::write(&handoff, "report\n").expect("handoff"),
                 Mark::Empty => std::fs::write(&handoff, "").expect("handoff"),
                 Mark::Dir => std::fs::create_dir_all(&handoff).expect("handoff"),
                 Mark::Unmarked | Mark::Missing => {}
             }
+            let spelled = if mark == Mark::Context { context_spelling(&handoff) } else { handoff.clone() };
             if record {
                 let line = if mark == Mark::Unmarked {
                     "pid=1 run=k\n".to_string()
                 } else {
-                    format!("pid=1 run=k handoff={}\n", handoff)
+                    format!("pid=1 run=k handoff={}\n", spelled)
                 };
-                std::fs::write(s.0.join("runs").join("k.run"), line).expect("record");
+                let rec = s.0.join("runs").join("k.run");
+                std::fs::write(&rec, line).expect("record");
+                if mark == Mark::Context {
+                    let read = crate::evidence::lock_read(&rec);
+                    assert!(matches!(read, crate::evidence::LockRead::Held { handoff: Some(_), .. }), "case {}", case);
+                }
             }
             let transcript = s.at("agent.jsonl");
             if let Some(b) = body {

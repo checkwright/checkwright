@@ -60,14 +60,6 @@ Two gaps between an observed hook trial (`--hook <member> --observe`) and what g
 
 **Cost while deferred:** a trial meant to enforce nothing still deletes scratch, and the log can hold typed command text. Both read from source; no observed trial of `session-context` ran, since the trial is the write at issue. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (two bullets, from source); filed at the next scope. Owner lookup: `observe`, `reason=`, `command text` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
-### path-root-context-spellings
-
-The tree-free and user-install absolute-path checks accept spellings whose location depends on context: `walk::path_root` (`native/src/walk.rs`) admits a leading backslash, drive-relative on Windows, and a drive spelling such as `C:/x`, relative on POSIX. Its callers: the user roots (`native/src/installer/user.rs`), the tree-free hook paths (`native/src/hook/mod.rs`) and the evidence `handoff=` marker (`native/src/evidence.rs`).
-
-**Deliverable:** a fix: each caller weighed for the host's `Path::is_absolute`, with a case per refused spelling.
-
-**Cost while deferred:** a path the check admits as absolute resolves against an unstated drive or directory. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a pathlib probe; the scope re-read `path_root`); filed at the next scope. Owner lookup: `path_root`, `is_absolute`, `drive-relative` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The path-dialect contract.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1161,4 +1153,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 ## Done
 
 - projection-witness-wall-clock
+- path-root-context-spellings
 
