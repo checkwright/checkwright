@@ -40,6 +40,16 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
 
+### recorded-test-mutation-control
+
+[spec: evidence-kit/SPEC-test-control.md]
+
+The fixture pair proves a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipline), and nothing shipped proves it of a test a suite records, so a recorded run of a test that cannot fail still supports a done claim. Consult advice of 2026-11-14: off unless a consumer selects it, a declared control (an adopter's form is an environment flag re-introducing the defect and naming the test it must fail), its run recorded as a witnessed red beside the suite's line, and a gate that a new test carries one. doctrine-kit/DOCTRINE.md's mutation corollary names that check buildable and unbuilt, and `installer-crate-test-gaps`' two-halves case is an instance.
+
+**Deliverable:** design-pending, a feature: how a control is stated in no consumer's vocabulary, where the witnessed red is recorded, and what counts as a new test.
+
+**Cost while deferred:** a test that cannot fail reads as evidence. Surfaced 2026-11-14 by a production adopter's handoff, ranked first of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `mutation control` in this file, none; owner evidence-kit/SPEC.md.
+
 ## Technical Debt
 
 ### projection-witness-wall-clock
@@ -269,16 +279,6 @@ An adopter reads from the docs, unobserved, that a hook fires twice where the pl
 **Deliverable:** design-pending: detect or dedupe a double registration, or state it as a limit.
 
 **Cost while deferred:** a doubled firing doubles a refusal's log line and its latency. Surfaced 2026-11-14 by a production adopter's handoff (ask 9c); filed at liveness-arm-adoption-pass' scope. Owner lookup: `double regist`, `double fir` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### recorded-test-mutation-control
-
-[cost: event/low] [surface: evidence-kit]
-
-The fixture pair proves a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipline), and nothing shipped proves it of a test a suite records, so a recorded run of a test that cannot fail still supports a done claim. Consult advice of 2026-11-14: off unless a consumer selects it, a declared control (an adopter's form is an environment flag re-introducing the defect and naming the test it must fail), its run recorded as a witnessed red beside the suite's line, and a gate that a new test carries one. doctrine-kit/DOCTRINE.md's mutation corollary names that check buildable and unbuilt, and `installer-crate-test-gaps`' two-halves case is an instance.
-
-**Deliverable:** design-pending, a feature: how a control is stated in no consumer's vocabulary, where the witnessed red is recorded, and what counts as a new test.
-
-**Cost while deferred:** a test that cannot fail reads as evidence. Surfaced 2026-11-14 by a production adopter's handoff, ranked first of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `mutation control` in this file, none; owner evidence-kit/SPEC.md.
 
 ### outbound-public-text-lint
 
