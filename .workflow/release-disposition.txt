@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+machine-verdict-contract-pass release deferred:v0.37.0 — minor, a new gate (check-test-control), knob additions and behavior changes declared; held: the elapsed limb is dormant under preview, no major, no security or supply-chain fix, no operator release direction (the set record's push need leaves the cut to the release policy), and no front-door verb, flag or plugin package the pinned release lacks
