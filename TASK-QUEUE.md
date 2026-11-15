@@ -16,6 +16,16 @@
 
 ## New Features
 
+### machine-verdict-contract
+
+[spec: gate-sdk/SPEC-verdict-contract.md]
+
+A machine reader of a gate run has only the battery's SARIF 2.1.0 log (gate-sdk/SPEC.md §run-gates), which is empty on a green run and carries no tool or kit version and no commit, so a caller driving the battery from outside scrapes human output to learn what passed and on what. Operator direction 2026-11-15, lead-relayed, not a ruling: that log becomes the versioned verdict contract — a tool version and one per kit, the commit, a result for every member (pass, fail or not applicable), a contract version under semver, and golden fixtures — with no fourth exit code, since a hook or CI reader blocks on any non-zero. `--run --only <gate>` is the per-gate form.
+
+**Deliverable:** design-pending, a feature: the provenance block, how a gate signals not applicable, the version marker and its migration rule.
+
+**Cost while deferred:** an outside caller reimplements the verdict from text a release may reword. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `SARIF`, `--json`, `exit code` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
 ## Technical Debt
 
 ### projection-witness-wall-clock
@@ -389,16 +399,6 @@ docs/manual-install.md's PowerShell attestation-verify block, which reads `--for
 **Deliverable:** a fix: refuse a duplicated `since:` key, with its fixture.
 
 **Cost while deferred:** a page can show the unreleased banner the gate reads as released. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a YAML renderer probe); filed at the next scope. Owner lookup: `docs-since`, `duplicat` in this file and the disposed-findings record, none; owner site-kit/SPEC.md §check-docs-since.
-
-### machine-verdict-contract
-
-[cost: event/high] [surface: gate-sdk]
-
-A machine reader of a gate run has only the battery's SARIF 2.1.0 log (gate-sdk/SPEC.md §run-gates), which is empty on a green run and carries no tool or kit version and no commit, so a caller driving the battery from outside scrapes human output to learn what passed and on what. Operator direction 2026-11-15, lead-relayed, not a ruling: that log becomes the versioned verdict contract — a tool version and one per kit, the commit, a result for every member (pass, fail or not applicable), a contract version under semver, and golden fixtures — with no fourth exit code, since a hook or CI reader blocks on any non-zero. `--run --only <gate>` is the per-gate form.
-
-**Deliverable:** design-pending, a feature: the provenance block, how a gate signals not applicable, the version marker and its migration rule.
-
-**Cost while deferred:** an outside caller reimplements the verdict from text a release may reword. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `SARIF`, `--json`, `exit code` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
 ### non-gate-arm-json
 
