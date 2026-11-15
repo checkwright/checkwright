@@ -1,14 +1,54 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: verdict-contract-residue-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, the four carried second-vendor findings and the tasks that can join them):** option A. Debt, promoted here: `empty-for-selection-sarif-skip`, `gate-run-schema-semver-pattern`, `gate-run-provenance-typing` and `not-applicable-sweep-residue`, the last joining on the verdict contract's result fidelity. Feature, deferred here and promoted by spec with its evidence-kit amendment: [test-control-decl-binding](#test-control-decl-binding). Stages scope, spec, build, validate, close: the one amendment spans evidence-kit alone. Composition: bundled on the machine-verdict contract, drain 1 against inflow 6.8, the directive bounding the theme to the four findings, which leave the inbox at intake rather than the pool. Supersession: none.
+
+  **The predicate's version (operator direction 2026-11-15, lead-relayed, not a ruling):** the schema and reader fixes bump no `contract`; they converge on evidence-kit/SPEC.md §The gate-run predicate's field table, and the release note's Behavior changes names the reader's new refusal.
+
+  **Push need (operator direction 2026-11-15, inside the budget):** 1 against 2, the closing push.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### empty-for-selection-sarif-skip
+
+An empty `--for` selection exits 0 before the SARIF block: native/src/runner.rs returns at `no coupled gate for the given path(s); nothing to run.` ahead of the `GATE_SDK_SARIF_RESULTS` parse and the `GATE_SDK_SARIF_FILE` write, so a stale log from a prior run stays in place beside a 0 exit and a bad selection value is not refused. gate-sdk/SPEC.md §run-gates writes the log on every `--run` with `scope` `for` covering the selection, refuses a bad selection at exit 2, and names no exception.
+
+**Deliverable:** a fix: parse the selection before the early return, and write the empty `for` log, with a runner case for each.
+
+**Cost while deferred:** a CI reader of the log takes a prior run's verdict for this one. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading runner.rs' early return against its SARIF block. Owner lookup: `SARIF`, `--for` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
+### gate-run-schema-semver-pattern
+
+docs/contracts/gate-run/v1/schema.json's `contract` pattern admits identifiers SemVer 2.0 refuses (`1.0.0-01`, `1.0.0-a..b`, `1.0.0+..`), which `provenance::semver` rejects at exit 2, so a producer passing the published schema can be refused by the reader.
+
+**Deliverable:** a fix: the pattern tightened to SemVer's identifier grammar, held by the renderer's golden test against `provenance::semver` over those cases.
+
+**Cost while deferred:** an outside producer validating against the schema writes a Statement the verify arm refuses. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there against provenance.rs' `semver` and the schema's pattern. Owner lookup: `schema`, `semver` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §The gate-run predicate.
+
+### gate-run-provenance-typing
+
+`--verify-gate-run` accepts a Statement whose provenance block is reduced to `{commit}`: `read_statement` in native/src/evidence.rs reads `/predicate/provenance` as any object and extracts `commit` alone, while the published schema requires `tool` and `kits` and evidence-kit/SPEC.md §verify-gate-run check 1 types every predicate field as §The gate-run predicate states.
+
+**Deliverable:** a fix: the shape check types the block to gate-sdk/SPEC.md §run-gates' provenance table, the schema mirrors it, and a case per refused shape.
+
+**Cost while deferred:** a Statement naming no binary or kit verifies clean. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading `read_statement` against the schema. Owner lookup: `verify-gate-run`, `provenance` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §verify-gate-run.
+
+### not-applicable-sweep-residue
+
+Bundled gates still print a plain clean line on an early-out that evaluated nothing, beyond the lexical oracle the verdict contract's sweep ran (gate-sdk/SPEC.md §Output contract, its honest limit), so their SARIF result reads `pass` where it should read not-applicable. Sites named, not branch-traced: native/src/gates action_pinning:85, action_gh_repo:160, action_permissions:196, action_run_path:158, action_run_shell:188, docs_link_convention:140, docs_nav_reachable:123, docs_render_fidelity:154, docs_since:40, core_files:41,55, commit_msg:71, commit_subject:72, dispatch_entry:63, audit_roster:233,291, crate_arms:218, disposed_findings:75, agent_tier_explicit:56, measured_claim:40,54, prose_enum:34,54, unmarked_claim:35,43,54.
+
+**Deliverable:** per site, read the branch and judge whether it evaluated nothing or passed over an empty corpus that is a real pass (an absent disposed-findings record is legal and may be one); respell each not-applicable one in the output contract's form, its fixture's `expect.txt` with it, and narrow the honest limit to what stays.
+
+**Cost while deferred:** a SARIF reader takes a vacuous pass from these gates as a real one, paid when a consumer's configuration leaves one with nothing to check. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: measured_claim:40, prose_enum:34, unmarked_claim:35 and :43, action_pinning:85 and docs_since:40 print a plain `clean` with no not-applicable marker. Owner lookup: `not-applicable`, `early-out` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
 
 ## Deferred
 
@@ -396,16 +436,6 @@ No check reads an agent brief: one that grants authority the agent must not hold
 
 **Cost while deferred:** an over-granting or unquoted brief reaches the agent. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `brief`, `forbidden verb` in this file, none; [outbound-public-text-lint](#outbound-public-text-lint) reads posted text, not briefs; owner delegation-kit/SPEC.md.
 
-### not-applicable-sweep-residue
-
-[cost: event/low] [surface: native]
-
-Bundled gates still print a plain clean line on an early-out that evaluated nothing, beyond the lexical oracle the verdict contract's sweep ran (gate-sdk/SPEC.md §Output contract, its honest limit), so their SARIF result reads `pass` where it should read not-applicable. Sites named, not branch-traced: native/src/gates action_pinning:85, action_gh_repo:160, action_permissions:196, action_run_path:158, action_run_shell:188, docs_link_convention:140, docs_nav_reachable:123, docs_render_fidelity:154, docs_since:40, core_files:41,55, commit_msg:71, commit_subject:72, dispatch_entry:63, audit_roster:233,291, crate_arms:218, disposed_findings:75, agent_tier_explicit:56, measured_claim:40,54, prose_enum:34,54, unmarked_claim:35,43,54.
-
-**Deliverable:** per site, read the branch and judge whether it evaluated nothing or passed over an empty corpus that is a real pass (an absent disposed-findings record is legal and may be one); respell each not-applicable one in the output contract's form, its fixture's `expect.txt` with it, and narrow the honest limit to what stays.
-
-**Cost while deferred:** a SARIF reader takes a vacuous pass from these gates as a real one, paid when a consumer's configuration leaves one with nothing to check. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: measured_claim:40, prose_enum:34, unmarked_claim:35 and :43, action_pinning:85 and docs_since:40 print a plain `clean` with no not-applicable marker. Owner lookup: `not-applicable`, `early-out` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
-
 ### observe-plain-text-context
 
 [cost: event/low] [surface: gate-sdk]
@@ -415,6 +445,18 @@ An observed `session-context` logs `would=error`: the member prints its brief as
 **Deliverable:** a table row reading plain-text stdout on a context-taking event as `advise`, reason withheld, which needs the event `classify` does not take today; or the member emits the context envelope under every binding; or the table names the case as a limit.
 
 **Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
+### test-control-decl-binding
+
+[cost: event/low] [surface: evidence-kit]
+
+`check-test-control` (C) never binds a witness to the control's assignments: native/src/gates/test_control.rs matches `control=`, `scenario=`, `commit=` and `cmd=` only, and the command digest in native/src/evidence.rs hashes the run and parser words alone, so editing a control's `VAR=value` after a red witness keeps that witness passing at close. evidence-kit/SPEC.md §Test controls' honest limits do not state it.
+
+**Fix shape (operator direction 2026-11-15, lead-relayed, not a ruling):** bind the declaration, never state the limit: a digest of the control's assignments rides the control line, and (C) holds it equal to the current declaration's.
+
+**Deliverable:** design-pending, a feature: the control-line field, its digest's input, (C)'s check and the manifest's migration, authored at spec as an evidence-kit amendment.
+
+**Cost while deferred:** a control re-pointed at another switch after its red witness still discharges its test at close. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading `close_witness`. Owner lookup: `test control`, `control line` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §Test controls.
 
 ## Icebox
 
