@@ -1,14 +1,46 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: machine-verdict-contract-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, a versioned machine contract for a caller driving the kits from outside):** option A. Debt, promoted here: `projection-witness-wall-clock` leading (the board's only `iteration` row), then `observe-trial-promise-gaps` and `path-root-context-spellings` on its gate-sdk surface. Features, deferred here and promoted by spec with their amendments, in this order: [machine-verdict-contract](#machine-verdict-contract), [gate-run-attestation-predicate](#gate-run-attestation-predicate) as widened, [recorded-test-mutation-control](#recorded-test-mutation-control). Stages scope, spec, align, build, validate, close: the set spans gate-sdk, evidence-kit and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the tier-one lead on the set's gate-sdk surface, and the evidence-kit pair as one manifest major version rather than two; drain 5 against inflow 4.6. Supersession: `gate-run-attestation-predicate` reshaped by `machine-verdict-contract`, whose provenance block goes first; `recorded-test-mutation-control` reshaped by `gate-run-attestation-predicate`, one manifest version, one batch, predicate first.
+
+  **The verdict contract's envelope (operator direction 2026-11-15, lead-relayed, not a ruling):** the SARIF log is the versioned verdict contract; a non-gate arm takes JSON only where a named caller reads it, the rest filed as [non-gate-arm-json](#non-gate-arm-json); no fourth exit code. The remaining asks of that date are filed deferred, and the 2026-11-14 adopter-target lead decision stands ([external-state-owner-mode](#external-state-owner-mode)).
+
+  **Push need (operator direction 2026-11-15, inside the budget):** 2 against 2: the closing push, which also first runs `path-root-context-spellings`' Windows-host cases no local run reaches, and a release tag push no one entry's landing spends, publishing the wire contracts on a released binary; close's release policy decides the cut, and 1 fits without it.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### projection-witness-wall-clock
+
+`--run-validate`'s projection_witness suite took about 3 of the 4 hours of liveness-arm-adoption-pass' validate. It spawns `check-trajectory-fresh` once per perturbation, up to three per class over about 134 classes, each spawn 15-28s wall at about 2s CPU (gate-sdk/SPEC.md §projection-witness).
+
+**Deliverable:** a fix: a faster trajectory arm, since the wall is mostly not CPU and likely a git-history read it could cache or narrow, or a narrower witness sample for a member whose trigger is wide.
+
+**Cost while deferred:** every validate pays about three hours of wall-clock. Surfaced 2026-11-14 at liveness-arm-adoption-pass' validate; filed at its close. Owner lookup: `projection_witness`, `projection-witness` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §projection-witness.
+
+### observe-trial-promise-gaps
+
+Two gaps between an observed hook trial (`--hook <member> --observe`) and what gate-sdk/SPEC.md §The harness-integration arm promises of it. First, the self-spawned child runs `--hook <member>` unflagged, so a trial still runs the member's own writes: observing `session-context` runs its scratch sweep (`native/src/hook/session_context.rs`), and the section states no rule for a member's own writes beside its withheld advise and grant effects. Second, the observe log's `reason=` is the child's first stderr line, and a shell-guard refusal can echo the command (the prefix rule in `native/src/guard/rules/spelling.rs` prints `Run it without the prefix: <command>`), against the log's 'holds no command text a session typed'.
+
+**Deliverable:** a fix per gap: pass the observe mark to the child so writing members skip their writes, or state the limit beside the shell-guard one; and scrub `reason=` for a command-echoing member, or narrow the promise.
+
+**Cost while deferred:** a trial meant to enforce nothing still deletes scratch, and the log can hold typed command text. Both read from source; no observed trial of `session-context` ran, since the trial is the write at issue. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (two bullets, from source); filed at the next scope. Owner lookup: `observe`, `reason=`, `command text` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
+### path-root-context-spellings
+
+The tree-free and user-install absolute-path checks accept spellings whose location depends on context: `walk::path_root` (`native/src/walk.rs`) admits a leading backslash, drive-relative on Windows, and a drive spelling such as `C:/x`, relative on POSIX. Its callers: the user roots (`native/src/installer/user.rs`), the tree-free hook paths (`native/src/hook/mod.rs`) and the evidence `handoff=` marker (`native/src/evidence.rs`).
+
+**Deliverable:** a fix: each caller weighed for the host's `Path::is_absolute`, with a case per refused spelling.
+
+**Cost while deferred:** a path the check admits as absolute resolves against an unstated drive or directory. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a pathlib probe; the scope re-read `path_root`); filed at the next scope. Owner lookup: `path_root`, `is_absolute`, `drive-relative` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The path-dialect contract.
 
 ## Deferred
 
@@ -174,6 +206,8 @@ the tree-side first unit of [hosted-attestation-service](#hosted-attestation-ser
 
 **First outside demand (consult advice, 2026-11-14):** the predicate is the evidence seam for an adopter running its own work engine, since a Statement's subject is a commit and it is stored anywhere. It adds four requirements: the subject is the commit, which the manifest, keyed by iteration and suite, does not carry; a run keys with no lifecycle iteration (`EVIDENCE_KIT_RUN_ID`); a foreign engine may produce the Statement; and a verifying read takes one from outside the tree on the command-knob seam (gate-sdk/SPEC.md §The knob file). Refused there: a read adapter emitting stage stamps or a queue from a foreign engine, since a stamp is worth its being committed and naming HEAD. That reopens when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
+**Widened (operator direction 2026-11-15, lead-relayed, not a ruling):** a published schema for the predicate, a verify arm that checks a Statement against the tree and its commit, and **imported runs** — a Statement produced on another host or in CI, bound by a hash of the command, the source commit and the counts, verified without re-running. The binding is one manifest major version beside [recorded-test-mutation-control](#recorded-test-mutation-control)'s record, with a migration note. Its provenance block (tool and kit versions, commit) is the one [machine-verdict-contract](#machine-verdict-contract) defines. Honest limit owed: an unsigned imported run proves its binding is consistent, never that the run happened; that is the signer's.
+
 **Cost while deferred:** a gate run is readable only in this tree's own formats, so no attestation verifier or log reads one; nothing rots. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close from the operator direction of that date, lead-relayed (not a ruling). Owner lookup: `in-toto`, `predicate`, `DSSE` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md.
 
 ### liveness-reader-template
@@ -326,36 +360,6 @@ docs/manual-install.md's PowerShell attestation-verify block, which reads `--for
 
 **Cost while deferred:** a Windows adopter verifying a download may meet a block that errors. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `PowerShell`, `ConvertFrom` in this file and the disposed-findings record, none on this block; owner docs/manual-install.md.
 
-### projection-witness-wall-clock
-
-[cost: iteration/high] [surface: gate-sdk]
-
-`--run-validate`'s projection_witness suite took about 3 of the 4 hours of liveness-arm-adoption-pass' validate. It spawns `check-trajectory-fresh` once per perturbation, up to three per class over about 134 classes, each spawn 15-28s wall at about 2s CPU (gate-sdk/SPEC.md §projection-witness).
-
-**Deliverable:** a fix: a faster trajectory arm, since the wall is mostly not CPU and likely a git-history read it could cache or narrow, or a narrower witness sample for a member whose trigger is wide.
-
-**Cost while deferred:** every validate pays about three hours of wall-clock. Surfaced 2026-11-14 at liveness-arm-adoption-pass' validate; filed at its close. Owner lookup: `projection_witness`, `projection-witness` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §projection-witness.
-
-### observe-trial-promise-gaps
-
-[cost: event/low] [surface: gate-sdk]
-
-Two gaps between an observed hook trial (`--hook <member> --observe`) and what gate-sdk/SPEC.md §The harness-integration arm promises of it. First, the self-spawned child runs `--hook <member>` unflagged, so a trial still runs the member's own writes: observing `session-context` runs its scratch sweep (`native/src/hook/session_context.rs`), and the section states no rule for a member's own writes beside its withheld advise and grant effects. Second, the observe log's `reason=` is the child's first stderr line, and a shell-guard refusal can echo the command (the prefix rule in `native/src/guard/rules/spelling.rs` prints `Run it without the prefix: <command>`), against the log's 'holds no command text a session typed'.
-
-**Deliverable:** a fix per gap: pass the observe mark to the child so writing members skip their writes, or state the limit beside the shell-guard one; and scrub `reason=` for a command-echoing member, or narrow the promise.
-
-**Cost while deferred:** a trial meant to enforce nothing still deletes scratch, and the log can hold typed command text. **Inferred, not run:** no observed trial of `session-context` was run. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (two bullets, from source); filed at the next scope. Owner lookup: `observe`, `reason=`, `command text` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
-
-### path-root-context-spellings
-
-[cost: event/low] [surface: gate-sdk]
-
-The tree-free and user-install absolute-path checks accept spellings whose location depends on context: `walk::path_root` (`native/src/walk.rs`) admits a leading backslash, drive-relative on Windows, and a drive spelling such as `C:/x`, relative on POSIX. Its callers: the user roots (`native/src/installer/user.rs`), the tree-free hook paths (`native/src/hook/mod.rs`) and the evidence `handoff=` marker (`native/src/evidence.rs`).
-
-**Deliverable:** a fix: each caller weighed for the host's `Path::is_absolute`, with a case per refused spelling.
-
-**Cost while deferred:** a path the check admits as absolute resolves against an unstated drive or directory. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a pathlib probe; the scope re-read `path_root`); filed at the next scope. Owner lookup: `path_root`, `is_absolute`, `drive-relative` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The path-dialect contract.
-
 ### user-lock-key-traversal
 
 [cost: event/low] [surface: installer]
@@ -385,6 +389,78 @@ The tree-free and user-install absolute-path checks accept spellings whose locat
 **Deliverable:** a fix: refuse a duplicated `since:` key, with its fixture.
 
 **Cost while deferred:** a page can show the unreleased banner the gate reads as released. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a YAML renderer probe); filed at the next scope. Owner lookup: `docs-since`, `duplicat` in this file and the disposed-findings record, none; owner site-kit/SPEC.md §check-docs-since.
+
+### machine-verdict-contract
+
+[cost: event/high] [surface: gate-sdk]
+
+A machine reader of a gate run has only the battery's SARIF 2.1.0 log (gate-sdk/SPEC.md §run-gates), which is empty on a green run and carries no tool or kit version and no commit, so a caller driving the battery from outside scrapes human output to learn what passed and on what. Operator direction 2026-11-15, lead-relayed, not a ruling: that log becomes the versioned verdict contract — a tool version and one per kit, the commit, a result for every member (pass, fail or not applicable), a contract version under semver, and golden fixtures — with no fourth exit code, since a hook or CI reader blocks on any non-zero. `--run --only <gate>` is the per-gate form.
+
+**Deliverable:** design-pending, a feature: the provenance block, how a gate signals not applicable, the version marker and its migration rule.
+
+**Cost while deferred:** an outside caller reimplements the verdict from text a release may reword. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `SARIF`, `--json`, `exit code` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
+### non-gate-arm-json
+
+[cost: event/low] [surface: gate-sdk]
+
+A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`) prints for a person, and no arm offers a machine form. Operator direction 2026-11-15, lead-relayed, not a ruling: a JSON form lands on an arm only where a named caller reads it (gate-sdk/SPEC.md §The non-gate arm), never across every arm at once.
+
+**Deliverable:** design-pending, a feature: per arm a caller names, its JSON form under [machine-verdict-contract](#machine-verdict-contract)'s versioning rule.
+
+**Cost while deferred:** an outside caller of an arm parses its text. Surfaced 2026-11-15 by an operator-relayed design review, split from the verdict contract at this scope. Owner lookup: `json` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
+
+### external-state-owner-mode
+
+[cost: event/low] [surface: lifecycle-kit]
+
+A declared mode where an outside tool renders the queue file and the iteration header: the gates check consistency and a provenance stamp (generator, version, content hash) instead of hand transitions, a corrective message names the owner's command from config, and stage transitions get verbs with JSON results.
+
+**Conflict, standing:** the lead decision of 2026-11-14 (operator-delegated) serves an adopter running its own work engine the checks and the session hooks only, with no lifecycle or queue read adapter, and [gate-run-attestation-predicate](#gate-run-attestation-predicate) records the refusal's ground: a stamp is worth its being committed and naming HEAD. Operator direction 2026-11-15, lead-relayed, not a ruling: that decision stands. **Reopens** when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
+
+**Deliverable:** design-pending, a feature, on reopening.
+
+**Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
+
+### gate-tamper-range-arm
+
+[cost: event/low] [surface: delegation-kit]
+
+`check-gate-tamper` reads only the index (delegation-kit/SPEC.md §check-gate-tamper), so a supervisor receiving an agent's commits cannot run it over the range they span.
+
+**Deliverable:** design-pending, a feature: a range form with a machine verdict, its fixture pair, and the index form unchanged.
+
+**Cost while deferred:** a handed-back range is checked for tamper only commit by commit at its own pre-commit, which an agent's hook bypass skips. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `gate-tamper`, `range` in this file, the icebox's coverage entry only; owner delegation-kit/SPEC.md §check-gate-tamper.
+
+### foreign-run-verb
+
+[cost: event/low] [surface: delegation-kit]
+
+The foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) is a procedure, not a verb: no arm takes a brief path, a vendor and model and a sandbox policy and returns a machine result with a transcript path, so a second-opinion caller builds its own executor.
+
+**Deliverable:** design-pending, a feature: the verb, its result shape and its sandbox policy's vocabulary held in config.
+
+**Cost while deferred:** each outside caller re-builds the run. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `foreign-vendor`, `foreign run` in this file and the disposed-findings record, none open; owner delegation-kit/SPEC.md §The foreign-vendor run.
+
+### external-kpi-series
+
+[cost: event/low] [surface: drift-kit]
+
+drift-kit's trend report covers only what it computes in-tree, so a velocity, lesson or queue-age series an outside tool holds cannot join it.
+
+**Deliverable:** design-pending, a feature: an input form for an outside series, its validation and how the report marks its provenance.
+
+**Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
+
+### brief-authority-lint
+
+[cost: event/low] [surface: delegation-kit]
+
+No check reads an agent brief: one that grants authority the agent must not hold (push, post, install) or that does not quote the request passes. A generic gate takes its forbidden verbs and required sections from config.
+
+**Deliverable:** design-pending, a feature: where a brief is read (a dispatch payload or a file), the config grammar, and its honest limit.
+
+**Cost while deferred:** an over-granting or unquoted brief reaches the agent. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `brief`, `forbidden verb` in this file, none; [outbound-public-text-lint](#outbound-public-text-lint) reads posted text, not briefs; owner delegation-kit/SPEC.md.
 
 ## Icebox
 

@@ -4,4 +4,4 @@
 
 ---
 
-— scope a6cd826c 2026-11-15 b7fcc303c
+machine-verdict-contract-pass scope a6cd826c 2026-11-15 b7fcc303c
