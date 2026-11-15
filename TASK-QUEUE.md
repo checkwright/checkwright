@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: liveness-arm-adoption-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-11-14, lead-relayed, not a ruling; the theme that date's standing directive, one session-hook arm adoptable on its own by an adopter running its own work engine):** option A, the arm delegation-kit's `subagent-stop-liveness`. Features, filed deferred here and promoted by spec with their amendments, in this order: `liveness-hook-false-refusals`, `liveness-hook-no-repo-run`, `hook-observe-mode`, `hook-only-user-install`, `hook-arm-adopter-page`. Debt: `nonutf8-repo-path-reads` in the no-repo run's batch, `installer-crate-test-gaps` in the user install's. Stages scope, spec, align, build, validate, close: the first two features span delegation-kit, gate-sdk and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the carried adopter bullets and two pool entries on the arm's path (its `--hook` dispatch and toplevel read, the installer, the site); drain 7 (5 features, 2 debt) against inflow 2.0. Supersession: [site-documents-unreleased](#site-documents-unreleased) reshaped by `hook-arm-adopter-page`, which settles it for its own pages; [personal-one-kit-hooks](#personal-one-kit-hooks) reshaped by `hook-only-user-install`, which goes first; `nonutf8-repo-path-reads` reshaped by `liveness-hook-no-repo-run`, one batch.
-
-  **Adopter target (lead decision 2026-11-14, operator-delegated):** an adopter running its own work engine is served the checks and the session hooks only, with no lifecycle or queue read adapter, its evidence seam [gate-run-attestation-predicate](#gate-run-attestation-predicate); the absorb candidates rank below the adopter's asks, false refusals first.
-
-  **Push need (operator direction 2026-11-14, inside the budget):** 2 against 2: the closing push, and a release tag push that no one entry's landing spends, since the adopter's pilot enforces only on a published tag; a tag-candidate pre-release serves its log-only run. Windows installer paths a local run cannot reach ride the closing push.
 
 ---
 

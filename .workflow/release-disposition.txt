@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-liveness-arm-adoption-pass release v0.36.0 — explicit operator direction (the set record's push need, lead-relayed) and the front-door --user flag the pinned release lacks; minor: new and tightened gates, knob additions and behavior changes declared
