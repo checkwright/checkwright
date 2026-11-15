@@ -1,0 +1,4 @@
+# graph: couples=knob:EVIDENCE_KIT_BASELINE_FILE,knob:EVIDENCE_KIT_MANIFEST_FILE,knob:EVIDENCE_KIT_QUEUE_FILE,knob:EVIDENCE_KIT_STATE_FILE dir=one valve=none tier=precommit
+# install: on-surface
+# armed-by: EVIDENCE_KIT_CONTROLS
+# spec: evidence-kit/SPEC.md §check-test-control — every declared control well-formed, every newly baselined pass row named by a control, and on a close cursor every control witnessed red by the current run

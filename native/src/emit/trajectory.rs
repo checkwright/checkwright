@@ -658,6 +658,7 @@ mod tests {
         assert!(!is_attestation("# a comment line"));
         assert!(!is_attestation("my-iter gate_tests md5=abc"));
         assert!(!is_attestation("My-Iter gate_tests sha256=abc"));
+        assert!(!is_attestation("my-iter unit control=c scenario=t witnessed=red 2026-01-01 commit=- cmd=abc"));
     }
 
     // spec: drift-kit/SPEC.md §The published-evidence extractor — a v2 suite line's appended fields

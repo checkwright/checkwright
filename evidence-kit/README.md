@@ -2,7 +2,7 @@
 
 A held-constant test baseline and a committed per-run evidence manifest for the validate stage: a stage stamp proves a stage was *invoked*, evidence-kit proves it produced its green result. The manifest is a versioned, hashable record (`# contract: evidence-manifest v2`), and a run can publish it as an in-toto Statement an attestation verifier reads, so the kit is adoptable with or without an iteration lifecycle.
 
-The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness, scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where lifecycle drives the tree, close-entry green block + validate-stamp coupling), `check-battery-roster` (the runner doc's battery block against the suite roster) and `check-producer-liveness` (no stage entry while the producer is still running). The tools that drive it are non-gate arms of the gate binary, reached through gate-sdk's front end: `--run-validate` (the codified spine that runs the suites and records evidence), `--diff-baseline` (the situational runtime diff), `--verify-gate-run` and `--import-gate-run` (judge a gate-run Statement against the tree, and record a verified one produced elsewhere) and `--emit baseline-claims` (each baseline row as a `measured:` oracle line, for prose that quotes one). See [SPEC.md](SPEC.md) for the full contracts.
+The gates: `check-evidence-baseline` (baseline grammar, blocking-slug liveness, scenario coverage, flip causation), `check-evidence-manifest` (manifest grammar and, where lifecycle drives the tree, close-entry green block + validate-stamp coupling), `check-battery-roster` (the runner doc's battery block against the suite roster), `check-test-control` (every newly baselined test names a declared control, and every control was witnessed red before close) and `check-producer-liveness` (no stage entry while the producer is still running). The tools that drive it are non-gate arms of the gate binary, reached through gate-sdk's front end: `--run-validate` (the codified spine that runs the suites, re-runs each under its declared test controls, and records evidence), `--diff-baseline` (the situational runtime diff), `--verify-gate-run` and `--import-gate-run` (judge a gate-run Statement against the tree, and record a verified one produced elsewhere) and `--emit baseline-claims` (each baseline row as a `measured:` oracle line, for prose that quotes one). See [SPEC.md](SPEC.md) for the full contracts.
 
 This file ships in the installer payload; what that payload withholds, and where this page's `SPEC.md` links then resolve, is [gate-sdk/SPEC.md §Consumer payload](../gate-sdk/SPEC.md#consumer-payload).
 
@@ -10,13 +10,14 @@ This file ships in the installer payload; what that payload withholds, and where
 
 Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 
-1. Register the gates — add each to your `gates.list` except `check-producer-liveness`, which step 6 wires at stage entry instead:
+1. Register the gates — add each to your `gates.list` except `check-producer-liveness`, which step 6 wires at stage entry instead, and `check-test-control`, which step 7 selects:
 
    <!-- gate-roster:begin -->
    ```
    check-evidence-baseline
    check-evidence-manifest
    check-battery-roster
+   check-test-control        # opt-in — see step 7
    check-producer-liveness   # entry hook only — never gates.list, see step 6
    ```
    <!-- gate-roster:end -->
@@ -44,6 +45,8 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
 5. Optional lifecycle integration — set `LIFECYCLE_KIT_BOUNDARY_TRUNCATE` to the evidence manifest so a new iteration starts from the contract header, and the manifest gate's close-entry and stamp-coupling assertions arm automatically.
 
 6. Wire `check-producer-liveness` on `LIFECYCLE_KIT_ENTRY_PREFLIGHT` rather than in `gates.list`, its command naming the lock file through a name-resolving front end rather than a path (`<stage>=<front end> check-producer-liveness <lock-file>`; [SPEC.md §check-evidence-manifest](SPEC.md#check-evidence-manifest) owns why a preflight entry names the gate), at whichever stage entries must not begin while `--run-validate` is still running. It asks whether a producer is in flight, not whether the tree is consistent, so a battery that `--run-validate` itself invokes would red every run against that run's own lock. See [SPEC.md §check-producer-liveness](SPEC.md#check-producer-liveness).
+
+7. Optional test controls — to prove a recorded test can fail, name it in `EVIDENCE_KIT_CONTROLS` with an `EVIDENCE_KIT_CONTROL_<name> = <suite> <scenario> <VAR>=<value>` declaration whose assignments re-introduce the defect it catches, and register `check-test-control`. `--run-validate` then re-runs the suite under those assignments and records whether the test went red. See [SPEC.md §Test controls](SPEC.md#test-controls).
 
 ## Test
 

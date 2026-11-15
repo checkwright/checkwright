@@ -99,6 +99,23 @@ pub fn state_stage(text: &str) -> Option<String> {
     last.split_whitespace().nth(1).map(String::from)
 }
 
+// spec: evidence-kit/SPEC.md §check-evidence-manifest — (A)'s date window: the earliest validate
+// stamp's date for the iteration, `None` where it has none
+pub fn earliest_validate(state_text: &str, iter: &str) -> Option<String> {
+    let mut earliest: Option<String> = None;
+    for line in state_lines(state_text) {
+        let f: Vec<&str> = line.split_whitespace().collect();
+        if f.first().copied().unwrap_or("") != iter || f.get(1).copied().unwrap_or("") != "validate" {
+            continue;
+        }
+        let d = f.get(3).copied().unwrap_or("");
+        if earliest.as_deref().map_or(true, |e| e.is_empty() || d < e) {
+            earliest = Some(d.to_string());
+        }
+    }
+    earliest
+}
+
 // spec: evidence-kit/SPEC.md §The evidence adapters — the unnamed-iteration placeholder, which names
 // no run key
 const UNNAMED: &str = "—";
@@ -355,6 +372,135 @@ impl SuiteLine {
 
     pub fn binding(&self) -> String {
         binding_digest(&self.suite, &self.cmd, &self.commit, self.counts, &self.verdict, &self.log)
+    }
+}
+
+// spec: evidence-kit/SPEC.md §Test controls — one declared control
+#[derive(Clone, Debug, PartialEq)]
+pub struct Control {
+    pub name: String,
+    pub suite: String,
+    pub scenario: String,
+    pub env: Vec<(String, String)>,
+}
+
+pub const CONTROL_PREFIX: &str = "EVIDENCE_KIT_CONTROL_";
+const CONTROL_SINCE: &str = "SINCE";
+
+fn is_identifier(s: &str) -> bool {
+    let mut c = s.chars();
+    matches!(c.next(), Some(h) if h.is_ascii_alphabetic() || h == '_')
+        && c.all(|t| t.is_ascii_alphanumeric() || t == '_')
+}
+
+// spec: evidence-kit/SPEC.md §Test controls — the one declaration parser `--run-validate`'s guards
+// and `check-test-control` (A) share: the well-formed controls, and a finding per malformed one
+pub fn controls(
+    names: &[String],
+    family: &[(String, String)],
+    suites: &[String],
+) -> (Vec<Control>, Vec<String>) {
+    let mut out = Vec::new();
+    let mut errors = Vec::new();
+    for name in names {
+        if name == CONTROL_SINCE {
+            errors.push(format!(
+                "control '{}' collides with {}{}, the since-commit knob, so it can have no member — rename the control",
+                name, CONTROL_PREFIX, CONTROL_SINCE
+            ));
+            continue;
+        }
+        let Some(value) = crate::walk::knob_in_family(family, name) else {
+            errors.push(format!("control '{}' has no {}{} declaration", name, CONTROL_PREFIX, name));
+            continue;
+        };
+        let words: Vec<&str> = value.split_whitespace().collect();
+        let (Some(suite), Some(scenario)) = (words.first(), words.get(1)) else {
+            errors.push(format!(
+                "control '{}' is '{}' — want <suite> <scenario> <VAR>=<value> [<VAR>=<value> ...]",
+                name, value
+            ));
+            continue;
+        };
+        let mut bad = false;
+        if !suites.iter().any(|s| s == suite) {
+            errors.push(format!("control '{}' names suite '{}', which is not in EVIDENCE_KIT_SUITES", name, suite));
+            bad = true;
+        }
+        if words.len() < 3 {
+            errors.push(format!("control '{}' carries no <VAR>=<value> assignment", name));
+            bad = true;
+        }
+        let mut env = Vec::new();
+        for w in &words[2.min(words.len())..] {
+            match w.split_once('=') {
+                Some((k, v)) if is_identifier(k) => env.push((k.to_string(), v.to_string())),
+                _ => {
+                    errors.push(format!(
+                        "control '{}' carries '{}', which is not a <identifier>=<value> assignment",
+                        name, w
+                    ));
+                    bad = true;
+                }
+            }
+        }
+        if !bad {
+            out.push(Control { name: name.clone(), suite: suite.to_string(), scenario: scenario.to_string(), env });
+        }
+    }
+    (out, errors)
+}
+
+// spec: evidence-kit/SPEC.md §Test controls — the scenario's last observed status as the witness
+pub fn witness(parsed: &[String], scenario: &str) -> &'static str {
+    let status = parsed.iter().rev().find_map(|l| {
+        let mut f = l.split_whitespace();
+        (f.next() == Some(scenario)).then(|| f.next().unwrap_or(""))
+    });
+    match status {
+        Some("fail") => "red",
+        Some("pass") => "green",
+        _ => "absent",
+    }
+}
+
+// spec: evidence-kit/SPEC.md §Evidence manifest — one v2 control line's fields
+#[derive(Clone, Debug, PartialEq)]
+pub struct ControlLine {
+    pub key: String,
+    pub suite: String,
+    pub name: String,
+    pub scenario: String,
+    pub witnessed: String,
+    pub date: String,
+    pub commit: String,
+    pub cmd: String,
+}
+
+impl ControlLine {
+    pub fn render(&self) -> String {
+        format!(
+            "{} {} control={} scenario={} witnessed={} {} commit={} cmd={}",
+            self.key, self.suite, self.name, self.scenario, self.witnessed, self.date, self.commit, self.cmd
+        )
+    }
+}
+
+// spec: evidence-kit/SPEC.md §check-evidence-baseline — the baseline as committed at `commit`, which
+// `label` names in a refusal: empty where that tree holds no such file, and Err on a git failure
+// listing or reading it, never an empty read
+pub fn baseline_at(commit: &str, label: &str, baseline: &str) -> Result<String, String> {
+    let closed = |what: String| format!("{} — the check could not run; treating as failure (not clean)", what);
+    let listed = crate::listing::names(None, &["ls-tree", "-z", "--full-name", "--name-only", commit, "--", baseline])
+        .map_err(|e| e.text_or(|_| closed(format!("cannot list {} at {} {}", baseline, label, commit))))?;
+    let name = listed.into_iter().next().unwrap_or_default();
+    if name.is_empty() {
+        return Ok(String::new());
+    }
+    let shown = crate::proc::run(&programs::GIT, &["show", &format!("{}:{}", commit, name)])?;
+    match shown.stdout() {
+        Some(b) => Ok(String::from_utf8_lossy(b).into_owned()),
+        None => Err(closed(format!("cannot read {} at {} {}", name, label, commit))),
     }
 }
 
@@ -738,6 +884,49 @@ fn windows_pid_held(pid: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn declared(pairs: &[(&str, &str)]) -> Result<Vec<Control>, Vec<String>> {
+        let family: Vec<(String, String)> = pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect();
+        let names: Vec<String> = pairs.iter().map(|(k, _)| k.to_string()).collect();
+        match controls(&names, &family, &["unit".to_string()]) {
+            (ok, e) if e.is_empty() => Ok(ok),
+            (_, e) => Err(e),
+        }
+    }
+
+    // spec: evidence-kit/SPEC.md §Test controls — the parser's refusals, each naming its control
+    #[test]
+    fn the_declaration_parser_refuses_each_malformed_shape() {
+        let ok = declared(&[("nullguard", "unit t_null BREAK_NULL=1 MODE=x")]).unwrap();
+        assert_eq!(
+            ok[0].env,
+            vec![("BREAK_NULL".to_string(), "1".to_string()), ("MODE".to_string(), "x".to_string())]
+        );
+        for (value, want) in [
+            ("ghost t BREAK=1", "not in EVIDENCE_KIT_SUITES"),
+            ("unit t", "carries no <VAR>=<value> assignment"),
+            ("unit t 9X=1", "not a <identifier>=<value> assignment"),
+            ("unit t NOEQUALS", "not a <identifier>=<value> assignment"),
+            ("unit", "want <suite> <scenario>"),
+        ] {
+            let err = declared(&[("c", value)]).unwrap_err().join("; ");
+            assert!(err.contains(want) && err.contains("'c'"), "{}: {}", value, err);
+        }
+        let since = declared(&[("SINCE", "unit t BREAK=1")]).unwrap_err().join("; ");
+        assert!(since.contains("collides with EVIDENCE_KIT_CONTROL_SINCE"), "{}", since);
+        let missing = controls(&["gone".to_string()], &[], &["unit".to_string()]).1.join("; ");
+        assert!(missing.contains("has no EVIDENCE_KIT_CONTROL_gone declaration"), "{}", missing);
+    }
+
+    #[test]
+    fn the_witness_maps_the_scenario_status_last_observation_winning() {
+        let parsed = |s: &[&str]| s.iter().map(|l| l.to_string()).collect::<Vec<_>>();
+        assert_eq!(witness(&parsed(&["t fail"]), "t"), "red");
+        assert_eq!(witness(&parsed(&["t pass"]), "t"), "green");
+        assert_eq!(witness(&parsed(&["t ignore"]), "t"), "absent");
+        assert_eq!(witness(&parsed(&["u fail"]), "t"), "absent");
+        assert_eq!(witness(&parsed(&["t pass", "t fail"]), "t"), "red");
+    }
 
     const GOLDEN_SUBJECT: &str = "0123456789abcdef0123456789abcdef01234567";
 

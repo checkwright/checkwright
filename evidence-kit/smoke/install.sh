@@ -10,6 +10,7 @@ cat >> scripts/gates.list <<'EOF'
 # evidence-kit
 check-evidence-baseline
 check-evidence-manifest
+check-test-control
 # spec: gate-sdk/SPEC.md §check-gate-substrate-parity — assertion I's own declaration grammar,
 # a sibling of the `# smoke-unregistered:` line below on a second roster (§The install disposition)
 # unregistered: check-battery-roster — its subject is the configured runner doc's battery-roster block vs EVIDENCE_KIT_SUITES; the scratch consumer vendors no root README carrying that block

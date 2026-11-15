@@ -9,7 +9,7 @@ use crate::walk;
 use std::io::Write;
 use std::path::Path;
 
-// spec: evidence-kit/SPEC.md §Layout and configuration — the declared roster, two of whose names
+// spec: evidence-kit/SPEC.md §Layout and configuration — the declared roster, three of whose names
 // are prefix families: a hardcoded top-level flag has no row to declare them on, so the knob-file derivation
 // could not see one of them, which is the forced-family test.
 pub const KNOBS: &[&str] = &[
@@ -26,6 +26,8 @@ pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_RUN_ID",
     "EVIDENCE_KIT_PRE_HOOK",
     "EVIDENCE_KIT_STATEMENT_FILE",
+    "EVIDENCE_KIT_CONTROLS",
+    "EVIDENCE_KIT_CONTROL_*",
     "GATE_SDK_KIT_DIRS",
 ];
 
@@ -65,6 +67,8 @@ struct Cfg {
     run_id: String,
     pre_hook: String,
     statement: String,
+    controls: Vec<String>,
+    control_family: Vec<(String, String)>,
 }
 
 fn config() -> Result<Cfg, Refusal> {
@@ -83,6 +87,8 @@ fn config() -> Result<Cfg, Refusal> {
         run_id: scalar("EVIDENCE_KIT_RUN_ID")?,
         pre_hook: scalar("EVIDENCE_KIT_PRE_HOOK")?,
         statement: scalar("EVIDENCE_KIT_STATEMENT_FILE")?,
+        controls: walk::knob_array("EVIDENCE_KIT_CONTROLS").map_err(guard)?,
+        control_family: walk::knob_prefix(evidence::CONTROL_PREFIX).map_err(guard)?,
     })
 }
 
@@ -147,6 +153,10 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             "no suites configured (EVIDENCE_KIT_SUITES) — nothing to run".to_string(),
         ));
     }
+    let (controls, malformed) = evidence::controls(&cfg.controls, &cfg.control_family, &cfg.suites);
+    if !malformed.is_empty() {
+        return Err(guard(format!("{} — nothing run, nothing written", malformed.join("; "))));
+    }
     let queue_text = std::fs::read(&cfg.queue)
         .ok()
         .map(|b| String::from_utf8_lossy(&b).into_owned());
@@ -195,6 +205,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
 
     let mut overall = 0;
     let mut rows: Vec<evidence::SuiteLine> = Vec::new();
+    let mut control_lines: Vec<evidence::ControlLine> = Vec::new();
     let baseline_text = read_or_empty(&cfg.baseline);
     let skip_text = if !cfg.skip.is_empty() && Path::new(&cfg.skip).is_file() {
         read_or_empty(&cfg.skip)
@@ -215,7 +226,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
         // guards' code with no evidence appended, and that ordering is the contract: it is what
         // keeps a refused run from writing a line.
         if !cfg.pre_hook.is_empty() {
-            let status = spawn("EVIDENCE_KIT_PRE_HOOK", &cfg.pre_hook, Some(suite), &proc::Sink::Inherit)
+            let status = spawn("EVIDENCE_KIT_PRE_HOOK", &cfg.pre_hook, Some(suite), &[], &proc::Sink::Inherit)
                 .map_err(guard)?;
             if status != 0 {
                 return Err(guard(format!(
@@ -240,7 +251,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
 
         let parser = evidence::parser_for(&cfg.parser_family, suite, &cfg.parser);
         let log = format!("{}/validate-{}.log", cfg.tmpdir, suite);
-        let status = spawn("EVIDENCE_KIT_RUN_*", &cmd, None, &proc::Sink::File(log.clone().into()))
+        let status = spawn("EVIDENCE_KIT_RUN_*", &cmd, None, &[], &proc::Sink::File(log.clone().into()))
             .map_err(guard)?;
         if status != 0 {
             eprintln!(
@@ -287,12 +298,52 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             origin: "local".to_string(),
         };
         append_line(&batch, &row.render()).map_err(guard)?;
-        rows.push(row);
-
         println!(
             "run-validate: {} -> {} (pass={} fail={} ignore={})",
             suite, verdict, npass, nfail, nignore
         );
+
+        // spec: evidence-kit/SPEC.md §Test controls — each control re-spawns its suite's argv under
+        // its assignments, on the tree the suite just ran on, so the pre-hook does not re-run
+        for c in controls.iter().filter(|c| &c.suite == suite) {
+            let (clog, cparsed) = control_paths(&cfg.tmpdir, suite, &c.name);
+            let status = spawn("EVIDENCE_KIT_RUN_*", &cmd, None, &c.env, &proc::Sink::File(clog.clone().into()))
+                .map_err(guard)?;
+            let lines = evidence::parse(suite, Path::new(&clog), status, &parser).map_err(guard)?;
+            write_lines(&cparsed, &lines).map_err(guard)?;
+            if lines.is_empty() {
+                return Err(Refusal {
+                    code: 1,
+                    message: format!(
+                        "parser '{}' produced no result for control '{}' of suite '{}' (log: {}) — a run failure, not an empty witness",
+                        parser, c.name, suite, clog
+                    ),
+                });
+            }
+            let witnessed = evidence::witness(&lines, &c.scenario);
+            let line = evidence::ControlLine {
+                key: key.clone(),
+                suite: suite.clone(),
+                name: c.name.clone(),
+                scenario: c.scenario.clone(),
+                witnessed: witnessed.to_string(),
+                date: today.clone(),
+                commit: row.commit.clone(),
+                cmd: row.cmd.clone(),
+            };
+            append_line(&batch, &line.render()).map_err(guard)?;
+            if witnessed != "red" {
+                overall = 1;
+                println!(
+                    "run-validate: control '{}' witnessed {} — {} {} did not fail under its assignments (log: {})",
+                    c.name, witnessed, suite, c.scenario, clog
+                );
+            } else {
+                println!("run-validate: control '{}' witnessed red", c.name);
+            }
+            control_lines.push(line);
+        }
+        rows.push(row);
     }
 
     // spec: evidence-kit/SPEC.md §bin/run-validate.sh — staged before the fold so a staging failure
@@ -316,7 +367,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             Some(staged)
         }
     };
-    fold(&cfg.manifest, &cfg.tmpdir, &key, &rows).map_err(guard)?;
+    fold(&cfg.manifest, &cfg.tmpdir, &key, &rows, &control_lines).map_err(guard)?;
     if let Some(staged) = staged {
         std::fs::rename(&staged, &cfg.statement).map_err(|e| {
             guard(format!(
@@ -330,8 +381,14 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
 }
 
 // spec: evidence-kit/SPEC.md §Evidence manifest — the single fold, published by rename; a v1 file
-// is rewritten at v2 with its v1 lines dropped
-pub(crate) fn fold(manifest: &str, tmpdir: &str, key: &str, rows: &[evidence::SuiteLine]) -> Result<(), String> {
+// is rewritten at v2 with its v1 lines dropped, and a superseded suite's control lines go with it
+pub(crate) fn fold(
+    manifest: &str,
+    tmpdir: &str,
+    key: &str,
+    rows: &[evidence::SuiteLine],
+    controls: &[evidence::ControlLine],
+) -> Result<(), String> {
     let superseded: Vec<&str> = rows.iter().map(|r| r.suite.as_str()).collect();
     let text = read_or_empty(manifest);
     let legacy = match evidence::manifest_header(&text) {
@@ -364,6 +421,10 @@ pub(crate) fn fold(manifest: &str, tmpdir: &str, key: &str, rows: &[evidence::Su
     for r in rows {
         out.push_str(&r.render());
         out.push('\n');
+        for c in controls.iter().filter(|c| c.suite == r.suite) {
+            out.push_str(&c.render());
+            out.push('\n');
+        }
     }
     let staged = format!("{}/validate-evidence.{}", tmpdir, std::process::id());
     std::fs::write(&staged, out).map_err(|e| format!("cannot write {}: {}", staged, e))?;
@@ -481,6 +542,7 @@ fn spawn(
     ground: &'static str,
     command: &str,
     operand: Option<&str>,
+    env: &[(String, String)],
     sink: &proc::Sink,
 ) -> Result<i32, String> {
     let mut words: Vec<&str> = command.split_whitespace().collect();
@@ -491,7 +553,14 @@ fn spawn(
     if let Some(o) = operand {
         words.push(o);
     }
-    proc::run_to(&program, &words, sink)
+    proc::run_to_env(&program, &words, env, sink)
+}
+
+// spec: evidence-kit/SPEC.md §Test controls — a control's log and parse beside its suite's; a family
+// suffix carries no `.`, so neither can collide with a suite's own
+fn control_paths(tmpdir: &str, suite: &str, name: &str) -> (String, String) {
+    let stem = format!("{}/validate-{}.control-{}", tmpdir, suite, name);
+    (format!("{}.log", stem), format!("{}.parsed", stem))
 }
 
 fn date_today() -> Result<String, String> {
@@ -561,7 +630,7 @@ mod tests {
         std::fs::create_dir_all(&dir).unwrap();
         let m = dir.join("manifest").display().to_string();
         std::fs::write(&m, before).unwrap();
-        fold(&m, &dir.display().to_string(), "iter_a", &[row()]).unwrap();
+        fold(&m, &dir.display().to_string(), "iter_a", &[row()], &[]).unwrap();
         let got = std::fs::read_to_string(&m).unwrap();
         std::fs::remove_dir_all(&dir).ok();
         got
@@ -608,6 +677,56 @@ mod tests {
             "# contract: evidence-manifest v2\n\
              # a note\n\
              iter_a gates sha256=new pass=2 fail=0 ignore=0 verdict=clean 2026-02-02 commit=- tree=- cmd=c origin=local\n"
+        );
+    }
+
+    // spec: evidence-kit/SPEC.md §Test controls — a control line folds directly after its suite's,
+    // and the run's prior control lines for that suite go with the superseded suite line
+    #[test]
+    fn the_fold_places_controls_after_their_suite_and_supersedes_them_with_it() {
+        let dir = std::env::temp_dir().join(format!("cw-fold-ctl-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let m = dir.join("manifest").display().to_string();
+        let tail = "commit=- tree=- cmd=c origin=local";
+        std::fs::write(
+            &m,
+            format!(
+                "# contract: evidence-manifest v2\n\
+                 iter_a gates sha256=old pass=1 fail=0 ignore=0 verdict=clean 2026-01-01 {}\n\
+                 iter_a gates control=old scenario=s witnessed=red 2026-01-01 commit=- cmd=c\n",
+                tail
+            ),
+        )
+        .unwrap();
+        let ctl = evidence::ControlLine {
+            key: "iter_a".into(),
+            suite: "gates".into(),
+            name: "new".into(),
+            scenario: "s".into(),
+            witnessed: "green".into(),
+            date: "2026-02-02".into(),
+            commit: "-".into(),
+            cmd: "c".into(),
+        };
+        fold(&m, &dir.display().to_string(), "iter_a", &[row()], &[ctl]).unwrap();
+        let got = std::fs::read_to_string(&m).unwrap();
+        std::fs::remove_dir_all(&dir).ok();
+        assert_eq!(
+            got,
+            format!(
+                "# contract: evidence-manifest v2\n\
+                 iter_a gates sha256=new pass=2 fail=0 ignore=0 verdict=clean 2026-02-02 {}\n\
+                 iter_a gates control=new scenario=s witnessed=green 2026-02-02 commit=- cmd=c\n",
+                tail
+            )
+        );
+    }
+
+    #[test]
+    fn a_control_logs_and_parses_beside_its_suite() {
+        assert_eq!(
+            control_paths("t", "unit", "nullguard"),
+            ("t/validate-unit.control-nullguard.log".to_string(), "t/validate-unit.control-nullguard.parsed".to_string())
         );
     }
 

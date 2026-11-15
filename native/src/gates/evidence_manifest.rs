@@ -71,6 +71,39 @@ fn suite_line(line: &str, v2: bool, grammar: &mut Vec<String>) -> Option<Vec<Str
     (grammar.len() == before).then_some(f)
 }
 
+const CONTROL_SHAPE: &str =
+    "<run-key> <suite> control=… scenario=… witnessed=red|green|absent <date> commit=… cmd=…";
+
+// spec: evidence-kit/SPEC.md §Evidence manifest — a v2 control line's eight fields, each bad field
+// its own finding; `None` when the line is not one
+fn control_line(line: &str, grammar: &mut Vec<String>) -> Option<Vec<String>> {
+    let (f, rest) = fields(line, 8);
+    if f[7].is_empty() || !rest.is_empty() {
+        grammar.push(format!("malformed control line (want '{}'): {}", CONTROL_SHAPE, line));
+        return None;
+    }
+    let before = grammar.len();
+    if f[2].strip_prefix("control=").map_or(true, str::is_empty) {
+        grammar.push(format!("bad control field '{}': {}", f[2], line));
+    }
+    if f[3].strip_prefix("scenario=").map_or(true, str::is_empty) {
+        grammar.push(format!("bad scenario field '{}': {}", f[3], line));
+    }
+    if !["witnessed=red", "witnessed=green", "witnessed=absent"].contains(&f[4].as_str()) {
+        grammar.push(format!("bad witnessed field '{}' (want witnessed=red|green|absent): {}", f[4], line));
+    }
+    if !evidence::is_date(&f[5]) {
+        grammar.push(format!("bad date '{}': {}", f[5], line));
+    }
+    if !f[6].strip_prefix("commit=").is_some_and(|c| c == "-" || crate::provenance::object_id(c)) {
+        grammar.push(format!("bad commit field '{}' (want commit=<40|64 lowercase hex>|-): {}", f[6], line));
+    }
+    if !f[7].strip_prefix("cmd=").is_some_and(evidence::is_hex64) {
+        grammar.push(format!("bad cmd field '{}': {}", f[7], line));
+    }
+    (grammar.len() == before).then_some(f)
+}
+
 pub fn run(args: &[String]) -> i32 {
     match rule(args) {
         Ok(rc) => rc,
@@ -114,15 +147,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let stage = evidence::state_stage(&stext).unwrap_or_default();
 
     // assertion B: every manifest line follows its header's major — v1's eight fields, or v2's
-    // line-kind rule and twelve-field suite line — and carries the current iteration
+    // line-kind rule, twelve-field suite line and eight-field control line placed under its suite
+    // line — and carries the current iteration
     let mut grammar: Vec<String> = Vec::new();
     let mut clean_suite_date: Vec<(String, String)> = Vec::new();
     let mut have_line_for_iter = false;
+    let mut suites_seen: Vec<(String, String)> = Vec::new();
     for line in evidence::data_lines(&mtext) {
         let third = line.split_whitespace().nth(2).unwrap_or("");
+        if v2 && third.starts_with("control=") {
+            let Some(f) = control_line(line, &mut grammar) else {
+                continue;
+            };
+            if !suites_seen.iter().any(|(k, s)| *k == f[0] && *s == f[1]) {
+                grammar.push(format!("control line with no '{} {}' suite line above it: {}", f[0], f[1], line));
+            }
+            continue;
+        }
         if v2 && !third.starts_with("sha256=") {
             grammar.push(format!(
-                "unknown line kind '{}' (a v2 line's third field is sha256=…): {}",
+                "unknown line kind '{}' (a v2 line's third field is sha256=… or control=…): {}",
                 third, line
             ));
             continue;
@@ -130,6 +174,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let Some(f) = suite_line(line, v2, &mut grammar) else {
             continue;
         };
+        suites_seen.push((f[0].clone(), f[1].clone()));
         if !iter.is_empty() && f[0] != iter {
             grammar.push(format!("foreign iteration '{}' (current is '{}') — the iteration-boundary truncation was skipped: {}", f[0], iter, line));
             continue;
@@ -162,20 +207,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    let mut earliest_validate = String::new();
-    let mut have_validate = false;
-    for line in evidence::state_lines(&stext) {
-        let f: Vec<&str> = line.split_whitespace().collect();
-        if f.first().copied().unwrap_or("") != iter || f.get(1).copied().unwrap_or("") != "validate"
-        {
-            continue;
-        }
-        have_validate = true;
-        let d = f.get(3).copied().unwrap_or("");
-        if earliest_validate.is_empty() || d < earliest_validate.as_str() {
-            earliest_validate = d.to_string();
-        }
-    }
+    let validate_stamp = evidence::earliest_validate(&stext, &iter);
+    let have_validate = validate_stamp.is_some();
+    let earliest_validate = validate_stamp.unwrap_or_default();
 
     let mut errors: Vec<String> = Vec::new();
 
@@ -254,6 +288,28 @@ mod tests {
         assert!(is_date("2026-01-01"));
         assert!(!is_date("2026-1-01"));
         assert!(!is_date("2026-01-01x"));
+    }
+
+    // spec: evidence-kit/SPEC.md §Evidence manifest — a control line's eight fields, each bad field
+    // its own finding
+    #[test]
+    fn a_control_line_holds_its_eight_fields() {
+        let h = "a".repeat(64);
+        let good = format!("k s control=c scenario=t witnessed=red 2026-01-01 commit=- cmd={}", h);
+        let mut g = Vec::new();
+        assert!(control_line(&good, &mut g).is_some(), "{:?}", g);
+        for bad in [
+            good.replace("witnessed=red", "witnessed=pink"),
+            good.replace("control=c", "control="),
+            good.replace("scenario=t", "scenario="),
+            good.replace("commit=-", "commit=xyz"),
+            good.replace(&format!("cmd={}", h), "cmd=short"),
+            format!("{} extra", good),
+        ] {
+            let mut g = Vec::new();
+            assert!(control_line(&bad, &mut g).is_none(), "{}", bad);
+            assert_eq!(g.len(), 1, "{}: {:?}", bad, g);
+        }
     }
 
     // spec: evidence-kit/SPEC.md §Evidence manifest — a v2 suite line's four appended fields, each bad

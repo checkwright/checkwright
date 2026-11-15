@@ -155,6 +155,7 @@ pub mod todo_task_liveness;
 pub mod task_names;
 pub mod template_copy_parity;
 pub mod template_registry_parity;
+pub mod test_control;
 pub mod test_hermetic;
 pub mod tightened_gates_grammar;
 pub mod release_declaration_parity;
@@ -1472,6 +1473,25 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "evidence-kit",
         &[("bash", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — the baselines, the manifest, the queue and the
+    // state file are read by name, so nothing is walked and the declared root set is empty
+    (
+        "check-test-control",
+        test_control::run,
+        &[],
+        &[
+            "EVIDENCE_KIT_CONTROLS",
+            "EVIDENCE_KIT_CONTROL_*",
+            "EVIDENCE_KIT_CONTROL_SINCE",
+            "EVIDENCE_KIT_SUITES",
+            "EVIDENCE_KIT_BASELINE_FILE",
+            "EVIDENCE_KIT_MANIFEST_FILE",
+            "EVIDENCE_KIT_QUEUE_FILE",
+            "EVIDENCE_KIT_STATE_FILE",
+        ],
+        "evidence-kit",
+        &[("git", "")],
     ),
     // spec: delegation-kit/SPEC.md §Verify after every agent commit — the corpus is the git
     // index and two named fixture lists, so nothing is walked and the declared root set is empty

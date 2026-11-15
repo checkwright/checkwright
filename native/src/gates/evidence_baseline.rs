@@ -103,18 +103,7 @@ fn flip_causation(baseline: &str, state: &str, rows: &[Row], errors: &mut Vec<St
     let closed = |what: String| {
         format!("{} — the check could not run; treating as failure (not clean)", what)
     };
-    let listed = crate::listing::names(None, &["ls-tree", "-z", "--full-name", "--name-only", &start, "--", baseline])
-        .map_err(|e| e.text_or(|_| closed(format!("cannot list {} at the iteration start {}", baseline, start))))?;
-    let name = listed.into_iter().next().unwrap_or_default();
-    let prior = if name.is_empty() {
-        String::new()
-    } else {
-        let shown = proc::run(&programs::GIT, &["show", &format!("{}:{}", start, name)])?;
-        match shown.stdout() {
-            Some(b) => String::from_utf8_lossy(b).into_owned(),
-            None => return Err(closed(format!("cannot read {} at the iteration start {}", name, start))),
-        }
-    };
+    let prior = crate::evidence::baseline_at(&start, "the iteration start", baseline)?;
     let flips = untokened_flips(&prior, rows);
     for r in &flips {
         errors.push(format!(

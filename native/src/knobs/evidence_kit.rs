@@ -1,4 +1,4 @@
-// spec: evidence-kit/SPEC.md §Layout and configuration — evidence-kit's static knob table, its two
+// spec: evidence-kit/SPEC.md §Layout and configuration — evidence-kit's static knob table, its three
 // declared families and its validator
 use super::{indexed, is_suffix, scalar, Family, Kit, Origin, Resolve, Row, Shape, Value, Values};
 
@@ -93,6 +93,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("EVIDENCE_KIT_STATEMENT_FILE", ""),
         Row::indexed("EVIDENCE_KIT_STATEMENT_CMD", &[]),
         Row::scalar("EVIDENCE_KIT_IMPORTED_RUNS", "refuse"),
+        Row::indexed("EVIDENCE_KIT_CONTROLS", &[]),
+        Row::scalar("EVIDENCE_KIT_CONTROL_SINCE", ""),
         Row::scalar("EVIDENCE_KIT_RUNNER_DOC", "README.md"),
         Row::keyed("EVIDENCE_KIT_SCENARIO_GLOBS", &[]),
         Row::indexed("EVIDENCE_KIT_PERMANENT_SLUGS", &[]),
@@ -113,13 +115,15 @@ pub const KIT: Kit = Kit {
             inputs: &["GATE_SDK_ROOT", "GATE_SDK_KIT_DIRS", "GATE_SDK_GATES_DIR", "GATE_SDK_NATIVE_BIN"],
         },
         Family { prefix: "EVIDENCE_KIT_PARSER_", derive: None, inputs: &[] },
+        Family { prefix: "EVIDENCE_KIT_CONTROL_", derive: None, inputs: &[] },
     ],
     retired: &[],
     env_only: &[],
 };
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — the paths, the parser and the Done section
-// non-empty, every suite a valid family suffix, and the import selection one of its two words
+// non-empty, every suite and control a valid family suffix, and the import selection one of its two
+// words
 fn validate(v: &Values) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for name in [
@@ -136,6 +140,11 @@ fn validate(v: &Values) -> Vec<String> {
     for s in indexed(v, "EVIDENCE_KIT_SUITES").unwrap_or(&[]) {
         if !is_suffix(s) {
             out.push(format!("suite name '{}' is not a valid EVIDENCE_KIT_RUN_<suite> suffix", s));
+        }
+    }
+    for c in indexed(v, "EVIDENCE_KIT_CONTROLS").unwrap_or(&[]) {
+        if !is_suffix(c) {
+            out.push(format!("control name '{}' is not a valid EVIDENCE_KIT_CONTROL_<name> suffix", c));
         }
     }
     if let Some(sel) = scalar(v, "EVIDENCE_KIT_IMPORTED_RUNS").filter(|s| !["refuse", "accept"].contains(s)) {

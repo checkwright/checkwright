@@ -1,1 +1,8 @@
 # spec: evidence-kit/SPEC.md §Layout and configuration — the knob roster (every knob, its default) and the line grammar; the gate binary at `GATE_SDK_NATIVE_BIN` prints the defaults with `--emit knob-roster`; set only what you override
+
+# spec: evidence-kit/SPEC.md §Test controls — the ordered control names and one declaration each, its assignments re-introducing the defect its scenario catches; default empty (no control run, check-test-control asserting nothing)
+# EVIDENCE_KIT_CONTROLS[] = <name>
+# EVIDENCE_KIT_CONTROL_<name> = <suite> <scenario> <VAR>=<value>
+
+# spec: evidence-kit/SPEC.md §check-test-control — the since commit where the state file carries no iteration start; default empty (the new-test assertion disarmed)
+# EVIDENCE_KIT_CONTROL_SINCE = <revision>

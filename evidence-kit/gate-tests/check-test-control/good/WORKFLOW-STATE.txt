@@ -1,0 +1,4 @@
+fixture state header
+---
+demo-iter validate s1 2026-07-02 none
+demo-iter close s1 2026-07-03 none

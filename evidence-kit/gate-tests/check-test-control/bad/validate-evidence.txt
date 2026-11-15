@@ -1,0 +1,3 @@
+# contract: evidence-manifest v2
+demo-iter unit sha256=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa pass=2 fail=0 ignore=0 verdict=clean 2026-07-02 commit=- tree=- cmd=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb origin=local
+demo-iter unit control=nullguard scenario=t_null witnessed=green 2026-07-02 commit=- cmd=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb

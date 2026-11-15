@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, a versioned machine contract for a caller driving the kits from outside):** option A. Debt, promoted here: `projection-witness-wall-clock` leading (the board's only `iteration` row), then `observe-trial-promise-gaps` and `path-root-context-spellings` on its gate-sdk surface. Features, deferred here and promoted by spec with their amendments, in this order: `machine-verdict-contract`, `gate-run-attestation-predicate` as widened, [recorded-test-mutation-control](#recorded-test-mutation-control). Stages scope, spec, align, build, validate, close: the set spans gate-sdk, evidence-kit and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the tier-one lead on the set's gate-sdk surface, and the evidence-kit pair as one manifest major version rather than two; drain 5 against inflow 4.6. Supersession: `gate-run-attestation-predicate` reshaped by `machine-verdict-contract`, whose provenance block goes first; `recorded-test-mutation-control` reshaped by `gate-run-attestation-predicate`, one manifest version, one batch, predicate first.
+  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, a versioned machine contract for a caller driving the kits from outside):** option A. Debt, promoted here: `projection-witness-wall-clock` leading (the board's only `iteration` row), then `observe-trial-promise-gaps` and `path-root-context-spellings` on its gate-sdk surface. Features, deferred here and promoted by spec with their amendments, in this order: `machine-verdict-contract`, `gate-run-attestation-predicate` as widened, `recorded-test-mutation-control`. Stages scope, spec, align, build, validate, close: the set spans gate-sdk, evidence-kit and the crate, so check-stage-entry assertion C demands the audit. Composition: bundled, the tier-one lead on the set's gate-sdk surface, and the evidence-kit pair as one manifest major version rather than two; drain 5 against inflow 4.6. Supersession: `gate-run-attestation-predicate` reshaped by `machine-verdict-contract`, whose provenance block goes first; `recorded-test-mutation-control` reshaped by `gate-run-attestation-predicate`, one manifest version, one batch, predicate first.
 
   **The verdict contract's envelope (operator direction 2026-11-15, lead-relayed, not a ruling):** the SARIF log is the versioned verdict contract; a non-gate arm takes JSON only where a named caller reads it, the rest filed as [non-gate-arm-json](#non-gate-arm-json); no fourth exit code. The remaining asks of that date are filed deferred, and the 2026-11-14 adopter-target lead decision stands ([external-state-owner-mode](#external-state-owner-mode)).
 
@@ -15,16 +15,6 @@
 ---
 
 ## New Features
-
-### recorded-test-mutation-control
-
-[spec: evidence-kit/SPEC-test-control.md]
-
-The fixture pair proves a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipline), and nothing shipped proves it of a test a suite records, so a recorded run of a test that cannot fail still supports a done claim. Consult advice of 2026-11-14: off unless a consumer selects it, a declared control (an adopter's form is an environment flag re-introducing the defect and naming the test it must fail), its run recorded as a witnessed red beside the suite's line, and a gate that a new test carries one. doctrine-kit/DOCTRINE.md rule 26's *Enforced by* lists nothing for a recorded test: the fixture pair is its shipped mechanism, a branch-coverage assertion its one buildable-but-unbuilt one, and whether a mutation probe targeted its assertion's range is listed unreachable. `installer-crate-test-gaps`' two-halves case is an instance.
-
-**Deliverable:** design-pending, a feature: how a control is stated in no consumer's vocabulary, where the witnessed red is recorded, and what counts as a new test.
-
-**Cost while deferred:** a test that cannot fail reads as evidence. Surfaced 2026-11-14 by a production adopter's handoff, ranked first of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `mutation control` in this file, none; owner evidence-kit/SPEC.md.
 
 ## Technical Debt
 
@@ -1125,4 +1115,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - observe-trial-promise-gaps
 - machine-verdict-contract
 - gate-run-attestation-predicate
+- recorded-test-mutation-control
 

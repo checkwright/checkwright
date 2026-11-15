@@ -1,0 +1,4 @@
+# spec: evidence-kit/SPEC.md §check-test-control — one suite and one declared control, so all three assertions are armed
+EVIDENCE_KIT_SUITES[] = unit
+EVIDENCE_KIT_CONTROLS[] = nullguard
+EVIDENCE_KIT_CONTROL_nullguard = unit t_null BREAK_NULL=1

@@ -109,6 +109,14 @@ case_run "B-bad-origin" "$V1LINE${TAIL/origin=local/origin=ci}\n" \
     '## Iteration: it' 'h\n---\n' '' 1 "bad origin field"
 case_run "B-unborn" "$V1LINE commit=- tree=- cmd=$HASH origin=local\n" \
     '## Iteration: it' 'h\n---\n' '' 0 "clean"
+# A control line is v2's second kind: green under its suite line, red with none above it, and red
+# on a witness outside red|green|absent.
+CTLLINE="it unit control=c scenario=t witnessed=red 2026-07-06 commit=$COMMIT cmd=$HASH"
+case_run "B-control-under-suite" "$V1LINE$TAIL\n$CTLLINE\n" '## Iteration: it' 'h\n---\n' '' 0 "clean"
+case_run "B-control-no-suite" "$CTLLINE\n$V1LINE$TAIL\n" \
+    '## Iteration: it' 'h\n---\n' '' 1 "control line with no 'it unit' suite line above it"
+case_run "B-control-bad-witness" "$V1LINE$TAIL\n${CTLLINE/witnessed=red/witnessed=pink}\n" \
+    '## Iteration: it' 'h\n---\n' '' 1 "bad witnessed field"
 # A v1 file whose lines are v1 stays green; a v2 line under a v1 header is red.
 MAJOR=v1
 case_run "B-v1-file" "$V1LINE\n" '## Iteration: it' 'h\n---\n' '' 0 "clean"

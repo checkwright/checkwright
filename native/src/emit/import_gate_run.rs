@@ -81,7 +81,7 @@ fn import(args: &[String]) -> Result<i32, Refusal> {
             origin: "imported".to_string(),
         })
         .collect();
-    run_validate::fold(&manifest, &tmpdir, &key, &rows).map_err(guard)?;
+    run_validate::fold(&manifest, &tmpdir, &key, &rows, &[]).map_err(guard)?;
     println!(
         "  recorded {} suite line(s) under '{}' in {} (origin=imported)",
         rows.len(),
