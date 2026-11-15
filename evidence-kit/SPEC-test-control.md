@@ -8,7 +8,7 @@ Pairs `recorded-test-mutation-control`. The fixture pair proves that a gate can 
 - **A baseline `pass` row is optional.** §Baseline manifest's fail-closed rule keys on `fail`, so an unbaselined test that passes is no red, and pass rows are recorded from a run by human commit.
 - **evidence-kit reads the stage cursor and not the iteration-start commit.** `evidence.rs` reads the state file's last data line for the cursor. The iteration-start commit, the first data line's `<head>` (lifecycle-kit/SPEC.md §The state machine), has a reader only in `stages.rs`, which evidence-kit does not call, for the independence §The evidence adapters states.
 - **A shipped gate may be left out of a registry with a declared reason** (`# unregistered:` lines in `scripts/gates.list`).
-- **The doctrine names the check as unbuilt.** doctrine-kit/DOCTRINE.md rule 26's corollary says a mutation proves an assertion bites only against a target the assertion ranges over. Its *Enforced by* lists the fixture pair as shipped, and nothing for a recorded test.
+- **The doctrine lists nothing for a recorded test.** doctrine-kit/DOCTRINE.md rule 26's corollary says a mutation proves an assertion bites only against a target the assertion ranges over. Its *Enforced by* lists the fixture pair as shipped and names only the branch-coverage assertion as buildable but unbuilt, with nothing for a recorded test.
 
 ## What changes
 
@@ -59,6 +59,8 @@ Each **Not yet applied.**
 - **`check-evidence-manifest`** (B): the v2 grammar gains the control line's eight fields, and a control line whose key and suite have no suite line above it is red.
 - **The knob table**: `native/src/knobs/evidence_kit.rs` gains `EVIDENCE_KIT_CONTROLS` (list, default empty), the `EVIDENCE_KIT_CONTROL_<name>` family (declared, no derived member) and `EVIDENCE_KIT_CONTROL_SINCE` (scalar, default empty). The family rule's *two declared families* sentence is re-phrased to name three. `evidence-kit/templates/evidence-config.knobs` gains the three knobs, commented out.
 - **`native/src/evidence.rs`** gains the declaration parser and the iteration-start reader, each with a directive citing its section.
+- **The gate's registrations** (`git grep -n "check-evidence-manifest" -- native/src evidence-kit/smoke` found the sites): the gate's registry tuple in `native/src/gates/mod.rs` (name, run function, declared knob reads, spawned programs), and `evidence-kit/smoke/install.sh`, whose registry heredoc and unregistered-gate accounting (gate-sdk/SPEC.md §check-gate-substrate-parity and §Consumer smoke) must declare the gate.
+- **Stale statements the control run moves**: evidence-kit/SPEC.md §bin/run-validate.sh's exit-0 sentence (*every suite clean*), which gains *every control red*, and its roster sentence naming two of the names as the kit's declared families, which becomes three; the matching code comments in `native/src/knobs/evidence_kit.rs` and `native/src/emit/run_validate.rs`.
 - **The release declaration** (`.workflow/release-declarations.md`): under `## Behavior changes`, declared test controls, the control line, and a `--run-validate` exit 1 when a control witnesses no red; under `## Knob changes`, the three knobs; and the new gate, named as opt-in.
 - **`scripts/gates.list`**: an `# unregistered: check-test-control` line whose reason is that this tree declares no control, the registration being a consumer's selection.
 - **doctrine-kit/DOCTRINE.md rule 26**: *Enforced by*'s shipped list gains evidence-kit's test controls (evidence-kit/SPEC.md §Test controls), which witness a recorded test failing against the defect it names. The buildable-but-unbuilt branch-coverage assertion stays, since it asks a different question.
@@ -86,9 +88,9 @@ The spine's spawn sites were found by `git grep -n "spawn(" -- native/src/emit/r
 
 ## Existing sections updated
 
-- `evidence-kit/SPEC.md` §Layout and configuration (deltas 1, 4), §bin/run-validate.sh (delta 2), the new §Test controls (deltas 1, 2), §Evidence manifest (delta 2), the new §check-test-control (delta 3), §check-evidence-manifest (delta 4), §Producers and consumers (delta 4).
-- `native/src/evidence.rs`, `native/src/emit/run_validate.rs`, `native/src/gates/evidence_manifest.rs`, the new gate module, `native/src/knobs/evidence_kit.rs` and `native/src/emit/trajectory.rs`'s tests, with their cases (deltas 1, 2, 3, 4, 5).
-- `evidence-kit/checks/check-test-control.gate` and its fixture pair, `evidence-kit/gate-tests/`, `evidence-kit/README.md`, `evidence-kit/templates/evidence-config.knobs`, `scripts/gates.list`, `doctrine-kit/DOCTRINE.md` rule 26, `.workflow/release-declarations.md`, and the regenerated surfaces delta 5 lists (deltas 3, 4, 5).
+- `evidence-kit/SPEC.md` §Layout and configuration (deltas 1, 4), §bin/run-validate.sh (deltas 2 and 4), the new §Test controls (deltas 1, 2), §Evidence manifest (delta 2), the new §check-test-control (delta 3), §check-evidence-manifest (delta 4), §Producers and consumers (delta 4).
+- `native/src/evidence.rs`, `native/src/emit/run_validate.rs`, `native/src/gates/evidence_manifest.rs`, the new gate module, `native/src/gates/mod.rs`, `native/src/knobs/evidence_kit.rs` and `native/src/emit/trajectory.rs`'s tests, with their cases (deltas 1, 2, 3, 4, 5).
+- `evidence-kit/checks/check-test-control.gate` and its fixture pair, `evidence-kit/gate-tests/`, `evidence-kit/smoke/install.sh`, `evidence-kit/README.md`, `evidence-kit/templates/evidence-config.knobs`, `scripts/gates.list`, `doctrine-kit/DOCTRINE.md` rule 26, `.workflow/release-declarations.md`, and the regenerated surfaces delta 5 lists (deltas 3, 4, 5).
 
 ## Retired spellings
 
