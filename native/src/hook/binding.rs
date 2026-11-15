@@ -74,7 +74,6 @@ pub const UPDATED_INPUT: &str = "updatedInput";
 pub const SYSTEM_MESSAGE: &str = "systemMessage";
 pub const TURN_END_DECISION: &str = "decision";
 pub const DECISION_BLOCK: &str = "block";
-pub const TURN_END_REASON: &str = "reason";
 
 // spec: gate-sdk/SPEC.md §The hook contract — the rows' spellings no reader reads, held here so the
 // test can hold those rows whole; read by the test alone
@@ -102,6 +101,7 @@ pub const UNREAD: &[&str] = &[
     "spawnDepth",
     "isFork",
     "agentType",
+    "reason",
 ];
 
 // spec: gate-sdk/SPEC.md §The hook contract — the allow list a settings document carries, `None`

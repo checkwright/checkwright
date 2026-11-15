@@ -1094,20 +1094,21 @@ The adapter self-spawns rather than translating in process because the members p
 
 **`--hook <member> --observe` runs a member as a trial that enforces nothing.** The arm's grammar is `--hook <member> [--observe] [--binding <name>] [--knobs <absolute file>]`, each optional token in that order and at most once. `hook::tail` is its one parser, read by the arm and by the registration grammar below. A token outside the grammar is refused where and as an unknown member is: exit 2 naming the token and printing the grammar, or the no-tree notice where the arm declines for want of a tree. A misspelled flag therefore blocks loudly rather than enforcing in silence, and `check-settings-paths` reds it at the commit.
 
-- **The observed run.** The arm does not call the member. It spawns `proc::self_image()` as `--hook <member>`, in the directory the arm stands in, with the payload bytes on stdin, through `proc::run_with_stdin`, the adapter's spawn; under `--knobs` the child's argv carries `--knobs <file>`, so it reads the layer its parent did. It reads the child's status and streams, appends one line to the observe log, writes nothing on stdout or stderr, and exits `0`.
+- **The observed run.** The arm does not call the member. It spawns `proc::self_image()` as `--hook <member>`, in the directory the arm stands in, with the payload bytes on stdin, through `proc::run_with_stdin`, the adapter's spawn; under `--knobs` the child's argv carries `--knobs <file>`, so it reads the layer its parent did. The child's environment carries the observe mark, `CHECKWRIGHT_HOOK_OBSERVED`, an internal signal and no knob. It reads the child's status and streams, appends one line to the observe log, writes nothing on stdout or stderr, and exits `0`.
 - **With a binding**, the adapter runs as above and carries `--observe` into its child's argv. The child observes on the translated payload, logs the shipped binding's decision, and exits 0 with nothing on stdout, which the adapter reads as no decision. One site logs, whichever binding reached it.
 - **Every member takes the flag**, since it is grammar at the dispatcher and reads no member's rule. Observing a member that advises or grants withholds that effect too. **A stated limit of a trial:** an observed `shell-guard` grants nothing, so a trial may show permission prompts the enforcing guard would have answered.
+- **A member's own writes.** Under the mark, `session-context` skips its scratch sweep, the one member write that deletes what a session may still want. **A second stated limit:** every other write still runs, so a trial appends to each member's own log as an enforcing run does. A member that decides from its own log reads it, so skipping those appends would change the decision the trial records.
 - **What still speaks.** The flag leaves the arm's own notices unchanged: the no-tree notice, and the front end's notice on an absent binary, which runs no arm to read the flag. Each reports that nothing ran, so nothing is logged and the trial is not silent about it.
 
 **The would-be decision** is read off the child, each envelope through `native/src/hook/binding.rs` ([§The hook contract](#the-hook-contract)), so a member's own decline on a knob it cannot resolve logs `notice` with the decline's text:
 
 | child | `would=` | `reason=` |
 | --- | --- | --- |
-| exit 2 | `block` | stderr's first line |
+| exit 2 | `block` | `withheld` |
 | exit 0, stdout empty | `none` | `-` |
-| exit 0, a context envelope | `advise` | the context text's first line |
+| exit 0, a context envelope | `advise` | `withheld` |
 | exit 0, an allow envelope | `grant`, or `rewrite` where it carries the changed input | the decision reason's first line |
-| exit 0, a turn-end block decision | `block` | the envelope's reason's first line |
+| exit 0, a turn-end block decision | `block` | `withheld` |
 | exit 0, the notice field alone | `notice` | the notice text's first line |
 | any other status, unparseable stdout, or no spawn | `error` | stderr's first line, or the spawn error |
 
@@ -1115,7 +1116,7 @@ The adapter self-spawns rather than translating in process because the members p
 
 `ts=<UTC, ISO 8601> member=<name> event=<event name or -> session=<session id or -> would=<decision> status=<child status or -> reason=<first line or ->`
 
-`reason=` is last, so a reason carrying spaces needs no quoting and a reader splits the line at most six times. `event` and `session` come from the payload, parsed once for them and handed on as bytes, with whitespace in either replaced by `_`. The line carries no transcript path and no tool input, so a log a trial leaves behind holds no command text a session typed.
+`reason=` is last, so a reason carrying spaces needs no quoting and a reader splits the line at most six times. `event` and `session` come from the payload, parsed once for them and handed on as bytes, with whitespace in either replaced by `_`. The line carries no transcript path and no tool input, so a log a trial leaves behind holds no command text a session typed. **A block's and an advise's reason is the token `withheld`**, whatever the member: a refusal or a context can quote the input it read, as a shell refusal naming the command to run instead does. The decision columns still say what the member would have done.
 
 **A log that cannot be written declines** through `hook::decline` below, naming the knob and the cause: a value that cannot resolve, a relative one under the tree-free mark, or a failed open or write. The call still proceeds at exit 0. **Grounds:** a trial whose log silently records nothing would be read at its review as a hook that never fired, the silent fail-open the decline exists to make loud. Once the observed run has started, this is the one way it speaks.
 

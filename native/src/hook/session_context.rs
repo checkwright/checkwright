@@ -133,7 +133,7 @@ fn brief(k: &Knobs, payload: Option<&Value>) -> String {
     }
 
     out.push_str(&memory_backstop());
-    out.push_str(&sweep(k));
+    out.push_str(&sweep(k, hook::observed(), std::time::SystemTime::now()));
     out.push_str(&footer(k));
 
     if !lead && !stage.is_empty() && !k.stage_rules.is_empty() {
@@ -317,17 +317,18 @@ fn sweep_dir(dir: &Path, root: bool, now: std::time::SystemTime, horizon: u64, s
 }
 
 // spec: context-kit/SPEC.md §The session-context hook — the scratch dir and the marker are both
-// resolved against the toplevel the member runs at, so the marker match compares two whole paths
-fn sweep(k: &Knobs) -> String {
+// resolved against the toplevel the member runs at, so the marker match compares two whole paths;
+// an observed run deletes nothing (gate-sdk/SPEC.md §The harness-integration arm)
+fn sweep(k: &Knobs, observed: bool, now: std::time::SystemTime) -> String {
     let Some(horizon) = k.horizon else { return String::new() };
     let Ok(here) = walk::cwd() else { return String::new() };
     let root = walk::abs_against(&here, &k.tmp_dir);
     let marker = walk::abs_against(&here, &k.role_file);
     let keep: Vec<String> = k.keep.iter().filter(|e| !e.contains('/')).cloned().collect();
     let mut lines: Vec<String> = Vec::new();
-    if Path::new(&root).is_dir() {
+    if !observed && Path::new(&root).is_dir() {
         let spare = Spare { keep: &keep, marker: &marker };
-        match sweep_dir(Path::new(&root), true, std::time::SystemTime::now(), horizon, &spare) {
+        match sweep_dir(Path::new(&root), true, now, horizon, &spare) {
             0 => {}
             n => lines.push(format!("Tidied {} stale scratch path(s) from {}/.", n, k.tmp_dir)),
         }
@@ -446,8 +447,25 @@ mod tests {
             keep: Vec::new(),
             ..knobs_for_test("", "")
         };
-        assert_eq!(sweep(&k), "");
+        assert_eq!(sweep(&k, false, later), "");
         assert!(dir.join("aged.txt").is_file());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — an observed run skips the sweep, so a
+    // stale path the enforcing run takes survives the trial
+    #[test]
+    fn an_observed_run_sweeps_nothing() {
+        let dir = std::env::temp_dir().join(format!("cw-session-observed-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("scratch dir");
+        std::fs::write(dir.join("aged.txt"), "x").expect("scratch file");
+        let k = Knobs { horizon: Some(3600), tmp_dir: dir.display().to_string(), ..knobs_for_test("", "") };
+        let later = std::time::SystemTime::now() + std::time::Duration::from_secs(3600 + 60);
+        assert_eq!(sweep(&k, true, later), "");
+        assert!(dir.join("aged.txt").is_file());
+        assert!(sweep(&k, false, later).starts_with("Tidied 1 stale scratch path(s)"));
+        assert!(!dir.join("aged.txt").exists());
         let _ = std::fs::remove_dir_all(&dir);
     }
 

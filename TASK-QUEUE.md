@@ -52,14 +52,6 @@ The fixture pair proves a gate can fail (gate-sdk/SPEC.md §Fixture-pair discipl
 
 ## Technical Debt
 
-### observe-trial-promise-gaps
-
-Two gaps between an observed hook trial (`--hook <member> --observe`) and what gate-sdk/SPEC.md §The harness-integration arm promises of it. First, the self-spawned child runs `--hook <member>` unflagged, so a trial still runs the member's own writes: observing `session-context` runs its scratch sweep (`native/src/hook/session_context.rs`), and the section states no rule for a member's own writes beside its withheld advise and grant effects. Second, the observe log's `reason=` is the child's first stderr line, and a shell-guard refusal can echo the command (the prefix rule in `native/src/guard/rules/spelling.rs` prints `Run it without the prefix: <command>`), against the log's 'holds no command text a session typed'.
-
-**Deliverable:** a fix per gap: pass the observe mark to the child so writing members skip their writes, or state the limit beside the shell-guard one; and scrub `reason=` for a command-echoing member, or narrow the promise.
-
-**Cost while deferred:** a trial meant to enforce nothing still deletes scratch, and the log can hold typed command text. Both read from source; no observed trial of `session-context` ran, since the trial is the write at issue. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (two bullets, from source); filed at the next scope. Owner lookup: `observe`, `reason=`, `command text` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1154,4 +1146,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 
 - projection-witness-wall-clock
 - path-root-context-spellings
+- observe-trial-promise-gaps
 

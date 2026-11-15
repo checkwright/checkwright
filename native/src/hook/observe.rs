@@ -20,6 +20,10 @@ pub const ERROR: &str = "error";
 // spec: gate-sdk/SPEC.md §The harness-integration arm — `-` stands for an absent value in every field
 const ABSENT: &str = "-";
 
+// spec: gate-sdk/SPEC.md §The harness-integration arm — a block's and an advise's reason, the one
+// token whatever the member, since a member's refusal or context can quote the input it read
+pub const WITHHELD: &str = "withheld";
+
 #[derive(Debug, PartialEq)]
 pub struct Would {
     pub decision: &'static str,
@@ -37,11 +41,13 @@ pub fn run(member: &str, payload: &Payload) -> i32 {
     if let Some(file) = knobs.as_deref() {
         argv.extend([super::KNOBS_FLAG, file]);
     }
+    let mark = [(super::OBSERVED_VAR.to_string(), "1".to_string())];
     let child = proc::self_image().map_err(|e| e.to_string()).and_then(|exe| {
-        proc::run_with_stdin(
+        proc::run_with_stdin_in(
             &programs::CHECKWRIGHT_GATES.at(exe.display().to_string()),
             &argv,
             payload.bytes(),
+            &proc::ChildEnv { set: &mark, ..proc::ChildEnv::default() },
         )
     });
     let (status, would) = match &child {
@@ -82,7 +88,7 @@ fn log_path() -> Result<String, String> {
 pub fn classify(code: Option<i32>, stdout: &[u8], stderr: &[u8]) -> Would {
     let error = || Would { decision: ERROR, reason: first_line(&String::from_utf8_lossy(stderr)) };
     match code {
-        Some(2) => Would { decision: BLOCK, reason: first_line(&String::from_utf8_lossy(stderr)) },
+        Some(2) => Would { decision: BLOCK, reason: WITHHELD.to_string() },
         Some(0) if stdout.iter().all(u8::is_ascii_whitespace) => Would { decision: NONE, reason: ABSENT.to_string() },
         Some(0) => serde_json::from_slice::<Value>(stdout).ok().and_then(|v| envelope(&v)).unwrap_or_else(error),
         _ => error(),
@@ -97,10 +103,10 @@ fn envelope(v: &Value) -> Option<Would> {
             let decision = if inner.get(binding::UPDATED_INPUT).is_some() { REWRITE } else { GRANT };
             return would(decision, text(inner.get(binding::PERMISSION_DECISION_REASON)));
         }
-        return inner.get(binding::ADDITIONAL_CONTEXT)?.as_str().and_then(|c| would(ADVISE, first_line(c)));
+        return inner.get(binding::ADDITIONAL_CONTEXT)?.as_str().and_then(|_| would(ADVISE, WITHHELD.to_string()));
     }
     if v.get(binding::TURN_END_DECISION).and_then(Value::as_str) == Some(binding::DECISION_BLOCK) {
-        return would(BLOCK, text(v.get(binding::TURN_END_REASON)));
+        return would(BLOCK, WITHHELD.to_string());
     }
     let alone = v.as_object().is_some_and(|o| o.len() == 1);
     match v.get(binding::SYSTEM_MESSAGE).and_then(Value::as_str) {
@@ -156,12 +162,12 @@ mod tests {
     #[test]
     fn each_child_outcome_reads_as_its_tables_row() {
         let s = |x: &str| x.to_string();
-        assert_eq!(read(Some(2), "", "m: refused\nmore"), ("block", s("m: refused")));
+        assert_eq!(read(Some(2), "", "m: refused\nmore"), ("block", s("withheld")));
         assert_eq!(read(Some(0), "\n", ""), ("none", s("-")));
-        assert_eq!(read(Some(0), &binding::context_envelope("advice\nrest"), ""), ("advise", s("advice")));
+        assert_eq!(read(Some(0), &binding::context_envelope("advice\nrest"), ""), ("advise", s("withheld")));
         assert_eq!(read(Some(0), &binding::allow_envelope("granted", None, Some("c")), ""), ("grant", s("granted")));
         assert_eq!(read(Some(0), &binding::allow_envelope("r", Some("ls"), None), ""), ("rewrite", s("r")));
-        assert_eq!(read(Some(0), r#"{"decision":"block","reason":"still running"}"#, ""), ("block", s("still running")));
+        assert_eq!(read(Some(0), r#"{"decision":"block","reason":"still running"}"#, ""), ("block", s("withheld")));
         assert_eq!(read(Some(0), &binding::notice_envelope("declined"), ""), ("notice", s("declined")));
         assert_eq!(read(Some(1), "", "boom"), ("error", s("boom")));
         assert_eq!(read(None, "", ""), ("error", s("-")));

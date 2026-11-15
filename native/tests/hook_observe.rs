@@ -103,9 +103,33 @@ fn an_observed_turn_end_logs_its_would_be_decision_and_allows() {
     silent(&fire(&s, &repo, &[LIVENESS, "--observe"], &log_env(&s), QUIET), "quiet");
     let l = lines(&s);
     assert_eq!(l.len(), 2, "{:?}", l);
-    assert!(l[0].contains("member=subagent-stop-liveness event=SubagentStop session=s-1 would=block status=2 reason="), "{}", l[0]);
-    assert!(l[0].contains("background shell task"), "the refusal's first line is missing: {}", l[0]);
+    assert!(l[0].contains("member=subagent-stop-liveness event=SubagentStop session=s-1 would=block status=2 reason=withheld"), "{}", l[0]);
+    assert!(!l[0].contains("background shell task"), "the refusal's text reached the log: {}", l[0]);
     assert!(l[1].contains("would=none status=0 reason=-"), "{}", l[1]);
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the child carries the observe mark, so an
+// observed session-context leaves a stale scratch path the enforcing run then takes
+#[cfg(unix)]
+#[test]
+fn an_observed_session_context_sweeps_no_scratch() {
+    let s = Scratch::new("sweep");
+    let repo = s.at("repo");
+    std::fs::create_dir_all(repo.join(".tmp")).expect("scratch root");
+    let aged = repo.join(".tmp/aged.txt");
+    std::fs::write(&aged, "x").expect("scratch file");
+    let touched = Command::new("touch").args(["-t", "200001010000"]).arg(&aged).status().expect("touch must be spawnable");
+    assert!(touched.success(), "touch could not age {}", aged.display());
+    let mut env = log_env(&s);
+    env.push(("CONTEXT_KIT_SWEEP_HORIZON_HOURS", "1".to_string()));
+    env.push(("GATE_SDK_TMP_DIR", ".tmp".to_string()));
+    let start = r#"{"session_id":"s-3","hook_event_name":"SessionStart"}"#;
+    silent(&fire(&s, &repo, &["session-context", "--observe"], &env, start), "observed");
+    assert!(aged.is_file(), "an observed session-context swept the scratch dir");
+    assert!(lines(&s)[0].contains("member=session-context event=SessionStart session=s-3"), "{:?}", lines(&s));
+    let f = fire(&s, &repo, &["session-context"], &env, start);
+    assert!(f.stdout.contains("Tidied 1 stale scratch path(s)"), "{}", f.stdout);
+    assert!(!aged.exists(), "the enforcing run kept the stale path, so the trial proved nothing");
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — a fork dispatch the guard blocks outright is

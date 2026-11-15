@@ -394,6 +394,14 @@ pub fn tree_free() -> bool {
     TREE_FREE.with(std::cell::Cell::get)
 }
 
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the observe mark an observed run sets in its
+// child's environment, read by the one member write a trial skips
+pub const OBSERVED_VAR: &str = "CHECKWRIGHT_HOOK_OBSERVED";
+
+pub fn observed() -> bool {
+    std::env::var_os(OBSERVED_VAR).is_some_and(|v| !v.is_empty())
+}
+
 #[cfg(test)]
 pub fn set_tree_free(on: bool) {
     TREE_FREE.with(|m| m.set(on));
