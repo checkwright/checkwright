@@ -1078,10 +1078,3 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 
 ## Done
 
-- provenance-blank-string
-- amend-only-not-applicable
-- docs-since-duplicate-key
-- price-table-row-shape
-- usage-poll-half-weekly-pair
-- user-lock-key-traversal
-
