@@ -93,6 +93,15 @@ fn report() -> Result<String, String> {
             ));
         }
     }
+    if let Some(rows) = prices.as_ref().map(|p| &p.malformed).filter(|m| !m.is_empty()) {
+        let lines: Vec<String> = rows.iter().map(usize::to_string).collect();
+        out.push_str(&format!(
+            "  unpriced row(s): line {} of {} — short of four numeric prices or an effective_from \
+             that is not an ISO day\n",
+            lines.join(", "),
+            table_path
+        ));
+    }
     out.push_str(&format!("price-page: {}\n", page(table.as_deref().unwrap_or(""))?));
     Ok(out)
 }

@@ -152,7 +152,7 @@ pub fn split_tokens(total: u64, counts: &[u64]) -> Vec<u64> {
 #[derive(Default)]
 pub struct Prices {
     pub present: bool,
-    pub malformed: usize,
+    pub malformed: Vec<usize>,
     rows: HashMap<String, Vec<Dated>>,
 }
 
@@ -161,11 +161,11 @@ type Dated = (Option<String>, [f64; 4]);
 impl Prices {
     // spec: drift-kit/SPEC.md §The stage-economics meter — input 3's row shape: several rows per
     // model, a repeated (model, date) replacing the first; a row short of four price cells, a cell
-    // that is not a number, or a non-ISO date prices nothing and is counted.
+    // that is not a number, or a non-ISO date prices nothing and is kept by its 1-based line.
     pub fn parse(text: &str) -> Prices {
         let mut rows: HashMap<String, Vec<Dated>> = HashMap::new();
-        let mut malformed = 0usize;
-        for line in text.lines() {
+        let mut malformed = Vec::new();
+        for (n, line) in text.lines().enumerate() {
             let f: Vec<&str> = line.split('\t').collect();
             let m = f[0];
             if m.is_empty() || m.starts_with('#') || m == "model" {
@@ -176,7 +176,7 @@ impl Prices {
                 .map(|i| f.get(i).and_then(|v| v.trim().parse::<f64>().ok()))
                 .collect();
             let (Some(cells), false) = (cells, from.is_some_and(|d| !super::kpi::is_iso_day(d))) else {
-                malformed += 1;
+                malformed.push(n + 1);
                 continue;
             };
             let from = from.map(str::to_string);
@@ -525,11 +525,11 @@ fn measure(r: &mut Run, state_file: &str, price_table: &str) -> Result<String, S
             price_table
         ));
     }
-    if r.prices.malformed > 0 {
+    if !r.prices.malformed.is_empty() {
         head.push_str(&format!(
             "  {} price-table row(s) skipped — short of four numeric price cells or an \
              effective_from that is not an ISO day, so they price nothing\n",
-            r.prices.malformed
+            r.prices.malformed.len()
         ));
     }
 
@@ -1302,7 +1302,7 @@ mod tests {
         assert_eq!(p.cell("model", t, day), None, "the header row is not a priced model");
         assert_eq!(p.cell("unpriced", t, day), None);
         assert_eq!(Prices::default().cell("test-model", t, day), None);
-        assert_eq!(p.malformed, 0);
+        assert!(p.malformed.is_empty());
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — input 3's `effective_from`: the row in
@@ -1330,7 +1330,7 @@ mod tests {
         assert_eq!(p.cell("late", t, "2026-04-30"), None, "before its every row");
         assert_eq!(p.cell("late", t, "2026-05-01").as_deref(), Some("5.0000"));
         assert_eq!(p.cell("bad", t, "2026-07-01"), None, "a malformed date prices nothing");
-        assert_eq!(p.malformed, 1);
+        assert_eq!(p.malformed, vec![7]);
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — a row short of four numeric price
@@ -1351,7 +1351,7 @@ mod tests {
             assert_eq!(p.cell(id, t, "2026-01-01"), None, "{id}");
         }
         assert_eq!(p.cell("ok", t, "2026-01-01").as_deref(), Some("1.0000"));
-        assert_eq!(p.malformed, 3);
+        assert_eq!(p.malformed, vec![1, 2, 3]);
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — Degradation: four zero counts price

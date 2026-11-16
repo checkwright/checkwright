@@ -520,6 +520,11 @@ grep -q 'unpriced: pc-unpriced, pc-open, pc-future — no price table' <<<"$(PC_
     || fail "an absent table did not read every id unpriced"
 grep -q '^  no sessions dir .* — set DRIFT_KIT_SESSIONS_DIR$' <<<"$(PC_SESSIONS="$work/no-such-sessions" pcov)" \
     || fail "a sessions dir that is not a directory did not say so in place of the coverage line"
+grep -q 'unpriced row' <<<"$pcout" && fail "a table with no malformed row reported an unpriced row: $pcout"
+printf 'pc-open\t1\t1\t1\t1\npc-open 2\t2\t2\t2\t2020-01-01\n' > "$work/pc-fused.tsv"
+pcfused="$(PC_TABLE="$work/pc-fused.tsv" pcov)"
+grep -q "^  unpriced row(s): line 2 of $work/pc-fused.tsv — " <<<"$pcfused" \
+    || fail "a row whose id fused with its input column, its id still priced by another row, was not reported unpriced: $pcfused"
 
 printf '# Pricing\nintro\n## Model pricing\n| m | $1 |\n### Note\nx\n## Other\ny\n' > "$work/pc-page.md"
 pchash="$(printf '## Model pricing\n| m | $1 |\n### Note\nx\n' | git hash-object --stdin)"

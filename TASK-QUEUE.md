@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### price-table-row-shape
-
-A `scripts/price-table.tsv` row whose model id and input column fused passed the full battery, and `--price-coverage` reported every model priced. The stage-economics reader already counts such a row and its run prints the skip count; no gate and no coverage line reads it.
-
-**Deliverable:** a fix: `--price-coverage` reports a malformed row as unpriced, its line in drift-kit/SPEC.md §The price-coverage arm and its smoke case; the born-native-gate route was declined at input-shape-refusal-pass' scope (operator direction 2026-11-16, lead-relayed, not a ruling), since a new gate is a new name.
-
-**Cost while deferred:** a mistyped row drops its model's cost from the meter, with only a line in a run nobody reads to say so. Surfaced 2026-11-14 at liveness-arm-adoption-pass' scope, which fixed the row; filed at its close. Owner lookup: `price` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md §The stage-economics meter.
-
 ### user-lock-key-traversal
 
 `uninstall --user` removes paths built from `user.lock`'s `files` keys without refusing a parent-dir or absolute component: `UserLock::read` copies the keys and `at_rel` folds them onto the data dir by `split('/')` (`native/src/installer/user.rs`), so a key `../victim` names a file outside the data dir, removed unconditionally under `--force`. The lock is installer-written in the user's own data dir, so this is defence in depth.
@@ -1107,4 +1099,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - provenance-blank-string
 - amend-only-not-applicable
 - docs-since-duplicate-key
+- price-table-row-shape
 
