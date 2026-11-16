@@ -26,14 +26,6 @@
 
 **Cost while deferred:** a corrupted or hand-edited lock can steer an uninstall outside its data dir. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (from source; the scope re-read `at_rel`); filed at the next scope. Owner lookup: `user.lock`, `at_rel`, `uninstall --user` in this file and the disposed-findings record, none; owner installer/SPEC.md §The user install.
 
-### usage-poll-half-weekly-pair
-
-`--usage-poll` accepts a half weekly pair: with a complete five-hour pair, `axes()` in `native/src/hook/poll.rs` returns a weekly percentage with an empty reset (`seven_day {utilization:99}`) and the snapshot is written with the weekly axis unarmed, though the poller's payload-mapping step in delegation-kit/SPEC.md reads half of an axis as unparseable. It predates the no-five-hour fix; the v0.36.0 note is worded to the shipped behaviour.
-
-**Deliverable:** a fix: refuse a weekly percentage without a reset, or the reverse, with the unit case.
-
-**Cost while deferred:** a malformed payload leaves the weekly budget verdict unarmed with no refusal. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close, confirmed there and at this scope by reading `axes()`; filed at the next scope. Owner lookup: `usage-poll`, `weekly` in this file and the disposed-findings record, none on this path; owner delegation-kit/SPEC.md §usage-verdict.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1100,4 +1092,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - amend-only-not-applicable
 - docs-since-duplicate-key
 - price-table-row-shape
+- usage-poll-half-weekly-pair
 

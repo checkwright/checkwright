@@ -96,15 +96,24 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 // spec: delegation-kit/SPEC.md §The usage.txt contract — the payload mapped onto the snapshot's two
-// axes (five-hour pct and reset, weekly pct and reset). A source with no five-hour window writes that
-// pair empty beside an armed weekly pair; a payload carrying neither axis is unparseable.
+// axes; no five-hour window writes that pair empty beside an armed weekly pair, and neither axis,
+// or half of either, is unparseable.
 fn axes(payload: &Value) -> Result<[String; 4], &'static str> {
     let five = axis(payload, "five_hour");
     let seven = axis(payload, "seven_day");
-    let seven_resets = usage::epoch_of(&seven.1);
-    let seven_pct = if usage::is_utilization(&seven.0) { seven.0 } else { String::new() };
+    let [seven_pct, seven_resets] = if seven.0.is_empty() && seven.1.is_empty() {
+        [String::new(), String::new()]
+    } else if !usage::is_utilization(&seven.0) {
+        return Err("no weekly utilization");
+    } else {
+        let resets = usage::epoch_of(&seven.1);
+        if resets.is_empty() {
+            return Err("no weekly reset epoch");
+        }
+        [seven.0, resets]
+    };
     if five.0.is_empty() && five.1.is_empty() {
-        if seven_pct.is_empty() || seven_resets.is_empty() {
+        if seven_pct.is_empty() {
             return Err("no five-hour and no weekly window");
         }
         return Ok([String::new(), String::new(), seven_pct, seven_resets]);
@@ -218,6 +227,36 @@ mod tests {
         assert_eq!(
             axes(&doc(r#"{"five_hour":{"resets_at":"1"}}"#)),
             Err("no five-hour utilization")
+        );
+    }
+
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — half a weekly pair is unparseable beside
+    // a complete five-hour pair, where it wrote the weekly axis unarmed; a weekly window absent or
+    // null still writes the three mandatory lines alone
+    #[test]
+    fn half_a_weekly_pair_refuses_beside_a_complete_five_hour_pair() {
+        let five = r#""five_hour":{"utilization":4,"resets_at":"1756656000"}"#;
+        let with = |seven: &str| axes(&doc(&format!("{{{},\"seven_day\":{}}}", five, seven)));
+        assert_eq!(with(r#"{"utilization":99}"#), Err("no weekly reset epoch"));
+        assert_eq!(with(r#"{"utilization":99,"resets_at":null}"#), Err("no weekly reset epoch"));
+        assert_eq!(with(r#"{"resets_at":"1756656000"}"#), Err("no weekly utilization"));
+        assert_eq!(with(r#"{"utilization":"n/a","resets_at":"1756656000"}"#), Err("no weekly utilization"));
+        let nested = doc(&format!(
+            "{{{},\"rate_limits\":{{\"seven_day\":{{\"used_percentage\":7}}}}}}",
+            five
+        ));
+        assert_eq!(axes(&nested), Err("no weekly reset epoch"));
+        let three = [
+            "4".to_string(),
+            "1756656000".to_string(),
+            String::new(),
+            String::new(),
+        ];
+        assert_eq!(with("null"), Ok(three.clone()));
+        assert_eq!(axes(&doc(&format!("{{{}}}", five))), Ok(three));
+        assert_eq!(
+            with(r#"{"utilization":99,"resets_at":"1756656000"}"#).map(|a| a[2..].to_vec()),
+            Ok(vec!["99".to_string(), "1756656000".to_string()])
         );
     }
 
