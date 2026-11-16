@@ -26,14 +26,6 @@ An empty `--for` selection exits 0 before the SARIF block: native/src/runner.rs 
 
 **Cost while deferred:** a CI reader of the log takes a prior run's verdict for this one. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading runner.rs' early return against its SARIF block. Owner lookup: `SARIF`, `--for` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
-### gate-run-provenance-typing
-
-`--verify-gate-run` accepts a Statement whose provenance block is reduced to `{commit}`: `read_statement` in native/src/evidence.rs reads `/predicate/provenance` as any object and extracts `commit` alone, while the published schema requires `tool` and `kits` and evidence-kit/SPEC.md §verify-gate-run check 1 types every predicate field as §The gate-run predicate states.
-
-**Deliverable:** a fix: the shape check types the block to gate-sdk/SPEC.md §run-gates' provenance table, the schema mirrors it, and a case per refused shape.
-
-**Cost while deferred:** a Statement naming no binary or kit verifies clean. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading `read_statement` against the schema. Owner lookup: `verify-gate-run`, `provenance` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §verify-gate-run.
-
 ### not-applicable-sweep-residue
 
 Bundled gates still print a plain clean line on an early-out that evaluated nothing, beyond the lexical oracle the verdict contract's sweep ran (gate-sdk/SPEC.md §Output contract, its honest limit), so their SARIF result reads `pass` where it should read not-applicable. Sites named, not branch-traced: native/src/gates action_pinning:85, action_gh_repo:160, action_permissions:196, action_run_path:158, action_run_shell:188, docs_link_convention:140, docs_nav_reachable:123, docs_render_fidelity:154, docs_since:40, core_files:41,55, commit_msg:71, commit_subject:72, dispatch_entry:63, audit_roster:233,291, crate_arms:218, disposed_findings:75, agent_tier_explicit:56, measured_claim:40,54, prose_enum:34,54, unmarked_claim:35,43,54.
@@ -1146,4 +1138,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 
 - test-control-decl-binding
 - gate-run-schema-semver-pattern
+- gate-run-provenance-typing
 

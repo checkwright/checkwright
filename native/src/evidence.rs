@@ -618,14 +618,7 @@ pub fn read_statement(bytes: &[u8]) -> Result<Statement, String> {
         return Err(format!("gitCommit '{}' is not 40 or 64 lowercase hex characters", subject));
     }
     let run = text(&v, "/predicate/run")?;
-    let provenance = v
-        .pointer("/predicate/provenance")
-        .filter(|p| p.is_object())
-        .ok_or("/predicate/provenance is absent or not an object")?;
-    let provenance_commit = match provenance.get("commit") {
-        None => None,
-        Some(c) => Some(c.as_str().ok_or("/predicate/provenance/commit is not a string")?.to_string()),
-    };
+    let provenance_commit = provenance_shape(v.pointer("/predicate/provenance"))?;
     let listed = v
         .pointer("/predicate/suites")
         .and_then(|s| s.as_array())
@@ -674,6 +667,59 @@ pub fn read_statement(bytes: &[u8]) -> Result<Statement, String> {
         });
     }
     Ok(Statement { subject, run, provenance_commit, suites })
+}
+
+// spec: evidence-kit/SPEC.md §verify-gate-run — check 1 types the embedded provenance block to
+// gate-sdk/SPEC.md §run-gates' table; the commit it carries, if any, is check 2's to judge
+fn provenance_shape(p: Option<&serde_json::Value>) -> Result<Option<String>, String> {
+    const AT: &str = "/predicate/provenance";
+    let p = p.filter(|p| p.is_object()).ok_or_else(|| format!("{} is absent or not an object", AT))?;
+    let named = |v: &serde_json::Value, at: &str| -> Result<(), String> {
+        match v.get("name").and_then(|n| n.as_str()) {
+            Some(n) if !n.is_empty() => Ok(()),
+            _ => Err(format!("{}/name is absent, empty or not a string", at)),
+        }
+    };
+    let optional = |v: &serde_json::Value, at: &str, key: &str| -> Result<(), String> {
+        match v.get(key) {
+            Some(s) if !s.is_string() => Err(format!("{}/{} is not a string", at, key)),
+            _ => Ok(()),
+        }
+    };
+    let tool_at = format!("{}/tool", AT);
+    let tool = p.get("tool").filter(|t| t.is_object()).ok_or_else(|| format!("{} is absent or not an object", tool_at))?;
+    named(tool, &tool_at)?;
+    for key in ["version", "sourceStamp", "target"] {
+        optional(tool, &tool_at, key)?;
+    }
+    let kits = p.get("kits").and_then(|k| k.as_array()).ok_or_else(|| format!("{}/kits is absent or not an array", AT))?;
+    for (i, kit) in kits.iter().enumerate() {
+        let at = format!("{}/kits/{}", AT, i);
+        if !kit.is_object() {
+            return Err(format!("{} is not an object", at));
+        }
+        named(kit, &at)?;
+        match kit.get("root").and_then(|r| r.as_str()) {
+            Some(r) if !r.is_empty() => {}
+            _ => return Err(format!("{}/root is absent, empty or not a string", at)),
+        }
+        optional(kit, &at, "version")?;
+    }
+    let commit = match p.get("commit") {
+        None => None,
+        Some(c) => match c.as_str() {
+            Some(c) if crate::provenance::object_id(c) => Some(c.to_string()),
+            _ => return Err(format!("{}/commit is not 40 or 64 lowercase hex characters", AT)),
+        },
+    };
+    match (commit.is_some(), p.get("worktree")) {
+        (true, Some(w)) if w == "clean" || w == "modified" => {}
+        (true, Some(_)) => return Err(format!("{}/worktree is not clean or modified", AT)),
+        (true, None) => return Err(format!("{}/worktree is absent beside a commit", AT)),
+        (false, Some(_)) => return Err(format!("{}/worktree is present with no commit", AT)),
+        (false, None) => {}
+    }
+    Ok(commit)
 }
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — DSSE's payload encoding, the standard and the
@@ -1031,6 +1077,20 @@ mod tests {
         assert_eq!(keys(&item["properties"]), want);
         assert_eq!(strings(item.get("required")), want);
         assert_eq!(strings(schema.get("required")), keys(&st));
+        let prov = pred.pointer("/properties/provenance").expect("the schema describes the provenance block");
+        let full = crate::provenance::Provenance {
+            tool_version: Some("1.0.0".into()),
+            exact: true,
+            source_stamp: Some("s".into()),
+            target: Some("t".into()),
+            kits: vec![crate::provenance::Kit { name: "k".into(), root: "k".into(), version: Some("1.0.0".into()) }],
+            commit: Some(GOLDEN_SUBJECT.into()),
+            clean: true,
+        }
+        .block();
+        assert_eq!(keys(&prov["properties"]), keys(&full));
+        assert_eq!(keys(&prov["properties"]["tool"]["properties"]), keys(&full["tool"]));
+        assert_eq!(keys(&prov["properties"]["kits"]["items"]["properties"]), keys(&full["kits"][0]));
         let read = read_statement(rendered.as_bytes()).expect("the golden reads back");
         assert_eq!(read.suites.len(), 2);
         assert_eq!(read.suites[1].binding, golden_row("fixtures", "checkwright-gates --run-gate-tests tests", (40, 2, 0), "new-failures").binding());
@@ -1139,7 +1199,8 @@ mod tests {
     }
 
     // spec: evidence-kit/SPEC.md §verify-gate-run — a reader refuses a type or a contract major it
-    // does not know, and a Statement whose subject is not one commit
+    // does not know, a Statement whose subject is not one commit, and each provenance shape the
+    // table refuses
     #[test]
     fn the_shape_refusals_name_their_field() {
         let st: serde_json::Value = serde_json::from_str(&golden_statement()).unwrap();
@@ -1158,6 +1219,34 @@ mod tests {
         refuse(&|v| v["predicate"]["suites"][1]["name"] = "unit".into(), "twice");
         refuse(&|v| v["predicate"]["suites"][0]["tree"] = "dirty".into(), "tree");
         refuse(&|v| v["predicate"]["suites"][0]["counts"]["fail"] = (-1).into(), "counts/fail");
+        let commit = st["predicate"]["provenance"]["commit"].clone();
+        refuse(&|v| v["predicate"]["provenance"] = serde_json::json!({ "commit": commit }), "provenance/tool");
+        refuse(&|v| v["predicate"]["provenance"] = "x".into(), "provenance is absent or not an object");
+        refuse(&|v| v["predicate"]["provenance"]["tool"] = "x".into(), "provenance/tool");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["name"] = "".into(), "provenance/tool/name");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["version"] = 1.into(), "provenance/tool/version");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["sourceStamp"] = 1.into(), "provenance/tool/sourceStamp");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["target"] = 1.into(), "provenance/tool/target");
+        refuse(&|v| { v["predicate"]["provenance"].as_object_mut().unwrap().remove("kits"); }, "provenance/kits");
+        refuse(&|v| v["predicate"]["provenance"]["kits"] = serde_json::json!(["x"]), "provenance/kits/0 is not");
+        refuse(&|v| { v["predicate"]["provenance"]["kits"][0].as_object_mut().unwrap().remove("name"); }, "kits/0/name");
+        refuse(&|v| v["predicate"]["provenance"]["kits"][0]["root"] = 7.into(), "kits/0/root");
+        refuse(&|v| v["predicate"]["provenance"]["kits"][0]["version"] = 7.into(), "kits/0/version");
+        refuse(&|v| v["predicate"]["provenance"]["commit"] = "ABC".into(), "provenance/commit");
+        refuse(&|v| v["predicate"]["provenance"]["worktree"] = "dirty".into(), "provenance/worktree is not");
+        refuse(&|v| { v["predicate"]["provenance"].as_object_mut().unwrap().remove("worktree"); }, "beside a commit");
+        refuse(&|v| { v["predicate"]["provenance"].as_object_mut().unwrap().remove("commit"); }, "with no commit");
+        let mut unborn = st.clone();
+        let block = unborn["predicate"]["provenance"].as_object_mut().unwrap();
+        block.remove("commit");
+        block.remove("worktree");
+        block["tool"].as_object_mut().unwrap().retain(|k, _| k == "name");
+        block["kits"] = serde_json::json!([]);
+        assert_eq!(
+            read_statement(unborn.to_string().as_bytes()).map(|s| s.provenance_commit),
+            Ok(None),
+            "a block whose fields the run could not fill reads, absent fields absent"
+        );
         let mut extra = st.clone();
         extra["predicate"]["future"] = "ignored".into();
         assert!(read_statement(extra.to_string().as_bytes()).is_ok(), "an unknown field is ignored");

@@ -44,8 +44,32 @@
           "description": "The provenance block the verdict contract defines (tool, kits, commit, worktree), embedded whole.",
           "type": "object",
           "required": ["kits", "tool"],
+          "dependentRequired": { "commit": ["worktree"], "worktree": ["commit"] },
           "properties": {
-            "commit": { "type": "string", "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$" }
+            "tool": {
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": { "type": "string", "minLength": 1 },
+                "version": { "type": "string" },
+                "sourceStamp": { "type": "string" },
+                "target": { "type": "string" }
+              }
+            },
+            "kits": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "root"],
+                "properties": {
+                  "name": { "type": "string", "minLength": 1 },
+                  "root": { "type": "string", "minLength": 1 },
+                  "version": { "type": "string" }
+                }
+              }
+            },
+            "commit": { "type": "string", "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$" },
+            "worktree": { "enum": ["clean", "modified"] }
           }
         },
         "suites": {
