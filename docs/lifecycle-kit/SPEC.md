@@ -1501,7 +1501,7 @@ Invariant: every non-blank line below the `# contract:` header of the disposed-f
 The four gate-sdk contracts ([gate-sdk/SPEC.md §The gate model](../gate-sdk/SPEC.md#the-gate-model)):
 
 - **Output**: the single `DISPOSED-FINDINGS: clean (<n> record(s) …)` line, and per finding the line and what it lacks, with a `help:` naming the grammar.
-- **Fail-closed**: exit 2 on an unreadable record or an explicitly named missing one. An absent record at the configured path is clean, since a consumer that never discarded a finding is in a legal state, and its line reads not applicable, since no record is there to judge ([gate-sdk/SPEC.md §Output contract](../gate-sdk/SPEC.md#output-contract)).
+- **Fail-closed**: exit 2 on an unreadable record or an explicitly named missing one. An absent record at the configured path is clean, since a consumer that never discarded a finding is in a legal state, and its line reads not applicable ([gate-sdk/SPEC.md §Output contract](../gate-sdk/SPEC.md#output-contract)).
 - **Fixture pair**: a `good/`+`bad/` pair under `gate-tests/`, driven through the hermetic argument. The good case is two records, one with two terms. The bad case is a record with no term, one with an empty span, one with no prose and one with an unparseable date. The module's unit tests pin the absent-record clean line, which only the bare form reaches, since a named missing file is exit 2.
 - **Self-lint**: registration in this repo's `gates.list`, where its scan target is this repo's own record.
 
