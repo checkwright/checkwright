@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, the four carried second-vendor findings and the tasks that can join them):** option A. Debt, promoted here: `empty-for-selection-sarif-skip`, `gate-run-schema-semver-pattern`, `gate-run-provenance-typing` and `not-applicable-sweep-residue`, the last joining on the verdict contract's result fidelity. Feature, deferred here and promoted by spec with its evidence-kit amendment: [test-control-decl-binding](#test-control-decl-binding). Stages scope, spec, build, validate, close: the one amendment spans evidence-kit alone. Composition: bundled on the machine-verdict contract, drain 1 against inflow 6.8, the directive bounding the theme to the four findings, which leave the inbox at intake rather than the pool. Supersession: none.
+  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, the four carried second-vendor findings and the tasks that can join them):** option A. Debt, promoted here: `empty-for-selection-sarif-skip`, `gate-run-schema-semver-pattern`, `gate-run-provenance-typing` and `not-applicable-sweep-residue`, the last joining on the verdict contract's result fidelity. Feature, deferred here and promoted by spec with its evidence-kit amendment: `test-control-decl-binding`. Stages scope, spec, build, validate, close: the one amendment spans evidence-kit alone. Composition: bundled on the machine-verdict contract, drain 1 against inflow 6.8, the directive bounding the theme to the four findings, which leave the inbox at intake rather than the pool. Supersession: none.
 
   **The predicate's version (operator direction 2026-11-15, lead-relayed, not a ruling):** the schema and reader fixes bump no `contract`; they converge on evidence-kit/SPEC.md §The gate-run predicate's field table, and the release note's Behavior changes names the reader's new refusal.
 
@@ -15,18 +15,6 @@
 ---
 
 ## New Features
-
-### test-control-decl-binding
-
-[spec: SPEC-test-control-binding.md]
-
-`check-test-control` (C) never binds a witness to the control's assignments: native/src/gates/test_control.rs matches `control=`, `scenario=`, `commit=` and `cmd=` only, and the command digest in native/src/evidence.rs hashes the run and parser words alone, so editing a control's `VAR=value` after a red witness keeps that witness passing at close. evidence-kit/SPEC.md §Test controls' honest limits do not state it.
-
-**Fix shape (operator direction 2026-11-15, lead-relayed, not a ruling):** bind the declaration, never state the limit: a digest of the control's assignments rides the control line, and (C) holds it equal to the current declaration's.
-
-**Deliverable:** a feature, designed in the amendment: the control line's `assign=` field, its digest's input, (C)'s check, and no manifest migration, since the control line has no released writer.
-
-**Cost while deferred:** a control re-pointed at another switch after its red witness still discharges its test at close. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading `close_witness`. Owner lookup: `test control`, `control line` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §Test controls.
 
 ## Technical Debt
 
@@ -1163,4 +1151,6 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 No arm exports a developer's workflow commits off a vendored tree they do not own, so the workflow half of a personal adoption is stripped by hand before an upstream pull request.
 
 ## Done
+
+- test-control-decl-binding
 

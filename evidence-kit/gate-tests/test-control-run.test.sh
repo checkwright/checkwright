@@ -32,6 +32,8 @@ manifest_lines() { grep -v '^#' "$1/.workflow/validate-evidence.txt"; }
 
 # A — a suite that fails when BREAK is set: the control witnesses red, its line follows the suite's,
 #     its log and parse sit beside the suite's, and the run exits 0. A re-run leaves one control line.
+#     The line's assign= is the SHA-256 of the declaration's one assignment, 'BREAK=1' and a newline.
+BREAK_DIGEST=ed00581708d857f9a1d8afd4572cdf1ef80eb19cdd5721a5405edfb5f617fa56
 mk_tree "$tmp/a" '[[ -z "${BREAK:-}" ]]' "alpha alpha BREAK=1"
 out="$(_rv "$tmp/a")"; rc=$?
 lines="$(manifest_lines "$tmp/a")"
@@ -41,6 +43,9 @@ fi
 if ! grep -q '^ctl-test alpha sha256=' <<<"$(sed -n 1p <<<"$lines")" \
     || ! grep -q '^ctl-test alpha control=guard scenario=alpha witnessed=red ' <<<"$(sed -n 2p <<<"$lines")"; then
     echo "  FAIL: the control line does not follow its suite line witnessed red: $lines"; fails=$((fails + 1))
+fi
+if ! grep -q " assign=$BREAK_DIGEST\$" <<<"$(sed -n 2p <<<"$lines")"; then
+    echo "  FAIL: the control line does not record its declaration's assignments digest: $lines"; fails=$((fails + 1))
 fi
 if [[ ! -e "$tmp/a/.tmp/validate-alpha.control-guard.log" ]] \
     || ! grep -q '^alpha fail' "$tmp/a/.tmp/validate-alpha.control-guard.parsed" 2>/dev/null; then
@@ -82,5 +87,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "test-control-run.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "test-control-run.test: ok (red witness after its suite line at exit 0 and superseded on re-run; green witness exit 1 with the line and Statement written; malformed declaration exit 2 with nothing run)"
+echo "test-control-run.test: ok (red witness after its suite line at exit 0, carrying its assignments digest, and superseded on re-run; green witness exit 1 with the line and Statement written; malformed declaration exit 2 with nothing run)"
 exit 0

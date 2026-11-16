@@ -95,7 +95,8 @@ case_run "since-disarmed" 0 "new-test check off: no iteration-start commit and E
 printf '# fixture\nunit t_old pass\nunit t_null pass\n' >"$repo/base.txt"
 printf '# state\n---\nit validate sid 2026-01-02 %s\nit close sid 2026-01-03 %s\n' "$start" "$start" >"$repo/close.txt"
 suite="it unit sha256=$H64 pass=2 fail=0 ignore=0 verdict=clean 2026-01-02 commit=$start tree=clean cmd=$H64 origin=local"
-witness="it unit control=nullguard scenario=t_null witnessed=red 2026-01-02 commit=$start cmd=$H64"
+# The witness's assign= is the SHA-256 of nullguard's one assignment, 'BREAK_NULL=1' and a newline.
+witness="it unit control=nullguard scenario=t_null witnessed=red 2026-01-02 commit=$start cmd=$H64 assign=ffc2bf120f95ff83431fa8cb7d89902ed9cdf9a3c62dd02a78a7fc2c0d3d2ff3"
 # close_case <name> <want-exit> <expect> <manifest-lines…>
 close_case() {
     local name="$1" want="$2" expect="$3"; shift 3
@@ -109,10 +110,12 @@ close_case "close-other-scenario" 1 "not its declared scenario t_null" "$suite" 
 close_case "close-other-command" 1 "not the commit and command of the suite line it follows" "$suite" "${witness/cmd=$H64/cmd=${H64//b/c}}"
 close_case "close-stale" 1 "before the earliest validate stamp 2026-01-02" "$suite" "${witness/2026-01-02/2026-01-01}"
 close_case "close-imported-after" 1 "control 'nullguard' has no witness" "$suite" "$witness" "${suite/origin=local/origin=imported}"
+knobs 'EVIDENCE_KIT_CONTROLS[] = nullguard' 'EVIDENCE_KIT_CONTROL_nullguard = unit t_null BREAK_NULL=2'
+close_case "close-other-assignments" 1 "control 'nullguard' was witnessed under other assignments than its declaration's" "$suite" "$witness"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-test-control.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-test-control.test: ok (empty controls not applicable; (A) reds and suppresses (B); (B) through git at the iteration start, an absent prior baseline, the since fall-through, its unresolvable exit 2 and the disarmed early-out; (C) witnessed, unwitnessed, green, other scenario, other command, stale and import-superseded)"
+echo "check-test-control.test: ok (empty controls not applicable; (A) reds and suppresses (B); (B) through git at the iteration start, an absent prior baseline, the since fall-through, its unresolvable exit 2 and the disarmed early-out; (C) witnessed, unwitnessed, green, other scenario, other command, stale, import-superseded and other assignments)"
 exit 0

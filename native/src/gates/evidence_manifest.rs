@@ -72,13 +72,13 @@ fn suite_line(line: &str, v2: bool, grammar: &mut Vec<String>) -> Option<Vec<Str
 }
 
 const CONTROL_SHAPE: &str =
-    "<run-key> <suite> control=… scenario=… witnessed=red|green|absent <date> commit=… cmd=…";
+    "<run-key> <suite> control=… scenario=… witnessed=red|green|absent <date> commit=… cmd=… assign=…";
 
-// spec: evidence-kit/SPEC.md §Evidence manifest — a v2 control line's eight fields, each bad field
+// spec: evidence-kit/SPEC.md §Evidence manifest — a v2 control line's nine fields, each bad field
 // its own finding; `None` when the line is not one
 fn control_line(line: &str, grammar: &mut Vec<String>) -> Option<Vec<String>> {
-    let (f, rest) = fields(line, 8);
-    if f[7].is_empty() || !rest.is_empty() {
+    let (f, rest) = fields(line, 9);
+    if f[8].is_empty() || !rest.is_empty() {
         grammar.push(format!("malformed control line (want '{}'): {}", CONTROL_SHAPE, line));
         return None;
     }
@@ -100,6 +100,9 @@ fn control_line(line: &str, grammar: &mut Vec<String>) -> Option<Vec<String>> {
     }
     if !f[7].strip_prefix("cmd=").is_some_and(evidence::is_hex64) {
         grammar.push(format!("bad cmd field '{}': {}", f[7], line));
+    }
+    if !f[8].strip_prefix("assign=").is_some_and(evidence::is_hex64) {
+        grammar.push(format!("bad assign field '{}': {}", f[8], line));
     }
     (grammar.len() == before).then_some(f)
 }
@@ -147,7 +150,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let stage = evidence::state_stage(&stext).unwrap_or_default();
 
     // assertion B: every manifest line follows its header's major — v1's eight fields, or v2's
-    // line-kind rule, twelve-field suite line and eight-field control line placed under its suite
+    // line-kind rule, twelve-field suite line and nine-field control line placed under its suite
     // line — and carries the current iteration
     let mut grammar: Vec<String> = Vec::new();
     let mut clean_suite_date: Vec<(String, String)> = Vec::new();
@@ -290,12 +293,13 @@ mod tests {
         assert!(!is_date("2026-01-01x"));
     }
 
-    // spec: evidence-kit/SPEC.md §Evidence manifest — a control line's eight fields, each bad field
+    // spec: evidence-kit/SPEC.md §Evidence manifest — a control line's nine fields, each bad field
     // its own finding
     #[test]
-    fn a_control_line_holds_its_eight_fields() {
+    fn a_control_line_holds_its_nine_fields() {
         let h = "a".repeat(64);
-        let good = format!("k s control=c scenario=t witnessed=red 2026-01-01 commit=- cmd={}", h);
+        let d = "d".repeat(64);
+        let good = format!("k s control=c scenario=t witnessed=red 2026-01-01 commit=- cmd={} assign={}", h, d);
         let mut g = Vec::new();
         assert!(control_line(&good, &mut g).is_some(), "{:?}", g);
         for bad in [
@@ -304,6 +308,8 @@ mod tests {
             good.replace("scenario=t", "scenario="),
             good.replace("commit=-", "commit=xyz"),
             good.replace(&format!("cmd={}", h), "cmd=short"),
+            good.replace(&format!("assign={}", d), "assign=short"),
+            good.replace(&format!(" assign={}", d), ""),
             format!("{} extra", good),
         ] {
             let mut g = Vec::new();

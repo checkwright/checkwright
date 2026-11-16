@@ -384,6 +384,12 @@ pub struct Control {
     pub env: Vec<(String, String)>,
 }
 
+// spec: evidence-kit/SPEC.md §Test controls — the assignments digest the spine writes and (C) recomputes
+pub fn assignments_digest(control: &Control) -> String {
+    let text: String = control.env.iter().map(|(k, v)| format!("{}={}\n", k, v)).collect();
+    crate::sha256::hex(text.as_bytes())
+}
+
 pub const CONTROL_PREFIX: &str = "EVIDENCE_KIT_CONTROL_";
 const CONTROL_SINCE: &str = "SINCE";
 
@@ -475,13 +481,22 @@ pub struct ControlLine {
     pub date: String,
     pub commit: String,
     pub cmd: String,
+    pub assign: String,
 }
 
 impl ControlLine {
     pub fn render(&self) -> String {
         format!(
-            "{} {} control={} scenario={} witnessed={} {} commit={} cmd={}",
-            self.key, self.suite, self.name, self.scenario, self.witnessed, self.date, self.commit, self.cmd
+            "{} {} control={} scenario={} witnessed={} {} commit={} cmd={} assign={}",
+            self.key,
+            self.suite,
+            self.name,
+            self.scenario,
+            self.witnessed,
+            self.date,
+            self.commit,
+            self.cmd,
+            self.assign
         )
     }
 }
@@ -926,6 +941,18 @@ mod tests {
         assert_eq!(witness(&parsed(&["t ignore"]), "t"), "absent");
         assert_eq!(witness(&parsed(&["u fail"]), "t"), "absent");
         assert_eq!(witness(&parsed(&["t pass", "t fail"]), "t"), "red");
+    }
+
+    // spec: evidence-kit/SPEC.md §Test controls — the assignments digest: declared order, each
+    // assignment newline-terminated, the declaration's whitespace never reaching it
+    #[test]
+    fn the_assignments_digest_pins_the_declared_assignments() {
+        let two = &declared(&[("c", "unit t BREAK_NULL=1 MODE=x")]).unwrap()[0];
+        let d = assignments_digest(two);
+        assert_eq!(d, crate::sha256::hex(b"BREAK_NULL=1\nMODE=x\n"));
+        assert_eq!(d, assignments_digest(&declared(&[("c", "  unit\tt  BREAK_NULL=1   MODE=x ")]).unwrap()[0]));
+        assert_ne!(d, assignments_digest(&declared(&[("c", "unit t MODE=x BREAK_NULL=1")]).unwrap()[0]));
+        assert_ne!(d, assignments_digest(&declared(&[("c", "unit t BREAK_NULL=0 MODE=x")]).unwrap()[0]));
     }
 
     const GOLDEN_SUBJECT: &str = "0123456789abcdef0123456789abcdef01234567";

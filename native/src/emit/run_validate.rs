@@ -330,6 +330,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
                 date: today.clone(),
                 commit: row.commit.clone(),
                 cmd: row.cmd.clone(),
+                assign: evidence::assignments_digest(c),
             };
             append_line(&batch, &line.render()).map_err(guard)?;
             if witnessed != "red" {
@@ -707,6 +708,7 @@ mod tests {
             date: "2026-02-02".into(),
             commit: "-".into(),
             cmd: "c".into(),
+            assign: "a".into(),
         };
         fold(&m, &dir.display().to_string(), "iter_a", &[row()], &[ctl]).unwrap();
         let got = std::fs::read_to_string(&m).unwrap();
@@ -716,7 +718,7 @@ mod tests {
             format!(
                 "# contract: evidence-manifest v2\n\
                  iter_a gates sha256=new pass=2 fail=0 ignore=0 verdict=clean 2026-02-02 {}\n\
-                 iter_a gates control=new scenario=s witnessed=green 2026-02-02 commit=- cmd=c\n",
+                 iter_a gates control=new scenario=s witnessed=green 2026-02-02 commit=- cmd=c assign=a\n",
                 tail
             )
         );

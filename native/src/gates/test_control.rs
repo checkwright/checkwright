@@ -204,6 +204,12 @@ fn close_witness(
                 get(7)
             ));
         }
+        if get(8) != format!("assign={}", evidence::assignments_digest(c)) {
+            findings.push(format!(
+                "close entry: control '{}' was witnessed under other assignments than its declaration's — re-run --run-validate",
+                c.name
+            ));
+        }
         if !earliest.is_empty() && get(5) < earliest.as_str() {
             findings.push(format!(
                 "close entry: control '{}' is dated {}, before the earliest validate stamp {} — stale evidence",
@@ -233,15 +239,18 @@ mod tests {
                 "it unit sha256={h} pass=1 fail=0 ignore=0 verdict=clean 2026-01-02 commit=- tree=- cmd={h} origin={origin}\n"
             )
         };
-        let control = format!("it unit control=c scenario=t witnessed=red 2026-01-02 commit=- cmd={h}\n");
         std::fs::write(p("queue"), "## Iteration: it\n").unwrap();
         std::fs::write(p("state"), "h\n---\nit validate s 2026-01-01 x\nit close s 2026-01-03 x\n").unwrap();
         let ctl = vec![evidence::Control {
             name: "c".into(),
             suite: "unit".into(),
             scenario: "t".into(),
-            env: vec![],
+            env: vec![("BREAK".into(), "1".into())],
         }];
+        let control = format!(
+            "it unit control=c scenario=t witnessed=red 2026-01-02 commit=- cmd={h} assign={}\n",
+            evidence::assignments_digest(&ctl[0])
+        );
         let judge = |body: String| {
             std::fs::write(p("manifest"), format!("# contract: evidence-manifest v2\n{}", body)).unwrap();
             let mut f = Vec::new();
