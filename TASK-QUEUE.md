@@ -1,14 +1,70 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: input-shape-refusal-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The set (operator direction 2026-11-16, lead-relayed, not a ruling; the theme that date's standing directive, the filed gaps and the tasks that can join them):** option A, six debt units, stages scope, build, validate, close. The two carried second-vendor findings promote as `provenance-blank-string` and `amend-only-not-applicable`; `price-table-row-shape` (its coverage-arm route), `user-lock-key-traversal`, `usage-poll-half-weekly-pair` and `docs-since-duplicate-key` join as input-shape refusals the owning SPECs already rule out. The set's behaviour changes are directed with it: the verify arm refuses a blank provenance string, `check-docs-since` reds a duplicated `since:` key, and `--price-coverage` reports malformed rows. Composition: bundled on the native crate's input-shape refusals, drain 4 against inflow 6.8, the remaining theme-adjacent rows being features or host-bound. Supersession: none.
+
+  **Push need (operator direction 2026-11-16, inside the budget):** 2 against 2, the closing push and the one `user-lock-key-traversal` spends.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### price-table-row-shape
+
+A `scripts/price-table.tsv` row whose model id and input column fused passed the full battery, and `--price-coverage` reported every model priced. The stage-economics reader already counts such a row and its run prints the skip count; no gate and no coverage line reads it.
+
+**Deliverable:** a fix: `--price-coverage` reports a malformed row as unpriced, its line in drift-kit/SPEC.md §The price-coverage arm and its smoke case; the born-native-gate route was declined at input-shape-refusal-pass' scope (operator direction 2026-11-16, lead-relayed, not a ruling), since a new gate is a new name.
+
+**Cost while deferred:** a mistyped row drops its model's cost from the meter, with only a line in a run nobody reads to say so. Surfaced 2026-11-14 at liveness-arm-adoption-pass' scope, which fixed the row; filed at its close. Owner lookup: `price` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md §The stage-economics meter.
+
+### user-lock-key-traversal
+
+`uninstall --user` removes paths built from `user.lock`'s `files` keys without refusing a parent-dir or absolute component: `UserLock::read` copies the keys and `at_rel` folds them onto the data dir by `split('/')` (`native/src/installer/user.rs`), so a key `../victim` names a file outside the data dir, removed unconditionally under `--force`. The lock is installer-written in the user's own data dir, so this is defence in depth.
+
+**Deliverable:** a fix: refuse such a key as a malformed lock, with its case. On Windows a key carrying a backslash (`..\victim`) survives the split on `/` and the join reads it as a separator, so the refusal covers it, with a case the CI windows leg runs.
+
+**Push need (2026-11-16, inside the budget):** one mid-iteration push after this lands, since its Windows case runs first on the CI windows leg.
+
+**Cost while deferred:** a corrupted or hand-edited lock can steer an uninstall outside its data dir. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (from source; the scope re-read `at_rel`); filed at the next scope. Owner lookup: `user.lock`, `at_rel`, `uninstall --user` in this file and the disposed-findings record, none; owner installer/SPEC.md §The user install.
+
+### usage-poll-half-weekly-pair
+
+`--usage-poll` accepts a half weekly pair: with a complete five-hour pair, `axes()` in `native/src/hook/poll.rs` returns a weekly percentage with an empty reset (`seven_day {utilization:99}`) and the snapshot is written with the weekly axis unarmed, though the poller's payload-mapping step in delegation-kit/SPEC.md reads half of an axis as unparseable. It predates the no-five-hour fix; the v0.36.0 note is worded to the shipped behaviour.
+
+**Deliverable:** a fix: refuse a weekly percentage without a reset, or the reverse, with the unit case.
+
+**Cost while deferred:** a malformed payload leaves the weekly budget verdict unarmed with no refusal. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close, confirmed there and at this scope by reading `axes()`; filed at the next scope. Owner lookup: `usage-poll`, `weekly` in this file and the disposed-findings record, none on this path; owner delegation-kit/SPEC.md §usage-verdict.
+
+### docs-since-duplicate-key
+
+`check-docs-since` and `--emit docs-since` read the first `since:` line of a page's front matter (`native/src/emit/docs_since.rs`), but a YAML renderer keeps the last duplicate key, so `since: v0.1.0` then `since: unreleased` passes the gate and the rewrite while the site renders the unreleased banner.
+
+**Deliverable:** a fix: refuse a duplicated `since:` key, with its fixture.
+
+**Cost while deferred:** a page can show the unreleased banner the gate reads as released. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a YAML renderer probe); filed at the next scope. Owner lookup: `docs-since`, `duplicat` in this file and the disposed-findings record, none; owner site-kit/SPEC.md §check-docs-since.
+
+### provenance-blank-string
+
+`--verify-gate-run` and the published schema admit a blank optional provenance string: `provenance_shape`'s `optional` closure in native/src/evidence.rs checks only that `tool.version`, `tool.sourceStamp`, `tool.target` and `kits[].version` are strings, and docs/contracts/gate-run/v1/schema.json sets no `minLength` on them, while gate-sdk/SPEC.md §run-gates, The provenance block, says a field the run cannot fill is absent, never null or blank.
+
+**Deliverable:** a fix: the closure refuses an empty string, the schema carries `minLength: 1` on the four, and a case per field.
+
+**Cost while deferred:** a Statement naming a blank version or target verifies clean. Surfaced 2026-11-16 by the second-vendor review at verdict-contract-residue-pass' close; filed at the next scope, re-verified there by reading both against the cited sentence. Owner lookup: over this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §verify-gate-run check 1.
+
+### amend-only-not-applicable
+
+`check-graph --amend-only` prints `CHECK-GRAPH: clean (amendment-body '# graph:' manifests well-formed)` when the scan root holds no SPEC-*.md or none carries a `# graph:` manifest (native/src/gates/graph.rs, the `--amend-only` branch of `rule`), having evaluated no instance of assertion G, where gate-sdk/SPEC.md §Output contract asks for `clean (not applicable: <reason>)`. The line opens with no empty-corpus word, so the lexical unit test misses it.
+
+**Deliverable:** a fix: count the manifests read and print the not-applicable form on zero, with its case.
+
+**Cost while deferred:** a SARIF reader takes a vacuous assertion-G pass as a real one. Surfaced 2026-11-16 by the second-vendor review at verdict-contract-residue-pass' close; filed at the next scope, re-verified there by reading the branch. Owner lookup: over this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
 
 ## Deferred
 
@@ -244,16 +300,6 @@ A read-only audit child cannot run the gate binary: agent-dispatch-guard isolate
 
 **Cost while deferred:** an isolated reader emulates an oracle it cannot run (Oracle-first). Surfaced 2026-11-14 by a consultation's dispatcher, held in its journal; filed at liveness-arm-adoption-pass' scope. Owner lookup: `READONLY`, `isolated` in this file, none; owner delegation-kit/SPEC.md.
 
-### price-table-row-shape
-
-[cost: event/low] [surface: drift-kit]
-
-A `scripts/price-table.tsv` row whose model id and input column fused passed the full battery, and `--price-coverage` reported every model priced. The stage-economics reader already counts such a row and its run prints the skip count; no gate and no coverage line reads it.
-
-**Deliverable:** a fix: `--price-coverage` reports a malformed row as unpriced, or a born-native gate holds the table's shape, with its fixture pair.
-
-**Cost while deferred:** a mistyped row drops its model's cost from the meter, with only a line in a run nobody reads to say so. Surfaced 2026-11-14 at liveness-arm-adoption-pass' scope, which fixed the row; filed at its close. Owner lookup: `price` in this file and the disposed-findings record, none; owner drift-kit/SPEC.md §The stage-economics meter.
-
 ### tree-free-hook-roster-widening
 
 [cost: event/low] [surface: gate-sdk]
@@ -303,36 +349,6 @@ docs/manual-install.md's PowerShell attestation-verify block, which reads `--for
 **Deliverable:** a fix: one run on a Windows host with `gh` signed in, and the property path corrected if it differs.
 
 **Cost while deferred:** a Windows adopter verifying a download may meet a block that errors. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `PowerShell`, `ConvertFrom` in this file and the disposed-findings record, none on this block; owner docs/manual-install.md.
-
-### user-lock-key-traversal
-
-[cost: event/low] [surface: installer]
-
-`uninstall --user` removes paths built from `user.lock`'s `files` keys without refusing a parent-dir or absolute component: `UserLock::read` copies the keys and `at_rel` folds them onto the data dir by `split('/')` (`native/src/installer/user.rs`), so a key `../victim` names a file outside the data dir, removed unconditionally under `--force`. The lock is installer-written in the user's own data dir, so this is defence in depth.
-
-**Deliverable:** a fix: refuse such a key as a malformed lock, with its case.
-
-**Cost while deferred:** a corrupted or hand-edited lock can steer an uninstall outside its data dir. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (from source; the scope re-read `at_rel`); filed at the next scope. Owner lookup: `user.lock`, `at_rel`, `uninstall --user` in this file and the disposed-findings record, none; owner installer/SPEC.md §The user install.
-
-### usage-poll-half-weekly-pair
-
-[cost: event/low] [surface: delegation-kit]
-
-`--usage-poll` accepts a half weekly pair: with a complete five-hour pair, `axes()` in `native/src/hook/poll.rs` returns a weekly percentage with an empty reset (`seven_day {utilization:99}`) and the snapshot is written with the weekly axis unarmed, though the poller's payload-mapping step in delegation-kit/SPEC.md reads half of an axis as unparseable. It predates the no-five-hour fix; the v0.36.0 note is worded to the shipped behaviour.
-
-**Deliverable:** a fix: refuse a weekly percentage without a reset, or the reverse, with the unit case.
-
-**Cost while deferred:** a malformed payload leaves the weekly budget verdict unarmed with no refusal. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close, confirmed there and at this scope by reading `axes()`; filed at the next scope. Owner lookup: `usage-poll`, `weekly` in this file and the disposed-findings record, none on this path; owner delegation-kit/SPEC.md §usage-verdict.
-
-### docs-since-duplicate-key
-
-[cost: event/low] [surface: docs]
-
-`check-docs-since` and `--emit docs-since` read the first `since:` line of a page's front matter (`native/src/emit/docs_since.rs`), but a YAML renderer keeps the last duplicate key, so `since: v0.1.0` then `since: unreleased` passes the gate and the rewrite while the site renders the unreleased banner.
-
-**Deliverable:** a fix: refuse a duplicated `since:` key, with its fixture.
-
-**Cost while deferred:** a page can show the unreleased banner the gate reads as released. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a YAML renderer probe); filed at the next scope. Owner lookup: `docs-since`, `duplicat` in this file and the disposed-findings record, none; owner site-kit/SPEC.md §check-docs-since.
 
 ### non-gate-arm-json
 
