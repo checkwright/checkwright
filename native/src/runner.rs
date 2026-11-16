@@ -878,6 +878,21 @@ pub fn run(args: &[String]) -> i32 {
     };
     let resolve_dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
 
+    // spec: gate-sdk/SPEC.md §run-gates — the selection is read only where a log is written, and a
+    // value it refuses stops the run before the first member, an empty `--for` selection included
+    let sarif_path = std::env::var(sarif::KNOB).unwrap_or_default();
+    let selection = if sarif_path.is_empty() {
+        sarif::Selection::All
+    } else {
+        match sarif::Selection::parse(&std::env::var(sarif::RESULTS_KNOB).unwrap_or_default()) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("{}: {}", TOOL, e);
+                return 2;
+            }
+        }
+    };
+
     let selected: Vec<Selected> = if !parsed.only.is_empty() {
         match select_only(&members, &list, &resolve_dirs, &parsed.only, parsed.only_args.as_deref()) {
             Ok(s) => s,
@@ -899,6 +914,12 @@ pub fn run(args: &[String]) -> i32 {
         };
         if s.is_empty() {
             print!("\n===== gates summary =====\nno coupled gate for the given path(s); nothing to run.\n");
+            if !sarif_path.is_empty() {
+                if let Err(e) = write_log(&sarif_path, &list, sarif::Scope::For, selection, &[], &[]) {
+                    eprintln!("{}: {}", TOOL, e);
+                    return 2;
+                }
+            }
             return 0;
         }
         s
@@ -955,20 +976,6 @@ pub fn run(args: &[String]) -> i32 {
         env: &[],
     };
 
-    // spec: gate-sdk/SPEC.md §run-gates — the selection is read only where a log is written, and a
-    // value it refuses stops the run before the first member
-    let sarif_path = std::env::var(sarif::KNOB).unwrap_or_default();
-    let selection = if sarif_path.is_empty() {
-        sarif::Selection::All
-    } else {
-        match sarif::Selection::parse(&std::env::var(sarif::RESULTS_KNOB).unwrap_or_default()) {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("{}: {}", TOOL, e);
-                return 2;
-            }
-        }
-    };
     let outcomes = dispatch_all(&d, &selected);
     drop(scratch);
 
@@ -1045,22 +1052,33 @@ pub fn run(args: &[String]) -> i32 {
                 .collect();
             (sarif::Scope::Registry, omissions)
         };
-        // spec: gate-sdk/SPEC.md §run-gates — the block's kit roots in their repo-relative spelling
-        let roots_here = walk::kit_roots().unwrap_or_default();
-        let provenance = crate::provenance::collect(&roots_here);
-        let run = sarif::Run {
-            registry: &list,
-            provenance: &provenance,
-            scope,
-            selection,
-        };
-        let body = sarif::render(&run, &members, &omissions, &|p| Path::new(p).is_file());
-        if let Err(e) = sarif::write(&sarif_path, &body) {
+        if let Err(e) = write_log(&sarif_path, &list, scope, selection, &members, &omissions) {
             eprintln!("{}: {}", TOOL, e);
             return 2;
         }
     }
     code
+}
+
+fn write_log(
+    path: &str,
+    list: &str,
+    scope: sarif::Scope,
+    selection: sarif::Selection,
+    members: &[sarif::Member],
+    omissions: &[sarif::Omission],
+) -> Result<(), String> {
+    // spec: gate-sdk/SPEC.md §run-gates — the block's kit roots in their repo-relative spelling
+    let roots_here = walk::kit_roots().unwrap_or_default();
+    let provenance = crate::provenance::collect(&roots_here);
+    let run = sarif::Run {
+        registry: list,
+        provenance: &provenance,
+        scope,
+        selection,
+    };
+    let body = sarif::render(&run, members, omissions, &|p| Path::new(p).is_file());
+    sarif::write(path, &body)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a rule's `properties.kit`: the kit root its member resolved

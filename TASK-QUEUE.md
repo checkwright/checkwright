@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### empty-for-selection-sarif-skip
-
-An empty `--for` selection exits 0 before the SARIF block: native/src/runner.rs returns at `no coupled gate for the given path(s); nothing to run.` ahead of the `GATE_SDK_SARIF_RESULTS` parse and the `GATE_SDK_SARIF_FILE` write, so a stale log from a prior run stays in place beside a 0 exit and a bad selection value is not refused. gate-sdk/SPEC.md §run-gates writes the log on every `--run` with `scope` `for` covering the selection, refuses a bad selection at exit 2, and names no exception.
-
-**Deliverable:** a fix: parse the selection before the early return, and write the empty `for` log, with a runner case for each.
-
-**Cost while deferred:** a CI reader of the log takes a prior run's verdict for this one. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading runner.rs' early return against its SARIF block. Owner lookup: `SARIF`, `--for` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
-
 ### not-applicable-sweep-residue
 
 Bundled gates still print a plain clean line on an early-out that evaluated nothing, beyond the lexical oracle the verdict contract's sweep ran (gate-sdk/SPEC.md §Output contract, its honest limit), so their SARIF result reads `pass` where it should read not-applicable. Sites named, not branch-traced: native/src/gates action_pinning:85, action_gh_repo:160, action_permissions:196, action_run_path:158, action_run_shell:188, docs_link_convention:140, docs_nav_reachable:123, docs_render_fidelity:154, docs_since:40, core_files:41,55, commit_msg:71, commit_subject:72, dispatch_entry:63, audit_roster:233,291, crate_arms:218, disposed_findings:75, agent_tier_explicit:56, measured_claim:40,54, prose_enum:34,54, unmarked_claim:35,43,54.
@@ -1139,4 +1131,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - test-control-decl-binding
 - gate-run-schema-semver-pattern
 - gate-run-provenance-typing
+- empty-for-selection-sarif-skip
 

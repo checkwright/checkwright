@@ -67,6 +67,21 @@ assert_has   nomatch "no registered gate couples to zzz/nowhere.md" "$out"
 assert_has   nomatch "nothing to run" "$out"
 [[ "$rc" -eq 0 ]] || { echo "FAIL [nomatch]: expected exit 0, got $rc"; fails=$((fails + 1)); }
 
+# An empty selection still writes the SARIF log, replacing a prior run's: scope for, no result.
+printf 'stale\n' > "$scratch/log.sarif"
+out="$(GATE_SDK_SARIF_FILE="$scratch/log.sarif" run_for zzz/nowhere.md)"; rc=$?
+[[ "$rc" -eq 0 ]] || { echo "FAIL [emptylog]: expected exit 0, got $rc -- $out"; fails=$((fails + 1)); }
+log="$(cat "$scratch/log.sarif")"
+assert_absent emptylog "stale" "$log"
+assert_has    emptylog '"scope": "for"' "$log"
+assert_has    emptylog '"results": []' "$log"
+
+# An empty selection still refuses a bad result selection at exit 2, naming the knob.
+out="$(GATE_SDK_SARIF_FILE="$scratch/log.sarif" GATE_SDK_SARIF_RESULTS=bogus run_for zzz/nowhere.md)"; rc=$?
+[[ "$rc" -eq 2 ]] || { echo "FAIL [emptyrefusal]: expected exit 2, got $rc -- $out"; fails=$((fails + 1)); }
+assert_has    emptyrefusal "GATE_SDK_SARIF_RESULTS" "$out"
+assert_absent emptyrefusal "nothing to run" "$out"
+
 # --for with no path is a usage error (exit 2).
 GATE_SDK_GATES_DIR="$scratch" GATE_SDK_KIT_DIRS="$scratch" \
     GATE_SDK_TMP_DIR="$scratch/.tmp" bash "$RUN" --for >/dev/null 2>&1
@@ -83,5 +98,5 @@ fi
 chmod 755 "$scratch/g_glob.sh"
 
 [[ "$fails" -eq 0 ]] || { echo "run-for-path.test: $fails assertion(s) failed"; exit 1; }
-echo "run-for-path.test: clean (--for selects by shared matcher; trigger='*' universal, mode=staged pathspec passes args, ungoverned path noted, an unreadable resolved member refused at 2)"
+echo "run-for-path.test: clean (--for selects by shared matcher; trigger='*' universal, mode=staged pathspec passes args, ungoverned path noted and its empty selection logged or its bad result selection refused, an unreadable resolved member refused at 2)"
 exit 0
