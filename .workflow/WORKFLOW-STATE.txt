@@ -6,3 +6,5 @@
 
 verdict-contract-residue-pass scope a41d2568 2026-11-15 f5b26f6e4
 verdict-contract-residue-pass spec a0d938f6 2026-11-15 46e25e585
+verdict-contract-residue-pass align-waived abd99483 2026-11-16 266bee18e
+verdict-contract-residue-pass build abd99483 2026-11-16 266bee18e
