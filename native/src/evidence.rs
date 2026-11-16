@@ -1036,6 +1036,28 @@ mod tests {
         assert_eq!(read.suites[1].binding, golden_row("fixtures", "checkwright-gates --run-gate-tests tests", (40, 2, 0), "new-failures").binding());
     }
 
+    // spec: evidence-kit/SPEC.md §The gate-run predicate — the schema's `contract` pattern admits at
+    // major 1 exactly what the reader's SemVer check admits
+    #[test]
+    fn the_schema_contract_pattern_agrees_with_the_readers_semver() {
+        let schema: serde_json::Value =
+            serde_json::from_str(include_str!("../../docs/contracts/gate-run/v1/schema.json")).expect("the schema is JSON");
+        let pattern = schema
+            .pointer("/properties/predicate/properties/contract/pattern")
+            .and_then(|p| p.as_str())
+            .expect("the schema patterns the contract");
+        let re = crate::ere::Ere::compile(pattern).expect("the pattern is in the ERE subset");
+        for v in [
+            "1.0.0", "1.2.3", "1.10.0", "1.0.0-0", "1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-0a", "1.0.0-a-b",
+            "1.0.0--", "1.0.0-x.7.z.92", "1.0.0+build", "1.0.0+001", "1.0.0+a.b-c", "1.0.0-rc.1+build.5",
+            "1.0.0-01", "1.0.0-a..b", "1.0.0-.a", "1.0.0-a.", "1.0.0-", "1.0.0+", "1.0.0+..", "1.0.0+a.",
+            "1.0.0-a_b", "1.0.0+a_b", "1.01.0", "1.0.01", "1.0", "1.0.0.0", "01.0.0", "1.0.0-00",
+        ] {
+            assert_eq!(re.is_match(v), crate::provenance::semver(v), "{}", v);
+        }
+        assert!(!re.is_match("2.0.0") && crate::provenance::semver("2.0.0"), "the pattern pins major 1");
+    }
+
     // spec: evidence-kit/SPEC.md §The gate-run predicate — the command digest hashes the spawned
     // argv, so whitespace that splits to the same words binds the same, and other words do not
     #[test]

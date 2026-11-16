@@ -26,14 +26,6 @@ An empty `--for` selection exits 0 before the SARIF block: native/src/runner.rs 
 
 **Cost while deferred:** a CI reader of the log takes a prior run's verdict for this one. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there by reading runner.rs' early return against its SARIF block. Owner lookup: `SARIF`, `--for` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
-### gate-run-schema-semver-pattern
-
-docs/contracts/gate-run/v1/schema.json's `contract` pattern admits identifiers SemVer 2.0 refuses (`1.0.0-01`, `1.0.0-a..b`, `1.0.0+..`), which `provenance::semver` rejects at exit 2, so a producer passing the published schema can be refused by the reader.
-
-**Deliverable:** a fix: the pattern tightened to SemVer's identifier grammar, held by the renderer's golden test against `provenance::semver` over those cases.
-
-**Cost while deferred:** an outside producer validating against the schema writes a Statement the verify arm refuses. Surfaced 2026-11-15 by the second-vendor review at machine-verdict-contract-pass' close; filed at the next scope, re-verified there against provenance.rs' `semver` and the schema's pattern. Owner lookup: `schema`, `semver` in this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §The gate-run predicate.
-
 ### gate-run-provenance-typing
 
 `--verify-gate-run` accepts a Statement whose provenance block is reduced to `{commit}`: `read_statement` in native/src/evidence.rs reads `/predicate/provenance` as any object and extracts `commit` alone, while the published schema requires `tool` and `kits` and evidence-kit/SPEC.md §verify-gate-run check 1 types every predicate field as §The gate-run predicate states.
@@ -1153,4 +1145,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 ## Done
 
 - test-control-decl-binding
+- gate-run-schema-semver-pattern
 
