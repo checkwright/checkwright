@@ -16,16 +16,6 @@
 
 ## Technical Debt
 
-### user-lock-key-traversal
-
-`uninstall --user` removes paths built from `user.lock`'s `files` keys without refusing a parent-dir or absolute component: `UserLock::read` copies the keys and `at_rel` folds them onto the data dir by `split('/')` (`native/src/installer/user.rs`), so a key `../victim` names a file outside the data dir, removed unconditionally under `--force`. The lock is installer-written in the user's own data dir, so this is defence in depth.
-
-**Deliverable:** a fix: refuse such a key as a malformed lock, with its case. On Windows a key carrying a backslash (`..\victim`) survives the split on `/` and the join reads it as a separator, so the refusal covers it, with a case the CI windows leg runs.
-
-**Push need (2026-11-16, inside the budget):** one mid-iteration push after this lands, since its Windows case runs first on the CI windows leg.
-
-**Cost while deferred:** a corrupted or hand-edited lock can steer an uninstall outside its data dir. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (from source; the scope re-read `at_rel`); filed at the next scope. Owner lookup: `user.lock`, `at_rel`, `uninstall --user` in this file and the disposed-findings record, none; owner installer/SPEC.md §The user install.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1093,4 +1083,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - docs-since-duplicate-key
 - price-table-row-shape
 - usage-poll-half-weekly-pair
+- user-lock-key-traversal
 
