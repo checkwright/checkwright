@@ -103,21 +103,22 @@ pub fn run(args: &[String]) -> i32 {
     0
 }
 
-// spec: delegation-kit/SPEC.md §The usage.txt contract — a payload carrying no rate-limit window
-// writes nothing and leaves `updated_at` where the last carrying render put it, so the last good
-// reading survives and still ages into STALE; `true` only for a completed write.
+// spec: delegation-kit/SPEC.md §The usage.txt contract — no rate-limit window, or half the weekly
+// pair, writes nothing, so the last good reading survives and still ages into STALE; `true` only
+// for a completed write
 fn record(payload: Option<&Value>, paths: &usage::Paths) -> bool {
     let at = |path: &[&str]| hook::field(payload, path);
     let five = at(&["rate_limits", "five_hour", "used_percentage"]);
     let seven = at(&["rate_limits", "seven_day", "used_percentage"]);
-    if five.is_empty() && seven.is_empty() {
+    let seven_resets = at(&["rate_limits", "seven_day", "resets_at"]);
+    if (five.is_empty() && seven.is_empty()) || seven.is_empty() != seven_resets.is_empty() {
         return false;
     }
     Snapshot {
         five_hour_used_pct: five,
         five_hour_resets_at: at(&["rate_limits", "five_hour", "resets_at"]),
         seven_day_used_pct: seven,
-        seven_day_resets_at: at(&["rate_limits", "seven_day", "resets_at"]),
+        seven_day_resets_at: seven_resets,
         account: usage::json_field(&paths.account_config, &["oauthAccount", "accountUuid"]),
         tier: usage::json_field(&paths.cred_file, &["claudeAiOauth", "subscriptionType"]),
     }
@@ -373,8 +374,8 @@ mod tests {
     }
 
     // spec: delegation-kit/SPEC.md §The usage.txt contract — a render carrying a window rewrites
-    // the snapshot, a weekly-only one with the five-hour pair empty; a render carrying none, or no
-    // payload at all, leaves the last good snapshot byte-identical, `updated_at` included
+    // the snapshot, a weekly-only one with the five-hour pair empty; none, half the weekly pair or
+    // no payload leaves the last good snapshot byte-identical, `updated_at` included
     #[test]
     fn a_render_without_rate_limits_keeps_the_last_snapshot() {
         let dir = std::env::temp_dir().join(format!("checkwright-statusline.{}", std::process::id()));
@@ -400,6 +401,15 @@ mod tests {
             serde_json::json!({"model": {"display_name": "Opus"}}),
             serde_json::json!({"rate_limits": null}),
             serde_json::json!({"rate_limits": {}}),
+            serde_json::json!({"rate_limits": {
+                "five_hour": {"used_percentage": 12.5, "resets_at": 1756600000},
+                "seven_day": {"used_percentage": 91}
+            }}),
+            serde_json::json!({"rate_limits": {
+                "five_hour": {"used_percentage": 12.5, "resets_at": 1756600000},
+                "seven_day": {"used_percentage": 91, "resets_at": null}
+            }}),
+            serde_json::json!({"rate_limits": {"seven_day": {"resets_at": 1756656000}}}),
         ] {
             assert!(!record(Some(&bare), &paths), "{} must not write", bare);
             assert_eq!(read(), good, "{} rewrote the last good snapshot", bare);
