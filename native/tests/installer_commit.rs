@@ -3,6 +3,7 @@
 // every other setting sit in its own config, never the process environment
 #![cfg(unix)]
 
+use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
@@ -35,12 +36,19 @@ fn scratch(case: &str) -> Scratch {
     std::fs::write(pkg.join("profiles.list"), "starter\ta-kit\n").expect("profiles.list");
     std::fs::write(pkg.join("payload").join("a-kit").join("x.txt"), "x\n").expect("the kit's file");
     let bin = art.join(Path::new(BIN).file_name().expect("a binary name"));
-    std::fs::copy(BIN, &bin).expect("cannot place the binary under test");
+    by_a_child("cp \"$1\" \"$2\"", &[OsStr::new(BIN), bin.as_os_str()]);
     let s = Scratch { dir, bin, repo };
     git(&s, &["init", "-q"]);
     git(&s, &["config", "user.name", "Scratch"]);
     git(&s, &["config", "user.email", "scratch@example.com"]);
     s
+}
+
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — a file a case spawns is written by a
+// child process, so no sibling test's fork holds its write descriptor into the spawn as ETXTBSY
+fn by_a_child(script: &str, args: &[&OsStr]) {
+    let out = Command::new("sh").arg("-c").arg(script).arg("sh").args(args).output().expect("sh did not spawn");
+    assert!(out.status.success(), "the writer failed: {}", String::from_utf8_lossy(&out.stderr));
 }
 
 // spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — a setup or assertion read aims at the scratch
@@ -94,12 +102,10 @@ fn verb_with(s: &Scratch, bin: &Path, args: &[&str], env: &[(&str, &str)]) -> (O
 }
 
 fn hook(s: &Scratch, body: &str) {
-    use std::os::unix::fs::PermissionsExt;
     let hooks = s.repo.join(".git").join("hooks");
     std::fs::create_dir_all(&hooks).expect("cannot make the hooks directory");
-    let h = hooks.join("pre-commit");
-    std::fs::write(&h, format!("#!/bin/sh\n{}\n", body)).expect("cannot write the hook");
-    std::fs::set_permissions(&h, std::fs::Permissions::from_mode(0o755)).expect("cannot mark the hook executable");
+    let text = format!("#!/bin/sh\n{}\n", body);
+    by_a_child("printf '%s' \"$1\" > \"$2\" && chmod 755 \"$2\"", &[OsStr::new(&text), hooks.join("pre-commit").as_os_str()]);
 }
 
 fn staged(s: &Scratch) -> Vec<String> {

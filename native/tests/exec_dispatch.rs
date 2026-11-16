@@ -175,13 +175,20 @@ fn an_executable_exec_member_starts_directly_and_an_unbuilt_one_refuses() {
 const SH_PASS: &str = "#!/usr/bin/env bash\nif [ -f trip ]; then\n  echo 'shpass tripped'\n  echo 'help: remove the trip file'\n  exit 1\nfi\necho 'SHPASS: clean (live)'\n";
 const SH_FAIL: &str = "#!/usr/bin/env bash\n# spec: docs/gates.md §live — the live case's invariant\necho \"BIN=$GATE_SDK_NATIVE_BIN\"\necho 'shfail fired'\necho 'help: fix the fixture'\nexit 1\n";
 
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — on unix a member is written by a child
+// process, so no sibling test's fork holds its write descriptor into the spawn as ETXTBSY
 fn shell_member(path: &Path, body: &str) {
-    std::fs::write(path, body).expect("shell member");
     #[cfg(unix)]
     {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).expect("chmod");
+        let out = Command::new("sh")
+            .args(["-c", "printf '%s' \"$1\" > \"$2\" && chmod 755 \"$2\"", "sh", body])
+            .arg(path)
+            .output()
+            .expect("sh did not spawn");
+        assert!(out.status.success(), "shell member: {}", String::from_utf8_lossy(&out.stderr));
     }
+    #[cfg(not(unix))]
+    std::fs::write(path, body).expect("shell member");
 }
 
 // spec: gate-sdk/SPEC.md §The gate-authoring surface — a `.sh` member starts under `--run` and

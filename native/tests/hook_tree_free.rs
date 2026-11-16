@@ -237,7 +237,10 @@ mod unspelled {
         std::fs::write(s.at("pkg/profiles.list"), "starter\ta-kit\n").expect("profiles.list");
         std::fs::write(s.at("pkg/payload").join("a-kit").join("x.txt"), "x\n").expect("the kit's file");
         let bin = art.join(Path::new(BIN).file_name().expect("a binary name"));
-        std::fs::copy(BIN, &bin).expect("cannot place the binary under test");
+        // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the binary is placed by a child
+        // process, so no sibling test's fork holds its write descriptor into the spawn as ETXTBSY
+        let placed = Command::new("cp").arg(BIN).arg(&bin).status().expect("cp did not spawn");
+        assert!(placed.success(), "cannot place the binary under test");
         let run = |verb: &str, at: &Path| {
             let mut c = Command::new(&bin);
             c.arg(verb).current_dir(at).stdin(Stdio::null());
