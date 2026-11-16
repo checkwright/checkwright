@@ -1,5 +1,6 @@
 check-docs-since: site/open.md:3: says since: unreleased while the v99.1.0 note notes/2026-01-01-v99-1-0.md is untagged
 check-docs-since: site/bare.md: no since: key in its front matter
 check-docs-since: site/odd.md:3: since: '1.2' is neither unreleased nor vX.Y.Z
+check-docs-since: site/twice.md:4: a second since: key beside line 3; a YAML renderer keeps the last, so keep one
   help: give the page since: unreleased, or since: vX.Y.Z naming the first release that carries what it says
   help: rewrite in the note-authoring commit —

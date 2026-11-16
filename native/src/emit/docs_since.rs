@@ -15,6 +15,7 @@ pub enum Since {
     Malformed(usize, String),
     Unreleased(usize),
     Version(usize, String),
+    Duplicate(usize, usize),
 }
 
 fn is_version(v: &str) -> bool {
@@ -26,26 +27,29 @@ fn is_version(v: &str) -> bool {
 }
 
 // spec: site-kit/SPEC.md §check-docs-since — the key is read inside the front-matter span alone; an
-// opening rule no later rule closes is a malformed span, an error rather than a missing key
+// opening rule no later rule closes is a malformed span, an error rather than a missing key; a
+// second `since:` line is a duplicate whatever either value says
 pub fn read(text: &str) -> Result<Since, String> {
     let lines: Vec<&str> = text.lines().collect();
     let span = spec::front_matter_span(&lines);
     if span == 0 && lines.first().is_some_and(|l| l.trim_end() == "---") {
         return Err("front matter opens with --- and no later --- or ... closes it".to_string());
     }
-    for (i, l) in lines[..span].iter().enumerate() {
-        if let Some(rest) = l.strip_prefix("since:") {
-            let v = rest.trim_matches([' ', '\t', '\r']).to_string();
-            return Ok(if v == UNRELEASED {
-                Since::Unreleased(i + 1)
-            } else if is_version(&v) {
-                Since::Version(i + 1, v)
-            } else {
-                Since::Malformed(i + 1, v)
-            });
-        }
+    let mut keys = lines[..span].iter().enumerate().filter_map(|(i, l)| Some((i + 1, l.strip_prefix("since:")?)));
+    let Some((line, rest)) = keys.next() else {
+        return Ok(Since::Missing);
+    };
+    if let Some((second, _)) = keys.next() {
+        return Ok(Since::Duplicate(line, second));
     }
-    Ok(Since::Missing)
+    let v = rest.trim_matches([' ', '\t', '\r']).to_string();
+    Ok(if v == UNRELEASED {
+        Since::Unreleased(line)
+    } else if is_version(&v) {
+        Since::Version(line, v)
+    } else {
+        Since::Malformed(line, v)
+    })
 }
 
 // spec: site-kit/SPEC.md §check-docs-since — the governed set: the files SITE_KIT_SINCE_PAGES's
@@ -134,13 +138,22 @@ fn apply(pages: &[String], note: Note, write: bool) -> Result<String, String> {
         }
         Note::Untagged(v, _) => v,
     };
-    let mut out = String::new();
+    let mut open = Vec::new();
     for page in pages {
         let text = std::fs::read_to_string(page).map_err(|e| format!("cannot read {}: {}", page, e))?;
-        let line = match read(&text).map_err(|e| format!("{}: {}", page, e))? {
-            Since::Unreleased(line) => line,
-            _ => continue,
-        };
+        match read(&text).map_err(|e| format!("{}: {}", page, e))? {
+            Since::Unreleased(line) => open.push((page, text, line)),
+            Since::Duplicate(first, second) => {
+                return Err(format!(
+                    "{}:{}: a second since: key beside line {}, so no one line says the page's release — keep one",
+                    page, second, first
+                ))
+            }
+            _ => {}
+        }
+    }
+    let mut out = String::new();
+    for (page, text, line) in open {
         if write {
             std::fs::write(page, rewrite(&text, line, &version)).map_err(|e| format!("cannot write {}: {}", page, e))?;
             out.push_str(&format!("docs-since: {}:{}: since: {} → {}\n", page, line, UNRELEASED, version));
@@ -168,6 +181,9 @@ mod tests {
         assert_eq!(read("---\ntitle: x\n---\nsince: unreleased\n"), Ok(Since::Missing));
         assert_eq!(read("# no front matter\n"), Ok(Since::Missing));
         assert!(read("---\nsince: unreleased\n").is_err());
+        assert_eq!(read("---\nsince: v0.1.0\ntitle: x\nsince: unreleased\n---\n"), Ok(Since::Duplicate(2, 4)));
+        assert_eq!(read("---\nsince: v0.1.0\nsince: v0.1.0\n---\n"), Ok(Since::Duplicate(2, 3)));
+        assert_eq!(read("---\nsince: v0.1.0\n---\nsince: unreleased\n"), Ok(Since::Version(2, "v0.1.0".into())));
     }
 
     #[test]
@@ -205,6 +221,14 @@ mod tests {
         assert_eq!(std::fs::read_to_string(&done).unwrap(), "---\nsince: v0.1.0\n---\n# b\n");
         let again = apply(&pages, Note::Untagged("v0.2.0".into(), "posts/n.md".into()), true).expect("rerun");
         assert_eq!(again, "docs-since: no governed page says since: unreleased\n");
+
+        let twice = d.join("twice.md").display().to_string();
+        std::fs::write(&open, "---\nsince: unreleased\n---\n").expect("write");
+        std::fs::write(&twice, "---\nsince: v0.1.0\nsince: unreleased\n---\n").expect("write");
+        let e = apply(&[open.clone(), twice.clone()], Note::Untagged("v0.2.0".into(), "posts/n.md".into()), true)
+            .expect_err("wrote beside a duplicated key");
+        assert!(e.contains(&format!("{}:3: a second since: key beside line 2", twice)), "{}", e);
+        assert_eq!(std::fs::read_to_string(&open).unwrap(), "---\nsince: unreleased\n---\n", "nothing is written");
         let _ = std::fs::remove_dir_all(&d);
     }
 }

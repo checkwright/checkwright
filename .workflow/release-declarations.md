@@ -4,6 +4,7 @@
 
 - `check-test-control` — new, opt-in: `init` registers it nowhere, and registered it asserts nothing until `EVIDENCE_KIT_CONTROLS` names a control. Then it reds a newly baselined `pass` row no control names, and at a close cursor a declared control with no red witness under its suite's current line, or witnessed under assignments its declaration no longer carries. Register it with `--with-gate` once you declare your first control.
 - `check-gate-substrate-parity` — reds after upgrading through assertion I, which holds every gate the binary carries for a kit you vendor to be registered in your `gates.list` or declared `# unregistered:` there. If you vendor evidence-kit, the new `check-test-control` is such a gate: register it once you declare a control, or declare `# unregistered: check-test-control — <reason>`.
+- `check-docs-since` — tightened: reds a governed page whose front matter carries a second `since:` line, whatever either value says, where it read the first and passed while a YAML renderer showed the last. `--emit docs-since` refuses such a page at exit 2 before writing any page. Keep one `since:` line per page.
 
 ## Knob changes
 

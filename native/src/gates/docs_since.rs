@@ -19,6 +19,7 @@ enum Finding {
     Missing(String),
     Malformed(String, usize, String),
     Unreleased(String, usize),
+    Duplicate(String, usize, usize),
 }
 
 fn findings(pages: &[(String, String)], note: &Note) -> Result<Vec<Finding>, String> {
@@ -27,6 +28,7 @@ fn findings(pages: &[(String, String)], note: &Note) -> Result<Vec<Finding>, Str
         match docs_since::read(text).map_err(|e| format!("{}: {}", page, e))? {
             Since::Missing => out.push(Finding::Missing(page.clone())),
             Since::Malformed(line, v) => out.push(Finding::Malformed(page.clone(), line, v)),
+            Since::Duplicate(first, second) => out.push(Finding::Duplicate(page.clone(), first, second)),
             Since::Unreleased(line) if matches!(note, Note::Untagged(..)) => out.push(Finding::Unreleased(page.clone(), line)),
             _ => {}
         }
@@ -69,6 +71,10 @@ fn rule(_args: &[String]) -> Result<i32, String> {
                 println!("{}: {}:{}: since: '{}' is neither unreleased nor vX.Y.Z", NAME, page, line, v);
                 key = true;
             }
+            Finding::Duplicate(page, first, second) => {
+                println!("{}: {}:{}: a second since: key beside line {}; a YAML renderer keeps the last, so keep one", NAME, page, second, first);
+                key = true;
+            }
             Finding::Unreleased(page, line) => {
                 if let Note::Untagged(v, path) = &note {
                     println!("{}: {}:{}: says since: unreleased while the {} note {} is untagged", NAME, page, line, v, path);
@@ -109,5 +115,7 @@ mod tests {
         let bare = vec![page("bare.md", "# x\n")];
         assert_eq!(findings(&bare, &Note::Off), Ok(vec![Finding::Missing("bare.md".into())]));
         assert!(findings(&[page("open.md", "---\nsince: unreleased\n")], &Note::Off).is_err());
+        let twice = vec![page("twice.md", "---\nsince: v0.1.0\nsince: unreleased\n---\n")];
+        assert_eq!(findings(&twice, &Note::Off), Ok(vec![Finding::Duplicate("twice.md".into(), 2, 3)]));
     }
 }

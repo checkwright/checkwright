@@ -42,14 +42,6 @@ A `scripts/price-table.tsv` row whose model id and input column fused passed the
 
 **Cost while deferred:** a malformed payload leaves the weekly budget verdict unarmed with no refusal. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close, confirmed there and at this scope by reading `axes()`; filed at the next scope. Owner lookup: `usage-poll`, `weekly` in this file and the disposed-findings record, none on this path; owner delegation-kit/SPEC.md §usage-verdict.
 
-### docs-since-duplicate-key
-
-`check-docs-since` and `--emit docs-since` read the first `since:` line of a page's front matter (`native/src/emit/docs_since.rs`), but a YAML renderer keeps the last duplicate key, so `since: v0.1.0` then `since: unreleased` passes the gate and the rewrite while the site renders the unreleased banner.
-
-**Deliverable:** a fix: refuse a duplicated `since:` key, with its fixture.
-
-**Cost while deferred:** a page can show the unreleased banner the gate reads as released. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a YAML renderer probe); filed at the next scope. Owner lookup: `docs-since`, `duplicat` in this file and the disposed-findings record, none; owner site-kit/SPEC.md §check-docs-since.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1114,4 +1106,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 
 - provenance-blank-string
 - amend-only-not-applicable
+- docs-since-duplicate-key
 
