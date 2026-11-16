@@ -27,7 +27,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // behavior
     if projection.is_empty() {
         println!(
-            "ROADMAP-FRESH: clean (QUEUE_KIT_ROADMAP_FILE empty — this consumer publishes no roadmap)"
+            "ROADMAP-FRESH: clean (not applicable: QUEUE_KIT_ROADMAP_FILE empty — this consumer publishes no roadmap)"
         );
         return Ok(0);
     }

@@ -1494,14 +1494,14 @@ Its `# graph:` couples the inbox at `tier=precommit`.
 
 Invariant: every non-blank line below the `# contract:` header of the disposed-findings record ([§The disposed-findings record](#the-disposed-findings-record)) is a record in its grammar: a calendar-valid date, at least one backticked term with no empty span, and non-empty prose. The arm's matcher skips a malformed record silently, so a malformed record turns a discard's protection off with nothing printed, and this gate is what tells. The header's presence and form are `check-workflow-tiering`'s.
 
-**It is `install: on-surface`** ([gate-sdk/SPEC.md §The install disposition](../gate-sdk/SPEC.md#the-install-disposition)). The record is a surface only a stage session writes, the analogue of the stage attestation that disposition names, so the gate arms when the adopter registers it rather than at install. lifecycle-kit's own smoke registers it beside its `on-surface` siblings, seeding the consumer's record with its contract header and one well-formed record before the battery runs, so the registration exercises the grammar rather than the absent-record clean pass.
+**It is `install: on-surface`** ([gate-sdk/SPEC.md §The install disposition](../gate-sdk/SPEC.md#the-install-disposition)). The record is a surface only a stage session writes, the analogue of the stage attestation that disposition names, so the gate arms when the adopter registers it rather than at install. lifecycle-kit's own smoke registers it beside its `on-surface` siblings, seeding the consumer's record with its contract header and one well-formed record before the battery runs, so the registration exercises the grammar rather than the absent record's not-applicable line.
 
 **Bare drives the configured record; an explicit file argument drives it hermetically**, the [§check-gap-inbox-neutrality](#check-gap-inbox-neutrality) precedent.
 
 The four gate-sdk contracts ([gate-sdk/SPEC.md §The gate model](../gate-sdk/SPEC.md#the-gate-model)):
 
 - **Output**: the single `DISPOSED-FINDINGS: clean (<n> record(s) …)` line, and per finding the line and what it lacks, with a `help:` naming the grammar.
-- **Fail-closed**: exit 2 on an unreadable record or an explicitly named missing one. An absent record at the configured path is clean, since a consumer that never discarded a finding is in a legal state.
+- **Fail-closed**: exit 2 on an unreadable record or an explicitly named missing one. An absent record at the configured path is clean, since a consumer that never discarded a finding is in a legal state, and its line reads not applicable, since no record is there to judge ([gate-sdk/SPEC.md §Output contract](../gate-sdk/SPEC.md#output-contract)).
 - **Fixture pair**: a `good/`+`bad/` pair under `gate-tests/`, driven through the hermetic argument. The good case is two records, one with two terms. The bad case is a record with no term, one with an empty span, one with no prose and one with an unparseable date. The module's unit tests pin the absent-record clean line, which only the bare form reaches, since a named missing file is exit 2.
 - **Self-lint**: registration in this repo's `gates.list`, where its scan target is this repo's own record.
 

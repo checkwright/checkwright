@@ -195,7 +195,7 @@ QUEUE_KIT_TRACKS[] = beta
 EOF
 out="$( cd "$SANDBOX" && QUEUE_KIT_KNOB_FILE="$SANDBOX/noroadmap.knobs" gate_run check-roadmap-fresh "$CHECKS" 2>&1 )"
 code "skip-exit" "$?" 0
-want "skip" "$out" "this consumer publishes no roadmap"
+want "skip" "$out" "clean (not applicable: QUEUE_KIT_ROADMAP_FILE empty — this consumer publishes no roadmap"
 
 # A half-configured vocabulary is malformed config, not a lenient default.
 cat >"$SANDBOX/halfconfig.knobs" <<'EOF'

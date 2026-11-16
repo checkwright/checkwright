@@ -40,7 +40,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .map(|p| p.display().to_string())
         .collect();
     if manifest_files.is_empty() {
-        println!("TRACKING-CLAIM: clean (0 governed manifest surface(s))");
+        println!("TRACKING-CLAIM: clean (not applicable: 0 governed manifest surface(s))");
         return Ok(0);
     }
 

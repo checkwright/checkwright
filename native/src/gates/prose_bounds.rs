@@ -390,7 +390,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     files.sort_by(|a, b| a.1.cmp(&b.1));
     files.dedup_by(|a, b| a.1 == b.1);
     if files.is_empty() {
-        println!("PROSE-BOUNDS: clean (0 governed file(s); nothing scanned)");
+        println!("PROSE-BOUNDS: clean (not applicable: 0 governed file(s); nothing scanned)");
         return Ok(0);
     }
 

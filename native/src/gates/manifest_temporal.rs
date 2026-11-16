@@ -23,7 +23,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let all = spec::manifest_files_sorted_stripped(root)?;
     if all.is_empty() {
-        println!("MANIFEST-TEMPORAL: clean (0 manifest file(s) found)");
+        println!("MANIFEST-TEMPORAL: clean (not applicable: 0 manifest file(s) found)");
         return Ok(0);
     }
 
@@ -39,7 +39,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     if manifests.is_empty() {
         println!(
-            "MANIFEST-TEMPORAL: clean ({} path-exempt, no other manifest)",
+            "MANIFEST-TEMPORAL: clean (not applicable: {} path-exempt, no other manifest)",
             exempt_n
         );
         return Ok(0);

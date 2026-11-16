@@ -113,7 +113,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
 
     if files.is_empty() {
         println!(
-            "DOCS-CNAME-PARITY: clean (0 tracked file(s) under {}; docs host is '{}')",
+            "DOCS-CNAME-PARITY: clean (not applicable: 0 tracked file(s) under {}; docs host is '{}')",
             scanroot, host
         );
         return Ok(0);

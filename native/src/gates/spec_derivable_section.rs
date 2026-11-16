@@ -36,7 +36,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let spec_name = spec::knob_pub("CANON_KIT_SPEC_NAME")?;
     let specs = spec::canonical_specs_sorted(root)?;
     if specs.is_empty() {
-        println!("SPEC-DERIVABLE-SECTION: clean (0 {} found)", spec_name);
+        println!("SPEC-DERIVABLE-SECTION: clean (not applicable: 0 {} found)", spec_name);
         return Ok(0);
     }
 

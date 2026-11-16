@@ -36,7 +36,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let landed = phrases(&spec::vocabulary(LANDED, LANDED_EXTRA)?);
     for (set, knob) in [(&pending, PENDING), (&landed, LANDED)] {
         if set.is_empty() {
-            println!("PENDENCY-CONTRADICTION: clean (skipped: {} and its extra are empty)", knob);
+            println!("PENDENCY-CONTRADICTION: clean (not applicable: {} and its extra are empty)", knob);
             return Ok(0);
         }
     }

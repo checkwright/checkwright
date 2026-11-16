@@ -185,7 +185,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if found.walked == 0 {
         println!(
-            "ACTION-RUN-SHELL: clean (no YAML under {} — 0 run: block(s) to lint)",
+            "ACTION-RUN-SHELL: clean (not applicable: no YAML under {} — 0 run: block(s) to lint)",
             scanroot
         );
         return 0;

@@ -157,7 +157,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if files.is_empty() {
         println!(
-            "ACTION-GH-REPO: clean (no YAML under {} — 0 job(s) to check)",
+            "ACTION-GH-REPO: clean (not applicable: no YAML under {} — 0 job(s) to check)",
             scanroot
         );
         return 0;

@@ -40,7 +40,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let roster = release_sections::roster()?;
     let Some(gates) = release_sections::find(&roster, release_sections::Role::Gates) else {
-        println!("TIGHTENED-GATES-GRAMMAR: clean (the release-section roster carries no gates role, so no section is read)");
+        println!("TIGHTENED-GATES-GRAMMAR: clean (not applicable: the release-section roster carries no gates role, so no section is read)");
         return Ok(0);
     };
     let names = gates.names();

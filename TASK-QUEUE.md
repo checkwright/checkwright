@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### not-applicable-sweep-residue
-
-Bundled gates still print a plain clean line on an early-out that evaluated nothing, beyond the lexical oracle the verdict contract's sweep ran (gate-sdk/SPEC.md §Output contract, its honest limit), so their SARIF result reads `pass` where it should read not-applicable. Sites named, not branch-traced: native/src/gates action_pinning:85, action_gh_repo:160, action_permissions:196, action_run_path:158, action_run_shell:188, docs_link_convention:140, docs_nav_reachable:123, docs_render_fidelity:154, docs_since:40, core_files:41,55, commit_msg:71, commit_subject:72, dispatch_entry:63, audit_roster:233,291, crate_arms:218, disposed_findings:75, agent_tier_explicit:56, measured_claim:40,54, prose_enum:34,54, unmarked_claim:35,43,54.
-
-**Deliverable:** per site, read the branch and judge whether it evaluated nothing or passed over an empty corpus that is a real pass (an absent disposed-findings record is legal and may be one); respell each not-applicable one in the output contract's form, its fixture's `expect.txt` with it, and narrow the honest limit to what stays.
-
-**Cost while deferred:** a SARIF reader takes a vacuous pass from these gates as a real one, paid when a consumer's configuration leaves one with nothing to check. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: measured_claim:40, prose_enum:34, unmarked_claim:35 and :43, action_pinning:85 and docs_since:40 print a plain `clean` with no not-applicable marker. Owner lookup: `not-applicable`, `early-out` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1132,4 +1124,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - gate-run-schema-semver-pattern
 - gate-run-provenance-typing
 - empty-for-selection-sarif-skip
+- not-applicable-sweep-residue
 

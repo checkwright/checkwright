@@ -158,7 +158,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let depth = nesting_depth();
     if (depth > 0 && args.is_empty()) || depth >= DEPTH_BACKSTOP {
         println!(
-            "FENCE-RUN: clean (nested {} deep inside a fence scratch; 0 marked fence(s) executed)",
+            "FENCE-RUN: clean (not applicable: nested {} deep inside a fence scratch; 0 marked fence(s) executed)",
             depth
         );
         return Ok(0);

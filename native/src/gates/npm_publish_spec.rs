@@ -90,7 +90,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             ));
         }
         println!(
-            "NPM-PUBLISH-SPEC: clean (no {} in this tree — 0 npm publish invocation(s) to judge)",
+            "NPM-PUBLISH-SPEC: clean (not applicable: no {} in this tree — 0 npm publish invocation(s) to judge)",
             wfdir
         );
         return Ok(0);
@@ -108,7 +108,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     .collect();
     if files.is_empty() {
         println!(
-            "NPM-PUBLISH-SPEC: clean (no YAML under {} — 0 npm publish invocation(s) to judge)",
+            "NPM-PUBLISH-SPEC: clean (not applicable: no YAML under {} — 0 npm publish invocation(s) to judge)",
             wfdir
         );
         return Ok(0);

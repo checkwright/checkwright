@@ -38,7 +38,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if !Path::new(&manifest).exists() {
         println!(
-            "CORE-FILES: clean (no manifest at {} — optional consumer config absent)",
+            "CORE-FILES: clean (not applicable: no manifest at {} — optional consumer config absent)",
             manifest
         );
         return 0;
@@ -52,7 +52,7 @@ pub fn run(args: &[String]) -> i32 {
     };
     let lines: Vec<String> = registry::members(&text);
     if lines.is_empty() {
-        println!("CORE-FILES: clean (manifest {} lists no paths)", manifest);
+        println!("CORE-FILES: clean (not applicable: manifest {} lists no paths)", manifest);
         return 0;
     }
 

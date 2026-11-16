@@ -88,7 +88,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let mut line = match held.len() {
-        0 => format!("FRONT-END-FAIL-OPEN: clean (no front-end stub to hold to the fail-open set {}", set),
+        0 => format!("FRONT-END-FAIL-OPEN: clean (not applicable: no front-end stub to hold to the fail-open set {}", set),
         1 => format!("FRONT-END-FAIL-OPEN: clean ({} names the fail-open set {}", held[0], set),
         _ => format!("FRONT-END-FAIL-OPEN: clean ({} name the fail-open set {}", held.join(" and "), set),
     };

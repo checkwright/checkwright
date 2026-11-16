@@ -31,7 +31,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let lines = spec::enum_sets()?;
     if lines.is_empty() {
-        println!("PROSE-ENUM: clean (CANON_KIT_ENUM_SETS_CMD declared no members)");
+        println!("PROSE-ENUM: clean (not applicable: CANON_KIT_ENUM_SETS_CMD declared no members)");
         return Ok(0);
     }
     let mut sets: Vec<Set> = Vec::new();
@@ -51,7 +51,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let manifests = spec::manifest_files_sorted_stripped(root)?;
     if manifests.is_empty() {
-        println!("PROSE-ENUM: clean (0 manifest file(s) found)");
+        println!("PROSE-ENUM: clean (not applicable: 0 manifest file(s) found)");
         return Ok(0);
     }
 

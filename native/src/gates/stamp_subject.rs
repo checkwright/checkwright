@@ -53,7 +53,7 @@ pub fn run(args: &[String]) -> i32 {
     // spec: lifecycle-kit/SPEC.md §check-stamp-subject — no-arg is a clean skip, on
     // check-commit-subject's ground: the message is not a whole-tree surface
     let Some(msg) = args.first() else {
-        println!("STAMP-SUBJECT: clean (no message file argument — the commit-msg hook surface is not a whole-tree target; skipped)");
+        println!("STAMP-SUBJECT: clean (not applicable: no message file argument — the commit-msg hook surface is not a whole-tree target; skipped)");
         return 0;
     };
     if args.len() == 2 {
@@ -104,7 +104,7 @@ pub fn run(args: &[String]) -> i32 {
         match live_state_sides(&state) {
             Some(sides) => sides,
             None => {
-                println!("STAMP-SUBJECT: clean (no staged state file {} — no stamp to bind)", state);
+                println!("STAMP-SUBJECT: clean (not applicable: no staged state file {} — no stamp to bind)", state);
                 return 0;
             }
         }
@@ -112,7 +112,7 @@ pub fn run(args: &[String]) -> i32 {
 
     let prior: Vec<&str> = priors.iter().map(String::as_str).collect();
     let Some(line) = stages::last_added_stamp_over(&staged, &prior, &roster) else {
-        println!("STAMP-SUBJECT: clean (the commit adds no stamp line)");
+        println!("STAMP-SUBJECT: clean (not applicable: the commit adds no stamp line)");
         return 0;
     };
     let stage = stages::stamp_stage(line);

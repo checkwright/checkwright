@@ -200,7 +200,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             return Ok(1);
         }
         println!(
-            "RELEASE-BUMP: clean ({} release note(s) under {} — no predecessor to derive a floor against)",
+            "RELEASE-BUMP: clean (not applicable: {} release note(s) under {} — no predecessor to derive a floor against)",
             rows.len(),
             posts
         );

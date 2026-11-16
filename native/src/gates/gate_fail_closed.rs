@@ -211,7 +211,7 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
         println!(
-            "GATE-FAIL-CLOSED: clean (0 shell gate(s) to scan, {} .gate-dispatched member(s) — the defect has no representation left in this corpus)",
+            "GATE-FAIL-CLOSED: clean (not applicable: 0 shell gate(s) to scan, {} .gate-dispatched member(s) — the defect has no representation left in this corpus)",
             ported
         );
         return 0;

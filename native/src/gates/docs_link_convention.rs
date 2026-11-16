@@ -137,7 +137,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         .filter(|p| p.ends_with(".md"))
         .collect();
     if pages.is_empty() {
-        println!("DOCS-LINK-CONVENTION: clean (0 docs page(s) found)");
+        println!("DOCS-LINK-CONVENTION: clean (not applicable: 0 docs page(s) found)");
         return Ok(0);
     }
 

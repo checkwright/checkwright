@@ -157,7 +157,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     specs.dedup();
 
     if specs.is_empty() {
-        println!("SPEC-EMBEDDED-SOURCE: clean (0 spec files found)");
+        println!("SPEC-EMBEDDED-SOURCE: clean (not applicable: 0 spec files found)");
         return Ok(0);
     }
 

@@ -32,7 +32,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let Some(bound) = bound else {
         println!(
-            "DOCS-PAGE-LENGTH: clean ({} page(s), nothing asserted: {} is off)",
+            "DOCS-PAGE-LENGTH: clean (not applicable: {} page(s), nothing asserted: {} is off)",
             pages.len(),
             MAX_KNOB
         );

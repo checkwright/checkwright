@@ -68,7 +68,7 @@ pub fn run(args: &[String]) -> i32 {
     // spec: gate-sdk/SPEC.md §check-commit-msg — no-arg is a clean skip: the message is not a
     // whole-tree surface and a history scan is deferred
     let Some(msg) = args.first() else {
-        println!("COMMIT-MSG: clean (no message file argument — the commit-msg hook surface is not a whole-tree target; skipped)");
+        println!("COMMIT-MSG: clean (not applicable: no message file argument — the commit-msg hook surface is not a whole-tree target; skipped)");
         return 0;
     };
     if !Path::new(msg).is_file() {

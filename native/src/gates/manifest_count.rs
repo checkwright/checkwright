@@ -27,7 +27,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let manifests = spec::manifest_files_sorted_stripped(root)?;
     if manifests.is_empty() {
-        println!("MANIFEST-COUNT: clean (0 manifest file(s) found)");
+        println!("MANIFEST-COUNT: clean (not applicable: 0 manifest file(s) found)");
         return Ok(0);
     }
 

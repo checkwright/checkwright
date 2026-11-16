@@ -116,7 +116,7 @@ fn set_mode(lock: &str) -> i32 {
 
     if records.is_empty() {
         println!(
-            "PRODUCER-LIVENESS: clean (no '*.run' record under {} — nothing in flight)",
+            "PRODUCER-LIVENESS: clean (not applicable: no '*.run' record under {} — nothing in flight)",
             lock
         );
     } else {
@@ -143,7 +143,7 @@ fn path_mode(lock: &str) -> i32 {
         }
         Ok(Verdict::Free) => {
             println!(
-                "PRODUCER-LIVENESS: clean (no producer lock at {} — nothing in flight)",
+                "PRODUCER-LIVENESS: clean (not applicable: no producer lock at {} — nothing in flight)",
                 lock
             );
             0

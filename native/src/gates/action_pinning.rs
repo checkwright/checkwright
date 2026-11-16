@@ -82,7 +82,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if files.is_empty() {
         println!(
-            "ACTION-PINNING: clean (no YAML under {} — 0 uses: refs to pin)",
+            "ACTION-PINNING: clean (not applicable: no YAML under {} — 0 uses: refs to pin)",
             scanroot
         );
         return 0;

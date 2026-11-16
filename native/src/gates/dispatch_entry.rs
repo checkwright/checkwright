@@ -60,7 +60,7 @@ fn fixture(args: &[String]) -> Result<Inputs, String> {
 
 pub fn run(args: &[String]) -> i32 {
     let Some(msg) = args.first() else {
-        println!("DISPATCH-ENTRY: clean (no message file argument — the commit-msg hook surface is not a whole-tree target; skipped)");
+        println!("DISPATCH-ENTRY: clean (not applicable: no message file argument — the commit-msg hook surface is not a whole-tree target; skipped)");
         return 0;
     };
     if args.len() != 1 && args.len() != 5 {
@@ -81,7 +81,7 @@ pub fn run(args: &[String]) -> i32 {
     };
     let outstanding: Vec<&str> = inputs.marker.as_deref().map(stages::marker_lines).unwrap_or_default();
     if outstanding.is_empty() {
-        println!("DISPATCH-ENTRY: clean (no dispatch declaration stands)");
+        println!("DISPATCH-ENTRY: clean (not applicable: no dispatch declaration stands)");
         return 0;
     }
     let inboxes = match (

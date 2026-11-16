@@ -66,13 +66,14 @@ pub fn lines(text: &str) -> impl Iterator<Item = (usize, &str)> {
 }
 
 // spec: lifecycle-kit/SPEC.md §check-disposed-findings — the verdict over one record; `None` is the
-// absent record at the configured path, clean because a consumer that never discarded is legal
+// absent record at the configured path, clean and not applicable because a consumer that never
+// discarded is legal and no record is there to judge
 fn verdict(path: &str, text: Option<&str>) -> (i32, Vec<String>) {
     let Some(text) = text else {
         return (
             0,
             vec![format!(
-                "DISPOSED-FINDINGS: clean (0 record(s); no record at {} — no finding discarded yet)",
+                "DISPOSED-FINDINGS: clean (not applicable: 0 record(s); no record at {} — no finding discarded yet)",
                 path
             )],
         );
@@ -171,13 +172,13 @@ mod tests {
         }
     }
 
-    // spec: lifecycle-kit/SPEC.md §check-disposed-findings — the absent-record clean line only the
-    // bare form reaches, since a named missing file is exit 2
+    // spec: lifecycle-kit/SPEC.md §check-disposed-findings — the absent-record not-applicable line
+    // only the bare form reaches, since a named missing file is exit 2
     #[test]
     fn an_absent_record_is_clean() {
         let (rc, out) = verdict(".workflow/disposed-findings.txt", None);
         assert_eq!(rc, 0);
-        assert!(out[0].starts_with("DISPOSED-FINDINGS: clean (0 record(s)"), "{}", out[0]);
+        assert!(out[0].starts_with("DISPOSED-FINDINGS: clean (not applicable: 0 record(s)"), "{}", out[0]);
     }
 
     #[test]

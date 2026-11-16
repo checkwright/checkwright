@@ -120,7 +120,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let pages = &model.pages;
     if pages.is_empty() {
         println!(
-            "DOCS-NAV-REACHABLE: clean (0 docs page(s) found under {})",
+            "DOCS-NAV-REACHABLE: clean (not applicable: 0 docs page(s) found under {})",
             root
         );
         return Ok(0);

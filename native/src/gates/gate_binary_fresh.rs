@@ -100,12 +100,13 @@ pub fn run(args: &[String]) -> i32 {
         }
     }
 
-    // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — nothing dispatching is a clean report, not
-    // a skipped assertion: no gate dispatches to the binary, so nothing can run stale. Both counts
-    // are named, so a reader can tell "no descriptors" from "descriptors nothing dispatches to".
+    // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — nothing dispatching is a clean
+    // not-applicable report, not a skipped assertion: no gate dispatches to the binary, so nothing
+    // can run stale. Both counts are named, so a reader can tell "no descriptors" from
+    // "descriptors nothing dispatches to".
     if dispatching.is_empty() {
         println!(
-            "GATE-BINARY-FRESH: clean ({} .gate descriptor(s) across {} resolve dir(s), 0 dispatched to by a live member of {}, so nothing dispatches to {} and no build can be stale; crate {} unread)",
+            "GATE-BINARY-FRESH: clean (not applicable: {} .gate descriptor(s) across {} resolve dir(s), 0 dispatched to by a live member of {}, so nothing dispatches to {} and no build can be stale; crate {} unread)",
             descriptors.len(),
             resolve_dirs.len(),
             list,

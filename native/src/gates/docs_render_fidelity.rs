@@ -151,7 +151,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
 
     if pages.is_empty() {
         println!(
-            "DOCS-RENDER-FIDELITY: clean (0 tracked markdown page(s) under {})",
+            "DOCS-RENDER-FIDELITY: clean (not applicable: 0 tracked markdown page(s) under {})",
             docs
         );
         return Ok(0);

@@ -75,8 +75,8 @@ check_case "uncompilable-ere-fails-closed" 2 "does not compile" uncompilable.kno
 # at all, and one configured that declared nothing. Both are green and they are
 # green for different reasons, which is why the reader checks the command knob
 # before it spawns the command.
-check_case "no-vocabulary-is-clean"      0 "CANON_KIT_CLAIM_CLASSES_CMD unset" off.knobs
-check_case "declared-nothing-is-clean"   0 "declared no claim classes"         nothing.knobs
+check_case "no-vocabulary-is-clean"      0 "not applicable: CANON_KIT_CLAIM_CLASSES_CMD unset" off.knobs
+check_case "declared-nothing-is-clean"   0 "not applicable: CANON_KIT_CLAIM_CLASSES_CMD declared no claim classes" nothing.knobs
 
 # A full-line marker discharges exactly the claim it binds, the claim
 # check-measured-claim reads: the span narrows it, off leaves the whole block

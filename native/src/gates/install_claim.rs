@@ -30,13 +30,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let transports = spec::claim_vocabulary("CANON_KIT_INSTALL_TRANSPORTS_CMD")?;
     if transports.is_empty() {
-        println!("INSTALL-CLAIM: clean (CANON_KIT_INSTALL_TRANSPORTS_CMD declared no transports)");
+        println!("INSTALL-CLAIM: clean (not applicable: CANON_KIT_INSTALL_TRANSPORTS_CMD declared no transports)");
         return Ok(0);
     }
 
     let files = governed_docs(root, "CANON_KIT_INSTALL_CLAIM_EXCLUDE")?;
     if files.is_empty() {
-        println!("INSTALL-CLAIM: clean (0 governed doc(s) found)");
+        println!("INSTALL-CLAIM: clean (not applicable: 0 governed doc(s) found)");
         return Ok(0);
     }
 

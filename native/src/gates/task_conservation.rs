@@ -84,7 +84,7 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
         Ok(None) => {
-            println!("TASK-CONSERVATION: clean (no git repository — no HEAD baseline to compare)");
+            println!("TASK-CONSERVATION: clean (not applicable: no git repository — no HEAD baseline to compare)");
             return 0;
         }
         Ok(Some(_)) => {}
@@ -101,7 +101,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(Some(b)) => crate::emit::queue_migrate::heading_form(&String::from_utf8_lossy(&b), &sec).into_owned(),
         Ok(None) => {
             println!(
-                "TASK-CONSERVATION: clean ({} not at HEAD — no prior live slugs to conserve)",
+                "TASK-CONSERVATION: clean (not applicable: {} not at HEAD — no prior live slugs to conserve)",
                 file
             );
             return 0;

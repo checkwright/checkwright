@@ -155,7 +155,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if found.walked == 0 {
         println!(
-            "ACTION-RUN-PATH: clean (no YAML under {} — 0 run: bodies to read)",
+            "ACTION-RUN-PATH: clean (not applicable: no YAML under {} — 0 run: bodies to read)",
             scanroot
         );
         return 0;

@@ -83,7 +83,7 @@ pub fn run(args: &[String]) -> i32 {
         match walk::toplevel_opt() {
             Ok(Some(_)) => {}
             Ok(None) => {
-                println!("LESSON-DISPOSITION: clean (no git repository — no HEAD baseline to compare)");
+                println!("LESSON-DISPOSITION: clean (not applicable: no git repository — no HEAD baseline to compare)");
                 return 0;
             }
             Err(e) => {
@@ -101,7 +101,7 @@ pub fn run(args: &[String]) -> i32 {
         };
         let Some(head) = shown else {
             println!(
-                "LESSON-DISPOSITION: clean ({} not at HEAD — no prior lessons to disposition)",
+                "LESSON-DISPOSITION: clean (not applicable: {} not at HEAD — no prior lessons to disposition)",
                 queue
             );
             return 0;

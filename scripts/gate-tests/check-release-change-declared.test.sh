@@ -53,7 +53,7 @@ a="$tmp/dormant"
 mkrepo "$a"
 git -C "$a" tag x1
 git -C "$a" rm -q alpha-kit/bin/tool.sh
-check_case "no-tag-dormant" "$a" 0 "RELEASE-CHANGE-DECLARED: clean (dormant" ""
+check_case "no-tag-dormant" "$a" 0 "RELEASE-CHANGE-DECLARED: clean (not applicable: no v* tag" ""
 
 # B — a tool deleted in the index and not yet committed: red at its own pre-commit,
 # naming the base the nearest v* tag resolves.

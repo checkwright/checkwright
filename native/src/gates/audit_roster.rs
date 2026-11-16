@@ -230,7 +230,7 @@ pub fn run(args: &[String]) -> i32 {
     let text = match read(&roster) {
         Ok(Read::Text(t)) => t,
         Ok(Read::Absent) => {
-            println!("AUDIT-ROSTER: clean (no roster at {} — inert)", roster);
+            println!("AUDIT-ROSTER: clean (not applicable: no roster at {} — inert)", roster);
             return 0;
         }
         Err(e) => return fail(format!("roster file not readable: {}", e)),
@@ -288,7 +288,7 @@ pub fn run(args: &[String]) -> i32 {
         return 1;
     }
     if blocks == 0 {
-        println!("AUDIT-ROSTER: clean (no class block in {} — inert)", roster);
+        println!("AUDIT-ROSTER: clean (not applicable: no class block in {} — inert)", roster);
     } else if hermetic.is_some() {
         println!(
             "AUDIT-ROSTER: clean ({} block(s) in {}; {} — hermetic file argument, so no stamp check)",

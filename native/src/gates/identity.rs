@@ -227,7 +227,7 @@ pub fn run(_args: &[String]) -> i32 {
 
     if !Path::new(&manifest).exists() {
         println!(
-            "IDENTITY: clean (no manifest at {} — optional consumer config absent)",
+            "IDENTITY: clean (not applicable: no manifest at {} — optional consumer config absent)",
             manifest
         );
         return 0;
@@ -248,7 +248,7 @@ pub fn run(_args: &[String]) -> i32 {
         // spec: gate-sdk/SPEC.md §check-identity — CI is not a committing clone (no local
         // identity to misattribute a commit/push with), so the guard steps aside
         if std::env::var("CI").map(|v| !v.is_empty()).unwrap_or(false) {
-            println!("IDENTITY: clean (CI context — not a committing clone; identity guard skipped)");
+            println!("IDENTITY: clean (not applicable: CI context — not a committing clone; identity guard skipped)");
             return 0;
         }
         match crate::walk::toplevel_opt() {

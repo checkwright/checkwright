@@ -55,4 +55,33 @@ mod tests {
         assert!(!not_applicable("CHECK-FOO: clean (not applicable)"));
         assert!(!not_applicable("check-foo: clean (not applicable: x)"));
     }
+
+    // spec: gate-sdk/SPEC.md §Output contract — a bundled clean line opening on an empty-corpus
+    // word says not applicable, less the named real passes; a lexical hold, its limit that section's
+    #[test]
+    fn no_bundled_clean_line_opens_on_an_empty_corpus_word_unsignalled() {
+        const OPENINGS: [&str; 5] = ["0 ", "no ", "nothing", "skipped", "dormant"];
+        const REAL_PASSES: [(&str, &str); 4] = [
+            ("portability_floor.rs", "0 banned construct(s) configured across"),
+            ("queue_hygiene.rs", "no HTML comments"),
+            ("queue_prose_precondition.rs", "no untagged forward precondition"),
+            ("queue_wrap.rs", "no line exceeds"),
+        ];
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/gates");
+        let mut unsignalled = Vec::new();
+        for path in crate::walk::find_files(&dir, &["rs"]).expect("the gates dir walks") {
+            let file = path.file_name().unwrap_or_default().to_string_lossy().into_owned();
+            let text = std::fs::read_to_string(&path).expect("a gate module reads");
+            for (n, line) in text.lines().enumerate() {
+                let Some((_, rest)) = line.split_once(": clean (") else {
+                    continue;
+                };
+                let real = REAL_PASSES.iter().any(|(f, o)| *f == file && rest.starts_with(o));
+                if OPENINGS.iter().any(|o| rest.starts_with(o)) && !real {
+                    unsignalled.push(format!("{}:{}: {}", file, n + 1, line.trim()));
+                }
+            }
+        }
+        assert!(unsignalled.is_empty(), "open with `{}`:\n{}", NOT_APPLICABLE, unsignalled.join("\n"));
+    }
 }

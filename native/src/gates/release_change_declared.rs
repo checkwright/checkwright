@@ -236,7 +236,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let Some(base) = source.base()? else {
-        println!("RELEASE-CHANGE-DECLARED: clean (dormant: no v* tag is reachable from HEAD, so no released base exists to diff against and nothing was checked)");
+        println!("RELEASE-CHANGE-DECLARED: clean (not applicable: no v* tag is reachable from HEAD, so no released base exists to diff against and nothing was checked)");
         return Ok(0);
     };
 

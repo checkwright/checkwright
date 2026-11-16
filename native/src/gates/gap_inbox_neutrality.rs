@@ -107,7 +107,7 @@ pub fn run(args: &[String]) -> i32 {
             // clean, not fail-closed: never having filed a gap is a legal state
             if !Path::new(&p).is_file() {
                 println!(
-                    "GAP-INBOX-NEUTRALITY: clean (no inbox at {} — no gap filed this iteration)",
+                    "GAP-INBOX-NEUTRALITY: clean (not applicable: no inbox at {} — no gap filed this iteration)",
                     p
                 );
                 return 0;

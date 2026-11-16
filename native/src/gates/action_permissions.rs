@@ -193,7 +193,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if files.is_empty() {
         println!(
-            "ACTION-PERMISSIONS: clean (no YAML under {} — 0 job(s) to check)",
+            "ACTION-PERMISSIONS: clean (not applicable: no YAML under {} — 0 job(s) to check)",
             scanroot
         );
         return 0;

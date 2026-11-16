@@ -215,7 +215,7 @@ pub fn run(_args: &[String]) -> i32 {
     // corpus reports clean rather than declaring a skip
     if !std::path::Path::new(&manifest).is_file() {
         println!(
-            "CRATE-ARMS: clean (no crate at {} — {} is absent, so there is no corpus to lint or test)",
+            "CRATE-ARMS: clean (not applicable: no crate at {} — {} is absent, so there is no corpus to lint or test)",
             crate_dir, manifest
         );
         return 0;

@@ -37,7 +37,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let globs = spec::knob_array_pub("CANON_KIT_MEASURED_SURFACE_GLOBS")?;
     if globs.is_empty() {
-        println!("MEASURED-CLAIM: clean (CANON_KIT_MEASURED_SURFACE_GLOBS empty — no scanned surface)");
+        println!("MEASURED-CLAIM: clean (not applicable: CANON_KIT_MEASURED_SURFACE_GLOBS empty — no scanned surface)");
         return Ok(0);
     }
     let roster = spec::measured_claims()?;
@@ -51,7 +51,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     files.sort();
     files.dedup();
     if files.is_empty() {
-        println!("MEASURED-CLAIM: clean (0 file(s) on the measured surface)");
+        println!("MEASURED-CLAIM: clean (not applicable: 0 file(s) on the measured surface)");
         return Ok(0);
     }
 

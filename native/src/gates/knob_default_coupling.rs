@@ -397,7 +397,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     sources.sort();
     sources.dedup();
     if sources.is_empty() {
-        println!("KNOB-DEFAULT-COUPLING: clean (0 kit source file(s) found)");
+        println!("KNOB-DEFAULT-COUPLING: clean (not applicable: 0 kit source file(s) found)");
         return Ok(0);
     }
 

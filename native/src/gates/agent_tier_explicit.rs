@@ -53,7 +53,7 @@ pub fn run(args: &[String]) -> i32 {
     let root = Path::new(&dir);
     if !root.is_dir() {
         println!(
-            "AGENT-TIER-EXPLICIT: clean (0 agent definition(s) under {}; no agent-definition directory)",
+            "AGENT-TIER-EXPLICIT: clean (not applicable: 0 agent definition(s) under {}; no agent-definition directory)",
             dir
         );
         return 0;

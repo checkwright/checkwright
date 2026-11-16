@@ -85,7 +85,7 @@ check_case "rev-unknown" "$ghost" 1 "rev names no commit in this repository"
 # --- an absent record is clean and counted inert: the surface is optional ---
 empty="$SANDBOX/empty"; mkdir -p "$empty"
 seed_repo "$empty" >/dev/null
-check_case "no-record" "$empty" 0 "no survey filed this iteration"
+check_case "no-record" "$empty" 0 "clean (not applicable: no record at"
 
 # --- a header-only record (the shape the iteration boundary leaves behind) ---
 hdr="$SANDBOX/header-only"; mkdir -p "$hdr/.workflow"

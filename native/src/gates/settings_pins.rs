@@ -72,7 +72,7 @@ pub fn run(args: &[String]) -> i32 {
     // not a failure (the identity.conf precedent)
     if !std::path::Path::new(&pins_file).exists() {
         println!(
-            "SETTINGS-PINS: clean (no pins file at {} — optional consumer config absent)",
+            "SETTINGS-PINS: clean (not applicable: no pins file at {} — optional consumer config absent)",
             pins_file
         );
         return 0;

@@ -37,7 +37,7 @@ fn findings(pages: &[(String, String)], note: &Note) -> Result<Vec<Finding>, Str
 fn rule(_args: &[String]) -> Result<i32, String> {
     let pages = docs_since::pages()?;
     if pages.is_empty() {
-        println!("DOCS-SINCE: clean ({} matches no page — no page is governed, 0 checked)", docs_since::PAGES_KNOB);
+        println!("DOCS-SINCE: clean (not applicable: {} matches no page — no page is governed, 0 checked)", docs_since::PAGES_KNOB);
         return Ok(0);
     }
     let mut texts = Vec::new();
