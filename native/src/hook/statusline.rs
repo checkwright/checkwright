@@ -409,7 +409,10 @@ mod tests {
                 "five_hour": {"used_percentage": 12.5, "resets_at": 1756600000},
                 "seven_day": {"used_percentage": 91, "resets_at": null}
             }}),
-            serde_json::json!({"rate_limits": {"seven_day": {"resets_at": 1756656000}}}),
+            serde_json::json!({"rate_limits": {
+                "five_hour": {"used_percentage": 12.5, "resets_at": 1756600000},
+                "seven_day": {"resets_at": 1756656000}
+            }}),
         ] {
             assert!(!record(Some(&bare), &paths), "{} must not write", bare);
             assert_eq!(read(), good, "{} rewrote the last good snapshot", bare);
