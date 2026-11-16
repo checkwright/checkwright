@@ -50,14 +50,6 @@ A `scripts/price-table.tsv` row whose model id and input column fused passed the
 
 **Cost while deferred:** a page can show the unreleased banner the gate reads as released. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a YAML renderer probe); filed at the next scope. Owner lookup: `docs-since`, `duplicat` in this file and the disposed-findings record, none; owner site-kit/SPEC.md §check-docs-since.
 
-### provenance-blank-string
-
-`--verify-gate-run` and the published schema admit a blank optional provenance string: `provenance_shape`'s `optional` closure in native/src/evidence.rs checks only that `tool.version`, `tool.sourceStamp`, `tool.target` and `kits[].version` are strings, and docs/contracts/gate-run/v1/schema.json sets no `minLength` on them, while gate-sdk/SPEC.md §run-gates, The provenance block, says a field the run cannot fill is absent, never null or blank.
-
-**Deliverable:** a fix: the closure refuses an empty string, the schema carries `minLength: 1` on the four, and a case per field.
-
-**Cost while deferred:** a Statement naming a blank version or target verifies clean. Surfaced 2026-11-16 by the second-vendor review at verdict-contract-residue-pass' close; filed at the next scope, re-verified there by reading both against the cited sentence. Owner lookup: over this file and the disposed-findings record, none; owner evidence-kit/SPEC.md §verify-gate-run check 1.
-
 ### amend-only-not-applicable
 
 `check-graph --amend-only` prints `CHECK-GRAPH: clean (amendment-body '# graph:' manifests well-formed)` when the scan root holds no SPEC-*.md or none carries a `# graph:` manifest (native/src/gates/graph.rs, the `--amend-only` branch of `rule`), having evaluated no instance of assertion G, where gate-sdk/SPEC.md §Output contract asks for `clean (not applicable: <reason>)`. The line opens with no empty-corpus word, so the lexical unit test misses it.
@@ -1127,4 +1119,6 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 No arm exports a developer's workflow commits off a vendored tree they do not own, so the workflow half of a personal adoption is stripped by hand before an upstream pull request.
 
 ## Done
+
+- provenance-blank-string
 

@@ -682,7 +682,7 @@ fn provenance_shape(p: Option<&serde_json::Value>) -> Result<Option<String>, Str
     };
     let optional = |v: &serde_json::Value, at: &str, key: &str| -> Result<(), String> {
         match v.get(key) {
-            Some(s) if !s.is_string() => Err(format!("{}/{} is not a string", at, key)),
+            Some(s) if s.as_str().map_or(true, str::is_empty) => Err(format!("{}/{} is empty or not a string", at, key)),
             _ => Ok(()),
         }
     };
@@ -1091,6 +1091,13 @@ mod tests {
         assert_eq!(keys(&prov["properties"]), keys(&full));
         assert_eq!(keys(&prov["properties"]["tool"]["properties"]), keys(&full["tool"]));
         assert_eq!(keys(&prov["properties"]["kits"]["items"]["properties"]), keys(&full["kits"][0]));
+        for fields in [&prov["properties"]["tool"]["properties"], &prov["properties"]["kits"]["items"]["properties"]] {
+            for (key, field) in fields.as_object().expect("the schema types the block's fields") {
+                if field["type"] == "string" {
+                    assert_eq!(field["minLength"], 1, "the schema admits a blank provenance {}", key);
+                }
+            }
+        }
         let read = read_statement(rendered.as_bytes()).expect("the golden reads back");
         assert_eq!(read.suites.len(), 2);
         assert_eq!(read.suites[1].binding, golden_row("fixtures", "checkwright-gates --run-gate-tests tests", (40, 2, 0), "new-failures").binding());
@@ -1232,6 +1239,10 @@ mod tests {
         refuse(&|v| { v["predicate"]["provenance"]["kits"][0].as_object_mut().unwrap().remove("name"); }, "kits/0/name");
         refuse(&|v| v["predicate"]["provenance"]["kits"][0]["root"] = 7.into(), "kits/0/root");
         refuse(&|v| v["predicate"]["provenance"]["kits"][0]["version"] = 7.into(), "kits/0/version");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["version"] = "".into(), "provenance/tool/version is empty");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["sourceStamp"] = "".into(), "provenance/tool/sourceStamp is empty");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["target"] = "".into(), "provenance/tool/target is empty");
+        refuse(&|v| v["predicate"]["provenance"]["kits"][0]["version"] = "".into(), "kits/0/version is empty");
         refuse(&|v| v["predicate"]["provenance"]["commit"] = "ABC".into(), "provenance/commit");
         refuse(&|v| v["predicate"]["provenance"]["worktree"] = "dirty".into(), "provenance/worktree is not");
         refuse(&|v| { v["predicate"]["provenance"].as_object_mut().unwrap().remove("worktree"); }, "beside a commit");

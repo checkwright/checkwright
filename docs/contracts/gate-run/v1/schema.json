@@ -51,9 +51,9 @@
               "required": ["name"],
               "properties": {
                 "name": { "type": "string", "minLength": 1 },
-                "version": { "type": "string" },
-                "sourceStamp": { "type": "string" },
-                "target": { "type": "string" }
+                "version": { "type": "string", "minLength": 1 },
+                "sourceStamp": { "type": "string", "minLength": 1 },
+                "target": { "type": "string", "minLength": 1 }
               }
             },
             "kits": {
@@ -64,7 +64,7 @@
                 "properties": {
                   "name": { "type": "string", "minLength": 1 },
                   "root": { "type": "string", "minLength": 1 },
-                  "version": { "type": "string" }
+                  "version": { "type": "string", "minLength": 1 }
                 }
               }
             },
