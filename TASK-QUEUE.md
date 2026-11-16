@@ -1120,9 +1120,3 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 
 ## Done
 
-- test-control-decl-binding
-- gate-run-schema-semver-pattern
-- gate-run-provenance-typing
-- empty-for-selection-sarif-skip
-- not-applicable-sweep-residue
-
