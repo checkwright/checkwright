@@ -259,6 +259,12 @@ fn knob_rel(member: &str) -> String {
     format!("{}/{}.knobs", KNOBS_DIR, member)
 }
 
+// spec: installer/SPEC.md §The user manifest — a `files` key joins onto the data dir component by
+// component, so each must be a plain name on either host
+fn inside_data_dir(rel: &str) -> bool {
+    rel.split('/').all(|c| !c.is_empty() && c != "." && c != ".." && !c.contains(['\\', ':']))
+}
+
 fn at_rel(d: &Dirs, rel: &str) -> PathBuf {
     rel.split('/').fold(d.data.clone(), |p, c| p.join(c))
 }
@@ -306,6 +312,15 @@ impl UserLock {
             return Err(unknown());
         }
         let s = |v: Option<&Value>| v.and_then(Value::as_str).unwrap_or_default().to_string();
+        if let Some(Value::Object(m)) = doc.get("files") {
+            if let Some(key) = m.keys().find(|k| !inside_data_dir(k)) {
+                return Err(refuse(
+                    format!("{} carries a files key that is not a path inside the data dir: {} ({})", LOCK_FILE, key, path.display()),
+                    "init --user records only paths under the data dir, so this manifest was edited or corrupted. Restore it, or remove the user install by hand.",
+                    2,
+                ));
+            }
+        }
         let artifact = doc.get("artifact");
         Ok(Some(UserLock {
             version: s(doc.get("version")),
@@ -906,6 +921,34 @@ mod tests {
         assert!(r.code == 1 && r.help.contains("init --user"), "{}", r.help);
         let r = uninstall(&d, &flags(false, false), &mut Vec::new()).expect_err("uninstall passed");
         assert!(r.code == 1 && r.help.contains("init --user"), "{}", r.help);
+    }
+
+    // spec: installer/SPEC.md §The user manifest — a `files` key outside the data dir refuses the
+    // manifest at exit 2 before anything is removed, a forced uninstall included; the backslash keys
+    // are the Windows traversal
+    #[test]
+    fn a_files_key_outside_the_data_dir_refuses_the_manifest() {
+        let s = Scratch::new("traversal");
+        let d = s.dirs();
+        init(&s, &d, "1.2.0", &flags(false, false)).expect("init");
+        let victim = s.0.join("victim");
+        std::fs::write(&victim, b"not the install's\n").expect("victim");
+        let hash = sha256::file_hex(&victim).expect("hash");
+        let lock_path = d.data.join(LOCK_FILE);
+        let good = std::fs::read_to_string(&lock_path).expect("lock");
+        for key in ["../../victim", "..\\..\\victim", "knobs\\..\\..\\..\\victim", "/abs", "C:/x", "C:x", "knobs//x", "knobs/./x", "./x", ""] {
+            let mut doc: Value = serde_json::from_str(&good).expect("lock JSON");
+            doc["files"] = serde_json::json!({ key: hash });
+            std::fs::write(&lock_path, doc.to_string()).expect("tamper");
+            let r = uninstall(&d, &flags(false, true), &mut Vec::new()).expect_err(key);
+            assert!(r.code == 2 && r.message.contains("not a path inside the data dir"), "{:?}: {}", key, r.message);
+            assert!(victim.is_file() && binary(&d).is_file(), "{:?}: a refused manifest removed a file", key);
+            let r = update(&d, &flags(false, false), &mut Vec::new()).expect_err(key);
+            assert_eq!(r.code, 2, "{:?}", key);
+        }
+        std::fs::write(&lock_path, &good).expect("restore");
+        uninstall(&d, &flags(false, true), &mut Vec::new()).expect("the restored manifest refused");
+        assert!(!d.data.exists() && victim.is_file());
     }
 
     // spec: installer/SPEC.md §uninstall — the binary and an unedited knob file go, an edited one
