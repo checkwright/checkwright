@@ -384,7 +384,7 @@ fn words_finding(name: &str) -> String {
 
 // spec: gate-sdk/SPEC.md §check-graph (assertion G) — the amendment corpus: every SPEC-*.md under
 // the scan root, through the shared pruned walk rather than a second traversal of this crate's own
-fn amendment_findings(root: &str, errors: &mut Vec<String>) -> Result<(), String> {
+fn amendment_findings(root: &str, errors: &mut Vec<String>) -> Result<usize, String> {
     let mut files: Vec<String> = walk::find_files(Path::new(root), &["md"])?
         .into_iter()
         .filter(|p| {
@@ -396,13 +396,39 @@ fn amendment_findings(root: &str, errors: &mut Vec<String>) -> Result<(), String
         .map(|p| p.display().to_string())
         .collect();
     files.sort();
+    let mut read = 0;
     for f in files {
         let text = std::fs::read_to_string(&f).map_err(|e| format!("cannot read {}: {}", f, e))?;
         for span in extract_amend_manifests(&text) {
             validate_amend_manifest(&f, &span, errors);
+            read += 1;
         }
     }
-    Ok(())
+    Ok(read)
+}
+
+// spec: gate-sdk/SPEC.md §check-graph — `--amend-only` runs assertion G alone, so a root carrying
+// no amendment-body manifest evaluated no instance of it (§Output contract)
+fn amend_only(root: &str) -> Result<(i32, Vec<String>), String> {
+    let mut errors: Vec<String> = Vec::new();
+    let read = amendment_findings(root, &mut errors)?;
+    if !errors.is_empty() {
+        let mut out = vec![format!("CHECK-GRAPH: {} amendment-manifest violation(s):", errors.len())];
+        out.extend(errors.iter().map(|e| format!("  {}", e)));
+        out.push("  help: fix the malformed '# graph:' manifest in the SPEC-*.md amendment body (required keys couples/dir/valve/tier; dir=bi|one valve=none|PROPOSED tier=precommit|align-only; couples tokens must be syntactically valid globs)".to_string());
+        return Ok((1, out));
+    }
+    if read == 0 {
+        return Ok((
+            0,
+            vec![format!(
+                "CHECK-GRAPH: clean ({}no SPEC-*.md under {} carries an amendment-body '# graph:' manifest)",
+                crate::output::NOT_APPLICABLE,
+                root
+            )],
+        ));
+    }
+    Ok((0, vec![format!("CHECK-GRAPH: clean (amendment-body '# graph:' manifests well-formed: {} read)", read)]))
 }
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — an expanded field's surfaces; a knob token a
@@ -456,22 +482,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mode = args.first().map(String::as_str).unwrap_or("");
 
     if mode == "--amend-only" {
-        let root = args.get(1).map(String::as_str).unwrap_or(".");
-        let mut errors: Vec<String> = Vec::new();
-        amendment_findings(root, &mut errors)?;
-        if !errors.is_empty() {
-            println!(
-                "CHECK-GRAPH: {} amendment-manifest violation(s):",
-                errors.len()
-            );
-            for e in &errors {
-                println!("  {}", e);
-            }
-            println!("  help: fix the malformed '# graph:' manifest in the SPEC-*.md amendment body (required keys couples/dir/valve/tier; dir=bi|one valve=none|PROPOSED tier=precommit|align-only; couples tokens must be syntactically valid globs)");
-            return Ok(1);
+        let (code, out) = amend_only(args.get(1).map(String::as_str).unwrap_or("."))?;
+        for l in &out {
+            println!("{}", l);
         }
-        println!("CHECK-GRAPH: clean (amendment-body '# graph:' manifests well-formed)");
-        return Ok(0);
+        return Ok(code);
     }
 
     if mode == "--refs-only" {
@@ -837,6 +852,29 @@ mod tests {
         assert_eq!(got.len(), 2);
         assert!(got[0].starts_with("couples=y"));
         assert!(got[1].starts_with("couples=z"));
+    }
+
+    // spec: gate-sdk/SPEC.md §Output contract — `--amend-only` over a root holding no SPEC-*.md, or
+    // none carrying a manifest, says not applicable; a root carrying one counts what it read
+    #[test]
+    fn amend_only_over_no_manifest_is_not_applicable() {
+        let dir = std::env::temp_dir().join(format!("cw-graph-amend-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let root = dir.to_str().unwrap();
+        let verdict = |want: &str| {
+            let (code, out) = amend_only(root).unwrap();
+            assert_eq!(code, 0, "{:?}", out);
+            assert_eq!(out.len(), 1, "{:?}", out);
+            assert!(out[0].contains(want), "want '{}' in {:?}", want, out);
+            crate::output::not_applicable(&out[0])
+        };
+        assert!(verdict("no SPEC-*.md"), "an empty root");
+        std::fs::write(dir.join("SPEC-plain.md"), "prose naming `# graph: couples=` mid-sentence\n").unwrap();
+        assert!(verdict("no SPEC-*.md"), "a SPEC-*.md carrying no manifest");
+        std::fs::write(dir.join("SPEC-gate.md"), "```bash\n# graph: couples=a/*.md dir=one valve=none tier=precommit\n```\n").unwrap();
+        assert!(!verdict("well-formed: 1 read"), "a root carrying one manifest");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: gate-sdk/SPEC.md §check-graph (Which amendment-body spans are manifests)

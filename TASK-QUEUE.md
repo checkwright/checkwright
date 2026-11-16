@@ -50,14 +50,6 @@ A `scripts/price-table.tsv` row whose model id and input column fused passed the
 
 **Cost while deferred:** a page can show the unreleased banner the gate reads as released. Surfaced 2026-11-14 by the second-vendor review at liveness-arm-adoption-pass' close (a YAML renderer probe); filed at the next scope. Owner lookup: `docs-since`, `duplicat` in this file and the disposed-findings record, none; owner site-kit/SPEC.md §check-docs-since.
 
-### amend-only-not-applicable
-
-`check-graph --amend-only` prints `CHECK-GRAPH: clean (amendment-body '# graph:' manifests well-formed)` when the scan root holds no SPEC-*.md or none carries a `# graph:` manifest (native/src/gates/graph.rs, the `--amend-only` branch of `rule`), having evaluated no instance of assertion G, where gate-sdk/SPEC.md §Output contract asks for `clean (not applicable: <reason>)`. The line opens with no empty-corpus word, so the lexical unit test misses it.
-
-**Deliverable:** a fix: count the manifests read and print the not-applicable form on zero, with its case.
-
-**Cost while deferred:** a SARIF reader takes a vacuous assertion-G pass as a real one. Surfaced 2026-11-16 by the second-vendor review at verdict-contract-residue-pass' close; filed at the next scope, re-verified there by reading the branch. Owner lookup: over this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1121,4 +1113,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 ## Done
 
 - provenance-blank-string
+- amend-only-not-applicable
 
