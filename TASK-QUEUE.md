@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: verdict-contract-residue-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-11-15, lead-relayed, not a ruling; the theme that date's standing directive, the four carried second-vendor findings and the tasks that can join them):** option A. Debt, promoted here: `empty-for-selection-sarif-skip`, `gate-run-schema-semver-pattern`, `gate-run-provenance-typing` and `not-applicable-sweep-residue`, the last joining on the verdict contract's result fidelity. Feature, deferred here and promoted by spec with its evidence-kit amendment: `test-control-decl-binding`. Stages scope, spec, build, validate, close: the one amendment spans evidence-kit alone. Composition: bundled on the machine-verdict contract, drain 1 against inflow 6.8, the directive bounding the theme to the four findings, which leave the inbox at intake rather than the pool. Supersession: none.
-
-  **The predicate's version (operator direction 2026-11-15, lead-relayed, not a ruling):** the schema and reader fixes bump no `contract`; they converge on evidence-kit/SPEC.md §The gate-run predicate's field table, and the release note's Behavior changes names the reader's new refusal.
-
-  **Push need (operator direction 2026-11-15, inside the budget):** 1 against 2, the closing push.
 
 ---
 
