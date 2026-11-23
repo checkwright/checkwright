@@ -31,6 +31,26 @@
 
 **Cost while deferred:** an adopter keeping Statements out of its tree hand-writes the store. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 3); filed at this scope. Owner lookup: `git notes`, `STATEMENT_CMD` in this file, none; owner evidence-kit/SPEC.md §verify-gate-run.
 
+### binary-only-ci-recipe
+
+[spec: SPEC-binary-only-recipe.md]
+
+An adopter running gates from the binary alone, in a read-only CI container with no vendored kit, has no documented route. The direct form `checkwright-gates <gate-name> [root]` already runs a compiled-in gate with no registry and writes nothing (gate-sdk/SPEC.md §run-gates), but emits no SARIF; `--run --only` needs `gates.list` and descriptors and writes the scratch dir unless `GATE_SDK_TMP_DIR` is absolute; `check-amendment-retired-spelling` needs a git worktree; and a child directory holding `checks/` or `smoke/` reads as a kit root unless `GATE_SDK_KIT_DIRS` is set. Neither docs/orchestration.md nor docs/choosing.md carries an install recipe for that adopter.
+
+**Deliverable:** design-pending, a feature: a binary-only CI recipe page linked from both pages, and, where spec rules it, a registry-free `--run` over compiled-in gates so the SARIF verdict survives. It names the ownership scope the direct form already gives, which is [meta-gate-ownership-scope](#meta-gate-ownership-scope)'s deliverable, so spec pairs that entry with this amendment.
+
+**Cost while deferred:** each binary-only adopter re-derives the route from source, and it blocks the canon pilot that [design-partner-preview](#design-partner-preview) waits on. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 4, and its install-recipe feedback); filed at this scope, re-verified from source there (.workflow/survey-record.md). Owner lookup: `recipe`, `binary-only`, `container` in this file, none; owner gate-sdk/SPEC.md §run-gates.
+
+### meta-gate-ownership-scope
+
+[spec: SPEC-binary-only-recipe.md]
+
+An adopter predicts, from reading rather than a firing, that meta-gates will read files it does not own, such as upstream-owned `.github/workflows` and commit subjects, and asks that they be scoped to paths it declares.
+
+**Deliverable:** design-pending, a feature: an ownership scope for the meta-gates, or the existing knob that already gives one, named.
+
+**Cost while deferred:** a red on a file the adopter cannot change reads as a false positive and invites a bypass. Surfaced 2026-11-14 by a production adopter's handoff (ask 9b); filed at liveness-arm-adoption-pass' scope. Owner lookup: `ownership scope` in this file, none; owner gate-sdk/SPEC.md.
+
 ## Technical Debt
 
 ### gate-test-system-gitconfig
@@ -233,16 +253,6 @@ No check holds an agent to handing off past a context size: an adopter measured 
 
 **Cost while deferred:** a personal install takes kits and worktrees its owner did not choose. Surfaced 2026-11-14 by a production adopter's handoff (ask 7); filed at liveness-arm-adoption-pass' scope. Owner lookup: `one kit`, `per-worktree` in this file, none; owner installer/SPEC.md §The personal install.
 
-### meta-gate-ownership-scope
-
-[cost: event/low] [surface: gate-sdk]
-
-An adopter predicts, from reading rather than a firing, that meta-gates will read files it does not own, such as upstream-owned `.github/workflows` and commit subjects, and asks that they be scoped to paths it declares.
-
-**Deliverable:** design-pending, a feature: an ownership scope for the meta-gates, or the existing knob that already gives one, named.
-
-**Cost while deferred:** a red on a file the adopter cannot change reads as a false positive and invites a bypass. Surfaced 2026-11-14 by a production adopter's handoff (ask 9b); filed at liveness-arm-adoption-pass' scope. Owner lookup: `ownership scope` in this file, none; owner gate-sdk/SPEC.md.
-
 ### hook-double-registration
 
 [cost: event/low] [surface: plugin]
@@ -444,16 +454,6 @@ A peer project relaying feedback or a feature ask has no channel: each ask arriv
 **Deliverable:** design-pending, a feature: a request record grammar (need, repro, wanted, evidence) with a per-request reply state (received, filed `<slug>`, refused `<reason>`, landed, shipped `<tag>`); a filing arm a peer runs outside any tree; a listing arm; scope's intake lane and close's shipped stamp; and a peer-side read that notifies at session start once a request reaches shipped. The channel path is a consumer knob, absolute and untracked, so a request body never enters a public tree and a queue entry cites an opaque request id. Spec rules its order against [user-install-update-notice](#user-install-update-notice), whose installed-version read the notify half also needs.
 
 **Cost while deferred:** every peer ask costs a hand-written handoff and reply, and a shipped ask is adopted only when the peer happens to look. Surfaced 2026-11-24 by an external orchestrator's handoff and the operator's direction; filed at this scope. Owner lookup: `peer`, `request channel`, `intake` in this file, none; owner lifecycle-kit/SPEC.md.
-
-### binary-only-ci-recipe
-
-[cost: event/high] [surface: gate-sdk]
-
-An adopter running gates from the binary alone, in a read-only CI container with no vendored kit, has no documented route. The direct form `checkwright-gates <gate-name> [root]` already runs a compiled-in gate with no registry and writes nothing (gate-sdk/SPEC.md §run-gates), but emits no SARIF; `--run --only` needs `gates.list` and descriptors and writes the scratch dir unless `GATE_SDK_TMP_DIR` is absolute; `check-amendment-retired-spelling` needs a git worktree; and a child directory holding `checks/` or `smoke/` reads as a kit root unless `GATE_SDK_KIT_DIRS` is set. Neither docs/orchestration.md nor docs/choosing.md carries an install recipe for that adopter.
-
-**Deliverable:** design-pending, a feature: a binary-only CI recipe page linked from both pages, and, where spec rules it, a registry-free `--run` over compiled-in gates so the SARIF verdict survives. It names the ownership scope the direct form already gives, which is [meta-gate-ownership-scope](#meta-gate-ownership-scope)'s deliverable, so spec pairs that entry with this amendment.
-
-**Cost while deferred:** each binary-only adopter re-derives the route from source, and it blocks the canon pilot that [design-partner-preview](#design-partner-preview) waits on. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 4, and its install-recipe feedback); filed at this scope, re-verified from source there (.workflow/survey-record.md). Owner lookup: `recipe`, `binary-only`, `container` in this file, none; owner gate-sdk/SPEC.md §run-gates.
 
 ### rule-id-coverage
 
