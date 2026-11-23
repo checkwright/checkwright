@@ -11,6 +11,16 @@
 
 ## New Features
 
+### verify-gate-run-strictness
+
+[spec: SPEC-gate-run-strict.md]
+
+`--verify-gate-run` exits 0 with commits ahead of the Statement's subject, printing `ahead` only; never judges a suite's verdict, which feeds the binding digest alone; and reads the tree with untracked files excluded. An adopter wanting a strict gate-run predicate wraps the verdict line.
+
+**Deliverable:** design-pending, a feature: a strictness knob set, off among them, covering ahead equal to zero, every bound suite passing, and untracked files counted, each with a fixture pair. [evidence-blank-semantics](#evidence-blank-semantics), the same provenance reader, rides this iteration beside it.
+
+**Cost while deferred:** a stale or failing Statement verifies, which keeps the adopter's evidence-kit adoption deferred. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 2); filed at this scope, re-verified there against native/src/emit/verify_gate_run.rs. Owner lookup: `verify-gate-run`, `strict` in this file, none; owner evidence-kit/SPEC.md §verify-gate-run.
+
 ## Technical Debt
 
 ### gate-test-system-gitconfig
@@ -434,16 +444,6 @@ An adopter running gates from the binary alone, in a read-only CI container with
 **Deliverable:** design-pending, a feature: a binary-only CI recipe page linked from both pages, and, where spec rules it, a registry-free `--run` over compiled-in gates so the SARIF verdict survives. It names the ownership scope the direct form already gives, which is [meta-gate-ownership-scope](#meta-gate-ownership-scope)'s deliverable, so spec pairs that entry with this amendment.
 
 **Cost while deferred:** each binary-only adopter re-derives the route from source, and it blocks the canon pilot that [design-partner-preview](#design-partner-preview) waits on. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 4, and its install-recipe feedback); filed at this scope, re-verified from source there (.workflow/survey-record.md). Owner lookup: `recipe`, `binary-only`, `container` in this file, none; owner gate-sdk/SPEC.md §run-gates.
-
-### verify-gate-run-strictness
-
-[cost: event/high] [surface: evidence-kit]
-
-`--verify-gate-run` exits 0 with commits ahead of the Statement's subject, printing `ahead` only; never judges a suite's verdict, which feeds the binding digest alone; and reads the tree with untracked files excluded. An adopter wanting a strict gate-run predicate wraps the verdict line.
-
-**Deliverable:** design-pending, a feature: a strictness knob set, off among them, covering ahead equal to zero, every bound suite passing, and untracked files counted, each with a fixture pair. [evidence-blank-semantics](#evidence-blank-semantics), the same provenance reader, rides this iteration beside it.
-
-**Cost while deferred:** a stale or failing Statement verifies, which keeps the adopter's evidence-kit adoption deferred. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 2); filed at this scope, re-verified there against native/src/emit/verify_gate_run.rs. Owner lookup: `verify-gate-run`, `strict` in this file, none; owner evidence-kit/SPEC.md §verify-gate-run.
 
 ### statement-out-of-tree-store
 
