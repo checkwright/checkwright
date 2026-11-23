@@ -1,14 +1,33 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: peer-adoption-channel-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
+  **Set record**
+
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. [gate-test-system-gitconfig](#gate-test-system-gitconfig) is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; [binary-only-ci-recipe](#binary-only-ci-recipe), with [meta-gate-ownership-scope](#meta-gate-ownership-scope) paired into its amendment; [verify-gate-run-strictness](#verify-gate-run-strictness), with [evidence-blank-semantics](#evidence-blank-semantics) beside it; [statement-out-of-tree-store](#statement-out-of-tree-store); and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### gate-test-system-gitconfig
+
+The fixture suites read the host's system git config: a machine-wide `core.hooksPath` in `/etc/gitconfig`, which another tool on the maintainer host installed after the last close, fails four assertions of gate-sdk's `native-git-hooks.test.sh` and four crate unit tests (two in `emit::install_hooks`, two in `installer::init`), so `check-crate-arms` reds every battery run there. The installer smoke and the fence runner already isolate their git with `GIT_CONFIG_NOSYSTEM` and `GIT_CONFIG_GLOBAL`; the bespoke-test bootstrap every suite sources first, `gate-sdk/lib/test-hermetic.sh`, pins knobs and the git ceiling but not git's own config.
+
+**Deliverable:** debt: the hermetic bootstrap isolates every sourcing suite's git from system and global config, and the crate's git-spawning unit tests do the same, each with a case run under a hostile system config; gate-sdk/SPEC.md §lib/test-hermetic.sh refuses moving the suites' pin into the runner.
+
+**Cost while deferred:** a red battery on any host with system git config, which an adopter's machine may carry too. Surfaced 2026-11-24 at this scope's battery. Re-verified there: the suite is clean under `GIT_CONFIG_NOSYSTEM=1`, and it sources the bootstrap as its first act; the 33 unit tests of those two modules pass under it too. Owner lookup: `NOSYSTEM`, `hermetic` in this file, none; owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
+
+### evidence-blank-semantics
+
+The evidence provenance reader admits a whitespace-only optional string: native/src/evidence.rs checks `is_empty`, and the gate-run v1 schema's `minLength: 1` admits `' \t'`, where gate-sdk/SPEC.md §run-gates and the declaration say never blank.
+
+**Deliverable:** design-pending: rule whether blank means zero characters or whitespace-only, then align reader, schema and SPEC.
+
+**Cost while deferred:** a whitespace-only field passes as provenance. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (medium confidence on intent), carried from its close; filed at the next scope. Owner lookup: `blank`, `whitespace` in this file, none; owner gate-sdk/SPEC.md §run-gates.
 
 ## Deferred
 
@@ -366,16 +385,6 @@ An observed `session-context` logs `would=error`: the member prints its brief as
 
 **Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
-### gate-test-system-gitconfig
-
-[cost: iteration/high] [surface: gate-sdk]
-
-The fixture suites read the host's system git config: a machine-wide `core.hooksPath` in `/etc/gitconfig`, which another tool on the maintainer host installed after the last close, fails four assertions of gate-sdk's `native-git-hooks.test.sh`, so `check-crate-arms` reds every battery run there. The installer smoke and the fence runner already isolate their git with `GIT_CONFIG_NOSYSTEM` and `GIT_CONFIG_GLOBAL`; the gate-tests runner does not.
-
-**Deliverable:** debt: the gate-tests runner isolates every suite's git from system and global config, with a case run under a hostile system config.
-
-**Cost while deferred:** a red battery on any host with system git config, which an adopter's machine may carry too. Surfaced 2026-11-24 at this scope's battery. Re-verified there: the suite is clean under `GIT_CONFIG_NOSYSTEM=1`. Owner lookup: `NOSYSTEM`, `hermetic` in this file, none; owner gate-sdk/SPEC.md §check-crate-arms.
-
 ### user-uninstall-containment
 
 [cost: event/high] [surface: installer]
@@ -385,16 +394,6 @@ The fixture suites read the host's system git config: a machine-wide `core.hooks
 **Deliverable:** debt: a resolved-path containment check before each removal, with a case per host.
 
 **Cost while deferred:** a tampered or corrupted user manifest can delete a file outside the install. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence on POSIX), carried from its close; filed at the next scope. Owner lookup: `symlink`, `containment` in this file, none; owner installer/SPEC.md §The user manifest.
-
-### evidence-blank-semantics
-
-[cost: event/low] [surface: evidence-kit]
-
-The evidence provenance reader admits a whitespace-only optional string: native/src/evidence.rs checks `is_empty`, and the gate-run v1 schema's `minLength: 1` admits `' \t'`, where gate-sdk/SPEC.md §run-gates and the declaration say never blank.
-
-**Deliverable:** design-pending: rule whether blank means zero characters or whitespace-only, then align reader, schema and SPEC.
-
-**Cost while deferred:** a whitespace-only field passes as provenance. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (medium confidence on intent), carried from its close; filed at the next scope. Owner lookup: `blank`, `whitespace` in this file, none; owner gate-sdk/SPEC.md §run-gates.
 
 ### price-row-shape-strictness
 
@@ -415,6 +414,86 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 **Deliverable:** debt: shape checks at both producers, and the composition rule stated or removed.
 
 **Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
+
+### peer-request-channel
+
+[cost: event/high] [surface: lifecycle-kit]
+
+A peer project relaying feedback or a feature ask has no channel: each ask arrives as a hand-carried handoff file, carries no reply state, and the peer learns a requested feature shipped only by reading release notes. An external orchestrator's handoff asks for an intake inbox with reply states (ask 1), whose four fields match its own intake. Operator direction 2026-11-24, lead-relayed (not a ruling), adds the notify-on-ready-for-adoption half and makes the channel kit mechanism in lifecycle-kit rather than this repo's binding alone.
+
+**Deliverable:** design-pending, a feature: a request record grammar (need, repro, wanted, evidence) with a per-request reply state (received, filed `<slug>`, refused `<reason>`, landed, shipped `<tag>`); a filing arm a peer runs outside any tree; a listing arm; scope's intake lane and close's shipped stamp; and a peer-side read that notifies at session start once a request reaches shipped. The channel path is a consumer knob, absolute and untracked, so a request body never enters a public tree and a queue entry cites an opaque request id. Spec rules its order against [user-install-update-notice](#user-install-update-notice), whose installed-version read the notify half also needs.
+
+**Cost while deferred:** every peer ask costs a hand-written handoff and reply, and a shipped ask is adopted only when the peer happens to look. Surfaced 2026-11-24 by an external orchestrator's handoff and the operator's direction; filed at this scope. Owner lookup: `peer`, `request channel`, `intake` in this file, none; owner lifecycle-kit/SPEC.md.
+
+### binary-only-ci-recipe
+
+[cost: event/high] [surface: gate-sdk]
+
+An adopter running gates from the binary alone, in a read-only CI container with no vendored kit, has no documented route. The direct form `checkwright-gates <gate-name> [root]` already runs a compiled-in gate with no registry and writes nothing (gate-sdk/SPEC.md §run-gates), but emits no SARIF; `--run --only` needs `gates.list` and descriptors and writes the scratch dir unless `GATE_SDK_TMP_DIR` is absolute; `check-amendment-retired-spelling` needs a git worktree; and a child directory holding `checks/` or `smoke/` reads as a kit root unless `GATE_SDK_KIT_DIRS` is set. Neither docs/orchestration.md nor docs/choosing.md carries an install recipe for that adopter.
+
+**Deliverable:** design-pending, a feature: a binary-only CI recipe page linked from both pages, and, where spec rules it, a registry-free `--run` over compiled-in gates so the SARIF verdict survives. It names the ownership scope the direct form already gives, which is [meta-gate-ownership-scope](#meta-gate-ownership-scope)'s deliverable, so spec pairs that entry with this amendment.
+
+**Cost while deferred:** each binary-only adopter re-derives the route from source, and it blocks the canon pilot that [design-partner-preview](#design-partner-preview) waits on. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 4, and its install-recipe feedback); filed at this scope, re-verified from source there (.workflow/survey-record.md). Owner lookup: `recipe`, `binary-only`, `container` in this file, none; owner gate-sdk/SPEC.md §run-gates.
+
+### verify-gate-run-strictness
+
+[cost: event/high] [surface: evidence-kit]
+
+`--verify-gate-run` exits 0 with commits ahead of the Statement's subject, printing `ahead` only; never judges a suite's verdict, which feeds the binding digest alone; and reads the tree with untracked files excluded. An adopter wanting a strict gate-run predicate wraps the verdict line.
+
+**Deliverable:** design-pending, a feature: a strictness knob set, off among them, covering ahead equal to zero, every bound suite passing, and untracked files counted, each with a fixture pair. [evidence-blank-semantics](#evidence-blank-semantics), the same provenance reader, rides this iteration beside it.
+
+**Cost while deferred:** a stale or failing Statement verifies, which keeps the adopter's evidence-kit adoption deferred. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 2); filed at this scope, re-verified there against native/src/emit/verify_gate_run.rs. Owner lookup: `verify-gate-run`, `strict` in this file, none; owner evidence-kit/SPEC.md §verify-gate-run.
+
+### statement-out-of-tree-store
+
+[cost: event/low] [surface: evidence-kit]
+
+`EVIDENCE_KIT_STATEMENT_FILE` writes the run's Statement into the tree whose commit it attests, and `EVIDENCE_KIT_STATEMENT_CMD` reads any store, but no shipped pair writes and reads one outside the tree.
+
+**Deliverable:** design-pending, a feature: a git-notes Statement write and read pair with a fixture, the read reachable through the existing command knob.
+
+**Cost while deferred:** an adopter keeping Statements out of its tree hand-writes the store. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 3); filed at this scope. Owner lookup: `git notes`, `STATEMENT_CMD` in this file, none; owner evidence-kit/SPEC.md §verify-gate-run.
+
+### rule-id-coverage
+
+[cost: event/high] [surface: canon-kit]
+
+`check-spec-pointer` is forward-only: canon-kit/SPEC.md §check-spec-pointer rules the reverse out, since flagging a requirement with no inbound pointer needs a notion of what counts as a requirement. An external orchestrator asks for coverage in both directions over rule ids (ask 5): every id a spec declares is cited, and every cited id is declared, the id shape being a consumer pattern. Operator direction 2026-11-24, lead-relayed (not a ruling), reopens it in this iteration; TRAJECTORY.md records no ruling on the calibration, so it is an owner-doc change.
+
+**Deliverable:** design-pending, a feature: a bidirectional id-coverage check whose requirement notion is a consumer-declared pattern, off by default; spec rules whether it is a new gate or a change to `check-spec-pointer`'s calibration, and rewrites the refusal sentence either way.
+
+**Cost while deferred:** a declared rule no test cites passes every gate, and the adopter keeps its own coverage test. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `spec-pointer`, `coverage`, `reverse` in this file, none live; owner canon-kit/SPEC.md §check-spec-pointer.
+
+### amendment-queue-not-applicable
+
+[cost: event/low] [surface: canon-kit]
+
+`check-amendment-queue` exits 2 with `file not found` in a tree that has no `TASK-QUEUE.md`, though gate-sdk's not-applicable clean line exists for exactly an absent subject.
+
+**Deliverable:** debt: the not-applicable clean line on an absent queue file, with a fixture.
+
+**Cost while deferred:** an adopter tracking work outside the queue grammar must leave the gate unregistered. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 6); filed at this scope, re-verified from source there. Owner lookup: `not-applicable`, `amendment-queue` in this file, none; owner canon-kit/SPEC.md §check-amendment-queue.
+
+### comment-tier-id-directive
+
+[cost: event/low] [surface: canon-kit]
+
+With its surface widened to source, `check-comment-tier` reads an id-shaped directive such as `rule <id>:` as a restatement, and the extras knobs match substrings, so blessing the word blesses every comment holding it.
+
+**Deliverable:** design-pending, a feature: an id-shaped directive pattern knob, with fixtures.
+
+**Cost while deferred:** an adopter citing rule ids in comments either sees false reds or over-blesses. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 7b); filed at this scope. Owner lookup: `comment-tier`, `directive` in this file, none; owner canon-kit/SPEC.md §check-comment-tier.
+
+### adopter-footprint-figure
+
+[cost: event/low] [surface: installer]
+
+No surface states the files and bytes an install places in an adopter's tree, and the payload ships each kit's gate-tests beside its gates.
+
+**Deliverable:** design-pending, a feature: a derived footprint figure per install shape, published and freshness-gated, and whether gate-tests stay in the payload.
+
+**Cost while deferred:** an adopter weighing the install measures it by hand. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `footprint` in this file, none; owner installer/SPEC.md.
 
 ## Icebox
 
