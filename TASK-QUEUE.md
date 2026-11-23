@@ -61,6 +61,16 @@ An adopter predicts, from reading rather than a firing, that meta-gates will rea
 
 **Cost while deferred:** a declared rule no test cites passes every gate, and the adopter keeps its own coverage test. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `spec-pointer`, `coverage`, `reverse` in this file, none live; owner canon-kit/SPEC.md §check-spec-pointer.
 
+### peer-request-channel
+
+[spec: SPEC-peer-request-channel.md]
+
+A peer project relaying feedback or a feature ask has no channel: each ask arrives as a hand-carried handoff file, carries no reply state, and the peer learns a requested feature shipped only by reading release notes. An external orchestrator's handoff asks for an intake inbox with reply states (ask 1), whose four fields match its own intake. Operator direction 2026-11-24, lead-relayed (not a ruling), adds the notify-on-ready-for-adoption half and makes the channel kit mechanism in lifecycle-kit rather than this repo's binding alone.
+
+**Deliverable:** design-pending, a feature: a request record grammar (need, repro, wanted, evidence) with a per-request reply state (received, filed `<slug>`, refused `<reason>`, landed, shipped `<tag>`); a filing arm a peer runs outside any tree; a listing arm; scope's intake lane and close's shipped stamp; and a peer-side read that notifies at session start once a request reaches shipped. The channel path is a consumer knob, absolute and untracked, so a request body never enters a public tree and a queue entry cites an opaque request id. Spec rules its order against [user-install-update-notice](#user-install-update-notice), whose installed-version read the notify half also needs.
+
+**Cost while deferred:** every peer ask costs a hand-written handoff and reply, and a shipped ask is adopted only when the peer happens to look. Surfaced 2026-11-24 by an external orchestrator's handoff and the operator's direction; filed at this scope. Owner lookup: `peer`, `request channel`, `intake` in this file, none; owner lifecycle-kit/SPEC.md.
+
 ## Technical Debt
 
 ### gate-test-system-gitconfig
@@ -454,16 +464,6 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 **Deliverable:** debt: shape checks at both producers, and the composition rule stated or removed.
 
 **Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
-
-### peer-request-channel
-
-[cost: event/high] [surface: lifecycle-kit]
-
-A peer project relaying feedback or a feature ask has no channel: each ask arrives as a hand-carried handoff file, carries no reply state, and the peer learns a requested feature shipped only by reading release notes. An external orchestrator's handoff asks for an intake inbox with reply states (ask 1), whose four fields match its own intake. Operator direction 2026-11-24, lead-relayed (not a ruling), adds the notify-on-ready-for-adoption half and makes the channel kit mechanism in lifecycle-kit rather than this repo's binding alone.
-
-**Deliverable:** design-pending, a feature: a request record grammar (need, repro, wanted, evidence) with a per-request reply state (received, filed `<slug>`, refused `<reason>`, landed, shipped `<tag>`); a filing arm a peer runs outside any tree; a listing arm; scope's intake lane and close's shipped stamp; and a peer-side read that notifies at session start once a request reaches shipped. The channel path is a consumer knob, absolute and untracked, so a request body never enters a public tree and a queue entry cites an opaque request id. Spec rules its order against [user-install-update-notice](#user-install-update-notice), whose installed-version read the notify half also needs.
-
-**Cost while deferred:** every peer ask costs a hand-written handoff and reply, and a shipped ask is adopted only when the peer happens to look. Surfaced 2026-11-24 by an external orchestrator's handoff and the operator's direction; filed at this scope. Owner lookup: `peer`, `request channel`, `intake` in this file, none; owner lifecycle-kit/SPEC.md.
 
 ### amendment-queue-not-applicable
 
