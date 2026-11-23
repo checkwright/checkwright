@@ -1,6 +1,6 @@
 # SPEC amendment: gate-run-strict
 
-Pairs `verify-gate-run-strictness`, and rules the question `evidence-blank-semantics` leaves open. `--verify-gate-run` is the gate-run predicate's reader, and an adopter reading it as a merge predicate meets three gaps. A Statement of an older commit verifies, so the exit says nothing about `HEAD`. A suite whose verdict is `new-failures` verifies. And a tree holding untracked files reads `clean`. Per the entry's deliverable, each becomes a knob a consumer selects, off among them. The same reader admits a whitespace-only provenance string that gate-sdk's provenance block says is never blank, so this amendment also rules what blank means.
+Pairs `verify-gate-run-strictness`, and rules the question `evidence-blank-semantics` leaves open. `--verify-gate-run` is the gate-run predicate's reader, and an adopter reading it as a merge predicate meets three gaps. A Statement of an older commit verifies, so the exit says nothing about `HEAD`. A suite whose verdict is `new-failures` verifies. And a tree holding untracked files reads `clean`. Per the entry's deliverable, each becomes a selection a consumer makes, off among them. The first two are words of one knob and the third is a knob of its own. The same reader admits a whitespace-only provenance string that gate-sdk's provenance block says is never blank, so this amendment also rules what blank means.
 
 **What the tree does today**, read from `native/src/emit/verify_gate_run.rs`, `native/src/emit/run_validate.rs`, `native/src/provenance.rs`, `native/src/evidence.rs` and `docs/contracts/gate-run/v1/schema.json`:
 
@@ -30,6 +30,8 @@ Replacement text for §verify-gate-run's closing check and exit paragraph. **Not
 >
 > Exit 0 means every check held. Exit 1 means a contradiction, with one line per finding naming the suite and the field, or the requirement it failed. Exit 2 means the Statement could not be read or judged, a `HEAD` naming no commit among the causes. The verdict line names the subject, the suite count, and how many commits `HEAD` is ahead of the subject (`ahead=-` where the subject is no ancestor). A reader wanting a merge predicate selects `head verdict` instead of parsing it.
 
+The paragraph's remainder, from *A DSSE signature is never checked*, is unchanged.
+
 The roster sentence at the end of §verify-gate-run gains `EVIDENCE_KIT_VERIFY_REQUIRE`, and §import-gate-run's *takes the verify arm's input forms and runs its checks* becomes *takes the verify arm's input forms and runs checks 1 to 5*, with the two halves of its roster sentence re-cut so the import's roster stays without the knob.
 
 ### (2) The producer may count untracked files {design-bearing} {user-facing: operator direction 2026-11-24, lead-relayed (not a ruling), on the set record and the paired entry's deliverable: a strictness knob, off among them, covering untracked files counted}
@@ -44,7 +46,7 @@ A new scalar knob, `EVIDENCE_KIT_TREE_UNTRACKED`, takes `ignore`, the default an
 
 Replacement text for §Evidence manifest's `commit=` and `tree=` bullet. **Not yet applied:**
 
-> - **`commit=` and `tree=` are read per suite**, after its pre-hook and before its run, by `git rev-parse HEAD` and `git status --porcelain`. Untracked files are left out unless `EVIDENCE_KIT_TREE_UNTRACKED` is `count`. Then an untracked path that is not ignored, and that is neither under `EVIDENCE_KIT_TMP_DIR` nor the Statement's path, reads `modified`. A pre-hook that rewrites a tracked file therefore shows as `tree=modified` on that suite's line alone. The fold follows every read, so a run from a clean tree reads `clean`, but a rerun over an uncommitted fold reads `modified` on every line, truly, since the gates suite reads the tracked manifest. Commit the fold before a rerun meant to record `clean`.
+> - **`commit=` and `tree=` are read per suite**, after its pre-hook and before its run, by `git rev-parse HEAD` and `git status --porcelain --untracked-files=no`, the reads the provenance block makes (gate-sdk/SPEC.md §run-gates, *The provenance block*), so untracked files are left out. Under `EVIDENCE_KIT_TREE_UNTRACKED=count` the tree read is `git status --porcelain --untracked-files=all` instead, and an untracked path that is not ignored, and that is neither under `EVIDENCE_KIT_TMP_DIR` nor the Statement's path, reads `modified`. A pre-hook that rewrites a tracked file therefore shows as `tree=modified` on that suite's line alone. The fold follows every read, so a run from a clean tree reads `clean`, but a rerun over an uncommitted fold reads `modified` on every line, truly, since the gates suite reads the tracked manifest. Commit the fold before a rerun meant to record `clean`.
 
 The Statement table's `suites[].tree` row reads *the worktree state when the suite started, under `EVIDENCE_KIT_TREE_UNTRACKED`*. §The gate-run predicate's honest limits gain the limit above, and §bin/run-validate.sh's declared knob roster gains the knob.
 
@@ -56,6 +58,7 @@ A provenance string is **blank** when it holds no character outside ASCII whites
 - **The reader.** `provenance_shape` refuses a blank `name`, `root` or optional string, in place of an empty one, through one helper, `evidence::blank`, which every refusal site calls. The refusal wording becomes *absent, blank or not a string*.
 - **The producer.** `provenance::present` filters a blank value to absent. So a build stamp or lock field holding only whitespace leaves its field out, never writing it blank.
 - **The schema.** Each provenance string that carries `minLength: 1` also gains `"pattern": "[^\\t\\n\\f\\r ]"`, an unanchored match requiring one non-blank character. `the_published_golden_and_schema_match_the_renderer` asserts that pattern beside `minLength`.
+- **The definition is the provenance block's.** installer/SPEC.md §The manifest also says *never null or blank* of its own writer's keys. That sentence is not a reader of this definition, and the amendment leaves it untouched. The block's lead cites the manifest for the absence convention alone.
 - **No version moves.** Both contracts are unreleased (above), so the correction narrows `1.0.0` before any reader of it exists. After a release, the same narrowing would be a major under §The predicate's version.
 
 Replacement text for gate-sdk/SPEC.md §run-gates' provenance-block lead. **Not yet applied:**
