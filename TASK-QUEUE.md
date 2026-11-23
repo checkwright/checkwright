@@ -51,6 +51,16 @@ An adopter predicts, from reading rather than a firing, that meta-gates will rea
 
 **Cost while deferred:** a red on a file the adopter cannot change reads as a false positive and invites a bypass. Surfaced 2026-11-14 by a production adopter's handoff (ask 9b); filed at liveness-arm-adoption-pass' scope. Owner lookup: `ownership scope` in this file, none; owner gate-sdk/SPEC.md.
 
+### rule-id-coverage
+
+[spec: SPEC-rule-id-coverage.md]
+
+`check-spec-pointer` is forward-only: canon-kit/SPEC.md §check-spec-pointer rules the reverse out, since flagging a requirement with no inbound pointer needs a notion of what counts as a requirement. An external orchestrator asks for coverage in both directions over rule ids (ask 5): every id a spec declares is cited, and every cited id is declared, the id shape being a consumer pattern. Operator direction 2026-11-24, lead-relayed (not a ruling), reopens it in this iteration; TRAJECTORY.md records no ruling on the calibration, so it is an owner-doc change.
+
+**Deliverable:** design-pending, a feature: a bidirectional id-coverage check whose requirement notion is a consumer-declared pattern, off by default; spec rules whether it is a new gate or a change to `check-spec-pointer`'s calibration, and rewrites the refusal sentence either way.
+
+**Cost while deferred:** a declared rule no test cites passes every gate, and the adopter keeps its own coverage test. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `spec-pointer`, `coverage`, `reverse` in this file, none live; owner canon-kit/SPEC.md §check-spec-pointer.
+
 ## Technical Debt
 
 ### gate-test-system-gitconfig
@@ -454,16 +464,6 @@ A peer project relaying feedback or a feature ask has no channel: each ask arriv
 **Deliverable:** design-pending, a feature: a request record grammar (need, repro, wanted, evidence) with a per-request reply state (received, filed `<slug>`, refused `<reason>`, landed, shipped `<tag>`); a filing arm a peer runs outside any tree; a listing arm; scope's intake lane and close's shipped stamp; and a peer-side read that notifies at session start once a request reaches shipped. The channel path is a consumer knob, absolute and untracked, so a request body never enters a public tree and a queue entry cites an opaque request id. Spec rules its order against [user-install-update-notice](#user-install-update-notice), whose installed-version read the notify half also needs.
 
 **Cost while deferred:** every peer ask costs a hand-written handoff and reply, and a shipped ask is adopted only when the peer happens to look. Surfaced 2026-11-24 by an external orchestrator's handoff and the operator's direction; filed at this scope. Owner lookup: `peer`, `request channel`, `intake` in this file, none; owner lifecycle-kit/SPEC.md.
-
-### rule-id-coverage
-
-[cost: event/high] [surface: canon-kit]
-
-`check-spec-pointer` is forward-only: canon-kit/SPEC.md §check-spec-pointer rules the reverse out, since flagging a requirement with no inbound pointer needs a notion of what counts as a requirement. An external orchestrator asks for coverage in both directions over rule ids (ask 5): every id a spec declares is cited, and every cited id is declared, the id shape being a consumer pattern. Operator direction 2026-11-24, lead-relayed (not a ruling), reopens it in this iteration; TRAJECTORY.md records no ruling on the calibration, so it is an owner-doc change.
-
-**Deliverable:** design-pending, a feature: a bidirectional id-coverage check whose requirement notion is a consumer-declared pattern, off by default; spec rules whether it is a new gate or a change to `check-spec-pointer`'s calibration, and rewrites the refusal sentence either way.
-
-**Cost while deferred:** a declared rule no test cites passes every gate, and the adopter keeps its own coverage test. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `spec-pointer`, `coverage`, `reverse` in this file, none live; owner canon-kit/SPEC.md §check-spec-pointer.
 
 ### amendment-queue-not-applicable
 
