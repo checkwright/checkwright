@@ -4,8 +4,4 @@
 
 ---
 
-input-shape-refusal-pass scope a9db8212 2026-11-16 715c9d92c
-input-shape-refusal-pass build a3f26e6b 2026-11-16 a4376ded6
-input-shape-refusal-pass build aba92ba0 2026-11-16 88a31cb26
-input-shape-refusal-pass validate a84c9fe0 2026-11-16 465daa0fb
-input-shape-refusal-pass close a7bf6d35 2026-11-16 39a4121cd
+— scope ab2bbda2 2026-11-24 13f33fd9f

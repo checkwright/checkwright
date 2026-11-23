@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: input-shape-refusal-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The set (operator direction 2026-11-16, lead-relayed, not a ruling; the theme that date's standing directive, the filed gaps and the tasks that can join them):** option A, six debt units, stages scope, build, validate, close. The two carried second-vendor findings promote as `provenance-blank-string` and `amend-only-not-applicable`; `price-table-row-shape` (its coverage-arm route), `user-lock-key-traversal`, `usage-poll-half-weekly-pair` and `docs-since-duplicate-key` join as input-shape refusals the owning SPECs already rule out. The set's behaviour changes are directed with it: the verify arm refuses a blank provenance string, `check-docs-since` reds a duplicated `since:` key, and `--price-coverage` reports malformed rows. Composition: bundled on the native crate's input-shape refusals, drain 4 against inflow 6.8, the remaining theme-adjacent rows being features or host-bound. Supersession: none.
-
-  **Push need (operator direction 2026-11-16, inside the budget):** 2 against 2, the closing push and the one `user-lock-key-traversal` spends.
 
 ---
 
