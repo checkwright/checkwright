@@ -366,6 +366,56 @@ An observed `session-context` logs `would=error`: the member prints its brief as
 
 **Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
+### gate-test-system-gitconfig
+
+[cost: iteration/high] [surface: gate-sdk]
+
+The fixture suites read the host's system git config: a machine-wide `core.hooksPath` in `/etc/gitconfig`, which another tool on the maintainer host installed after the last close, fails four assertions of gate-sdk's `native-git-hooks.test.sh`, so `check-crate-arms` reds every battery run there. The installer smoke and the fence runner already isolate their git with `GIT_CONFIG_NOSYSTEM` and `GIT_CONFIG_GLOBAL`; the gate-tests runner does not.
+
+**Deliverable:** debt: the gate-tests runner isolates every suite's git from system and global config, with a case run under a hostile system config.
+
+**Cost while deferred:** a red battery on any host with system git config, which an adopter's machine may carry too. Surfaced 2026-11-24 at this scope's battery. Re-verified there: the suite is clean under `GIT_CONFIG_NOSYSTEM=1`. Owner lookup: `NOSYSTEM`, `hermetic` in this file, none; owner gate-sdk/SPEC.md §check-crate-arms.
+
+### user-uninstall-containment
+
+[cost: event/high] [surface: installer]
+
+`uninstall --user --force` follows a directory symlink inside the data dir: a `user.lock` files key `escape/victim` passes the lexical component check in native/src/installer/user.rs, and removal deletes a file outside the install when `<data>/escape` links out (a junction on Windows), where installer/SPEC.md §The user manifest states containment.
+
+**Deliverable:** debt: a resolved-path containment check before each removal, with a case per host.
+
+**Cost while deferred:** a tampered or corrupted user manifest can delete a file outside the install. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence on POSIX), carried from its close; filed at the next scope. Owner lookup: `symlink`, `containment` in this file, none; owner installer/SPEC.md §The user manifest.
+
+### evidence-blank-semantics
+
+[cost: event/low] [surface: evidence-kit]
+
+The evidence provenance reader admits a whitespace-only optional string: native/src/evidence.rs checks `is_empty`, and the gate-run v1 schema's `minLength: 1` admits `' \t'`, where gate-sdk/SPEC.md §run-gates and the declaration say never blank.
+
+**Deliverable:** design-pending: rule whether blank means zero characters or whitespace-only, then align reader, schema and SPEC.
+
+**Cost while deferred:** a whitespace-only field passes as provenance. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (medium confidence on intent), carried from its close; filed at the next scope. Owner lookup: `blank`, `whitespace` in this file, none; owner gate-sdk/SPEC.md §run-gates.
+
+### price-row-shape-strictness
+
+[cost: event/low] [surface: drift-kit]
+
+The price-table row check is lexical: `kpi::is_iso_day` (native/src/emit/kpi/mod.rs) admits `2026-00-00`, and its float parse admits `NaN` and `inf`, so such a row counts as priced with no unpriced-row line, against drift-kit/SPEC.md §The stage-economics meter's ISO-day and numeric-price shape.
+
+**Deliverable:** debt: a calendar-valid day and a finite non-negative price, each with a case.
+
+**Cost while deferred:** a malformed row prices silently. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_iso_day` tests digit positions only. Owner lookup: `is_iso_day`, `NaN` in this file, none; owner drift-kit/SPEC.md §The stage-economics meter.
+
+### weekly-pair-shape-check
+
+[cost: event/low] [surface: delegation-kit]
+
+The weekly-pair producers check presence, not shape: `usage::is_utilization` (native/src/hook/usage.rs) admits `1..2`, and the statusline producer writes a non-scalar `resets_at` rendered `{}`, each a fresh snapshot the verdict reads with the weekly axis unarmed. The poller also composes a pair from a flat utilization and a nested reset, a rule delegation-kit/SPEC.md does not state.
+
+**Deliverable:** debt: shape checks at both producers, and the composition rule stated or removed.
+
+**Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
