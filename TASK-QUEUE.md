@@ -167,79 +167,9 @@ Only TRAJECTORY.md holds rulings (operator direction, 2026-10-25), yet tracked p
 
 **Cost while deferred:** a session reading the label treats a direction as operator-class and escalates what it could decide. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `ruling`, `ruled` in this file, the two instances; owner lifecycle-kit/SPEC.md §The steering vocabulary.
 
-### liveness-reader-template
-
-[cost: event/low] [surface: delegation-kit]
-
-`DELEGATION_KIT_LIVENESS_CMD` lets a consumer read liveness beyond PIDs, and only the SPEC explains it: no template shows a reader over a batch-scheduler job or a remote CI run. Joined to it, on consult advice of 2026-11-14: a reader that ran and did not answer allows the turn end today, so the template's failure contract states the exit classes the hook reads and reports a failed sample as a tool error, never as nothing running. An adopter's reader maps exit code and first output token to live, dead or unknown, unknown refusing, and reads a CI run with `gh run view <id> --json status`. Refused there: a heartbeat grammar and a stale-watcher audit, since an age policy on a liveness record is refused where the record is defined (evidence-kit/SPEC.md §The producer-liveness lock).
-
-**Deliverable:** design-pending, a feature: the template, its failure contract and the hook's read of an unanswered reader.
-
-**Cost while deferred:** a consumer whose work runs off-host either writes its reader from the SPEC or leaves the hook blind to that work. Surfaced 2026-11-14 by a production adopter's handoff (ask 3); filed at liveness-arm-adoption-pass' scope. Owner lookup: `adapter template`, `LIVENESS_CMD` in this file, none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
-
-### turn-end-context-size-check
-
-[cost: event/low] [surface: delegation-kit]
-
-No check holds an agent to handing off past a context size: an adopter measured code agents at 144k tokens per turn on average, 86% of agent tokens, and its rule goes unenforced. Joined, on consult advice of 2026-11-14: token and wall time per task at hand-back is the same read, since the child-turn-end payload names the agent's transcript and model-verdict already reads its newest usage record (delegation-kit/SPEC.md §model-verdict), and the stage-economics meter carries no dispatch dimension. Refused for now: a per-task spend throttle, as agent-budget-guard blocks on the account window and a per-task budget is a work engine's figure.
-
-**Deliverable:** design-pending, a feature: the threshold's knob, the check's verdict and a per-dispatch measurement line.
-
-**Cost while deferred:** an over-full agent keeps working past the size its consumer's rule sets. Surfaced 2026-11-14 by a production adopter's handoff (ask 5); filed at liveness-arm-adoption-pass' scope. Owner lookup: `context-size`, `per-task` in this file, none; owner delegation-kit/SPEC.md §model-verdict.
-
-### personal-one-kit-hooks
-
-[cost: event/low] [surface: installer]
-
-`--personal` installs every selected kit's hooks, and its exclude block and hooks sit in the common git directory, so they reach every linked worktree (installer/SPEC.md §The personal install). An adopter asks for one kit's hooks alone and a per-worktree opt-out.
-
-**Deliverable:** design-pending, a feature: a one-kit personal selection and a worktree opt-out, or a refusal recorded. Reshaped by `hook-only-user-install`, landed at liveness-arm-adoption-pass, whose one-arm install is the hook-only half.
-
-**Cost while deferred:** a personal install takes kits and worktrees its owner did not choose. Surfaced 2026-11-14 by a production adopter's handoff (ask 7); filed at liveness-arm-adoption-pass' scope. Owner lookup: `one kit`, `per-worktree` in this file, none; owner installer/SPEC.md §The personal install.
-
-### hook-double-registration
-
-[cost: event/low] [surface: plugin]
-
-An adopter reads from the docs, unobserved, that a hook fires twice where the plugin's hooks and a hand-wired entry for the same arm coexist; `subagent-stop-liveness` itself is not plugin-wired (delegation-kit/README.md).
-
-**Deliverable:** design-pending: detect or dedupe a double registration, or state it as a limit.
-
-**Cost while deferred:** a doubled firing doubles a refusal's log line and its latency. Surfaced 2026-11-14 by a production adopter's handoff (ask 9c); filed at liveness-arm-adoption-pass' scope. Owner lookup: `double regist`, `double fir` in this file, none; owner plugin/SPEC.md §The harnesses.
-
-### outbound-public-text-lint
-
-[cost: event/low] [surface: guard-kit]
-
-check-commit-msg and check-tree-terms hold a commit message and the tracked files to the leak patterns (gate-sdk/SPEC.md §check-commit-msg), and no shipped rule reads the text of an issue comment, a review or a release note an agent posts, though the scope binding's boundary sweep posts the first two. Consult advice of 2026-11-14: a consumer-selectable shell-guard rule holding a public-write command's body to the commit-message gate's pattern files; the exact-text approval half is the harness's permission prompt, owing at most a line in guard-kit/SPEC.md §The recommended allowlist.
-
-**Deliverable:** design-pending, a feature: the commands and body carriers it reaches, its verdict on an unreadable body, and its honest limit.
-
-**Cost while deferred:** a leak in a posted body passes every gate. Surfaced 2026-11-14 by a production adopter's handoff, ranked second of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `outbound` in this file, none; owner guard-kit/SPEC.md.
-
-### reader-handback-head-line
-
-[cost: event/low] [surface: delegation-kit]
-
-No shipped return contract names the commit a reviewing agent read, so a review of a stale tree reads like any other. Consult advice of 2026-11-14: an opt-in turn-end check that the report names the head it read, resolving and matching the dispatch's base; the child-turn-end payload carries the final message, which no hook member reads today (gate-sdk/SPEC.md §The hook contract). Kept out: a closed verdict set and any classing of a report. One family with the icebox's unattested-completion and unverified-base entries, re-filing neither.
-
-**Deliverable:** design-pending, a feature, trialled first under `--observe` (`hook-observe-mode`, landed at liveness-arm-adoption-pass), since it adds a refusing hook.
-
-**Cost while deferred:** a stale-tree review passes as current. Surfaced 2026-11-14 by a production adopter's handoff, ranked third of its absorb candidates; filed at liveness-arm-adoption-pass' scope. Owner lookup: `head line`, `hand-back` in this file, none; owner delegation-kit/SPEC.md §The turn-end liveness hook.
-
-### readonly-child-gate-arms
-
-[cost: event/low] [surface: delegation-kit]
-
-A read-only audit child cannot run the gate binary: agent-dispatch-guard isolates a `DELEGATION_KIT_READONLY_TYPES` dispatch in a worktree, which carries no built binary, and one child reported the shell guard refusing the main checkout's binary, so it derived the command-knob roster by grep where `--emit knob-roster` is the oracle; its dispatcher's later run agreed. The refusal text was not read.
-
-**Deliverable:** design-pending: a route for an isolated read-only child to the non-writing arms, or a dispatch brief that carries the arm's output.
-
-**Cost while deferred:** an isolated reader emulates an oracle it cannot run (Oracle-first). Surfaced 2026-11-14 by a consultation's dispatcher, held in its journal; filed at liveness-arm-adoption-pass' scope. Owner lookup: `READONLY`, `isolated` in this file, none; owner delegation-kit/SPEC.md.
-
 ### tree-free-hook-roster-widening
 
-[cost: event/low] [surface: gate-sdk]
+[cost: event/low] [surface: gate-sdk] [not-icebox-eligible: 2026-11-24 named a filed follow-on by the operator direction of 2026-11-14, held only in this entry]
 
 The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (gate-sdk/SPEC.md §The harness-integration arm). Another member whose inputs all resolve absolute (payload, knobs, spawned programs) could run outside a repository too. Operator direction 2026-11-14, lead-relayed (not a ruling), names this a filed follow-on.
 
@@ -247,49 +177,9 @@ The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (ga
 
 **Cost while deferred:** an adopter running outside any repository gets only the turn-end guard. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `tree-free` in this file, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
-### user-install-doctor-diff
-
-[cost: event/low] [surface: installer]
-
-`doctor` and `diff` read no user install (installer/SPEC.md §The user install, Honest limits), so a user whose knob file was edited or whose placed binary drifted has no read-only verb to ask.
-
-**Deliverable:** design-pending, a feature: a user-manifest reader per verb with cases, and whether `doctor` reports a user install beside a repository one.
-
-**Cost while deferred:** a drifted user install is found only by re-running `init --user`. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `doctor`, `user install` in this file, none; owner installer/SPEC.md §The user install.
-
-### user-install-update-notice
-
-[cost: event/low] [surface: installer]
-
-A user install gets no update notice, since the notice reads a repository's lock (installer/SPEC.md §The user install, Honest limits).
-
-**Deliverable:** design-pending, a feature: a notice reading `user.lock`'s version without network on the turn-end path, and where a tree-free notice may print.
-
-**Cost while deferred:** an adopter on `init --user` learns of a release only by re-running the bootstrap. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `update notice` in this file, none; owner installer/SPEC.md §The user install.
-
-### tree-bound-hook-pages
-
-[cost: event/low] [surface: docs]
-
-`check-hook-knobs-fresh` owes a page only for a tree-free HOOKS member, so `shell-guard` and the other tree-bound arms have no `docs/hooks/` page. The gate already allows one.
-
-**Deliverable:** a page per arm an adopter weighs, then `--emit hook-knobs --write`.
-
-**Cost while deferred:** an adopter weighing one tree-bound arm reads its knobs off the SPEC. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `docs/hooks` in this file, none; owner docs/site-architecture.md.
-
-### powershell-verify-probe
-
-[cost: event/low] [surface: docs]
-
-docs/manual-install.md's PowerShell attestation-verify block, which reads `--format json` through `ConvertFrom-Json`, is unprobed; the POSIX block's filter was probed against a published release.
-
-**Deliverable:** a fix: one run on a Windows host with `gh` signed in, and the property path corrected if it differs.
-
-**Cost while deferred:** a Windows adopter verifying a download may meet a block that errors. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `PowerShell`, `ConvertFrom` in this file and the disposed-findings record, none on this block; owner docs/manual-install.md.
-
 ### non-gate-arm-json
 
-[cost: event/low] [surface: gate-sdk]
+[cost: event/low] [surface: gate-sdk] [not-icebox-eligible: 2026-11-24 carries the operator direction of 2026-11-15 on how a JSON form lands, held only in this entry]
 
 A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`) prints for a person, and no arm offers a machine form. Operator direction 2026-11-15, lead-relayed, not a ruling: a JSON form lands on an arm only where a named caller reads it (gate-sdk/SPEC.md §The non-gate arm), never across every arm at once.
 
@@ -299,7 +189,7 @@ A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`)
 
 ### external-state-owner-mode
 
-[cost: event/low] [surface: lifecycle-kit]
+[cost: event/low] [surface: lifecycle-kit] [not-icebox-eligible: 2026-11-24 carries the operator direction of 2026-11-15 that the lead decision stands, held only in this entry]
 
 A declared mode where an outside tool renders the queue file and the iteration header: the gates check consistency and a provenance stamp (generator, version, content hash) instead of hand transitions, a corrective message names the owner's command from config, and stage transitions get verbs with JSON results.
 
@@ -308,36 +198,6 @@ A declared mode where an outside tool renders the queue file and the iteration h
 **Deliverable:** design-pending, a feature, on reopening.
 
 **Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
-
-### gate-tamper-range-arm
-
-[cost: event/low] [surface: delegation-kit]
-
-`check-gate-tamper` reads only the index (delegation-kit/SPEC.md §check-gate-tamper), so a supervisor receiving an agent's commits cannot run it over the range they span.
-
-**Deliverable:** design-pending, a feature: a range form with a machine verdict, its fixture pair, and the index form unchanged.
-
-**Cost while deferred:** a handed-back range is checked for tamper only commit by commit at its own pre-commit, which an agent's hook bypass skips. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `gate-tamper`, `range` in this file, the icebox's coverage entry only; owner delegation-kit/SPEC.md §check-gate-tamper.
-
-### foreign-run-verb
-
-[cost: event/low] [surface: delegation-kit]
-
-The foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) is a procedure, not a verb: no arm takes a brief path, a vendor and model and a sandbox policy and returns a machine result with a transcript path, so a second-opinion caller builds its own executor.
-
-**Deliverable:** design-pending, a feature: the verb, its result shape and its sandbox policy's vocabulary held in config.
-
-**Cost while deferred:** each outside caller re-builds the run. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `foreign-vendor`, `foreign run` in this file and the disposed-findings record, none open; owner delegation-kit/SPEC.md §The foreign-vendor run.
-
-### external-kpi-series
-
-[cost: event/low] [surface: drift-kit]
-
-drift-kit's trend report covers only what it computes in-tree, so a velocity, lesson or queue-age series an outside tool holds cannot join it.
-
-**Deliverable:** design-pending, a feature: an input form for an outside series, its validation and how the report marks its provenance.
-
-**Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
 
 ### brief-authority-lint
 
@@ -351,7 +211,7 @@ No check reads an agent brief: one that grants authority the agent must not hold
 
 ### observe-plain-text-context
 
-[cost: event/low] [surface: gate-sdk]
+[cost: event/low] [surface: gate-sdk] [not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
 
 An observed `session-context` logs `would=error`: the member prints its brief as plain text on stdout (native/src/hook/session_context.rs), and the would-be decision table reads exit 0 with stdout that is not JSON as `error` (gate-sdk/SPEC.md §The harness-integration arm), so a trial of the session-start member never logs the `advise` its enforcing run gives.
 
@@ -371,7 +231,7 @@ An observed `session-context` logs `would=error`: the member prints its brief as
 
 ### price-row-shape-strictness
 
-[cost: event/low] [surface: drift-kit]
+[cost: event/low] [surface: drift-kit] [not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
 
 The price-table row check is lexical: `kpi::is_iso_day` (native/src/emit/kpi/mod.rs) admits `2026-00-00`, and its float parse admits `NaN` and `inf`, so such a row counts as priced with no unpriced-row line, against drift-kit/SPEC.md §The stage-economics meter's ISO-day and numeric-price shape.
 
@@ -381,7 +241,7 @@ The price-table row check is lexical: `kpi::is_iso_day` (native/src/emit/kpi/mod
 
 ### weekly-pair-shape-check
 
-[cost: event/low] [surface: delegation-kit]
+[cost: event/low] [surface: delegation-kit] [not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
 
 The weekly-pair producers check presence, not shape: `usage::is_utilization` (native/src/hook/usage.rs) admits `1..2`, and the statusline producer writes a non-scalar `resets_at` rendered `{}`, each a fresh snapshot the verdict reads with the weekly axis unarmed. The poller also composes a pair from a flat utilization and a nested reset, a rule delegation-kit/SPEC.md does not state.
 
@@ -1133,14 +993,61 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 
 No arm exports a developer's workflow commits off a vendored tree they do not own, so the workflow half of a personal adoption is stripped by hand before an upstream pull request.
 
-## Done
+### liveness-reader-template
 
-- gate-test-system-gitconfig
-- verify-gate-run-strictness
-- evidence-blank-semantics
-- statement-out-of-tree-store
-- binary-only-ci-recipe
-- meta-gate-ownership-scope
-- rule-id-coverage
-- peer-request-channel
+No template shows a liveness reader for off-host work, such as a batch job or a CI run.
+
+### turn-end-context-size-check
+
+No check holds an agent to handing off past a context size its consumer sets.
+
+### personal-one-kit-hooks
+
+A personal install cannot take one kit's hooks alone or opt a worktree out.
+
+### hook-double-registration
+
+Nothing detects a hook registered both by the plugin and by hand.
+
+### outbound-public-text-lint
+
+No rule reads the body of an issue comment, review or release note an agent posts for leak patterns.
+
+### reader-handback-head-line
+
+No return contract names the commit a reviewing agent read.
+
+### readonly-child-gate-arms
+
+An isolated read-only child cannot run the gate binary's non-writing arms.
+
+### user-install-doctor-diff
+
+The doctor and diff verbs read no user install.
+
+### user-install-update-notice
+
+A user install gets no update notice.
+
+### tree-bound-hook-pages
+
+Tree-bound hook arms have no docs/hooks page.
+
+### powershell-verify-probe
+
+The manual-install PowerShell attestation-verify block has not been run on a Windows host.
+
+### gate-tamper-range-arm
+
+check-gate-tamper cannot run over a commit range.
+
+### foreign-run-verb
+
+No verb runs the foreign-vendor review and returns a machine result.
+
+### external-kpi-series
+
+The drift trend report cannot take a KPI series held outside the tree.
+
+## Done
 
