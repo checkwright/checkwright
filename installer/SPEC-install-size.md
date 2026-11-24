@@ -38,7 +38,7 @@ A section `## The install size` is added to `installer/SPEC.md` after §Profiles
 
 ### (2) The binary's size, measured at release {design-bearing} {user-facing: feature deliverable on the paired entry, the files and bytes an install places}
 
-gate-sdk/SPEC.md §measure-commit's output gains a third line, and installer/SPEC.md §The hosted install pin's invariant D is rephrased over both release-measured blocks. **Not yet applied:**
+gate-sdk/SPEC.md §measure-commit's output gains a third line, and installer/SPEC.md §The hosted install pin's invariant D and its fail-closed paragraph are rephrased over both release-measured blocks. **Not yet applied:**
 
 > ```text
 > measure-commit: <median>ms median of 3 (<a>ms, <b>ms, <c>ms) — <m> pre-commit member(s) over <p> tracked path(s), every path selected
@@ -49,6 +49,8 @@ gate-sdk/SPEC.md §measure-commit's output gains a third line, and installer/SPE
 > The binary line is the size of the running executable, read from its metadata with no spawn. Run through the installed gate binary, as the release step runs it, that is the artifact `init` placed for this host's target. The line is absent where the platform cannot name the running executable.
 
 > - **Invariant D — the release-measured figures are the pinned release's.** The install pages carry exactly one `<!-- commit-cost:begin -->` … `<!-- commit-cost:end -->` block and exactly one `<!-- install-binary:begin -->` … `<!-- install-binary:end -->` block across their members. Each holds exactly one `measured at v<X.Y.Z>` token, whose version equals the pin. So the commit that moves the pin carries new measurements (RELEASING.md §The procedure, *Tag the stamp commit, then drain the release declaration surface*). **Honest limit:** D reads the version and never the host or the figure, so a figure copied forward under a new version passes.
+
+> It also exits 2 on a missing or duplicated commit-cost or install-binary block, and on a block carrying no `measured at` token, more than one, or one naming no `v<major>.<minor>.<patch>`.
 
 The `install-binary` block sits in the requirements page's install section beside the derived block, one sentence: on `<os> <arch>`, the gate binary `init` placed is **<size>**, measured at v<X.Y.Z>, the size in the derived block's units. RELEASING.md's step writes it from the same run that writes the commit-cost block.
 
@@ -76,13 +78,14 @@ The `install-binary` block sits in the requirements page's install section besid
 
 Roster from `git grep -n -e "commit-cost" -e "measure-commit" -e "Invariant D" -e "GATE_SDK_PAYLOAD_WITHHOLD"` over the tracked tree, the posts, the queue and the generated mirrors excluded, narrowed to the sites stating a release-measured block, the measuring arm's output, or what the payload carries.
 
-- `installer/SPEC.md` — §The install size, new (delta 1); §The hosted install pin, invariant D (delta 2).
-- `gate-sdk/SPEC.md` §measure-commit — the output block and the binary-line paragraph, and its *Named caller* line names the binary line's reader (delta 2).
+- `installer/SPEC.md` — §The install size, new (delta 1); §The hosted install pin, invariant D and the fail-closed sentence on a missing or duplicated block (delta 2).
+- `gate-sdk/SPEC.md` §measure-commit — the output block, the opening sentence's "two lines" count, the binary-line paragraph, and its *Named caller* line naming the binary line's reader (delta 2).
+- `scripts/check-install-pin.gate` — the `# spec:` header's paraphrase of invariant D, which names the commit-cost figure alone (delta 2).
 - `native/src/emit/install_size.rs` — new, with its unit tests (delta 1). `native/src/emit/mod.rs` — the arm's row and its knob roster (delta 1). `native/src/emit/pack_installer.rs` — `pathspec` made crate-visible (delta 1).
 - `native/src/gates/install_size_fresh.rs` and `native/src/gates/mod.rs` — new gate and its row (delta 1). `scripts/check-install-size-fresh.gate`, `scripts/gates.list`, `scripts/gate-tests/check-install-size-fresh/{good,bad}/` — new (delta 1).
 - `native/src/emit/git_hook.rs` — the measure-commit binary line and its unit test (delta 2).
 - `native/src/gates/install_pin.rs` and `scripts/gate-tests/check-install-pin/{good,bad}/` — invariant D over both blocks: `good/` gains an `install-binary` block, `bad/` one measured at a stale version (delta 2).
-- `RELEASING.md` §The procedure, *Tag the stamp commit, then drain the release declaration surface* — the measuring run writes the binary line into the `install-binary` block too (delta 2).
+- `RELEASING.md` §The procedure, *Tag the stamp commit, then drain the release declaration surface* — the measuring run writes the binary line into the `install-binary` block too, and the step's "its two lines" count and its "also carries the new commit-cost figure" sentence name both blocks (delta 2).
 - `docs/requirements.md` — `## What an install places`, new (delta 3).
 - `docs/install-block-contracts.md` — *The install-size block* and *The install-binary block* sections beside *The commit-cost block*, and the hosted install scripts section's D sentence (deltas 1 and 2).
 - `docs/install.md` §Choosing a profile — one sentence pointing to the figure (delta 3).

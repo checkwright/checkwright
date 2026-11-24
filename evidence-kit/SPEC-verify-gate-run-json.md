@@ -13,9 +13,11 @@ Pairs `non-gate-arm-json`. An orchestrator that gates a merge or a dispatch on a
 
 ### (1) `--verify-gate-run --json` {design-bearing} {user-facing: operator direction 2026-11-24, lead-relayed (not a ruling), on the set record: the JSON form narrowed to `--verify-gate-run`, the one arm an adopter has named}
 
-§verify-gate-run's opening sentence takes the option, and a paragraph is added after the exit paragraph. **Not yet applied:**
+§verify-gate-run's opening sentence takes the option, the operand-refusal sentence admits it, and a paragraph is added after the exit paragraph. **Not yet applied:**
 
 > **`--verify-gate-run [--json] [<file> | -]`** judges one Statement against this tree and its commit, dispatched to `native/src/emit/verify_gate_run.rs`.
+
+> A second positional, or one beginning `--` other than `--json`, is refused at exit 2.
 
 > **`--json` replaces the verdict line with one JSON document**, for a caller that gates on the result. The checks and the exit statuses are unchanged. On exit 0 or 1 the arm prints one object on stdout, its keys sorted and no insignificant whitespace, ending in a newline:
 >
@@ -61,7 +63,7 @@ A paragraph added to gate-sdk/SPEC.md §The non-gate arm, after *A flag spelling
 
 Roster from `git grep -n -e "verify-gate-run" -e "verdictContract"` over the tracked tree, the posts, the queue and the generated mirrors excluded, narrowed to the sites stating the arm's grammar or output, or the binary's machine-read contracts.
 
-- `evidence-kit/SPEC.md` §verify-gate-run — the opening sentence and the new paragraph (delta 1). §Producers and consumers gains the document and its goldens beside the schema and golden entry (delta 1).
+- `evidence-kit/SPEC.md` §verify-gate-run — the opening sentence, the operand-refusal sentence and the new paragraph (delta 1). §Producers and consumers gains the document and its goldens beside the schema and golden entry (delta 1).
 - `gate-sdk/SPEC.md` §The non-gate arm — the new paragraph (delta 2). §run-gates, *The verdict contract's version*, gains one sentence naming the arms' machine forms as further users of the rule (delta 2).
 - `native/src/emit/verify_gate_run.rs` — the option, the renderer, and the golden unit test (delta 1).
 - `native/src/runner.rs` — the usage line and the `--verify-gate-run` help paragraph name `--json` (delta 1).
