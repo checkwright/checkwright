@@ -1013,12 +1013,3 @@ The drift trend report cannot take a KPI series held outside the tree.
 
 ## Done
 
-- peer-reply-unbound-channel
-- peer-channel-input-shape
-- comment-tier-id-directive
-- amendment-queue-not-applicable
-- untracked-count-symlink
-- non-gate-arm-json
-- adopter-footprint-figure
-- integration-test-git-isolation
-
