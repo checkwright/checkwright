@@ -419,6 +419,16 @@ No surface states the files and bytes an install places in an adopter's tree, an
 
 **Cost while deferred:** an adopter weighing the install measures it by hand. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `footprint` in this file, none; owner installer/SPEC.md.
 
+### integration-test-git-isolation
+
+[cost: event/low] [surface: gate-sdk]
+
+The crate's integration tests (native/tests/*.rs) isolate git from host config per spawn by hand, outside proc's `cfg(test)` pin: grant_link_reach.rs's git helper sets no isolation, none sets `GIT_CONFIG_GLOBAL`, and no catcher holds the next raw `Command::new("git")` there.
+
+**Deliverable:** debt: a shared native/tests common module whose git and binary spawn builder applies the §check-crate-arms pin, every integration test routed through it, and a proc unit-test scan refusing a `Command::new` in native/tests outside that module.
+
+**Cost while deferred:** a host-config-sensitive integration test reds only on such a host, after the fact. Filed 2026-11-24 by peer-adoption-channel-pass' close. Re-verified there: grant_link_reach.rs spawns git with no isolation and no file under native/tests names `GIT_CONFIG_GLOBAL`. Owner lookup: `native/tests`, `GIT_CONFIG_GLOBAL`, `Command::new` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-crate-arms.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
