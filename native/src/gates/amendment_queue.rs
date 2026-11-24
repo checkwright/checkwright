@@ -233,8 +233,20 @@ fn rule(args: &[String]) -> Result<i32, String> {
         None => spec::knob_pub("CANON_KIT_QUEUE_FILE")?,
     };
     let root = args.get(1).map(String::as_str).unwrap_or(".");
+    // spec: canon-kit/SPEC.md §check-amendment-queue — an absent queue is an absent subject, and a
+    // queue path naming anything but a file still refuses
+    let present = Path::new(&queue)
+        .try_exists()
+        .map_err(|e| format!("cannot stat {}: {}", queue, e))?;
+    if !present {
+        println!(
+            "AMENDMENT-QUEUE: clean (not applicable: no queue file at {} — work tracked outside the queue grammar has no entry to pair)",
+            queue
+        );
+        return Ok(0);
+    }
     if !Path::new(&queue).is_file() {
-        return Err(format!("file not found: {}", queue));
+        return Err(format!("not a file: {}", queue));
     }
     let sets = Sets {
         feature: spec::knob_array_pub("CANON_KIT_FEATURE_SECTIONS")?,

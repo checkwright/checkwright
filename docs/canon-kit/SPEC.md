@@ -223,7 +223,7 @@ Cross-kit note: the section knobs carry the same defaults as queue-kit's. The kn
 
 ## Per-component contracts
 
-Each gate below owns its section: the assertion, its fixture pair, and the reason for any bespoke unit test beside it. The bespoke unit tests are named together here, since a roster spread across sections is one no reader sees whole: `check-amendment-update-target.test.sh`, `check-comment-tier.test.sh`, `check-deprecation-task.test.sh`, `check-docs-cmd.test.sh`, `check-docs-link-convention.test.sh`, `check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`, `check-manifest-count.test.sh`, `check-md-refs.test.sh`, `check-measured-claim.test.sh`, `check-prose-bounds.test.sh`, `check-prose-enum.test.sh`, `check-provenance-seam.test.sh`, `check-spec-dod-singleton.test.sh`, `check-tracking-claim.test.sh` and `check-unmarked-claim.test.sh`.
+Each gate below owns its section: the assertion, its fixture pair, and the reason for any bespoke unit test beside it. The bespoke unit tests are named together here, since a roster spread across sections is one no reader sees whole: `check-amendment-queue.test.sh`, `check-amendment-update-target.test.sh`, `check-comment-tier.test.sh`, `check-deprecation-task.test.sh`, `check-docs-cmd.test.sh`, `check-docs-link-convention.test.sh`, `check-knob-citation.test.sh`, `check-knob-default-coupling.test.sh`, `check-manifest-count.test.sh`, `check-md-refs.test.sh`, `check-measured-claim.test.sh`, `check-prose-bounds.test.sh`, `check-prose-enum.test.sh`, `check-provenance-seam.test.sh`, `check-spec-dod-singleton.test.sh`, `check-tracking-claim.test.sh` and `check-unmarked-claim.test.sh`.
 
 ### The shared spec adapters
 
@@ -282,6 +282,8 @@ Invariant: the bidirectional rule holds.
 - **(e)** Every amendment-glob filename cited in the body of an amendment on disk resolves to a file. An amendment is deleted on merge, so a filename citation of a sibling dangles from that moment; inside a transition artifact it always reads as governing input. Its durable form is the canonical section the cited amendment merged into.
 
 Calibration: a ref is a bare amendment basename (searched tree-wide) or a repo-relative path (resolved directly — the generalization that lets a consumer point a task at any design artifact, e.g. this repo's kit-SPEC drafts). Sub-bullets and prose notes are outside the entry grammar; `precommit` tier.
+
+**An absent queue file is an absent subject.** Where nothing exists at the queue path, `CANON_KIT_QUEUE_FILE` or the first argument, the gate prints its not-applicable clean line naming the path and exits 0 ([gate-sdk/SPEC.md §Output contract](../gate-sdk/SPEC.md#output-contract)). A consumer tracking work outside the queue grammar can so keep it registered. A queue path naming anything but a file, or one the gate cannot stat, refuses at exit 2. The bespoke unit test holds both, since the pair's `good/` holds a queue and exit 2 has no pair spelling.
 
 Arm (e)'s calibration:
 

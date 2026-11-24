@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then [amendment-queue-not-applicable](#amendment-queue-not-applicable) and [untracked-count-symlink](#untracked-count-symlink), with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and [untracked-count-symlink](#untracked-count-symlink), with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
 
   **The release (2026-11-24, operator direction, lead-relayed, not a ruling):** this iteration's close cuts v0.37.0, since adopters take the landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push and the release tag push.
 ---
@@ -34,14 +34,6 @@ No surface states the files and bytes an install places in an adopter's tree, an
 **Cost while deferred:** an adopter weighing the install measures it by hand. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `footprint` in this file, none; owner installer/SPEC.md.
 
 ## Technical Debt
-
-### amendment-queue-not-applicable
-
-`check-amendment-queue` exits 2 with `file not found` in a tree that has no `TASK-QUEUE.md`, though gate-sdk's not-applicable clean line exists for exactly an absent subject.
-
-**Deliverable:** debt: the not-applicable clean line on an absent queue file, with a fixture.
-
-**Cost while deferred:** an adopter tracking work outside the queue grammar must leave the gate unregistered. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 6); filed at this scope, re-verified from source there. Owner lookup: `not-applicable`, `amendment-queue` in this file, none; owner canon-kit/SPEC.md §check-amendment-queue.
 
 ### untracked-count-symlink
 
@@ -1052,4 +1044,5 @@ The drift trend report cannot take a KPI series held outside the tree.
 - peer-reply-unbound-channel
 - peer-channel-input-shape
 - comment-tier-id-directive
+- amendment-queue-not-applicable
 
