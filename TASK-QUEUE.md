@@ -1,16 +1,9 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: adopter-asks-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
-  **Set record**
-
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and `untracked-count-symlink`, with `integration-test-git-isolation` joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; `adopter-footprint-figure`; and `non-gate-arm-json`, narrowed to `--verify-gate-run`, the one arm an adopter has named.
-
-  **The release (2026-11-24, operator direction, lead-relayed, not a ruling):** this iteration's close cuts v0.37.0, since adopters take the landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push and the release tag push.
-
-  **The history rewrite (2026-11-24, operator direction, lead-relayed, not a ruling):** a host pre-push guard refused the closing push on the attribution trailer most of the unpushed commits carry, so the unpushed range is rewritten to drop the barred trailers before it is pushed. Only that range moves, the pushed head stays an ancestor, and every tree is unchanged apart from the commit bindings: each stamp head is remapped to its rewritten commit, the validate evidence is re-produced by a fresh `--run-validate` rather than re-labelled, and the always-loaded baseline is re-measured. The battery passes at the new head before the push and tag sequence runs, under the same grant.
 ---
 
 ## New Features
