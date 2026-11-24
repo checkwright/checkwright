@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. [peer-reply-unbound-channel](#peer-reply-unbound-channel) leads, its per-close cost the set's only iteration-class row, with [peer-channel-input-shape](#peer-channel-input-shape) beside it. Then [amendment-queue-not-applicable](#amendment-queue-not-applicable) and [untracked-count-symlink](#untracked-count-symlink), with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: [comment-tier-id-directive](#comment-tier-id-directive), reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then [amendment-queue-not-applicable](#amendment-queue-not-applicable) and [untracked-count-symlink](#untracked-count-symlink), with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: [comment-tier-id-directive](#comment-tier-id-directive), reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
 
   **The release (2026-11-24, operator direction, lead-relayed, not a ruling):** this iteration's close cuts v0.37.0, since adopters take the landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push and the release tag push.
 ---
@@ -44,22 +44,6 @@ No surface states the files and bytes an install places in an adopter's tree, an
 **Cost while deferred:** an adopter weighing the install measures it by hand. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `footprint` in this file, none; owner installer/SPEC.md.
 
 ## Technical Debt
-
-### peer-reply-unbound-channel
-
-lifecycle-kit/templates/stages/close.md runs `--emit peer-reply --landed` and `--shipped` unconditionally, while `LIFECYCLE_KIT_PEER_CHANNEL` defaults empty and the writing arms refuse at exit 2 when it is unset, so every close on a consumer with no channel bound meets refusals it judges by hand. lifecycle-kit/SPEC.md contradicts itself: its closing paragraph says the two close steps 'need no slot, since an unbound channel prints nothing', while §The peer request channel and the knob line state the refusal native/src/emit/peer_channel.rs implements. .workflow/release-declarations.md's knob line repeats the 'nothing to do' claim into the next release note.
-
-**Deliverable (operator direction, 2026-11-24, lead-relayed):** debt, split by form: the bulk forms `peer-reply --landed <slug>` and `--shipped <tag>` print nothing and exit 0 on an unset channel, which has no request to move; the targeted `peer-reply <id> …` forms and `peer-file` keep refusing, so a filing never vanishes. The SPEC's channel paragraph and knob line say so, its close-steps sentence then holds, and the declaration line moves with it. Each form gets a case.
-
-**Cost while deferred:** each close here, and on any consumer binding no channel, judges one refusal per done slug. Surfaced 2026-11-24 at peer-adoption-channel-pass' close, three gap bullets; filed at the next scope. Probed there: eight `--landed` runs each refused 'LIFECYCLE_KIT_PEER_CHANNEL is unset'. Owner lookup: `peer-reply`, `PEER_CHANNEL` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §The peer request channel.
-
-### peer-channel-input-shape
-
-Three input shapes in native/src/emit/peer_channel.rs break lifecycle-kit/SPEC.md §The peer request channel's promises. `is_utc_stamp` slices the filing time at byte 10 after a byte-length check, so a 20-byte `filed:` value with a multibyte character across byte 10 panics every reading arm (probed: `peer-list` exit 101) where a malformed record refuses at exit 2 naming its file. `peer-list` prints the need line and a refused reason verbatim into a tab-separated row, and neither the request grammar nor `peer-reply refused` refuses a tab. The SPEC says the same ask filed twice gets two ids, but the filing time is whole-second, so two identical filings within one second collide.
-
-**Deliverable:** debt: a char-boundary-safe stamp check, a tab refused at both writers, and the id rule made true or its limit stated, each with a case.
-
-**Cost while deferred:** a malformed or tabbed request stops or skews every reading arm. Surfaced 2026-11-24 by peer-adoption-channel-pass' second-vendor review at its close; filed at the next scope. Owner lookup: `is_utc_stamp`, `peer-list`, `tab` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §The peer request channel.
 
 ### amendment-queue-not-applicable
 
@@ -1074,4 +1058,7 @@ No verb runs the foreign-vendor review and returns a machine result.
 The drift trend report cannot take a KPI series held outside the tree.
 
 ## Done
+
+- peer-reply-unbound-channel
+- peer-channel-input-shape
 

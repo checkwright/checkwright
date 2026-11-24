@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §The peer request channel — the four arms end-to-end over a scratch channel outside any repository: a request files from a non-git directory and lists as received, every legal move lands and an illegal one is refused leaving the reply byte-identical, both bulk forms move their matches and a bulk form matching none prints nothing, the ready notice prints a later release and stays silent on an earlier one, a malformed body, a relative channel, a missing one and one inside a work tree are refused at exit 2, an unset channel reads as nothing and refuses a write, and with no repository a stray scripts/ knob file configures neither peer arm
+# spec: lifecycle-kit/SPEC.md §The peer request channel — the four arms end-to-end over a scratch channel outside any repository: a request files from a non-git directory and lists as received, every legal move lands and an illegal one is refused leaving the reply byte-identical, both bulk forms move their matches and a bulk form matching none prints nothing, the ready notice prints a later release and stays silent on an earlier one, a malformed body, a tab in the need line or a refused reason, a multibyte filing time, a relative channel, a missing one and one inside a work tree are refused at exit 2, an unset channel reads as nothing, moves nothing in bulk and refuses a filing or a targeted move, and with no repository a stray scripts/ knob file configures neither peer arm
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -90,6 +90,21 @@ out="$(printf '## need\nx\n\n## wanted\ny\n' | arm "$CH" --emit-peer-file peer-a
 [[ "$rc" -eq 2 && "$out" == *"## wanted"*"## repro"* ]] || note malformed "got $rc -- $out"
 [[ "$(find "$CH" -name '*.md' | wc -l)" -eq "$n" ]] || note malformed-write "a malformed body was filed"
 
+# --- a tab is refused where peer-list prints it: the need line and a refused reason ---
+TAB=$'\t'
+out="$(printf '%s' "${BODY/the gate refuses a path/a tabbed${TAB}ask}" | arm "$CH" --emit-peer-file peer-a)"; rc=$?
+[[ "$rc" -eq 2 && "$out" == *"holds a tab"* ]] || note tab-need "got $rc -- $out"
+[[ "$(find "$CH" -name '*.md' | wc -l)" -eq "$n" ]] || note tab-need-write "a tabbed need line was filed"
+out="$(arm "$CH" --emit-peer-reply "$id3" refused $'no\tthanks')"; rc=$?
+[[ "$rc" -eq 2 && "$out" == *"holds a tab"* ]] || note tab-reason "got $rc -- $out"
+
+# --- a multibyte character across the filing time's byte 10 is malformed at exit 2, never a panic ---
+bad_id=r20261124-00000000
+printf '# peer-request v1\nid: %s\nfrom: peer-a\nfiled: 2026-11-2\xc3\xa910:20:30Z\n\n%s' "$bad_id" "$BODY" >"$CH/$bad_id.md"
+out="$(arm "$CH" --emit-peer-list)"; rc=$?
+[[ "$rc" -eq 2 && "$out" == *"$bad_id.md"*"not a UTC time"* ]] || note multibyte-filed "got $rc -- $out"
+rm -f "$CH/$bad_id.md"
+
 # --- a bad channel value is refused at exit 2 naming the knob ---
 mkdir -p "$SANDBOX/repo" && git -C "$SANDBOX/repo" init -q
 : >"$SANDBOX/a-file"
@@ -98,15 +113,22 @@ for bad in relative/channel "$SANDBOX/missing" "$SANDBOX/a-file" "$SANDBOX/repo"
     [[ "$rc" -eq 2 && "$out" == *"LIFECYCLE_KIT_PEER_CHANNEL is '$bad'"* ]] || note "bad-channel $bad" "got $rc -- $out"
 done
 
-# --- unset: the readers print nothing, the writers refuse ---
+# --- unset: the readers and the bulk moves print nothing, the targeted writers refuse ---
 out="$(arm "" --emit-peer-list)"; rc=$?
 [[ "$rc" -eq 0 && -z "$out" ]] || note unset-list "got $rc -- $out"
 out="$(arm "" --emit-peer-ready peer-a)"; rc=$?
 [[ "$rc" -eq 0 && -z "$out" ]] || note unset-ready "got $rc -- $out"
+out="$(arm "" --emit-peer-reply --landed a-slug)"; rc=$?
+[[ "$rc" -eq 0 && -z "$out" ]] || note unset-bulk-landed "got $rc -- $out"
+out="$(arm "" --emit-peer-reply --shipped v1.0.0)"; rc=$?
+[[ "$rc" -eq 0 && -z "$out" ]] || note unset-bulk-shipped "got $rc -- $out"
 out="$(printf '%s' "$BODY" | arm "" --emit-peer-file peer-a)"; rc=$?
 [[ "$rc" -eq 2 && "$out" == *"is unset"* ]] || note unset-file "got $rc -- $out"
-out="$(arm "" --emit-peer-reply --shipped v1.0.0)"; rc=$?
-[[ "$rc" -eq 2 && "$out" == *"is unset"* ]] || note unset-reply "got $rc -- $out"
+for move in "filed a-slug" "refused no" "landed"; do
+    read -ra mv <<<"$move"
+    out="$(arm "" --emit-peer-reply "$id" "${mv[@]}")"; rc=$?
+    [[ "$rc" -eq 2 && "$out" == *"is unset"* ]] || note "unset-reply $move" "got $rc -- $out"
+done
 
 # --- with no repository a stray scripts/ knob file configures neither peer arm ---
 mkdir -p "$FREE/scripts"

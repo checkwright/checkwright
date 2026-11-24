@@ -30,6 +30,7 @@ fn is_id(s: &str) -> bool {
 fn is_utc_stamp(s: &str) -> bool {
     let b = s.as_bytes();
     b.len() == 20
+        && s.is_char_boundary(10)
         && super::kpi::is_iso_day(&s[..10])
         && b[10] == b'T'
         && b[13] == b':'
@@ -92,6 +93,9 @@ fn sections(lines: &[&str]) -> Result<Vec<String>, String> {
     }
     if let Some(i) = bodies.iter().position(|b| b.trim().is_empty()) {
         return Err(format!("`## {}` has a blank body", SECTIONS[i]));
+    }
+    if first_line(&bodies[0]).contains('\t') {
+        return Err("the first line of `## need` holds a tab, which would split peer-list's row".to_string());
     }
     Ok(bodies)
 }
@@ -171,7 +175,7 @@ impl State {
         let (word, operand) = s.split_once(' ').unwrap_or((s, ""));
         match (word, operand) {
             ("filed", o) if crate::queue::is_slug(o) => Some(State::Filed(o.to_string())),
-            ("refused", o) if !o.trim().is_empty() => Some(State::Refused(o.to_string())),
+            ("refused", o) if !o.trim().is_empty() && !o.contains('\t') => Some(State::Refused(o.to_string())),
             ("landed", "") => Some(State::Landed),
             ("shipped", o) if is_tag(o) => Some(State::Shipped(o.to_string())),
             _ => None,
@@ -317,17 +321,24 @@ pub fn file(args: &[String]) -> Result<String, String> {
     sections(&body.lines().collect::<Vec<_>>()).map_err(|e| format!("the request is malformed: {}", e))?;
     let filed = utc_now();
     let id = id_of(&filed[..10], &request_bytes(peer, &filed, "", body));
+    create_exclusive(&dir, &id, &request_bytes(peer, &filed, &id, body))?;
+    Ok(format!("{}\n", id))
+}
+
+// spec: lifecycle-kit/SPEC.md §The peer request channel — a linked temporary file, so a collision
+// refuses rather than overwrites
+fn create_exclusive(dir: &Path, id: &str, bytes: &[u8]) -> Result<(), String> {
     let target = dir.join(format!("{}.md", id));
     let tmp = dir.join(format!(".{}.{}.tmp", id, std::process::id()));
-    std::fs::write(&tmp, request_bytes(peer, &filed, &id, body))
-        .map_err(|e| format!("cannot write {}: {}", tmp.display(), e))?;
+    std::fs::write(&tmp, bytes).map_err(|e| format!("cannot write {}: {}", tmp.display(), e))?;
     let linked = std::fs::hard_link(&tmp, &target);
     let _ = std::fs::remove_file(&tmp);
     match linked {
-        Ok(()) => Ok(format!("{}\n", id)),
-        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
-            Err(format!("{} already exists, so nothing was filed — file again", target.display()))
-        }
+        Ok(()) => Ok(()),
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => Err(format!(
+            "{} already exists, as the same ask filed in the same second does, so nothing was filed — file again",
+            target.display()
+        )),
         Err(e) => Err(format!("cannot create {}: {}", target.display(), e)),
     }
 }
@@ -369,13 +380,24 @@ pub fn reply(args: &[String]) -> Result<String, String> {
         ["--landed", slug] if crate::queue::is_slug(slug) => (None, State::Landed),
         ["--shipped", tag] if is_tag(tag) => (None, State::Shipped(tag.to_string())),
         [id, "filed", slug] if crate::queue::is_slug(slug) => single(id, State::Filed(slug.to_string())),
+        [_, "refused", reason] if reason.contains('\t') => {
+            return Err("the reason holds a tab, which would split peer-list's row — give one line of prose with no tab".to_string());
+        }
         [id, "refused", reason] if !reason.trim().is_empty() && !reason.contains('\n') => {
             single(id, State::Refused(reason.to_string()))
         }
         [id, "landed"] => single(id, State::Landed),
         _ => return Err(usage()),
     };
-    let dir = bound()?;
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — an unbound channel holds no request for a
+    // bulk form to move, while a targeted move names one and refuses
+    let dir = match id {
+        None => match channel()? {
+            Some(dir) => dir,
+            None => return Ok(String::new()),
+        },
+        Some(_) => bound()?,
+    };
     let all = entries(&dir)?;
     match (id, a[0]) {
         (None, "--landed") => bulk(&all, |s| *s == State::Filed(a[1].to_string()), &to),
@@ -562,6 +584,50 @@ mod tests {
         for a in [&[][..], &["r1", "filed"][..], &["r1", "refused", ""][..], &["--landed"][..], &["--shipped", "a b"][..], &["r1", "shipped", "v1"][..]] {
             assert_eq!(reply(&argv(a)), Err(REPLY_USAGE.to_string()), "{:?}", a);
         }
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — a filing time with a multibyte character
+    // across byte 10 is malformed, never a panic
+    #[test]
+    fn a_multibyte_filing_time_is_malformed() {
+        assert!(is_utc_stamp("2026-11-24T10:20:30Z"));
+        let skewed = "2026-11-2é10:20:30Z";
+        assert_eq!(skewed.len(), 20);
+        assert!(!is_utc_stamp(skewed));
+        let (id, bytes) = filed("peer-a", "2026-11-24T10:20:30Z", BODY);
+        let text = String::from_utf8(bytes).unwrap().replace("2026-11-24T10:20:30Z", skewed);
+        assert!(parse_request(&id, text.as_bytes()).unwrap_err().contains("is not a UTC time"));
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — the need line and a refused reason carry
+    // no tab, since peer-list prints both into a tab-separated row
+    #[test]
+    fn a_tab_is_refused_where_a_row_prints_it() {
+        let tabbed = BODY.replace("the gate refuses a path", "the gate\trefuses a path");
+        assert!(sections(&lines(&tabbed)).unwrap_err().contains("holds a tab"));
+        assert!(sections(&lines(&BODY.replace("run it", "run\tit"))).is_ok(), "a tab off the need line was refused");
+        assert_eq!(State::parse("refused out\tof scope"), None);
+        let argv = ["r20261124-00000000", "refused", "out\tof scope"].map(String::from);
+        assert!(reply(&argv).unwrap_err().contains("holds a tab"));
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — the same ask from one peer in one second
+    // hashes to one id, and the second filing refuses, leaving the first byte-identical
+    #[test]
+    fn a_same_second_refiling_collides_and_refuses() {
+        let (id, bytes) = filed("peer-a", "2026-11-24T10:20:30Z", BODY);
+        assert_eq!(filed("peer-a", "2026-11-24T10:20:30Z", BODY).0, id);
+        let dir = std::env::temp_dir().join(format!("cw-peer-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let first = create_exclusive(&dir, &id, &bytes);
+        let second = create_exclusive(&dir, &id, b"other");
+        let kept = std::fs::read(dir.join(format!("{}.md", id)));
+        let left = crate::walk::list_dir(&dir).map(|d| d.len());
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(first, Ok(()));
+        assert!(second.unwrap_err().contains("already exists"));
+        assert_eq!(kept.unwrap(), bytes);
+        assert_eq!(left.unwrap(), 1, "a temporary file was left behind");
     }
 
     // spec: lifecycle-kit/SPEC.md §The peer request channel — a fence closes only on its own character
