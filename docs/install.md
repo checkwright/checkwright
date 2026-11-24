@@ -126,7 +126,7 @@ The last step is the same walk the plugin's `adopt` skill runs.
 
 ### Choosing a profile
 
-Choose a profile with `--profile`. If another toolkit writes your specs, pass `--recipe` with the toolkit's name, as [Spec toolkits](spec-toolkits.md) shows. With none, a first install takes `starter` and a re-run keeps the profile the install recorded:
+Choose a profile with `--profile`. If another toolkit writes your specs, pass `--recipe` and its name, as [Spec toolkits](spec-toolkits.md) shows. With none, a first install takes `starter` and a re-run keeps the recorded one:
 
 - `starter` — the gate SDK on its own;
 - `workflow` — adds the stage machine and the recorded test runs to it, the least on which `prove` catches a done claim;
@@ -134,9 +134,9 @@ Choose a profile with `--profile`. If another toolkit writes your specs, pass `-
 - `prose` — adds canon-kit, for a repository of documents;
 - `full` — everything.
 
-Moving to a profile that contains yours only adds. Re-running it is safe: it reports files you have edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
+[What an install places](requirements.md#what-an-install-places) sizes each profile. Moving to one that contains yours only adds. Re-running is safe: it reports files you edited instead of overwriting them, unless you pass `--force`. `--dry-run` prints the plan and writes nothing.
 
-**Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do the same for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
+**Choosing kits and gates.** `--with-kit` and `--without-kit` add a kit to your profile or take one out. `--with-gate` and `--without-gate` do so for a gate. Each repeats. `checkwright.lock` records them, so a re-run keeps them until you pass new ones or `--no-selection`. To replace a gate with your own, put a gate of the same name in your gates directory. It runs instead of the kit's, and `init` never overwrites it.
 
 ### On a project that does not adopt it
 

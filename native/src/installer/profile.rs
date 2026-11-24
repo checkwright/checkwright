@@ -70,21 +70,25 @@ fn names_of(rows: Vec<(String, String)>) -> Vec<String> {
 // spec: installer/SPEC.md §Profiles — emit in payload order so a roster's line order never
 // decides install order.
 pub fn kits(installer: &Path, want: &str) -> Vec<String> {
+    resolve(rows(installer), want, payload_kits(installer))
+}
+
+// spec: installer/SPEC.md §The install size — the same resolution over a roster's text and a kit
+// set the caller names, so a profile row the install-size figure sums cannot disagree with `init`
+pub fn kits_among(text: &str, want: &str, payload: Vec<String>) -> Vec<String> {
+    resolve(rows_in(text), want, payload)
+}
+
+fn resolve(rows: Vec<(String, String)>, want: &str, payload: Vec<String>) -> Vec<String> {
     if want == DERIVED {
-        return payload_kits(installer);
+        return payload;
     }
-    let members: Vec<String> = rows(installer)
+    let members: Vec<String> = rows
         .into_iter()
         .filter(|(p, _)| p == want)
         .map(|(_, k)| k)
         .collect();
-    if members.is_empty() {
-        return Vec::new();
-    }
-    payload_kits(installer)
-        .into_iter()
-        .filter(|k| members.contains(k))
-        .collect()
+    payload.into_iter().filter(|k| members.contains(k)).collect()
 }
 
 pub fn known(installer: &Path, want: &str) -> bool {

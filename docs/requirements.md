@@ -68,6 +68,44 @@ The hook wiring the kits ship for Claude Code names the gate binary as the hook'
 
 A missing tool comes from your distribution's package on Linux or WSL, from Homebrew on macOS, or from Chocolatey on native Windows. To check your machine, run the gate binary with `--emit env-probe`: it writes an untracked `ENV.local.md` with each tool's version and verdict. Building Checkwright itself takes more: see the [contributing guide](https://github.com/checkwright/checkwright/blob/master/CONTRIBUTING.md).
 
+## What an install places
+
+A repository install commits the profile's kit files, the gate binary and a handful of seeded config files; a personal install (`init --personal`) writes the same files untracked, and a user install (`init --user`) places nothing in the repository. Most of the kit files are each gate's fixture pair, which ships because it is how you check the binary's gates against their own cases ([gate-sdk/SPEC.md §Fixture-pair discipline](gate-sdk/SPEC.md#fixture-pair-discipline)); each figure is rounded to two significant figures, and a kit selection is the sum of its kits' rows:
+
+<!-- install-size:begin -->
+
+| Profile | Kits | Files | Of which gate-tests | Size |
+| --- | --- | --- | --- | --- |
+| `starter` | 1 | 590 | 540 | 450 kB |
+| `workflow` | 3 | 850 | 760 | 960 kB |
+| `delegation` | 8 | 1,100 | 940 | 1.5 MB |
+| `prose` | 2 | 1,000 | 930 | 680 kB |
+| `full` | 11 | 1,600 | 1,400 | 1.8 MB |
+
+| Kit | Files | Of which gate-tests | Size |
+| --- | --- | --- | --- |
+| canon-kit | 430 | 390 | 220 kB |
+| context-kit | 69 | 47 | 48 kB |
+| delegation-kit | 33 | 24 | 84 kB |
+| doctrine-kit | 12 | 9 | 64 kB |
+| drift-kit | 6 | 0 | 23 kB |
+| evidence-kit | 69 | 62 | 94 kB |
+| gate-sdk | 590 | 540 | 450 kB |
+| guard-kit | 42 | 30 | 220 kB |
+| lifecycle-kit | 190 | 160 | 410 kB |
+| queue-kit | 84 | 70 | 93 kB |
+| site-kit | 74 | 66 | 64 kB |
+
+<!-- install-size:end -->
+
+The gate binary is one file and differs per target, so it is measured at each release rather than derived:
+
+<!-- install-binary:begin -->
+
+On `linux x86_64`, the gate binary `init` placed is **12.0 MB**, measured at v0.36.0.
+
+<!-- install-binary:end -->
+
 ## What a commit costs
 
 The pre-commit hook runs the gates your profile registers whose triggers match the staged files. It runs them one after another and stops at the first red. The figure runs every gate whose triggers match a file over every tracked file, in a repository the one-line install has just initialized with `full`, the profile that contains every other. A gate that reads the staged set from git itself sees nothing staged, so the figure is a reference reading, not a ceiling.
@@ -80,14 +118,6 @@ On `linux x86_64` with `14` logical CPUs, the hook ran `43` pre-commit gates ove
 
 To measure your own repository, run the gate binary with `--measure-commit`. It stages nothing and times the same run over every tracked file. Two costs sit outside the figure. First, the hook's own start: git starts it with no shell on any OS, and the `gates` workflow's probe step prints what that costs on each OS and architecture. Second, a gate you register yourself adds its own time.
 
-## Writing your own shell gates
+## Writing your own gates
 
-A gate you write is a copy of gate-sdk's `templates/check-skeleton.sh`. It is a bash script that sources gate-sdk's library, so it needs the `bash` floor above on every system, whatever your profile. `doctor` checks it once your `gates.list` registers the gate. On native Windows that bash is Git for Windows' bash, or write the gate in PowerShell instead. `check-shellcheck` lints your gate if you register it, and then `shellcheck`'s row binds you.
-
-## Writing your own PowerShell gates
-
-A PowerShell gate is two files in your gates directory: a `.gate` descriptor carrying the gate's `# graph:` line, its `# spec:` line and `# exec: <script>.ps1`, and the script it names. It needs a PowerShell host, which you name by setting `GATE_SDK_POWERSHELL` in `gate-sdk-config.knobs`: `powershell` for Windows PowerShell 5.1, which every Windows host carries, or `pwsh` for PowerShell 7 on any system. The gate runs as your shell gates do and prints the same lines; it reads a knob through `--emit knob-values <NAME>` on the binary its environment names. `check-psscriptanalyzer` lints it once you register it, and then the `PSScriptAnalyzer` module binds you. Running its fixture pair with `--run-gate-tests` also uses Git for Windows' bash. [gate-sdk/SPEC.md](gate-sdk/SPEC.md#the-gate-authoring-surface) owns this.
-
-## Writing your own Rust gates
-
-A Rust gate is a program you build. Its `.gate` descriptor in your gates directory carries the gate's `# graph:` line, its `# spec:` line, and `# exec: <path>`, naming the built program relative to that directory with no extension. The battery adds `.exe` on Windows, so one descriptor serves every system. It needs a Rust toolchain on every machine that runs the gate. The battery runs the program at that path and never builds it, so build it before the battery runs and rebuild it after each edit: the battery does not compare it with its source. A gate not yet built fails as a gate that could not run. It prints the lines your shell gates print, and reads a knob through `--emit knob-values <NAME>` on the binary its environment names. The same descriptor starts a program built in any language. The same section of gate-sdk/SPEC.md owns this.
+A gate you write needs more than an install does: [Writing gates](authoring-gates.md) lists it for shell, PowerShell and Rust.

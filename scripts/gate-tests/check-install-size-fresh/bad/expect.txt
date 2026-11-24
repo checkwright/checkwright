@@ -1,0 +1,2 @@
+1 stale block — page.md:5 differs from the figure emission.txt derives
+> | alpha-kit | 410 | 390 | 230 kB |

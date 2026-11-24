@@ -1,0 +1,4 @@
+# graph: couples=docs/requirements.md,installer/profiles.list,native/src/emit/install_size.rs,native/src/gates/install_size_fresh.rs,kit:* dir=one valve=none tier=precommit
+# projection: docs/requirements.md
+# spec: installer/SPEC.md §The install size — the requirements page's install-size block carries the figure the index derives for each profile and kit
+# knob: GATE_LOCAL_INSTALL_SIZE_PAGE = docs/requirements.md

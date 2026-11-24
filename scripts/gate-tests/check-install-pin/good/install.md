@@ -14,3 +14,9 @@ Invoke-WebRequest $url -OutFile "$cw\checkwright-$v.tgz"
 On `linux x86_64` with `4` logical CPUs, the hook ran `12` pre-commit gates over every tracked file in **900 ms**, the median of three, measured at v0.21.0.
 
 <!-- commit-cost:end -->
+
+<!-- install-binary:begin -->
+
+On `linux x86_64`, the gate binary `init` placed is **12.0 MB**, measured at v0.21.0.
+
+<!-- install-binary:end -->

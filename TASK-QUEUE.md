@@ -6,22 +6,12 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and `untracked-count-symlink`, with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and `non-gate-arm-json`, narrowed to `--verify-gate-run`, the one arm an adopter has named.
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and `untracked-count-symlink`, with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; `adopter-footprint-figure`; and `non-gate-arm-json`, narrowed to `--verify-gate-run`, the one arm an adopter has named.
 
   **The release (2026-11-24, operator direction, lead-relayed, not a ruling):** this iteration's close cuts v0.37.0, since adopters take the landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push and the release tag push.
 ---
 
 ## New Features
-
-### adopter-footprint-figure
-
-[spec: installer/SPEC-install-size.md]
-
-No surface states the files and bytes an install places in an adopter's tree, and the payload ships each kit's gate-tests beside its gates.
-
-**Deliverable:** design-pending, a feature: a derived footprint figure per install shape, published and freshness-gated, and whether gate-tests stay in the payload.
-
-**Cost while deferred:** an adopter weighing the install measures it by hand. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `footprint` in this file, none; owner installer/SPEC.md.
 
 ## Technical Debt
 
@@ -1029,4 +1019,5 @@ The drift trend report cannot take a KPI series held outside the tree.
 - amendment-queue-not-applicable
 - untracked-count-symlink
 - non-gate-arm-json
+- adopter-footprint-figure
 

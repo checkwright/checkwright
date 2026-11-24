@@ -37,6 +37,7 @@ pub mod import_gate_run;
 pub mod install_evidence;
 pub mod install_hooks;
 pub mod install_lifecycle;
+pub mod install_size;
 pub mod installer_smoke;
 pub mod journal;
 pub mod kfric;
@@ -333,6 +334,16 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-support-table",
         Arm::Emit(support_table::emit, Grammar::Flags(&["--write"])),
         &[support_table::PAGE_KNOB, support_table::COMPANION_KNOB],
+    ),
+    (
+        "--emit-install-size",
+        Arm::Emit(install_size::emit, Grammar::Flags(&["--write"])),
+        &[
+            "GATE_SDK_KIT_DIRS",
+            install_size::WITHHOLD_KNOB,
+            install_size::INSTALLER_KNOB,
+            install_size::PAGE_KNOB,
+        ],
     ),
     (
         "--emit-release-table",

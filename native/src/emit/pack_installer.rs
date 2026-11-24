@@ -664,7 +664,8 @@ fn make_scratch(base: &str, scratch: &mut Scratch) -> Result<String, Refusal> {
 // tracked-set boundary and the strip count peels exactly the source's own path depth
 // spec: gate-sdk/SPEC.md §Consumer payload — the withheld shape as `git archive` pathspec
 // exclusions, a member naming a directory on disk contributing its subtree form too
-fn pathspec(src: &str, withhold: &[String]) -> Vec<String> {
+// spec: installer/SPEC.md §The install size — the figure sizes the set this pathspec selects
+pub(crate) fn pathspec(src: &str, withhold: &[String]) -> Vec<String> {
     let mut spec = vec![src.to_string()];
     for member in withhold {
         let member = member.trim_matches('/');

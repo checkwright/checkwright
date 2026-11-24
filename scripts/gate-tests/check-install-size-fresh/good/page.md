@@ -1,0 +1,15 @@
+# Requirements
+
+<!-- install-size:begin -->
+
+| Profile | Kits | Files | Of which gate-tests | Size |
+| --- | --- | --- | --- | --- |
+| `starter` | 1 | 590 | 540 | 450 kB |
+| `full` | 2 | 1,000 | 930 | 680 kB |
+
+| Kit | Files | Of which gate-tests | Size |
+| --- | --- | --- | --- |
+| alpha-kit | 410 | 390 | 230 kB |
+| gate-sdk | 590 | 540 | 450 kB |
+
+<!-- install-size:end -->

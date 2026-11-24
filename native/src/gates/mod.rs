@@ -67,6 +67,7 @@ pub mod front_door_verbs;
 pub mod front_end_fail_open;
 pub mod install_evidence_fresh;
 pub mod install_pin;
+pub mod install_size_fresh;
 pub mod install_platforms;
 pub mod install_toolchain;
 pub mod pinned_release;
@@ -2042,6 +2043,20 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_LOCAL_RELEASES_PAGE",
             "GATE_SDK_RELEASE_SECTIONS",
             "GATE_SDK_RELEASE_SECTION_ALIASES",
+        ],
+        "-",
+        &[],
+    ),
+    (
+        "check-install-size-fresh",
+        install_size_fresh::run,
+        &[],
+        &[
+            "GATE_SDK_NATIVE_BIN",
+            "GATE_SDK_KIT_DIRS",
+            "GATE_SDK_PAYLOAD_WITHHOLD",
+            "GATE_LOCAL_INSTALLER_DIR",
+            "GATE_LOCAL_INSTALL_SIZE_PAGE",
         ],
         "-",
         &[],

@@ -26,6 +26,7 @@
 40545cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 3468cp docs/agent-index.md
+2563cp docs/authoring-gates.md
 6579cp docs/binary-only.md
 1308cp docs/canon-kit/index.md
 6022cp docs/choosing.md
@@ -36,13 +37,13 @@
 1285cp docs/drift-kit/index.md
 1344cp docs/evidence-kit/index.md
 1463cp docs/gate-sdk/index.md
-11608cp docs/generated-projections.md
+12042cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
 7028cp docs/hooks/subagent-stop-liveness.md
 5308cp docs/index.md
-8768cp docs/install-block-contracts.md
+9654cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
-10439cp docs/install.md
+10477cp docs/install.md
 1506cp docs/kits.md
 1458cp docs/lifecycle-kit/index.md
 3465cp docs/maintenance.md
@@ -92,7 +93,7 @@
 10719cp docs/posts/2026-11-14-checkwright-v0-36-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
-8984cp docs/requirements.md
+8555cp docs/requirements.md
 7012cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 5463cp docs/spec-toolkits.md
@@ -103,11 +104,11 @@
 2698cp drift-kit/templates/close-knowledge.md
 4680cp drift-kit/templates/economics.md
 126749cp evidence-kit/SPEC.md
-1100713cp gate-sdk/SPEC.md
+1101573cp gate-sdk/SPEC.md
 3130cp gate-sdk/templates/adopt.md
 355765cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
-326210cp installer/SPEC.md
+331064cp installer/SPEC.md
 410739cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md

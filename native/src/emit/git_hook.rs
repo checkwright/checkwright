@@ -218,7 +218,7 @@ fn measure_run() -> Result<(i32, String), String> {
     Ok((
         0,
         format!(
-            "measure-commit: {}ms median of 3 ({}ms, {}ms, {}ms) — {} pre-commit member(s) over {} tracked path(s), every path selected\nhost: {} {}, {} logical CPU(s)\n",
+            "measure-commit: {}ms median of 3 ({}ms, {}ms, {}ms) — {} pre-commit member(s) over {} tracked path(s), every path selected\nhost: {} {}, {} logical CPU(s)\n{}",
             median(&samples),
             samples[0],
             samples[1],
@@ -227,9 +227,16 @@ fn measure_run() -> Result<(i32, String), String> {
             paths.len(),
             std::env::consts::OS,
             std::env::consts::ARCH,
-            cpus
+            cpus,
+            binary_line(proc::self_image().and_then(std::fs::metadata).map(|m| m.len()).ok())
         ),
     ))
+}
+
+// spec: gate-sdk/SPEC.md §measure-commit — the running executable's size, read from its metadata
+// with no spawn; absent where the platform cannot name the executable
+fn binary_line(bytes: Option<u64>) -> String {
+    bytes.map(|b| format!("binary: {} bytes\n", b)).unwrap_or_default()
 }
 
 pub fn measure(args: &[String]) -> i32 {
@@ -320,6 +327,13 @@ mod tests {
         assert_eq!(median(&[7]), 7);
         assert_eq!(median(&[]), 0);
         assert_eq!(measure(&argv(&["x"])), 2);
+    }
+
+    #[test]
+    fn the_binary_line_names_the_size_and_is_absent_without_one() {
+        assert_eq!(binary_line(Some(12_600_000)), "binary: 12600000 bytes\n");
+        assert_eq!(binary_line(None), "");
+        assert!(proc::self_image().and_then(std::fs::metadata).map(|m| m.len() > 0).unwrap_or(true));
     }
 
     #[test]
