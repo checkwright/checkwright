@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+peer-adoption-channel-pass release deferred:v0.37.0 — minor by the declarations (four new peer-channel arms, check-rule-id-coverage, new evidence-kit and canon-kit knobs), no decommission; no trigger fired: channel preview (elapsed limb dormant), no security or supply-chain fix, no operator direction, front-door and plugin parity green
