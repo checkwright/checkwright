@@ -33,6 +33,16 @@ A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`)
 
 **Cost while deferred:** an outside caller of an arm parses its text. Surfaced 2026-11-15 by an operator-relayed design review, split from the verdict contract at this scope. Owner lookup: `json` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
 
+### adopter-footprint-figure
+
+[spec: installer/SPEC-install-size.md]
+
+No surface states the files and bytes an install places in an adopter's tree, and the payload ships each kit's gate-tests beside its gates.
+
+**Deliverable:** design-pending, a feature: a derived footprint figure per install shape, published and freshness-gated, and whether gate-tests stay in the payload.
+
+**Cost while deferred:** an adopter weighing the install measures it by hand. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `footprint` in this file, none; owner installer/SPEC.md.
+
 ## Technical Debt
 
 ### peer-reply-unbound-channel
@@ -302,16 +312,6 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 **Deliverable:** debt: shape checks at both producers, and the composition rule stated or removed.
 
 **Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
-
-### adopter-footprint-figure
-
-[cost: event/low] [surface: installer]
-
-No surface states the files and bytes an install places in an adopter's tree, and the payload ships each kit's gate-tests beside its gates.
-
-**Deliverable:** design-pending, a feature: a derived footprint figure per install shape, published and freshness-gated, and whether gate-tests stay in the payload.
-
-**Cost while deferred:** an adopter weighing the install measures it by hand. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `footprint` in this file, none; owner installer/SPEC.md.
 
 ## Icebox
 
