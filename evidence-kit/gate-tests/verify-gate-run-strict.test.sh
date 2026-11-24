@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: evidence-kit/SPEC.md §verify-gate-run — each EVIDENCE_KIT_VERIFY_REQUIRE word reds its own case and holds on a run of HEAD with every suite clean; EVIDENCE_KIT_TREE_UNTRACKED=count reads an untracked path as modified unless it is ignored or the run's own write, a link judged where it sits.
+# spec: evidence-kit/SPEC.md §verify-gate-run — each EVIDENCE_KIT_VERIFY_REQUIRE word reds its own case and holds on a run of HEAD with every suite clean; EVIDENCE_KIT_TREE_UNTRACKED=count reads an untracked path as modified unless it is ignored or the run's own write, a link judged where it sits; --json prints the result as one document on exit 0 and 1 and none on a refusal, and the import arm refuses the option.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -42,6 +42,19 @@ out="$(EVIDENCE_KIT_VERIFY_REQUIRE="head" _fe "$tmp/a" --verify-gate-run "$tmp/a
     || fail "head must red a Statement one commit behind HEAD, naming the requirement (rc=$rc): $out"
 out="$(_fe "$tmp/a" --verify-gate-run "$tmp/a-statement.json")"; rc=$?
 [[ "$rc" -eq 0 ]] || fail "the empty default must not red a Statement behind HEAD (rc=$rc): $out"
+
+# A' — --json: the document's top-level verdict and ahead on a clean and on a contradicted Statement,
+# no document on a refusal, and the import arm keeps refusing the option.
+out="$(_fe "$tmp/a" --verify-gate-run --json "$tmp/a-statement.json")"; rc=$?
+[[ "$rc" -eq 0 && "$out" == '{"ahead":1,'* && "$out" == *'],"verdict":"clean"}' ]] \
+    || fail "--json must print a clean document at ahead 1 (rc=$rc): $out"
+out="$(EVIDENCE_KIT_VERIFY_REQUIRE="head" _fe "$tmp/a" --verify-gate-run "$tmp/a-statement.json" --json)"; rc=$?
+[[ "$rc" -eq 1 && "$out" == '{"ahead":1,'* && "$out" == *'],"verdict":"contradiction"}' ]] \
+    || fail "--json must print a contradiction document, the option after the operand (rc=$rc): $out"
+out="$( cd "$tmp/a" && EVIDENCE_KIT_KNOB_FILE=scripts/evidence-config.knobs bash "$FE" --verify-gate-run --json "$tmp/absent.json" 2>/dev/null )"; rc=$?
+[[ "$rc" -eq 2 && -z "$out" ]] || fail "--json must print no document on a refusal (rc=$rc): $out"
+out="$(EVIDENCE_KIT_IMPORTED_RUNS=accept _fe "$tmp/a" --import-gate-run --json "$tmp/a-statement.json")"; rc=$?
+[[ "$rc" -eq 2 && "$out" == *"at most one operand (got: --json "* ]] || fail "--import-gate-run must keep refusing --json (rc=$rc): $out"
 
 # B — verdict: clean on a passing suite, red on a failing one, and the default selection reds neither.
 out="$(EVIDENCE_KIT_VERIFY_REQUIRE=verdict _fe "$tmp/a" --verify-gate-run "$tmp/a-statement.json")"; rc=$?
@@ -104,5 +117,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "verify-gate-run-strict.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "verify-gate-run-strict.test: ok (head clean at the subject and red one commit later, verdict clean on a passing suite and red on a failing one, count clean with only ignored and run-written untracked files and modified with another or with a link into the tmp dir, unknown words refused at exit 2)"
+echo "verify-gate-run-strict.test: ok (head clean at the subject and red one commit later, verdict clean on a passing suite and red on a failing one, count clean with only ignored and run-written untracked files and modified with another or with a link into the tmp dir, unknown words refused at exit 2, --json a document on exit 0 and 1 and none on a refusal)"
 exit 0

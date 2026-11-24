@@ -42,7 +42,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --wait-probe <sub> [args]               the wait-primitive probe: 'sweep' is the reproducer
        --run-validate                          run the codified validate spine over the roster
        --diff-baseline <group>...              diff captured logs against the baseline slice
-       --verify-gate-run [<file> | -]          judge a gate-run Statement against this tree
+       --verify-gate-run [--json] [<file> | -] judge a gate-run Statement against this tree
        --import-gate-run [<file> | -]          verify a Statement and record its suites
        --run -h | --help                      this text, on stdout, exit 0
 
@@ -213,7 +213,9 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           then each EVIDENCE_KIT_VERIFY_REQUIRE word: `head` the subject is
           HEAD, `verdict` every suite clean. The DSSE signature is never checked. Exit 0 every check held, 1 a
           contradiction (one line per finding), 2 a Statement that could not
-          be read or judged; unavailable is 2. Writes nothing.
+          be read or judged; unavailable is 2. Writes nothing. --json prints
+          one versioned JSON object in place of the verdict line on exit 0
+          or 1, and nothing on exit 2.
   --import-gate-run  takes the same input and checks, then records each suite
           as an origin=imported manifest line under this tree's run key,
           under the producer-liveness lock. Refused unless

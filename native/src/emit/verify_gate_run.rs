@@ -16,8 +16,13 @@ pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_VERIFY_REQUIRE",
 ];
 
+// spec: evidence-kit/SPEC.md §verify-gate-run — the `--json` document's version, under gate-sdk/SPEC.md
+// §run-gates' verdict-contract rule
+const DOCUMENT_CONTRACT: &str = "1.0.0";
+
 pub fn run(args: &[String]) -> i32 {
-    let judged = read_input("--verify-gate-run", args).and_then(|bytes| judge(&bytes)).and_then(|mut j| {
+    let (json, args) = json_option(args);
+    let judged = read_input("--verify-gate-run [--json]", &args).and_then(|bytes| judge(&bytes)).and_then(|mut j| {
         let words = walk::knob_scalar("EVIDENCE_KIT_VERIFY_REQUIRE")?;
         let extra = required(&j, &words);
         j.findings.extend(extra);
@@ -30,8 +35,44 @@ pub fn run(args: &[String]) -> i32 {
             return 2;
         }
     };
-    judged.report("VERIFY-GATE-RUN");
+    if json {
+        println!("{}", document(&judged));
+    } else {
+        judged.report("VERIFY-GATE-RUN");
+    }
     i32::from(!judged.findings.is_empty())
+}
+
+// spec: evidence-kit/SPEC.md §verify-gate-run — one `--json` is the option wherever it sits; a second
+// stays an operand, which the input grammar refuses
+fn json_option(args: &[String]) -> (bool, Vec<String>) {
+    match args.iter().position(|a| a == "--json") {
+        Some(i) => (true, args[..i].iter().chain(&args[i + 1..]).cloned().collect()),
+        None => (false, args.to_vec()),
+    }
+}
+
+// spec: evidence-kit/SPEC.md §verify-gate-run — one object, keys sorted, no insignificant whitespace;
+// `ahead` is absent where the subject is no ancestor
+fn document(j: &Judged) -> String {
+    use serde_json::{Map, Value};
+    let mut doc = Map::new();
+    doc.insert("contract".into(), DOCUMENT_CONTRACT.into());
+    doc.insert("verdict".into(), if j.findings.is_empty() { "clean" } else { "contradiction" }.into());
+    doc.insert("subject".into(), j.statement.subject.as_str().into());
+    if let Ok(n) = j.ahead.parse::<u64>() {
+        doc.insert("ahead".into(), n.into());
+    }
+    let suites = j.statement.suites.iter().map(|s| {
+        let mut o = Map::new();
+        o.insert("name".into(), s.name.as_str().into());
+        o.insert("tree".into(), s.tree.as_str().into());
+        o.insert("verdict".into(), s.verdict.as_str().into());
+        Value::Object(o)
+    });
+    doc.insert("suites".into(), Value::Array(suites.collect()));
+    doc.insert("findings".into(), Value::Array(j.findings.iter().map(|f| f.as_str().into()).collect()));
+    Value::Object(doc).to_string()
 }
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — check 6, the verify arm's alone: the import shares
@@ -55,8 +96,8 @@ fn required(j: &Judged, words: &str) -> Vec<String> {
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — the input forms: a file, stdin for `-`, else the
 // stdout of the consumer's command knob, its argv spawned with no shell
-pub(crate) fn read_input(arm: &str, args: &[String]) -> Result<Vec<u8>, String> {
-    let usage = format!("usage: {} [<file> | -]", arm);
+pub(crate) fn read_input(spelling: &str, args: &[String]) -> Result<Vec<u8>, String> {
+    let usage = format!("usage: {} [<file> | -]", spelling);
     match args {
         [] => {}
         [one] if one == "-" => {
@@ -293,5 +334,60 @@ mod tests {
         assert!(read_input("--verify-gate-run", &two).unwrap_err().contains("at most one operand"));
         let flag = ["--help".to_string()];
         assert!(read_input("--verify-gate-run", &flag).unwrap_err().contains("usage"));
+    }
+
+    // spec: evidence-kit/SPEC.md §verify-gate-run — `--json` is taken in either position and once; a
+    // second, and any other `--` word, reaches the operand rules and is refused there
+    #[test]
+    fn one_json_option_is_taken_and_a_second_is_refused() {
+        let words = |w: &[&str]| w.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        assert_eq!(json_option(&words(&["--json", "s.json"])), (true, words(&["s.json"])));
+        assert_eq!(json_option(&words(&["s.json", "--json"])), (true, words(&["s.json"])));
+        assert_eq!(json_option(&words(&["-"])), (false, words(&["-"])));
+        let (on, rest) = json_option(&words(&["--json", "--json"]));
+        assert!(on);
+        assert!(read_input("--verify-gate-run [--json]", &rest).unwrap_err().contains("usage: --verify-gate-run [--json] [<file> | -]"));
+    }
+
+    fn second_suite(st: &mut Statement, tree: &str) {
+        let (cmd, log, counts) = (evidence::command_digest("cargo test", "libtest"), "b".repeat(64), (5, 1, 0));
+        st.suites.push(evidence::StatementSuite {
+            name: "smoke".into(),
+            binding: evidence::binding_digest("smoke", &cmd, &st.subject, counts, "new-failures", &log),
+            cmd,
+            log,
+            counts,
+            verdict: "new-failures".into(),
+            date: "2026-01-01".into(),
+            tree: tree.into(),
+        });
+    }
+
+    // spec: evidence-kit/SPEC.md §verify-gate-run — the goldens are the renderer's output on a fixed
+    // judgment: a two-suite Statement clean at `ahead` 0, and a subject off HEAD's line with a suite
+    // whose tree is `modified`
+    #[test]
+    fn the_document_matches_its_goldens() {
+        let (mut st, mut cfg) = fixture();
+        second_suite(&mut st, "clean");
+        cfg.suites.push("smoke".into());
+        cfg.run_family.push(("smoke".into(), "cargo test".into()));
+        let clean = Judged { findings: field_findings(&st, &cfg), statement: st, ahead: "0".into() };
+        assert!(clean.findings.is_empty(), "{:?}", clean.findings);
+        let (mut st, mut cfg) = fixture();
+        second_suite(&mut st, "modified");
+        cfg.suites.push("smoke".into());
+        cfg.run_family.push(("smoke".into(), "cargo test".into()));
+        let mut findings = vec![format!("subject {} is neither HEAD nor an ancestor of it", st.subject)];
+        findings.extend(field_findings(&st, &cfg));
+        assert_eq!(findings.len(), 2, "{:?}", findings);
+        let contradiction = Judged { statement: st, findings, ahead: "-".into() };
+        for (judged, golden, name) in [
+            (clean, include_str!("../../../docs/contracts/verify-gate-run/v1/clean.json"), "clean.json"),
+            (contradiction, include_str!("../../../docs/contracts/verify-gate-run/v1/contradiction.json"), "contradiction.json"),
+        ] {
+            let rendered = format!("{}\n", document(&judged));
+            assert_eq!(rendered, golden, "docs/contracts/verify-gate-run/v1/{} is stale; the renderer now writes:\n{}", name, rendered);
+        }
     }
 }

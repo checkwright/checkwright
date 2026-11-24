@@ -6,22 +6,12 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and `untracked-count-symlink`, with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and `untracked-count-symlink`, with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and `non-gate-arm-json`, narrowed to `--verify-gate-run`, the one arm an adopter has named.
 
   **The release (2026-11-24, operator direction, lead-relayed, not a ruling):** this iteration's close cuts v0.37.0, since adopters take the landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push and the release tag push.
 ---
 
 ## New Features
-
-### non-gate-arm-json
-
-[spec: evidence-kit/SPEC-verify-gate-run-json.md] [not-icebox-eligible: 2026-11-24 carries the operator direction of 2026-11-15 on how a JSON form lands, held only in this entry]
-
-A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`) prints for a person, and no arm offers a machine form. Operator direction 2026-11-15, lead-relayed, not a ruling: a JSON form lands on an arm only where a named caller reads it (gate-sdk/SPEC.md §The non-gate arm), never across every arm at once.
-
-**Deliverable:** design-pending, a feature: per arm a caller names, its JSON form under the verdict contract's versioning rule (gate-sdk/SPEC.md §run-gates).
-
-**Cost while deferred:** an outside caller of an arm parses its text. Surfaced 2026-11-15 by an operator-relayed design review, split from the verdict contract at this scope. Owner lookup: `json` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
 
 ### adopter-footprint-figure
 
@@ -1038,4 +1028,5 @@ The drift trend report cannot take a KPI series held outside the tree.
 - comment-tier-id-directive
 - amendment-queue-not-applicable
 - untracked-count-symlink
+- non-gate-arm-json
 
