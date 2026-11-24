@@ -246,6 +246,56 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 
 **Cost while deferred:** an adopter tracking work outside the queue grammar leaves both gates unregistered. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified there: both gates return the error before reading the surface. Owner lookup: `todo-task-liveness`, `deprecation-task`, `absent queue` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md §check-todo-task-liveness and §check-deprecation-task.
 
+### attribution-trailer-ban
+
+[cost: iteration/high] [surface: scripts] [recurrence: 2026-11-25]
+
+The harness's attribution reminder asks for a `Co-Authored-By` trailer in every session, and CLAUDE.md's prose bar (operator direction 2026-11-24) does not hold against it: 27 of adopter-asks-pass' 30 commits carried it (probed: `git log origin/master..HEAD --format=%B | grep -c '^Co-Authored-By'`), a host pre-push guard refused the closing push, and the operator directed a message rewrite of the unpushed range. Banning the trailer is check-commit-msg's consumer-selectable class (gate-sdk/SPEC.md §check-commit-msg), yet scripts/msg-patterns.list says this repo leaves it unbanned.
+
+**Deliverable:** debt: a trailer-anchored pattern in scripts/msg-patterns.list, its comment corrected. check-tree-terms reads the same list over the tree, so the two good fixtures carrying the trailer at a line start (gate-sdk/gate-tests/check-commit-msg/good/msg.txt, check-commit-subject/good/msg.txt) are reworded or the pattern scoped to keep them green. README.md's attribution paragraph, which says most commits carry the trailer, is corrected to the bar.
+
+**Cost while deferred:** each iteration's close finds its range trailered and pays a refused push and a rewrite of the unpushed range. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, two bullets: the recurrence and its premise correction. Re-verified at this scope: scripts/msg-patterns.list carries no trailer pattern, and README.md's attribution paragraph states the trailer. Owner lookup: `Co-Authored`, `trailer` in this file — the icebox's co-authored-by-trailer-attribution, a baked trailer misattributing authorship, which this ban moots; owner gate-sdk/SPEC.md §check-commit-msg.
+
+### knobs-lock-test-race
+
+[cost: iteration/low] [surface: native]
+
+native/src/output.rs's test `no_bundled_clean_line_opens_on_an_empty_corpus_word_unsignalled` walks src/gates through `walk::find_files`, whose `prune_dirs` reads knob state, without taking `knobenv::lock`. A concurrent knobs test holding the lock with a temporary knob dir makes the walk refuse ('GATE_SDK_GATES_DIR is not read from a knob file'), so `native_crate` reds intermittently.
+
+**Deliverable:** debt: the test takes `knobenv::lock`, or the walk it needs reads no knob; a sweep of the other tests walking through knob-reading helpers unlocked.
+
+**Cost while deferred:** a flaky `native_crate` red forces a re-run of an hours-long validate battery. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified at this scope: the test calls `crate::walk::find_files` and takes no lock. Owner lookup: `knobenv`, `find_files` in this file, none; owner native/src/knobenv.rs.
+
+### install-size-contract-drift
+
+[cost: event/low] [surface: installer]
+
+Two claims of installer/SPEC.md §The install size miss the arm. Its honest limit says the packer's per-kit additions are each smaller than the rounding, but the packer adds an 11,358-byte LICENSE copy to every kit (native/src/emit/pack_installer.rs), moving drift-kit's packed figure from about 23 to 35 kB and full's from 1.8 to about 1.9 MB. And the bare `--emit install-size` never reads `GATE_LOCAL_INSTALL_SIZE_PAGE`, so 'the arm exits 2 on an unreadable page and on a block absent or twice' holds only for `--write` and the gate.
+
+**Deliverable:** debt: count the license additions in the figure or state their magnitude; read the page in the bare arm or narrow the sentence to `--write`.
+
+**Cost while deferred:** an adopter sizing a small profile reads a figure about a third low, on the measure an external orchestrator asked for. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, two second-vendor review bullets. Re-verified at this scope: native/src/emit/install_size.rs reads the page knob only under `--write`, and the packer places a license per kit. Owner lookup: `install-size`, `LICENSE` in this file, none; owner installer/SPEC.md §The install size.
+
+### amendment-queue-dangling-link
+
+[cost: event/low] [surface: canon-kit]
+
+check-amendment-queue tests presence with `Path::try_exists`, which follows links, so a dangling queue symlink takes the not-applicable exit 0 where canon-kit/SPEC.md §check-amendment-queue says a queue path naming anything but a file refuses at exit 2. The bespoke unit test covers an absent path and a directory only.
+
+**Deliverable:** debt: probe presence with `symlink_metadata`, so a dangling link refuses, with a case beside the absent and directory ones.
+
+**Cost while deferred:** a broken queue link reads as no queue, and the gate passes an adopter whose queue went missing. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, a second-vendor review bullet. Re-verified at this scope: native/src/gates/amendment_queue.rs calls `try_exists`. Owner lookup: `amendment-queue`, `symlink` in this file; [absent-queue-liveness-gates](#absent-queue-liveness-gates) gives two sibling gates the same absent-subject shape; owner canon-kit/SPEC.md §check-amendment-queue.
+
+### lead-journal-session-id
+
+[cost: event/low] [surface: lifecycle-kit]
+
+The lead-journal arm (`--enter-stage --open-lead-journal`), re-run by a resumed lead after a mid-iteration re-login, wrote a build stage session's id rather than the lead's to the session-role marker and to the journal segment's heading. The cause is inferred, not probed: the arm reads the id from a source a resumed or re-authenticated lead does not refresh, or from the last stamp.
+
+**Deliverable:** debt: the arm resolves the invoking session's id, with a case for a resumed lead.
+
+**Cost while deferred:** the session-context hook suppresses executor steps for the wrong session. Filed 2026-11-24 by adopter-asks-pass' lead. Owner lookup: `lead-journal`, `session-role` in this file, none; owner lifecycle-kit/SPEC.md §bin/enter-stage.sh and context-kit/SPEC.md §The session-context hook.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
