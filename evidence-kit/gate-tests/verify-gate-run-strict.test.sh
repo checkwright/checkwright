@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: evidence-kit/SPEC.md §verify-gate-run — each EVIDENCE_KIT_VERIFY_REQUIRE word reds its own case and holds on a run of HEAD with every suite clean; EVIDENCE_KIT_TREE_UNTRACKED=count reads an untracked path as modified unless it is ignored or the run's own write.
+# spec: evidence-kit/SPEC.md §verify-gate-run — each EVIDENCE_KIT_VERIFY_REQUIRE word reds its own case and holds on a run of HEAD with every suite clean; EVIDENCE_KIT_TREE_UNTRACKED=count reads an untracked path as modified unless it is ignored or the run's own write, a link judged where it sits.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -87,9 +87,22 @@ grep -q '^strict ok .* tree=clean ' "$tmp/c/.workflow/validate-evidence.txt" \
 out="$(EVIDENCE_KIT_TREE_UNTRACKED=all _fe "$tmp/c" --run-validate)"; rc=$?
 [[ "$rc" -eq 2 && "$out" == *"EVIDENCE_KIT_TREE_UNTRACKED is 'all'"* ]] || fail "an unknown untracked selection must refuse at exit 2 (rc=$rc): $out"
 
+# D — count judges a link where it sits: an untracked symlink outside the tmp dir whose target lies
+# inside it is no write of the run's. Git Bash copies on a plain `ln -s`, so a copy is a skip.
+mk_tree "$tmp/d" ok
+mkdir -p "$tmp/d/.tmp/inside"
+MSYS=winsymlinks:nativestrict ln -s .tmp/inside "$tmp/d/escape" 2>/dev/null
+if [[ -L "$tmp/d/escape" ]]; then
+    EVIDENCE_KIT_TREE_UNTRACKED=count _fe "$tmp/d" --run-validate >/dev/null
+    grep -q '^strict ok .* tree=modified ' "$tmp/d/.workflow/validate-evidence.txt" \
+        || fail "count must read an untracked link into the tmp dir as modified: $(cat "$tmp/d/.workflow/validate-evidence.txt")"
+else
+    echo "verify-gate-run-strict.test: skip [D]: this host made no symlink"
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "verify-gate-run-strict.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "verify-gate-run-strict.test: ok (head clean at the subject and red one commit later, verdict clean on a passing suite and red on a failing one, count clean with only ignored and run-written untracked files and modified with another, unknown words refused at exit 2)"
+echo "verify-gate-run-strict.test: ok (head clean at the subject and red one commit later, verdict clean on a passing suite and red on a failing one, count clean with only ignored and run-written untracked files and modified with another or with a link into the tmp dir, unknown words refused at exit 2)"
 exit 0

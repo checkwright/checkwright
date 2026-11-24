@@ -160,11 +160,20 @@ fn counted_clean(tmpdir: &str, statement: &str) -> Option<bool> {
         if code.contains(['R', 'C']) {
             fields.next();
         }
-        if code != "??" || !own_write(&walk::physical_against(&top, path), &tmp, stmt.as_deref()) {
+        if code != "??" || !own_write(&entry_path(&top, path), &tmp, stmt.as_deref()) {
             return Some(false);
         }
     }
     Some(true)
+}
+
+// spec: evidence-kit/SPEC.md §Evidence manifest — the exemption is a directory-entry test: the parent
+// resolves physically and the leaf stays as git names it, so a link is judged where it sits
+fn entry_path(top: &str, path: &str) -> String {
+    let path = path.trim_end_matches('/');
+    let (parent, leaf) = path.rsplit_once('/').unwrap_or(("", path));
+    let parent = if parent.is_empty() { walk::physical_against(top, ".") } else { walk::physical_against(top, parent) };
+    format!("{}/{}", parent.trim_end_matches(['/', '\\']), leaf)
 }
 
 // spec: evidence-kit/SPEC.md §Evidence manifest — a path under the tmp dir, or the Statement's own,

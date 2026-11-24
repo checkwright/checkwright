@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and [untracked-count-symlink](#untracked-count-symlink), with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and `untracked-count-symlink`, with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
 
   **The release (2026-11-24, operator direction, lead-relayed, not a ruling):** this iteration's close cuts v0.37.0, since adopters take the landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push and the release tag push.
 ---
@@ -34,14 +34,6 @@ No surface states the files and bytes an install places in an adopter's tree, an
 **Cost while deferred:** an adopter weighing the install measures it by hand. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `footprint` in this file, none; owner installer/SPEC.md.
 
 ## Technical Debt
-
-### untracked-count-symlink
-
-native/src/emit/run_validate.rs `counted_clean` resolves each untracked path physically before `own_write`'s under-the-tmp-dir test, so under `EVIDENCE_KIT_TREE_UNTRACKED=count` an untracked symlink outside the tmp dir whose target lies inside it is exempted as the run's own write and the suite reads `tree=clean`. evidence-kit/SPEC.md §Evidence manifest exempts paths under the tmp dir or at the Statement path, a directory-entry test, and states no target-based exemption.
-
-**Deliverable:** debt: resolve the parent and keep the leaf, with a case.
-
-**Cost while deferred:** a merge predicate selecting `count` can pass a tree carrying an uncommitted symlink. Surfaced 2026-11-24 by peer-adoption-channel-pass' second-vendor review at its close, read from walk::physical_against's deepest-existing-prefix resolution; filed at the next scope. Probed at adopter-asks-pass' scope in a scratch repo: an untracked `escape` linking into the tmp dir recorded `tree=clean` under `count`, a plain untracked file `tree=modified`. Owner lookup: `counted_clean`, `own_write`, `symlink` in this file and the disposed-findings record, none on this read; owner evidence-kit/SPEC.md §Evidence manifest.
 
 ### integration-test-git-isolation
 
@@ -1045,4 +1037,5 @@ The drift trend report cannot take a KPI series held outside the tree.
 - peer-channel-input-shape
 - comment-tier-id-directive
 - amendment-queue-not-applicable
+- untracked-count-symlink
 
