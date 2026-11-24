@@ -1,0 +1,3 @@
+specs/access.md:7: undeclared: family `rule` cites `R-9`, which no declaring file declares
+src/rules.rs:3: uncited: family `rule` declares `R-2`, which no spec file cites
+src/rules.rs:4: cited twice: family `rule` declares `R-3`, cited by 2 spec files: specs/access.md:5, specs/export.md:3

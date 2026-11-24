@@ -1,0 +1,5 @@
+# spec: canon-kit/SPEC.md §check-rule-id-coverage — fixture consumer config: the code under src/ declares rule ids the specs under specs/ cite
+CANON_KIT_RULE_ID_DECLARE_GLOBS[] = src/*.rs
+CANON_KIT_RULE_ID_SPEC_GLOBS[] = specs/*.md
+CANON_KIT_RULE_ID_DECLARES[rule] = rule\("(R-[0-9]+)"\)
+CANON_KIT_RULE_ID_CITES[rule] = \[(R-[0-9]+)\]

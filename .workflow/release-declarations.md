@@ -5,6 +5,7 @@
 - `check-test-control` — new, opt-in: `init` registers it nowhere, and registered it asserts nothing until `EVIDENCE_KIT_CONTROLS` names a control. Then it reds a newly baselined `pass` row no control names, and at a close cursor a declared control with no red witness under its suite's current line, or witnessed under assignments its declaration no longer carries. Register it with `--with-gate` once you declare your first control.
 - `check-gate-substrate-parity` — reds after upgrading through assertion I, which holds every gate the binary carries for a kit you vendor to be registered in your `gates.list` or declared `# unregistered:` there. If you vendor evidence-kit, the new `check-test-control` is such a gate: register it once you declare a control, or declare `# unregistered: check-test-control — <reason>`.
 - `check-docs-since` — tightened: reds a governed page whose front matter carries a second `since:` line, whatever either value says, where it read the first and passed while a YAML renderer showed the last. `--emit docs-since` refuses such a page at exit 2 before writing any page. Keep one `since:` line per page.
+- `check-rule-id-coverage` — new, canon-kit, opt-in by configuration: registered, it asserts nothing until `CANON_KIT_RULE_ID_DECLARES` names a rule family. Then it reds a declared rule id no spec file cites, one cited by two or more spec files under the default `CANON_KIT_RULE_ID_HOMES=one`, and a cited id no declaring file declares; `rule-id-exempt: <reason>` keeps a site. Register it in your `gates.list` beside the other canon-kit gates, or declare `# unregistered: check-rule-id-coverage — <reason>`, and set its knobs once your code declares rules by id.
 
 ## Knob changes
 
@@ -18,6 +19,9 @@
 - `EVIDENCE_KIT_IMPORTED_RUNS` — new: `refuse` or `accept`, defaulting to `refuse`, under which `--import-gate-run` exits 2 before reading anything. Any other value is a configuration error. Select `accept` only once your own signer's tooling verifies a Statement's signature before the import reads it.
 - `EVIDENCE_KIT_VERIFY_REQUIRE` — new: space-separated requirement words `--verify-gate-run` adds as a sixth check, `head` (the subject is `HEAD` itself) and `verdict` (every suite clean), empty by default, which adds none. Select `head verdict` for a merge predicate; any other word is a configuration error.
 - `EVIDENCE_KIT_TREE_UNTRACKED` — new: `ignore` or `count`, defaulting to `ignore`, today's tracked-only tree read. Under `count`, `--run-validate` records a suite's `tree=modified` when an untracked path the ignore rules leave sits outside its own tmp dir and Statement. Any other value is a configuration error.
+- `CANON_KIT_RULE_ID_DECLARE_GLOBS` and `CANON_KIT_RULE_ID_SPEC_GLOBS` — new: the globs naming the files that declare rule ids and the spec files that cite them, empty by default.
+- `CANON_KIT_RULE_ID_DECLARES` and `CANON_KIT_RULE_ID_CITES` — new keyed knobs: per rule family, the one-group ERE declaring an id and the one citing it, empty by default, which disarms `check-rule-id-coverage`. Unequal key sets, a pattern outside the one-group shape, or a set family with either glob knob empty refuses every canon-kit gate at exit 2.
+- `CANON_KIT_RULE_ID_HOMES` — new: `one` or `any`, defaulting to `one`, how many spec files may cite a declared id. Any other value is a configuration error.
 
 ## Behavior changes
 

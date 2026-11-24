@@ -6,20 +6,10 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; `binary-only-ci-recipe`, with `meta-gate-ownership-scope` paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; `statement-out-of-tree-store`; and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; `binary-only-ci-recipe`, with `meta-gate-ownership-scope` paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; `statement-out-of-tree-store`; and `rule-id-coverage`, reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
 ---
 
 ## New Features
-
-### rule-id-coverage
-
-[spec: SPEC-rule-id-coverage.md]
-
-`check-spec-pointer` is forward-only: canon-kit/SPEC.md §check-spec-pointer rules the reverse out, since flagging a requirement with no inbound pointer needs a notion of what counts as a requirement. An external orchestrator asks for coverage in both directions over rule ids (ask 5): every id a spec declares is cited, and every cited id is declared, the id shape being a consumer pattern. Operator direction 2026-11-24, lead-relayed (not a ruling), reopens it in this iteration; TRAJECTORY.md records no ruling on the calibration, so it is an owner-doc change.
-
-**Deliverable:** design-pending, a feature: a bidirectional id-coverage check whose requirement notion is a consumer-declared pattern, off by default; spec rules whether it is a new gate or a change to `check-spec-pointer`'s calibration, and rewrites the refusal sentence either way.
-
-**Cost while deferred:** a declared rule no test cites passes every gate, and the adopter keeps its own coverage test. Surfaced 2026-11-24 by an external orchestrator's handoff; filed at this scope. Owner lookup: `spec-pointer`, `coverage`, `reverse` in this file, none live; owner canon-kit/SPEC.md §check-spec-pointer.
 
 ### peer-request-channel
 
@@ -1151,4 +1141,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - statement-out-of-tree-store
 - binary-only-ci-recipe
 - meta-gate-ownership-scope
+- rule-id-coverage
 

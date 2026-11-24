@@ -137,6 +137,7 @@ check-unmarked-claim
 check-tracking-claim
 check-task-path-claim
 check-task-label-resolution
+check-rule-id-coverage
 check-delta-agreement
 check-prose-enum
 check-prose-tells

@@ -121,7 +121,7 @@ fn families(cites: &[(String, String)], defines: &[(String, String)]) -> Result<
 
 // spec: canon-kit/SPEC.md §check-task-label-resolution — the line is matched whole: each
 // leftmost-longest match in turn, its group captured within that match's span
-fn labels(cap: &EreCapture, line: &str) -> Vec<String> {
+pub(crate) fn labels(cap: &EreCapture, line: &str) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     let mut from = 0usize;
     while from <= line.len() {

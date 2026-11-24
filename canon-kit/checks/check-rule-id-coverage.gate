@@ -1,0 +1,4 @@
+# graph: couples=knob:CANON_KIT_RULE_ID_DECLARE_GLOBS,knob:CANON_KIT_RULE_ID_SPEC_GLOBS dir=one valve=none tier=precommit
+# install: zero-config
+# armed-by: CANON_KIT_RULE_ID_DECLARES
+# spec: canon-kit/SPEC.md §check-rule-id-coverage — every rule id the code declares is cited by exactly one spec file, and every id a spec cites is declared

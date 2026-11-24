@@ -69,6 +69,11 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_TASK_LIST_GLOBS", &[]),
         Row::keyed("CANON_KIT_TASK_LABEL_CITES", &[]),
         Row::keyed("CANON_KIT_TASK_LABEL_DEFINES", &[]),
+        Row::indexed("CANON_KIT_RULE_ID_DECLARE_GLOBS", &[]),
+        Row::indexed("CANON_KIT_RULE_ID_SPEC_GLOBS", &[]),
+        Row::keyed("CANON_KIT_RULE_ID_DECLARES", &[]),
+        Row::keyed("CANON_KIT_RULE_ID_CITES", &[]),
+        Row::scalar("CANON_KIT_RULE_ID_HOMES", "one"),
         Row::scalar("CANON_KIT_DELTA_PATH", ""),
         Row::scalar("CANON_KIT_DELTA_BASE_DIR", ""),
         Row::scalar("CANON_KIT_DELTA_BASE_ITEM", ""),
@@ -426,6 +431,13 @@ fn validate(v: &Values) -> Vec<String> {
         keyed(v, "CANON_KIT_TASK_LABEL_CITES").unwrap_or(&[]),
         keyed(v, "CANON_KIT_TASK_LABEL_DEFINES").unwrap_or(&[]),
     ));
+    errs.extend(rule_id_refusals(&RuleIdConfig {
+        declares: keyed(v, "CANON_KIT_RULE_ID_DECLARES").unwrap_or(&[]),
+        cites: keyed(v, "CANON_KIT_RULE_ID_CITES").unwrap_or(&[]),
+        declare_globs: indexed(v, "CANON_KIT_RULE_ID_DECLARE_GLOBS").unwrap_or(&[]),
+        spec_globs: indexed(v, "CANON_KIT_RULE_ID_SPEC_GLOBS").unwrap_or(&[]),
+        homes: scalar(v, "CANON_KIT_RULE_ID_HOMES").unwrap_or("one"),
+    }));
     errs.extend(delta_refusals(
         scalar(v, "CANON_KIT_DELTA_PATH").unwrap_or(""),
         scalar(v, "CANON_KIT_DELTA_BASE_ITEM").unwrap_or(""),
@@ -524,6 +536,55 @@ pub(crate) fn task_label_refusals(cites: &[(String, String)], defines: &[(String
     errs
 }
 
+pub(crate) struct RuleIdConfig<'a> {
+    pub declares: &'a [(String, String)],
+    pub cites: &'a [(String, String)],
+    pub declare_globs: &'a [String],
+    pub spec_globs: &'a [String],
+    pub homes: &'a str,
+}
+
+// spec: canon-kit/SPEC.md §check-rule-id-coverage — the two id knobs carry one key set, each value
+// a one-group ERE, a set family needs both glob sets, and the home count is one or any
+pub(crate) fn rule_id_refusals(c: &RuleIdConfig) -> Vec<String> {
+    const DECLARES: &str = "CANON_KIT_RULE_ID_DECLARES";
+    const CITES: &str = "CANON_KIT_RULE_ID_CITES";
+    let mut errs: Vec<String> = Vec::new();
+    if !matches!(c.homes, "one" | "any") {
+        errs.push(format!("CANON_KIT_RULE_ID_HOMES must be one|any (got '{}')", c.homes));
+    }
+    for (have, lack, a, b) in [(DECLARES, CITES, c.declares, c.cites), (CITES, DECLARES, c.cites, c.declares)] {
+        for (k, _) in a.iter().filter(|(k, _)| !b.iter().any(|(bk, _)| bk == k)) {
+            errs.push(format!(
+                "the rule family '{}' is a key of {} and not of {}: the two knobs carry one key set",
+                k, have, lack
+            ));
+        }
+    }
+    for (knob, pairs) in [(DECLARES, c.declares), (CITES, c.cites)] {
+        for (k, p) in pairs {
+            if let Err(e) = crate::ere::EreCapture::compile(p) {
+                errs.push(format!("{}[{}] = '{}' is not a one-group ERE: {}", knob, k, p, e));
+            }
+        }
+    }
+    let families: Vec<&str> = c.declares.iter().chain(c.cites).map(|(k, _)| k.as_str()).collect();
+    if let Some(first) = families.first() {
+        for (knob, globs) in [
+            ("CANON_KIT_RULE_ID_DECLARE_GLOBS", c.declare_globs),
+            ("CANON_KIT_RULE_ID_SPEC_GLOBS", c.spec_globs),
+        ] {
+            if globs.is_empty() {
+                errs.push(format!(
+                    "{} is empty while the rule family '{}' is set: a family reads both sides",
+                    knob, first
+                ));
+            }
+        }
+    }
+    errs
+}
+
 fn at_least_or_off(v: &str, floor: u64) -> bool {
     v == "off" || (digits(v) && v.parse::<u64>().is_ok_and(|n| n >= floor))
 }
@@ -613,6 +674,43 @@ mod tests {
         let e = task_label_refusals(&pair("story", "a"), &pair("story", "(b)(c)"));
         assert!(e[0].contains("CANON_KIT_TASK_LABEL_CITES[story]") && e[0].contains("no capture group"), "{:?}", e);
         assert!(e[1].contains("second capture group"), "{:?}", e);
+    }
+
+    // spec: canon-kit/SPEC.md §check-rule-id-coverage — the exit-2 config, which a `bad/` fixture
+    // held to exit 1 cannot express
+    #[test]
+    fn the_rule_id_knobs_pair_by_family_and_need_both_sides() {
+        let pair = |a: &str, b: &str| vec![(a.to_string(), b.to_string())];
+        let globs = vec!["src/**".to_string()];
+        let (d, c) = (pair("rule", "rule!\\(\"([A-Z]+-[0-9]+)\""), pair("rule", "\\[([A-Z]+-[0-9]+)\\]"));
+        fn cfg<'a>(
+            declares: &'a [(String, String)],
+            cites: &'a [(String, String)],
+            declare_globs: &'a [String],
+            homes: &'a str,
+        ) -> RuleIdConfig<'a> {
+            RuleIdConfig {
+                declares,
+                cites,
+                declare_globs,
+                spec_globs: declare_globs,
+                homes,
+            }
+        }
+        assert!(rule_id_refusals(&cfg(&d, &c, &globs, "one")).is_empty());
+        assert!(rule_id_refusals(&cfg(&d, &c, &globs, "any")).is_empty());
+        assert!(rule_id_refusals(&cfg(&[], &[], &[], "one")).is_empty());
+        let e = rule_id_refusals(&cfg(&d, &c, &[], "all"));
+        assert_eq!(e.len(), 3, "{:?}", e);
+        assert!(e[0].contains("CANON_KIT_RULE_ID_HOMES") && e[0].contains("'all'"), "{:?}", e);
+        assert!(e[1].contains("CANON_KIT_RULE_ID_DECLARE_GLOBS is empty") && e[1].contains("'rule'"), "{:?}", e);
+        assert!(e[2].contains("CANON_KIT_RULE_ID_SPEC_GLOBS is empty"), "{:?}", e);
+        let e = rule_id_refusals(&cfg(&d, &pair("req", "(b)"), &globs, "one"));
+        assert_eq!(e.len(), 2, "{:?}", e);
+        assert!(e[0].contains("'rule'") && e[1].contains("'req'") && e[0].contains("one key set"), "{:?}", e);
+        let e = rule_id_refusals(&cfg(&pair("rule", "a"), &pair("rule", "(b)(c)"), &globs, "one"));
+        assert!(e[0].contains("CANON_KIT_RULE_ID_DECLARES[rule]") && e[0].contains("no capture group"), "{:?}", e);
+        assert!(e[1].contains("CANON_KIT_RULE_ID_CITES[rule]") && e[1].contains("second capture group"), "{:?}", e);
     }
 
     // spec: canon-kit/SPEC.md §check-delta-agreement — the exit-2 config: an empty path reads no

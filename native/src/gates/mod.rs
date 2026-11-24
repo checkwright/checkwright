@@ -125,6 +125,7 @@ pub mod hook_knobs_fresh;
 pub mod roadmap_fresh;
 pub mod root_tiering;
 pub mod rule_citation;
+pub mod rule_id_coverage;
 pub mod scratch_citation;
 pub mod settings_paths;
 pub mod settings_pins;
@@ -751,6 +752,27 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_TASK_LIST_GLOBS",
             "CANON_KIT_TASK_LABEL_CITES",
             "CANON_KIT_TASK_LABEL_DEFINES",
+        ],
+        "canon-kit",
+        &[],
+    ),
+    // spec: canon-kit/SPEC.md §check-rule-id-coverage — the declaring files and the spec files are
+    // the two knobs' glob walks
+    (
+        "check-rule-id-coverage",
+        rule_id_coverage::run,
+        &[
+            (".", "glob:knob:CANON_KIT_RULE_ID_DECLARE_GLOBS", "", ""),
+            (".", "glob:knob:CANON_KIT_RULE_ID_SPEC_GLOBS", "", ""),
+        ],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "CANON_KIT_RULE_ID_DECLARE_GLOBS",
+            "CANON_KIT_RULE_ID_SPEC_GLOBS",
+            "CANON_KIT_RULE_ID_DECLARES",
+            "CANON_KIT_RULE_ID_CITES",
+            "CANON_KIT_RULE_ID_HOMES",
         ],
         "canon-kit",
         &[],

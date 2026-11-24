@@ -26,6 +26,7 @@ const SHELL_COLON: &[&str] = &[
     "path-dialect-exempt:",
     "gh-repo-exempt:",
     "action-permissions-exempt:",
+    "rule-id-exempt:",
     "enforce:",
     "door-contributor:",
     "no-port:",

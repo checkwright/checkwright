@@ -40,6 +40,7 @@ check-prose-bounds
 check-prose-enum
 check-prose-tells
 check-provenance-seam
+check-rule-id-coverage
 check-spec-fence-balance
 check-spec-pointer
 check-task-label-resolution
