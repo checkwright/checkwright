@@ -23,6 +23,16 @@ With its surface widened to source, `check-comment-tier` reads an id-shaped dire
 
 **Cost while deferred:** an adopter citing rule ids in comments either sees false reds or over-blesses. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 7b); filed at this scope. Owner lookup: `comment-tier`, `directive` in this file, none; owner canon-kit/SPEC.md §check-comment-tier.
 
+### non-gate-arm-json
+
+[spec: evidence-kit/SPEC-verify-gate-run-json.md] [not-icebox-eligible: 2026-11-24 carries the operator direction of 2026-11-15 on how a JSON form lands, held only in this entry]
+
+A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`) prints for a person, and no arm offers a machine form. Operator direction 2026-11-15, lead-relayed, not a ruling: a JSON form lands on an arm only where a named caller reads it (gate-sdk/SPEC.md §The non-gate arm), never across every arm at once.
+
+**Deliverable:** design-pending, a feature: per arm a caller names, its JSON form under the verdict contract's versioning rule (gate-sdk/SPEC.md §run-gates).
+
+**Cost while deferred:** an outside caller of an arm parses its text. Surfaced 2026-11-15 by an operator-relayed design review, split from the verdict contract at this scope. Owner lookup: `json` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
+
 ## Technical Debt
 
 ### peer-reply-unbound-channel
@@ -230,16 +240,6 @@ The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (ga
 **Deliverable:** a feature: each other member weighed, the column widened with its cases or the member's tree-bound reason recorded.
 
 **Cost while deferred:** an adopter running outside any repository gets only the turn-end guard. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `tree-free` in this file, none; owner gate-sdk/SPEC.md §The harness-integration arm.
-
-### non-gate-arm-json
-
-[cost: event/low] [surface: gate-sdk] [not-icebox-eligible: 2026-11-24 carries the operator direction of 2026-11-15 on how a JSON form lands, held only in this entry]
-
-A non-gate arm (an `--emit`, `--queue` or `--enter-stage` verb, `usage-verdict`) prints for a person, and no arm offers a machine form. Operator direction 2026-11-15, lead-relayed, not a ruling: a JSON form lands on an arm only where a named caller reads it (gate-sdk/SPEC.md §The non-gate arm), never across every arm at once.
-
-**Deliverable:** design-pending, a feature: per arm a caller names, its JSON form under the verdict contract's versioning rule (gate-sdk/SPEC.md §run-gates).
-
-**Cost while deferred:** an outside caller of an arm parses its text. Surfaced 2026-11-15 by an operator-relayed design review, split from the verdict contract at this scope. Owner lookup: `json` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
 
 ### external-state-owner-mode
 
