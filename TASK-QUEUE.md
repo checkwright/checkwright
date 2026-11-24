@@ -945,7 +945,7 @@ A retired gate-binary arm cited in a kit SPEC code span resolves under no gate, 
 
 ### toolchain-pin-trails-stable
 
-The Rust pin trails stable by one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
+The Rust pin trails stable by more than one minor, and the tried move to 1.99.0 reddened the x86-64 glibc floor check (2.34 measured against the declared 2.39), so it waits on a floor-row or floor-rule decision that the audit roster's toolchain-pin class re-surfaces at release prep.
 
 ### cursor-muse-plugin-observed
 
