@@ -92,6 +92,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("EVIDENCE_KIT_PRE_HOOK", ""),
         Row::scalar("EVIDENCE_KIT_STATEMENT_FILE", ""),
         Row::indexed("EVIDENCE_KIT_STATEMENT_CMD", &[]),
+        Row::indexed("EVIDENCE_KIT_STATEMENT_WRITE_CMD", &[]),
         Row::scalar("EVIDENCE_KIT_VERIFY_REQUIRE", ""),
         Row::scalar("EVIDENCE_KIT_TREE_UNTRACKED", "ignore"),
         Row::scalar("EVIDENCE_KIT_IMPORTED_RUNS", "refuse"),

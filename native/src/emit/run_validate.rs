@@ -26,6 +26,7 @@ pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_RUN_ID",
     "EVIDENCE_KIT_PRE_HOOK",
     "EVIDENCE_KIT_STATEMENT_FILE",
+    "EVIDENCE_KIT_STATEMENT_WRITE_CMD",
     "EVIDENCE_KIT_TREE_UNTRACKED",
     "EVIDENCE_KIT_CONTROLS",
     "EVIDENCE_KIT_CONTROL_*",
@@ -68,6 +69,7 @@ struct Cfg {
     run_id: String,
     pre_hook: String,
     statement: String,
+    write_cmd: Vec<String>,
     untracked: String,
     controls: Vec<String>,
     control_family: Vec<(String, String)>,
@@ -89,6 +91,7 @@ fn config() -> Result<Cfg, Refusal> {
         run_id: scalar("EVIDENCE_KIT_RUN_ID")?,
         pre_hook: scalar("EVIDENCE_KIT_PRE_HOOK")?,
         statement: scalar("EVIDENCE_KIT_STATEMENT_FILE")?,
+        write_cmd: walk::knob_array("EVIDENCE_KIT_STATEMENT_WRITE_CMD").map_err(guard)?,
         untracked: scalar("EVIDENCE_KIT_TREE_UNTRACKED")?,
         controls: walk::knob_array("EVIDENCE_KIT_CONTROLS").map_err(guard)?,
         control_family: walk::knob_prefix(evidence::CONTROL_PREFIX).map_err(guard)?,
@@ -210,17 +213,14 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
 
     // spec: evidence-kit/SPEC.md §bin/run-validate.sh — the Statement's subject and provenance are
     // read once, after the claim; an unborn branch has no subject, so it writes none
-    let attest = if cfg.statement.is_empty() {
+    let attest = if !renders(&cfg.statement, &cfg.write_cmd) {
         None
     } else {
         let provenance = crate::provenance::collect(&walk::kit_roots().unwrap_or_default());
         match provenance.commit.clone() {
             Some(subject) => Some((subject, provenance.block())),
             None => {
-                eprintln!(
-                    "run-validate: HEAD names no commit (an unborn branch) — no Statement written to {}",
-                    cfg.statement
-                );
+                eprintln!("run-validate: HEAD names no commit (an unborn branch) — no Statement written or stored");
                 None
             }
         }
@@ -388,7 +388,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
         Some((subject, block)) => {
             let target = Path::new(&cfg.statement);
             let parent = target.parent().filter(|p| !p.as_os_str().is_empty()).unwrap_or(Path::new("."));
-            if !parent.is_dir() {
+            if !cfg.statement.is_empty() && !parent.is_dir() {
                 return Err(guard(format!(
                     "the Statement's directory {} does not exist — nothing recorded",
                     parent.display()
@@ -397,22 +397,52 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             let staged = format!("{}/validate-statement.{}", cfg.tmpdir, std::process::id());
             let body = evidence::statement(&key, subject, block.clone(), &rows) + "\n";
             claimed.statement = Some(staged.clone());
-            std::fs::write(&staged, body)
+            std::fs::write(&staged, &body)
                 .map_err(|e| guard(format!("cannot stage the Statement {}: {} — nothing recorded", staged, e)))?;
-            Some(staged)
+            Some(Staged { path: staged, body: body.into_bytes(), subject: subject.clone() })
         }
     };
     fold(&cfg.manifest, &cfg.tmpdir, &key, &rows, &control_lines).map_err(guard)?;
     if let Some(staged) = staged {
-        std::fs::rename(&staged, &cfg.statement).map_err(|e| {
-            guard(format!(
-                "the manifest {} is published but the Statement {} is not: {}",
-                cfg.manifest, cfg.statement, e
-            ))
-        })?;
-        println!("run-validate: Statement written to {}", cfg.statement);
+        publish(&staged, &cfg.manifest, &cfg.statement, &cfg.write_cmd).map_err(guard)?;
     }
     Ok(overall)
+}
+
+struct Staged {
+    path: String,
+    body: Vec<u8>,
+    subject: String,
+}
+
+// spec: evidence-kit/SPEC.md §bin/run-validate.sh — a Statement renders where either destination is set
+fn renders(statement: &str, write_cmd: &[String]) -> bool {
+    !statement.is_empty() || !write_cmd.is_empty()
+}
+
+// spec: evidence-kit/SPEC.md §bin/run-validate.sh — after the manifest, the file by rename, then the
+// store last, the one write that leaves the tree; a failure names each destination already published
+fn publish(staged: &Staged, manifest: &str, statement: &str, write_cmd: &[String]) -> Result<(), String> {
+    let mut published = vec![format!("the manifest {}", manifest)];
+    if !statement.is_empty() {
+        std::fs::rename(&staged.path, statement)
+            .map_err(|e| format!("{} is published but the Statement {} is not: {}", published[0], statement, e))?;
+        println!("run-validate: Statement written to {}", statement);
+        published.push(format!("the Statement {}", statement));
+    }
+    let Some((head, rest)) = write_cmd.split_first() else {
+        return Ok(());
+    };
+    let program = programs::Program::consumer("EVIDENCE_KIT_STATEMENT_WRITE_CMD", head.as_str());
+    let mut args: Vec<&str> = rest.iter().map(String::as_str).collect();
+    args.push(&staged.subject);
+    let failed = |why: String| format!("{} — {} published, the store is not", why, published.join(" and "));
+    let out = proc::run_streamed(&program, &args, &staged.body, proc::Stderr::Inherit).map_err(failed)?;
+    if out.code() != 0 {
+        return Err(failed(format!("EVIDENCE_KIT_STATEMENT_WRITE_CMD exited {}", out.code())));
+    }
+    println!("run-validate: Statement stored by EVIDENCE_KIT_STATEMENT_WRITE_CMD");
+    Ok(())
 }
 
 // spec: evidence-kit/SPEC.md §Evidence manifest — the single fold, published by rename; a v1 file
@@ -769,6 +799,32 @@ mod tests {
         assert!(!own_write("/r/other.txt", t, s), "another untracked path");
         assert!(!own_write("/r/.tmp-sibling", t, s), "a sibling sharing the tmp dir's name as a prefix");
         assert!(own_write("C:/r/.tmp/log", "C:\\r\\.tmp", None), "either separator spells the tmp dir");
+    }
+
+    // spec: evidence-kit/SPEC.md §bin/run-validate.sh — either destination renders a Statement, and the
+    // store runs last with the subject appended, a failure naming each destination already published
+    #[test]
+    fn the_store_runs_after_both_renames_and_names_them_when_it_fails() {
+        let words = |w: &[&str]| w.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        assert!(!renders("", &[]));
+        assert!(renders("", &words(&["git", "notes"])), "the write command alone renders a Statement");
+        assert!(renders("out.json", &[]));
+
+        let dir = std::env::temp_dir().join(format!("cw-store-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let at = |f: &str| dir.join(f).display().to_string();
+        let stage = || {
+            std::fs::write(at("staged"), "{}\n").unwrap();
+            Staged { path: at("staged"), body: b"{}\n".to_vec(), subject: "a".repeat(40) }
+        };
+        let stored = publish(&stage(), "m.txt", "", &words(&["git", "check-ref-format", "--allow-onelevel"]));
+        assert_eq!(stored, Ok(()), "the subject reaches the command as its last argument");
+
+        let err = publish(&stage(), "m.txt", &at("statement.json"), &words(&["git", "no-such-subcommand"])).unwrap_err();
+        assert!(dir.join("statement.json").is_file(), "the file is renamed before the store runs");
+        assert!(err.contains("EVIDENCE_KIT_STATEMENT_WRITE_CMD exited"), "{}", err);
+        assert!(err.contains("the manifest m.txt and the Statement"), "{}", err);
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]

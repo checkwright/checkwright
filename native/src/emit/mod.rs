@@ -1213,6 +1213,7 @@ mod tests {
             "--foreign-resume",
             "--verify-gate-run",
             "--import-gate-run",
+            "--run-validate",
         ];
         for arm in NETWORK_ARMS {
             assert!(lookup(arm).is_some(), "{} names no arm-table row", arm);

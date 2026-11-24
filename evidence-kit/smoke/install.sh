@@ -102,4 +102,29 @@ _es --import-gate-run .tmp/statement.json >/dev/null \
     || { echo "smoke(statement): the import arm did not record a verified Statement" >&2; exit 1; }
 grep -qE '^smoke green sha256=[0-9a-f]{64} .* origin=imported$' "$es/.workflow/validate-evidence.txt" \
     || { echo "smoke(statement): no origin=imported line recorded" >&2; exit 1; }
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — Storing Statements in git notes: with no Statement file and the pair bound, a run stores the note on its subject and the verify arm reads it clean through the read knob
+cat > "$es/scripts/evidence-config.knobs" <<'EOF'
+EVIDENCE_KIT_SUITES[] = green
+EVIDENCE_KIT_RUN_ID = smoke
+EVIDENCE_KIT_RUN_green = true
+EVIDENCE_KIT_STATEMENT_WRITE_CMD[] = git
+EVIDENCE_KIT_STATEMENT_WRITE_CMD[] = notes
+EVIDENCE_KIT_STATEMENT_WRITE_CMD[] = --ref=gate-run
+EVIDENCE_KIT_STATEMENT_WRITE_CMD[] = add
+EVIDENCE_KIT_STATEMENT_WRITE_CMD[] = -f
+EVIDENCE_KIT_STATEMENT_WRITE_CMD[] = -F
+EVIDENCE_KIT_STATEMENT_WRITE_CMD[] = -
+EVIDENCE_KIT_STATEMENT_CMD[] = git
+EVIDENCE_KIT_STATEMENT_CMD[] = notes
+EVIDENCE_KIT_STATEMENT_CMD[] = --ref=gate-run
+EVIDENCE_KIT_STATEMENT_CMD[] = show
+EVIDENCE_KIT_STATEMENT_CMD[] = HEAD
+EOF
+git -C "$es" config user.name smoke && git -C "$es" config user.email smoke@example.invalid
+( cd "$es" && git add -A && git commit -q -m notes ) >/dev/null 2>&1
+rm -f "$es/.tmp/statement.json"
+out="$(_es --run-validate)" && [[ "$out" == *"Statement stored by EVIDENCE_KIT_STATEMENT_WRITE_CMD"* && ! -e "$es/.tmp/statement.json" ]] \
+    || { echo "smoke(statement): the run did not store its Statement as a git note: $out" >&2; exit 1; }
+out="$(_es --verify-gate-run)" && [[ "$out" == *"clean"*"ahead=0"* ]] \
+    || { echo "smoke(statement): the verify arm did not read the stored note clean: $out" >&2; exit 1; }
 rm -rf "$es"

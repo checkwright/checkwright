@@ -193,7 +193,10 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           a parser producing no result is 1); unavailable is 2, because a
           caller that read a silent 0 would believe a run it never got had
           passed. With EVIDENCE_KIT_STATEMENT_FILE set it also writes one
-          in-toto Statement of the run there.
+          in-toto Statement of the run there, and with
+          EVIDENCE_KIT_STATEMENT_WRITE_CMD set it hands the Statement to that
+          argv on stdin, the subject commit appended, after every other write;
+          a store that fails is 2.
   --diff-baseline  parses each captured log named on argv and diffs it against
           the baseline's suite slice per-scenario, printing `new-failure` and
           `recovery` findings. Each argument group is `<suite> <logfile>

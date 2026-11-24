@@ -6,20 +6,10 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; [binary-only-ci-recipe](#binary-only-ci-recipe), with [meta-gate-ownership-scope](#meta-gate-ownership-scope) paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; [statement-out-of-tree-store](#statement-out-of-tree-store); and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; [binary-only-ci-recipe](#binary-only-ci-recipe), with [meta-gate-ownership-scope](#meta-gate-ownership-scope) paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; `statement-out-of-tree-store`; and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
 ---
 
 ## New Features
-
-### statement-out-of-tree-store
-
-[spec: SPEC-statement-store.md]
-
-`EVIDENCE_KIT_STATEMENT_FILE` writes the run's Statement into the tree whose commit it attests, and `EVIDENCE_KIT_STATEMENT_CMD` reads any store, but no shipped pair writes and reads one outside the tree.
-
-**Deliverable:** design-pending, a feature: a git-notes Statement write and read pair with a fixture, the read reachable through the existing command knob.
-
-**Cost while deferred:** an adopter keeping Statements out of its tree hand-writes the store. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 3); filed at this scope. Owner lookup: `git notes`, `STATEMENT_CMD` in this file, none; owner evidence-kit/SPEC.md §verify-gate-run.
 
 ### binary-only-ci-recipe
 
@@ -1178,4 +1168,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - gate-test-system-gitconfig
 - verify-gate-run-strictness
 - evidence-blank-semantics
+- statement-out-of-tree-store
 
