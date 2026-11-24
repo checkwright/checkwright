@@ -270,7 +270,13 @@ mod unspelled {
             assert_eq!(out.status.code(), Some(2), "{}: {}", verb, err);
             assert!(err.contains("main-\\xff") && !err.contains("panicked"), "{}: {}", verb, err);
             assert!(!common.join("gate-hooks").exists(), "{}: a hooks directory was placed", verb);
-            let pointed = Command::new("git").arg("-C").arg(s.at("wt")).args(["config", "core.hooksPath"]).output().expect("git");
+            let pointed = Command::new("git")
+                .arg("-C")
+                .arg(s.at("wt"))
+                .args(["config", "core.hooksPath"])
+                .env("GIT_CONFIG_NOSYSTEM", "1")
+                .output()
+                .expect("git");
             assert!(pointed.stdout.is_empty(), "{}: core.hooksPath was set", verb);
             assert!(s.at("wt/checkwright.lock").is_file() && s.at("wt").join("a-kit").join("x.txt").is_file(), "{}: files were removed", verb);
             assert_eq!(git(&s.at("wt"), &["status", "--porcelain"]), "", "{}: the worktree was written", verb);

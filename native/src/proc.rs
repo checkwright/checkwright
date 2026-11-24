@@ -69,6 +69,37 @@ impl Completed {
     }
 }
 
+// spec: gate-sdk/SPEC.md §check-crate-arms — every child this module builds; under the test build
+// it reads no host git configuration, and a caller's own value for either name still wins
+fn command(target: &str) -> Command {
+    let mut cmd = Command::new(target);
+    git_isolation::pin(&mut cmd);
+    cmd
+}
+
+mod git_isolation {
+    #[cfg(not(test))]
+    pub fn pin(_: &mut std::process::Command) {}
+
+    #[cfg(test)]
+    static GLOBAL: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — the empty global file, and no system file off
+    // native Windows
+    #[cfg(test)]
+    pub fn pin(cmd: &mut std::process::Command) {
+        let global = GLOBAL.get_or_init(|| {
+            let p = std::env::temp_dir().join("checkwright-test-empty.gitconfig");
+            let _ = std::fs::File::create(&p);
+            p
+        });
+        cmd.env("GIT_CONFIG_GLOBAL", global);
+        if !cfg!(windows) {
+            cmd.env("GIT_CONFIG_NOSYSTEM", "1");
+        }
+    }
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — `Err` is a *spawn* failure and nothing
 // else, so folding it into a benign branch is something a caller has to write down rather
 // than inherit from one `Result` that meant two things at once
@@ -76,7 +107,7 @@ pub fn run(program: &Program, args: &[&str]) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
     let target = spawn_target(program.invocation())?;
-    let out = Command::new(target.as_ref()).args(args).output().map_err(|e| {
+    let out = command(target.as_ref()).args(args).output().map_err(|e| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
             program.label(), e
@@ -532,13 +563,14 @@ fn merged(
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
     let err = out.try_clone().map_err(spawn_err)?;
-    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::from(err));
     if isolated {
         cmd.env_clear();
+        git_isolation::pin(&mut cmd);
     }
     for k in unset {
         cmd.env_remove(k);
@@ -588,7 +620,7 @@ pub fn run_bounded_in(
     #[cfg(test)]
     recorder::note(program.invocation());
     let target = spawn_target(program.invocation()).map_err(BoundedError::Spawn)?;
-    let mut cmd = Command::new(target.as_ref());
+    let mut cmd = command(target.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
@@ -743,7 +775,7 @@ pub fn run_bounded_capture(
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
-    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .envs(env.iter().copied())
         .stdin(std::process::Stdio::null())
@@ -802,7 +834,7 @@ pub fn run_bounded_redirected(
     let stdin = std::fs::File::open(io.stdin).map_err(spawn_err)?;
     let stdout = std::fs::File::create(io.stdout).map_err(spawn_err)?;
     let stderr = std::fs::File::create(io.stderr).map_err(spawn_err)?;
-    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .current_dir(io.cwd)
         .stdin(std::process::Stdio::from(stdin))
@@ -850,7 +882,7 @@ pub fn run_with_env_in(
 ) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
-    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -931,7 +963,7 @@ pub fn run_with_stdin_in(
             program.label(), e
         )
     };
-    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -1050,7 +1082,7 @@ pub fn piped(program: &Program, args: &[&str]) -> Result<Piped, String> {
             program.label(), e
         )
     };
-    let mut child = Command::new(spawn_target(program.invocation())?.as_ref())
+    let mut child = command(spawn_target(program.invocation())?.as_ref())
         .args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -1132,7 +1164,7 @@ pub fn run_streamed(
             return Err(io_err(e));
         }
     };
-    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::from(feed))
         .stdout(std::process::Stdio::from(sink));
@@ -1225,7 +1257,7 @@ pub fn run_to_in(
             program.label(), e
         )
     };
-    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -1279,7 +1311,7 @@ pub fn run_stdout_scrubbed(
     let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     let outp = temp_base().join(format!("checkwright-out.{}.{}", std::process::id(), seq));
     let sink = std::fs::File::create(&outp).map_err(io_err)?;
-    let mut cmd = Command::new(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .current_dir(cwd)
         .stdout(std::process::Stdio::from(sink));
@@ -1392,7 +1424,7 @@ pub fn dispatch(
     };
     let out = std::fs::File::create(capture).map_err(|e| io_err("create the capture file", e))?;
     let err = out.try_clone().map_err(|e| io_err("share the capture file", e))?;
-    let mut cmd = Command::new(program.invocation());
+    let mut cmd = command(program.invocation());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
@@ -2115,6 +2147,43 @@ pub(crate) mod tests {
         assert_eq!(no_link, there);
         assert_eq!(named, there);
         assert_eq!(literal, marked);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-crate-arms — a host whose system, home and XDG git files all set
+    // core.hooksPath reaches no child a test spawns, while a caller naming its own global file is read
+    #[test]
+    fn a_tests_git_child_reads_no_hostile_host_config_and_a_callers_own_global_wins() {
+        let d = std::env::temp_dir().join(format!("checkwright-hostile-git.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(d.join("home/.config/git")).expect("scratch");
+        let hostile = |file: &str, value: &str| {
+            std::fs::write(d.join(file), format!("[core]\n\thooksPath = {}\n", value)).expect("a hostile file");
+            d.join(file).display().to_string()
+        };
+        let system = hostile("system.config", "/hostile-system");
+        let global = hostile("global.config", "/hostile-global");
+        hostile("home/.gitconfig", "/hostile-home");
+        hostile("home/.config/git/config", "/hostile-xdg");
+        let mut env = vec![
+            ("HOME".to_string(), d.join("home").display().to_string()),
+            ("XDG_CONFIG_HOME".to_string(), d.join("home/.config").display().to_string()),
+        ];
+        if !cfg!(windows) {
+            env.push(("GIT_CONFIG_SYSTEM".to_string(), system));
+        }
+        let args = ["config", "--show-scope", "--get-all", "core.hooksPath"];
+        let read = |env: &[(String, String)]| {
+            let got = run_with_env_in(&GIT, &args, env, Some(&d)).expect("git runs");
+            String::from_utf8_lossy(&got.stdout).into_owned()
+        };
+        let pinned = read(&env);
+        env.push(("GIT_CONFIG_GLOBAL".to_string(), global));
+        let named = read(&env);
+        let _ = std::fs::remove_dir_all(&d);
+        let host: Vec<&str> =
+            pinned.lines().filter(|l| l.starts_with("system\t") || l.starts_with("global\t")).collect();
+        assert!(host.is_empty(), "a test's git child read host config: {:?}", host);
+        assert!(named.lines().any(|l| l == "global\t/hostile-global"), "the caller's own global file went unread: {:?}", named);
     }
 
     // spec: gate-sdk/SPEC.md §upgrade-smoke — a member writing scratch registers nothing

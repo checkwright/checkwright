@@ -21,4 +21,22 @@ out="$(bash -c '
     exit 1
 }
 [[ "$out" == survived ]] || exit 1
-echo 'LIB-TEST-HERMETIC: clean (inherited kit variables cleared, binary kept, library and later pins applied)'
+
+hostile="$(mktemp -d)"
+trap 'rm -rf "$hostile"' EXIT
+mkdir -p "$hostile/home/.config/git" "$hostile/plain"
+printf '[core]\n\thooksPath = %s\n' /hostile-system >"$hostile/system.config"
+printf '[core]\n\thooksPath = %s\n' /hostile-global >"$hostile/global.config"
+printf '[core]\n\thooksPath = %s\n' /hostile-home >"$hostile/home/.gitconfig"
+printf '[core]\n\thooksPath = %s\n' /hostile-xdg >"$hostile/home/.config/git/config"
+system=GIT_CONFIG_SYSTEM
+case "${OSTYPE:-}" in msys* | cygwin* | win32*) system=GIT_CONFIG_HOSTILE_UNREAD ;; esac
+leaked="$(env -u GIT_CONFIG_NOSYSTEM "$system=$hostile/system.config" GIT_CONFIG_GLOBAL="$hostile/global.config" \
+    HOME="$hostile/home" XDG_CONFIG_HOME="$hostile/home/.config" \
+    bash -c 'source "$1"; git -C "$2" config --get-all core.hooksPath' \
+    bash "$GATE_SDK_TEST_LIB_DIR/test-hermetic.sh" "$hostile/plain")"
+[[ -z "$leaked" ]] || {
+    printf 'FAIL: a sourcing suite read host git config: %s\n' "$leaked"
+    exit 1
+}
+echo 'LIB-TEST-HERMETIC: clean (inherited kit variables cleared, binary kept, library and later pins applied, host git config unread)'

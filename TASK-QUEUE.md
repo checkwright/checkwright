@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. [gate-test-system-gitconfig](#gate-test-system-gitconfig) is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; [binary-only-ci-recipe](#binary-only-ci-recipe), with [meta-gate-ownership-scope](#meta-gate-ownership-scope) paired into its amendment; [verify-gate-run-strictness](#verify-gate-run-strictness), with [evidence-blank-semantics](#evidence-blank-semantics) beside it; [statement-out-of-tree-store](#statement-out-of-tree-store); and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; [binary-only-ci-recipe](#binary-only-ci-recipe), with [meta-gate-ownership-scope](#meta-gate-ownership-scope) paired into its amendment; [verify-gate-run-strictness](#verify-gate-run-strictness), with [evidence-blank-semantics](#evidence-blank-semantics) beside it; [statement-out-of-tree-store](#statement-out-of-tree-store); and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
 ---
 
 ## New Features
@@ -72,14 +72,6 @@ A peer project relaying feedback or a feature ask has no channel: each ask arriv
 **Cost while deferred:** every peer ask costs a hand-written handoff and reply, and a shipped ask is adopted only when the peer happens to look. Surfaced 2026-11-24 by an external orchestrator's handoff and the operator's direction; filed at this scope. Owner lookup: `peer`, `request channel`, `intake` in this file, none; owner lifecycle-kit/SPEC.md.
 
 ## Technical Debt
-
-### gate-test-system-gitconfig
-
-The fixture suites read the host's system git config: a machine-wide `core.hooksPath` in `/etc/gitconfig`, which another tool on the maintainer host installed after the last close, fails four assertions of gate-sdk's `native-git-hooks.test.sh` and four crate unit tests (two in `emit::install_hooks`, two in `installer::init`), so `check-crate-arms` reds every battery run there. The installer smoke and the fence runner already isolate their git with `GIT_CONFIG_NOSYSTEM` and `GIT_CONFIG_GLOBAL`; the bespoke-test bootstrap every suite sources first, `gate-sdk/lib/test-hermetic.sh`, pins knobs and the git ceiling but not git's own config.
-
-**Deliverable:** debt: the hermetic bootstrap isolates every sourcing suite's git from system and global config, and the crate's git-spawning unit tests do the same, each with a case run under a hostile system config; gate-sdk/SPEC.md §lib/test-hermetic.sh refuses moving the suites' pin into the runner.
-
-**Cost while deferred:** a red battery on any host with system git config, which an adopter's machine may carry too. Surfaced 2026-11-24 at this scope's battery. Re-verified there: the suite is clean under `GIT_CONFIG_NOSYSTEM=1`, and it sources the bootstrap as its first act; the 33 unit tests of those two modules pass under it too. Owner lookup: `NOSYSTEM`, `hermetic` in this file, none; owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
 
 ### evidence-blank-semantics
 
@@ -1200,4 +1192,6 @@ Cursor and Muse Code's plugin/SPEC.md §The harnesses rows rest on vendor docs a
 No arm exports a developer's workflow commits off a vendored tree they do not own, so the workflow half of a personal adoption is stripped by hand before an upstream pull request.
 
 ## Done
+
+- gate-test-system-gitconfig
 

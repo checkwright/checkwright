@@ -24,6 +24,11 @@ _th_sep=:
 case "${OSTYPE:-}" in msys* | cygwin* | win32*) _th_sep=';' ;; esac
 _th_tmp="$(cd -P "${TMPDIR:-/tmp}" && pwd -P)"
 export GIT_CEILING_DIRECTORIES="${_th_tmp}${GIT_CEILING_DIRECTORIES:+${_th_sep}${GIT_CEILING_DIRECTORIES}}"
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — git reads no host global config, and no system config off native Windows
+_th_git_global="${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.gitconfig"
+: >"$_th_git_global"
+export GIT_CONFIG_GLOBAL="$_th_git_global"
+[[ "$_th_sep" == ';' ]] || export GIT_CONFIG_NOSYSTEM=1
 GATE_SDK_TEST_LIB_DIR="$(cd "${BASH_SOURCE[0]%/*}" && pwd)"
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the gate-sdk root locator, absolute from this library's own anchor, because a suite drives its subject from a sandbox cwd the default cannot reach
 export GATE_SDK_ROOT="${GATE_SDK_TEST_LIB_DIR%/lib}"
@@ -39,7 +44,7 @@ if [[ -z "${GATE_SDK_NATIVE_BIN:-}" ]]; then
 fi
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — gate-sdk's overlay is pinned after the binary read above, outside its already-set guard
 export GATE_SDK_LOCAL_KNOB_FILE="$_th_empty_knobs"
-unset _th_name _th_root _th_empty _th_empty_knobs _th_kit _th_var _th_bin _th_sep _th_tmp
+unset _th_name _th_root _th_empty _th_empty_knobs _th_kit _th_var _th_bin _th_sep _th_tmp _th_git_global
 
 # spec: gate-sdk/SPEC.md §run-gate-tests — invoke a gate through its declared dispatch rather
 # than by script path, so a bespoke test names a gate and never a substrate: gate_command
