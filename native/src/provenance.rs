@@ -24,7 +24,7 @@ pub struct Provenance {
 }
 
 fn present(s: &str) -> Option<String> {
-    Some(s.to_string()).filter(|s| !s.is_empty())
+    Some(s.to_string()).filter(|s| !crate::evidence::blank(s))
 }
 
 impl Provenance {
@@ -184,6 +184,10 @@ mod tests {
         assert_eq!(b["kits"], json!([{ "name": "gate-sdk", "root": "gate-sdk" }]));
         assert!(b.get("commit").is_none());
         assert!(b.get("worktree").is_none());
+        for unfilled in ["", " \t", "\n\r\x0c"] {
+            assert_eq!(present(unfilled), None, "{:?}", unfilled);
+        }
+        assert_eq!(present(" 1.0.0").as_deref(), Some(" 1.0.0"));
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — a SHA-256 object id is a commit, and `worktree` rides it

@@ -13,10 +13,17 @@ pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_RUN_*",
     "EVIDENCE_KIT_PARSER",
     "EVIDENCE_KIT_PARSER_*",
+    "EVIDENCE_KIT_VERIFY_REQUIRE",
 ];
 
 pub fn run(args: &[String]) -> i32 {
-    let judged = match read_input("--verify-gate-run", args).and_then(|bytes| judge(&bytes)) {
+    let judged = read_input("--verify-gate-run", args).and_then(|bytes| judge(&bytes)).and_then(|mut j| {
+        let words = walk::knob_scalar("EVIDENCE_KIT_VERIFY_REQUIRE")?;
+        let extra = required(&j, &words);
+        j.findings.extend(extra);
+        Ok(j)
+    });
+    let judged = match judged {
         Ok(j) => j,
         Err(e) => {
             eprintln!("verify-gate-run: {}", e);
@@ -25,6 +32,25 @@ pub fn run(args: &[String]) -> i32 {
     };
     judged.report("VERIFY-GATE-RUN");
     i32::from(!judged.findings.is_empty())
+}
+
+// spec: evidence-kit/SPEC.md §verify-gate-run — check 6, the verify arm's alone: the import shares
+// `judge` and records an older or failing run as history, so the requirements stay out of it
+fn required(j: &Judged, words: &str) -> Vec<String> {
+    let mut findings = Vec::new();
+    for word in words.split_whitespace() {
+        match word {
+            "head" if j.ahead != "0" && j.ahead != "-" => findings.push(format!(
+                "subject {} is {} commit(s) behind HEAD (EVIDENCE_KIT_VERIFY_REQUIRE: head)",
+                j.statement.subject, j.ahead
+            )),
+            "verdict" => findings.extend(j.statement.suites.iter().filter(|s| s.verdict != "clean").map(|s| {
+                format!("suite '{}' verdict: {} (EVIDENCE_KIT_VERIFY_REQUIRE: verdict)", s.name, s.verdict)
+            })),
+            _ => {}
+        }
+    }
+    findings
 }
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — the input forms: a file, stdin for `-`, else the
@@ -235,6 +261,30 @@ mod tests {
         red(&|_, cfg| cfg.suites.clear(), "configures no such suite");
         red(&|_, cfg| cfg.run_family.clear(), "configures no such suite");
         red(&|st, _| st.suites[0].tree = "modified".into(), "tree: modified");
+    }
+
+    // spec: evidence-kit/SPEC.md §verify-gate-run — each requirement word reds its own case and holds
+    // on a run of `HEAD` with every suite clean; an empty selection requires nothing
+    #[test]
+    fn each_requirement_reds_its_own_case() {
+        let judged = |ahead: &str, verdict: &str| {
+            let (mut st, _) = fixture();
+            st.suites[0].verdict = verdict.into();
+            Judged { statement: st, findings: Vec::new(), ahead: ahead.into() }
+        };
+        assert!(required(&judged("0", "clean"), "head verdict").is_empty());
+        assert!(required(&judged("3", "new-failures"), "").is_empty());
+        let behind = required(&judged("3", "clean"), "head");
+        assert!(
+            behind.len() == 1 && behind[0].contains("is 3 commit(s) behind HEAD (EVIDENCE_KIT_VERIFY_REQUIRE: head)"),
+            "{:?}",
+            behind
+        );
+        assert!(required(&judged("-", "clean"), "head").is_empty(), "check 2 already names a subject off HEAD's line");
+        let failing = required(&judged("0", "new-failures"), "verdict");
+        assert_eq!(failing, vec!["suite 'unit' verdict: new-failures (EVIDENCE_KIT_VERIFY_REQUIRE: verdict)".to_string()]);
+        assert!(required(&judged("0", "new-failures"), "head").is_empty());
+        assert_eq!(required(&judged("2", "new-failures"), "verdict head").len(), 2);
     }
 
     #[test]

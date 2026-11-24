@@ -206,8 +206,9 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
   --verify-gate-run  reads one gate-run Statement, bare or in a DSSE
           envelope, from <file>, from stdin for `-`, or from the stdout of the
           EVIDENCE_KIT_STATEMENT_CMD argv, and checks its shape, its subject
-          against HEAD's ancestry, and each suite's binding, command and tree.
-          The DSSE signature is never checked. Exit 0 every check held, 1 a
+          against HEAD's ancestry, and each suite's binding, command and tree,
+          then each EVIDENCE_KIT_VERIFY_REQUIRE word: `head` the subject is
+          HEAD, `verdict` every suite clean. The DSSE signature is never checked. Exit 0 every check held, 1 a
           contradiction (one line per finding), 2 a Statement that could not
           be read or judged; unavailable is 2. Writes nothing.
   --import-gate-run  takes the same input and checks, then records each suite

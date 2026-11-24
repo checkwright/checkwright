@@ -92,6 +92,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("EVIDENCE_KIT_PRE_HOOK", ""),
         Row::scalar("EVIDENCE_KIT_STATEMENT_FILE", ""),
         Row::indexed("EVIDENCE_KIT_STATEMENT_CMD", &[]),
+        Row::scalar("EVIDENCE_KIT_VERIFY_REQUIRE", ""),
+        Row::scalar("EVIDENCE_KIT_TREE_UNTRACKED", "ignore"),
         Row::scalar("EVIDENCE_KIT_IMPORTED_RUNS", "refuse"),
         Row::indexed("EVIDENCE_KIT_CONTROLS", &[]),
         Row::scalar("EVIDENCE_KIT_CONTROL_SINCE", ""),
@@ -122,8 +124,8 @@ pub const KIT: Kit = Kit {
 };
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — the paths, the parser and the Done section
-// non-empty, every suite and control a valid family suffix, and the import selection one of its two
-// words
+// non-empty, every suite and control a valid family suffix, the import and untracked selections one
+// of their two words each, and every verify requirement a known word
 fn validate(v: &Values) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for name in [
@@ -150,5 +152,50 @@ fn validate(v: &Values) -> Vec<String> {
     if let Some(sel) = scalar(v, "EVIDENCE_KIT_IMPORTED_RUNS").filter(|s| !["refuse", "accept"].contains(s)) {
         out.push(format!("EVIDENCE_KIT_IMPORTED_RUNS is '{}' (want refuse or accept)", sel));
     }
+    if let Some(sel) = scalar(v, "EVIDENCE_KIT_TREE_UNTRACKED").filter(|s| !["ignore", "count"].contains(s)) {
+        out.push(format!("EVIDENCE_KIT_TREE_UNTRACKED is '{}' (want ignore or count)", sel));
+    }
+    for word in scalar(v, "EVIDENCE_KIT_VERIFY_REQUIRE").unwrap_or("").split_whitespace() {
+        if !VERIFY_REQUIREMENTS.contains(&word) {
+            out.push(format!("EVIDENCE_KIT_VERIFY_REQUIRE word '{}' is not one of head, verdict", word));
+        }
+    }
     out
+}
+
+pub const VERIFY_REQUIREMENTS: &[&str] = &["head", "verdict"];
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn one(name: &'static str, value: &str) -> Vec<String> {
+        let mut v: Values = Values::new();
+        v.insert(name, (Value::Scalar(value.to_string()), Origin::Tracked));
+        validate(&v)
+    }
+
+    // spec: evidence-kit/SPEC.md §Layout and configuration — the untracked-file selection is one of
+    // its two words, spelled exactly
+    #[test]
+    fn the_untracked_selection_admits_only_its_two_words() {
+        assert!(one("EVIDENCE_KIT_TREE_UNTRACKED", "ignore").is_empty());
+        assert!(one("EVIDENCE_KIT_TREE_UNTRACKED", "count").is_empty());
+        for bad in ["", "off", "Count", "all"] {
+            let e = one("EVIDENCE_KIT_TREE_UNTRACKED", bad);
+            assert!(e.len() == 1 && e[0].contains("want ignore or count"), "{:?} -> {:?}", bad, e);
+        }
+    }
+
+    // spec: evidence-kit/SPEC.md §Layout and configuration — the verify requirements are a set of
+    // known words, empty selecting none
+    #[test]
+    fn the_verify_requirements_admit_only_known_words() {
+        for ok in ["", "head", "verdict", "head verdict", " verdict  head "] {
+            assert!(one("EVIDENCE_KIT_VERIFY_REQUIRE", ok).is_empty(), "{:?}", ok);
+        }
+        let e = one("EVIDENCE_KIT_VERIFY_REQUIRE", "head ahead Verdict");
+        assert_eq!(e.len(), 2, "{:?}", e);
+        assert!(e[0].contains("'ahead'") && e[1].contains("'Verdict'") && e[0].contains("head, verdict"), "{:?}", e);
+    }
 }

@@ -26,6 +26,7 @@ pub const KNOBS: &[&str] = &[
     "EVIDENCE_KIT_RUN_ID",
     "EVIDENCE_KIT_PRE_HOOK",
     "EVIDENCE_KIT_STATEMENT_FILE",
+    "EVIDENCE_KIT_TREE_UNTRACKED",
     "EVIDENCE_KIT_CONTROLS",
     "EVIDENCE_KIT_CONTROL_*",
     "GATE_SDK_KIT_DIRS",
@@ -67,6 +68,7 @@ struct Cfg {
     run_id: String,
     pre_hook: String,
     statement: String,
+    untracked: String,
     controls: Vec<String>,
     control_family: Vec<(String, String)>,
 }
@@ -87,6 +89,7 @@ fn config() -> Result<Cfg, Refusal> {
         run_id: scalar("EVIDENCE_KIT_RUN_ID")?,
         pre_hook: scalar("EVIDENCE_KIT_PRE_HOOK")?,
         statement: scalar("EVIDENCE_KIT_STATEMENT_FILE")?,
+        untracked: scalar("EVIDENCE_KIT_TREE_UNTRACKED")?,
         controls: walk::knob_array("EVIDENCE_KIT_CONTROLS").map_err(guard)?,
         control_family: walk::knob_prefix(evidence::CONTROL_PREFIX).map_err(guard)?,
     })
@@ -124,16 +127,47 @@ pub(crate) fn manifest_guard(manifest: &str) -> Result<(), String> {
 
 // spec: evidence-kit/SPEC.md §Evidence manifest — `commit=` and `tree=` for the suite about to run,
 // `-` for both on an unborn branch; a worktree git could not read refuses rather than guessing
-fn head_state() -> Result<(String, String), String> {
+fn head_state(cfg: &Cfg) -> Result<(String, String), String> {
     let Some(commit) = crate::provenance::head() else {
         return Ok(("-".to_string(), "-".to_string()));
     };
-    let tree = match crate::provenance::worktree_clean() {
+    let clean = if cfg.untracked == "count" {
+        counted_clean(&cfg.tmpdir, &cfg.statement)
+    } else {
+        crate::provenance::worktree_clean()
+    };
+    let tree = match clean {
         Some(true) => "clean",
         Some(false) => "modified",
         None => return Err("cannot read the worktree state (git status) — nothing recorded".to_string()),
     };
     Ok((commit, tree.to_string()))
+}
+
+// spec: evidence-kit/SPEC.md §Evidence manifest — the `count` read: every change and every untracked
+// path the ignore rules leave, but the run's own writes, read against git's root-relative paths
+fn counted_clean(tmpdir: &str, statement: &str) -> Option<bool> {
+    let (here, top) = (walk::cwd().ok()?, walk::toplevel().ok()?);
+    let fields = crate::listing::names(None, &["status", "--porcelain", "-z", "--untracked-files=all"]).ok()?;
+    let tmp = walk::physical_against(&here, tmpdir);
+    let stmt = (!statement.is_empty()).then(|| walk::physical_against(&here, statement));
+    let mut fields = fields.into_iter();
+    while let Some(entry) = fields.next() {
+        let (code, path) = (entry.get(..2).unwrap_or(""), entry.get(3..).unwrap_or(""));
+        if code.contains(['R', 'C']) {
+            fields.next();
+        }
+        if code != "??" || !own_write(&walk::physical_against(&top, path), &tmp, stmt.as_deref()) {
+            return Some(false);
+        }
+    }
+    Some(true)
+}
+
+// spec: evidence-kit/SPEC.md §Evidence manifest — a path under the tmp dir, or the Statement's own,
+// is the run's write, so counting it would dirty the tree the next run reads
+fn own_write(path: &str, tmpdir: &str, statement: Option<&str>) -> bool {
+    walk::under(tmpdir, path) || statement.is_some_and(|s| walk::at_or_under(s, path))
 }
 
 // spec: evidence-kit/SPEC.md §bin/run-validate.sh — the whole input arrives as knobs, so the
@@ -236,7 +270,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             }
         }
 
-        let (commit, tree) = head_state().map_err(guard)?;
+        let (commit, tree) = head_state(&cfg).map_err(guard)?;
         // spec: evidence-kit/SPEC.md §bin/run-validate.sh — a Statement never attests a suite at a
         // commit other than its subject, so a pre-hook that moved `HEAD` refuses the whole run
         if let Some((subject, _)) = &attest {
@@ -722,6 +756,19 @@ mod tests {
                 tail
             )
         );
+    }
+
+    // spec: evidence-kit/SPEC.md §Evidence manifest — under `count` a path under the tmp dir and the
+    // Statement's own path are the run's writes, and any other untracked path is not
+    #[test]
+    fn the_runs_own_writes_are_excluded_from_the_count() {
+        let (t, s) = ("/r/.tmp", Some("/r/out/statement.json"));
+        assert!(own_write("/r/.tmp/nested/log", t, None), "a path under the tmp dir");
+        assert!(own_write("/r/out/statement.json", t, s), "the Statement's path");
+        assert!(!own_write("/r/out/statement.json", t, None), "the Statement's path with no Statement configured");
+        assert!(!own_write("/r/other.txt", t, s), "another untracked path");
+        assert!(!own_write("/r/.tmp-sibling", t, s), "a sibling sharing the tmp dir's name as a prefix");
+        assert!(own_write("C:/r/.tmp/log", "C:\\r\\.tmp", None), "either separator spells the tmp dir");
     }
 
     #[test]

@@ -92,6 +92,9 @@ out="$(_es --verify-gate-run .tmp/statement.json)" && [[ "$out" == *"clean"*"ahe
     || { echo "smoke(statement): the verify arm did not judge the run's own Statement clean: $out" >&2; exit 1; }
 out="$(_es --verify-gate-run)" && [[ "$out" == *"clean"* ]] \
     || { echo "smoke(statement): the verify arm did not read the Statement through EVIDENCE_KIT_STATEMENT_CMD: $out" >&2; exit 1; }
+# spec: evidence-kit/SPEC.md §verify-gate-run — check 6, the installed adopter's merge predicate: a run of HEAD with every suite clean holds both requirement words
+out="$(EVIDENCE_KIT_VERIFY_REQUIRE="head verdict" _es --verify-gate-run .tmp/statement.json)" && [[ "$out" == *"clean"*"ahead=0"* ]] \
+    || { echo "smoke(statement): the merge predicate did not hold on a run of HEAD with every suite clean: $out" >&2; exit 1; }
 rc=0; _es --import-gate-run .tmp/statement.json >/dev/null 2>&1 || rc=$?
 [[ "$rc" -eq 2 ]] || { echo "smoke(statement): an import ran under the default refuse (rc=$rc)" >&2; exit 1; }
 printf 'EVIDENCE_KIT_IMPORTED_RUNS = accept\n' >> "$es/scripts/evidence-config.knobs"

@@ -6,20 +6,10 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; [binary-only-ci-recipe](#binary-only-ci-recipe), with [meta-gate-ownership-scope](#meta-gate-ownership-scope) paired into its amendment; [verify-gate-run-strictness](#verify-gate-run-strictness), with [evidence-blank-semantics](#evidence-blank-semantics) beside it; [statement-out-of-tree-store](#statement-out-of-tree-store); and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; [binary-only-ci-recipe](#binary-only-ci-recipe), with [meta-gate-ownership-scope](#meta-gate-ownership-scope) paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; [statement-out-of-tree-store](#statement-out-of-tree-store); and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
 ---
 
 ## New Features
-
-### verify-gate-run-strictness
-
-[spec: SPEC-gate-run-strict.md]
-
-`--verify-gate-run` exits 0 with commits ahead of the Statement's subject, printing `ahead` only; never judges a suite's verdict, which feeds the binding digest alone; and reads the tree with untracked files excluded. An adopter wanting a strict gate-run predicate wraps the verdict line.
-
-**Deliverable:** design-pending, a feature: a strictness knob set, off among them, covering ahead equal to zero, every bound suite passing, and untracked files counted, each with a fixture pair. [evidence-blank-semantics](#evidence-blank-semantics), the same provenance reader, rides this iteration beside it.
-
-**Cost while deferred:** a stale or failing Statement verifies, which keeps the adopter's evidence-kit adoption deferred. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 2); filed at this scope, re-verified there against native/src/emit/verify_gate_run.rs. Owner lookup: `verify-gate-run`, `strict` in this file, none; owner evidence-kit/SPEC.md §verify-gate-run.
 
 ### statement-out-of-tree-store
 
@@ -72,14 +62,6 @@ A peer project relaying feedback or a feature ask has no channel: each ask arriv
 **Cost while deferred:** every peer ask costs a hand-written handoff and reply, and a shipped ask is adopted only when the peer happens to look. Surfaced 2026-11-24 by an external orchestrator's handoff and the operator's direction; filed at this scope. Owner lookup: `peer`, `request channel`, `intake` in this file, none; owner lifecycle-kit/SPEC.md.
 
 ## Technical Debt
-
-### evidence-blank-semantics
-
-The evidence provenance reader admits a whitespace-only optional string: native/src/evidence.rs checks `is_empty`, and the gate-run v1 schema's `minLength: 1` admits `' \t'`, where gate-sdk/SPEC.md §run-gates and the declaration say never blank.
-
-**Deliverable:** design-pending: rule whether blank means zero characters or whitespace-only, then align reader, schema and SPEC.
-
-**Cost while deferred:** a whitespace-only field passes as provenance. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (medium confidence on intent), carried from its close; filed at the next scope. Owner lookup: `blank`, `whitespace` in this file, none; owner gate-sdk/SPEC.md §run-gates.
 
 ## Deferred
 
@@ -1194,4 +1176,6 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 ## Done
 
 - gate-test-system-gitconfig
+- verify-gate-run-strictness
+- evidence-blank-semantics
 

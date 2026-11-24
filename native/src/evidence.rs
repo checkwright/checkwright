@@ -669,6 +669,12 @@ pub fn read_statement(bytes: &[u8]) -> Result<Statement, String> {
     Ok(Statement { subject, run, provenance_commit, suites })
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — the provenance block's one definition of blank: no character
+// outside ASCII space, tab, line feed, form feed and carriage return, the empty string included
+pub fn blank(s: &str) -> bool {
+    s.bytes().all(|b| b.is_ascii_whitespace())
+}
+
 // spec: evidence-kit/SPEC.md §verify-gate-run — check 1 types the embedded provenance block to
 // gate-sdk/SPEC.md §run-gates' table; the commit it carries, if any, is check 2's to judge
 fn provenance_shape(p: Option<&serde_json::Value>) -> Result<Option<String>, String> {
@@ -676,13 +682,13 @@ fn provenance_shape(p: Option<&serde_json::Value>) -> Result<Option<String>, Str
     let p = p.filter(|p| p.is_object()).ok_or_else(|| format!("{} is absent or not an object", AT))?;
     let named = |v: &serde_json::Value, at: &str| -> Result<(), String> {
         match v.get("name").and_then(|n| n.as_str()) {
-            Some(n) if !n.is_empty() => Ok(()),
-            _ => Err(format!("{}/name is absent, empty or not a string", at)),
+            Some(n) if !blank(n) => Ok(()),
+            _ => Err(format!("{}/name is absent, blank or not a string", at)),
         }
     };
     let optional = |v: &serde_json::Value, at: &str, key: &str| -> Result<(), String> {
         match v.get(key) {
-            Some(s) if s.as_str().map_or(true, str::is_empty) => Err(format!("{}/{} is empty or not a string", at, key)),
+            Some(s) if s.as_str().map_or(true, blank) => Err(format!("{}/{} is blank or not a string", at, key)),
             _ => Ok(()),
         }
     };
@@ -700,8 +706,8 @@ fn provenance_shape(p: Option<&serde_json::Value>) -> Result<Option<String>, Str
         }
         named(kit, &at)?;
         match kit.get("root").and_then(|r| r.as_str()) {
-            Some(r) if !r.is_empty() => {}
-            _ => return Err(format!("{}/root is absent, empty or not a string", at)),
+            Some(r) if !blank(r) => {}
+            _ => return Err(format!("{}/root is absent, blank or not a string", at)),
         }
         optional(kit, &at, "version")?;
     }
@@ -1094,7 +1100,8 @@ mod tests {
         for fields in [&prov["properties"]["tool"]["properties"], &prov["properties"]["kits"]["items"]["properties"]] {
             for (key, field) in fields.as_object().expect("the schema types the block's fields") {
                 if field["type"] == "string" {
-                    assert_eq!(field["minLength"], 1, "the schema admits a blank provenance {}", key);
+                    assert_eq!(field["minLength"], 1, "the schema admits an empty provenance {}", key);
+                    assert_eq!(field["pattern"], "[^\\t\\n\\f\\r ]", "the schema admits a blank provenance {}", key);
                 }
             }
         }
@@ -1239,10 +1246,14 @@ mod tests {
         refuse(&|v| { v["predicate"]["provenance"]["kits"][0].as_object_mut().unwrap().remove("name"); }, "kits/0/name");
         refuse(&|v| v["predicate"]["provenance"]["kits"][0]["root"] = 7.into(), "kits/0/root");
         refuse(&|v| v["predicate"]["provenance"]["kits"][0]["version"] = 7.into(), "kits/0/version");
-        refuse(&|v| v["predicate"]["provenance"]["tool"]["version"] = "".into(), "provenance/tool/version is empty");
-        refuse(&|v| v["predicate"]["provenance"]["tool"]["sourceStamp"] = "".into(), "provenance/tool/sourceStamp is empty");
-        refuse(&|v| v["predicate"]["provenance"]["tool"]["target"] = "".into(), "provenance/tool/target is empty");
-        refuse(&|v| v["predicate"]["provenance"]["kits"][0]["version"] = "".into(), "kits/0/version is empty");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["version"] = "".into(), "provenance/tool/version is blank");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["sourceStamp"] = "".into(), "provenance/tool/sourceStamp is blank");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["target"] = "".into(), "provenance/tool/target is blank");
+        refuse(&|v| v["predicate"]["provenance"]["kits"][0]["version"] = "".into(), "kits/0/version is blank");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["name"] = " \t".into(), "provenance/tool/name is absent, blank");
+        refuse(&|v| v["predicate"]["provenance"]["kits"][0]["root"] = "\n".into(), "kits/0/root is absent, blank");
+        refuse(&|v| v["predicate"]["provenance"]["tool"]["version"] = " \t".into(), "provenance/tool/version is blank");
+        refuse(&|v| v["predicate"]["provenance"]["kits"][0]["version"] = "\r\x0c".into(), "kits/0/version is blank");
         refuse(&|v| v["predicate"]["provenance"]["commit"] = "ABC".into(), "provenance/commit");
         refuse(&|v| v["predicate"]["provenance"]["worktree"] = "dirty".into(), "provenance/worktree is not");
         refuse(&|v| { v["predicate"]["provenance"].as_object_mut().unwrap().remove("worktree"); }, "beside a commit");
