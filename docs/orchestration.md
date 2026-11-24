@@ -26,7 +26,7 @@ Checkwright checks each hop's claims rather than orchestrating; *unattended* orc
 - **The iteration lead** — a live session that dispatches an iteration's stage sessions as background agents and answers their batched escalations. The protocol is owned by [`lifecycle-kit/SPEC.md §templates/lead.md`](lifecycle-kit/SPEC.md#templatesleadmd).
 - **Multi-operator semantics** — merge and conflict behavior for the lifecycle's single-writer state surfaces, walked through [below](#two-operators-one-governed-tree). Owned by [`lifecycle-kit/SPEC.md §Multi-operator semantics`](lifecycle-kit/SPEC.md#multi-operator-semantics).
 
-Within one iteration that is the extent of it: a lead dispatching its own verified stages. Across operators Checkwright coordinates nothing: it checks the evidence behind each claim, whatever coordinates the work. Where the coordination layer goes next is the queue's Deferred section, checkable in the tree.
+Across operators Checkwright coordinates nothing: it checks the evidence behind each claim, whatever coordinates the work. Where the coordination layer goes next is the queue's Deferred section, checkable in the tree.
 
 ## Running an iteration under a lead
 
@@ -62,3 +62,4 @@ The through-line: concurrency is isolation git already provides, and the gates r
 
 - [Why Checkwright](methodology.md) — the delivery-methodology essay behind the mechanism.
 - [The kits](index.md#the-kits) — one page per kit, in reading order.
+- [Binary-only CI](binary-only.md) — the gates in CI from the release binary alone.

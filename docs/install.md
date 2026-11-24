@@ -11,7 +11,7 @@ This page gets the kits into your repository, keeps them current, and takes them
 
 ## Requirements
 
-An install needs a supported system and a few tools, and [What an install requires](requirements.md) lists both.
+[What an install requires](requirements.md) lists the supported systems and tools.
 
 ## Install
 
@@ -157,6 +157,7 @@ Its last line is the verdict, and its exit status says the same: `PROVE: held`, 
 - **What a commit costs**, measured: [the pre-commit figure](requirements.md#what-a-commit-costs).
 - **Every step of the install**, run by hand: [Manual steps](manual-install.md).
 - **Managing, uninstalling and upgrading**: [Maintenance](maintenance.md).
+- **CI from the binary alone**: [Binary-only CI](binary-only.md).
 - **One session hook alone**, with no repository: [the turn-end hook](hooks/subagent-stop-liveness.md).
 
 Back to the [kit map](index.md#the-kits) or [why Checkwright](methodology.md).

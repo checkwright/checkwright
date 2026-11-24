@@ -19,6 +19,7 @@
 - [Requirements](https://checkwright.dev/requirements.html)
 - [Manual steps](https://checkwright.dev/manual-install.html)
 - [Maintenance](https://checkwright.dev/maintenance.html)
+- [Binary-only CI](https://checkwright.dev/binary-only.html): Running Checkwright's gates in a read-only CI container from the release binary alone, with no vendored kit and no init.
 - [The turn-end hook](https://checkwright.dev/hooks/subagent-stop-liveness.html): The subagent-stop-liveness hook keeps a dispatched agent session from ending its turn while work it launched is still writing, and installs on its own, for one user, with no repository.
 
 ## Spec toolkits

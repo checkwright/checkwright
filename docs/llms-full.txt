@@ -106,7 +106,7 @@ Checkwright does not fit a team that needs code judged correct, because its gate
 
 ## What you install
 
-Each install profile is a set of kits ([`installer/SPEC.md` §Profiles](https://checkwright.dev/installer/SPEC.html#profiles)). The `starter` profile is gate-sdk alone. The `workflow` profile is `starter` plus lifecycle-kit and evidence-kit, the least on which a done claim is caught. The `prose` profile adds canon-kit. The `delegation` profile adds the kits whose subject is the agent session. The `full` profile is every kit. The checks and the workflow install without each other, on one base. gate-sdk's binary is that base: it runs the checks, places the git hooks and carries the commands the workflow's stages run, so every profile carries gate-sdk. The checks run without the workflow: `starter` and `prose` carry no lifecycle-kit, and the companion recipes gate another toolkit's workflow. The workflow runs without the document and site checks, since `workflow` and `delegation` carry neither canon-kit nor site-kit. Both build on `starter`, so gate-sdk's own starting checks come with them, and `--without-gate` drops any of those. The two part on what they write. The checks read what your repository tracks, and the workflow commits its own record: the stage stamps, the task queue and the recorded test runs. Under `delegation`, lifecycle-kit's checks enforce nothing until the files each one reads exist.
+Each install profile is a set of kits ([`installer/SPEC.md` §Profiles](https://checkwright.dev/installer/SPEC.html#profiles)). The `starter` profile is gate-sdk alone. The `workflow` profile is `starter` plus lifecycle-kit and evidence-kit, the least on which a done claim is caught. The `prose` profile adds canon-kit. The `delegation` profile adds the kits whose subject is the agent session. The `full` profile is every kit. The checks and the workflow install without each other, on one base. gate-sdk's binary is that base: it runs the checks, places the git hooks and carries the commands the workflow's stages run, so every profile carries gate-sdk. The checks run without the workflow: `starter` and `prose` carry no lifecycle-kit, and the companion recipes gate another toolkit's workflow. The workflow runs without the document and site checks, since `workflow` and `delegation` carry neither canon-kit nor site-kit. Both build on `starter`, so gate-sdk's own starting checks come with them, and `--without-gate` drops any of those. The two part on what they write. The checks read what your repository tracks, and the workflow commits its own record: the stage stamps, the task queue and the recorded test runs. Under `delegation`, lifecycle-kit's checks enforce nothing until the files each one reads exist. A CI job can also run the checks from the release binary alone, installing nothing in the tree ([Binary-only CI](https://checkwright.dev/binary-only.html)).
 
 ## Alternatives
 
@@ -182,7 +182,7 @@ Checkwright checks each hop's claims rather than orchestrating; *unattended* orc
 - **The iteration lead** — a live session that dispatches an iteration's stage sessions as background agents and answers their batched escalations. The protocol is owned by [`lifecycle-kit/SPEC.md §templates/lead.md`](https://checkwright.dev/lifecycle-kit/SPEC.html#templatesleadmd).
 - **Multi-operator semantics** — merge and conflict behavior for the lifecycle's single-writer state surfaces, walked through [below](https://checkwright.dev/orchestration.html#two-operators-one-governed-tree). Owned by [`lifecycle-kit/SPEC.md §Multi-operator semantics`](https://checkwright.dev/lifecycle-kit/SPEC.html#multi-operator-semantics).
 
-Within one iteration that is the extent of it: a lead dispatching its own verified stages. Across operators Checkwright coordinates nothing: it checks the evidence behind each claim, whatever coordinates the work. Where the coordination layer goes next is the queue's Deferred section, checkable in the tree.
+Across operators Checkwright coordinates nothing: it checks the evidence behind each claim, whatever coordinates the work. Where the coordination layer goes next is the queue's Deferred section, checkable in the tree.
 
 ## Running an iteration under a lead
 
@@ -218,6 +218,7 @@ The through-line: concurrency is isolation git already provides, and the gates r
 
 - [Why Checkwright](https://checkwright.dev/methodology.html) — the delivery-methodology essay behind the mechanism.
 - [The kits](https://checkwright.dev/#the-kits) — one page per kit, in reading order.
+- [Binary-only CI](https://checkwright.dev/binary-only.html) — the gates in CI from the release binary alone.
 
 Source: https://checkwright.dev/ddd.html
 
@@ -347,7 +348,7 @@ This page gets the kits into your repository, keeps them current, and takes them
 
 ## Requirements
 
-An install needs a supported system and a few tools, and [What an install requires](https://checkwright.dev/requirements.html) lists both.
+[What an install requires](https://checkwright.dev/requirements.html) lists the supported systems and tools.
 
 ## Install
 
@@ -483,6 +484,7 @@ Its last line is the verdict, and its exit status says the same: `PROVE: held`, 
 - **What a commit costs**, measured: [the pre-commit figure](https://checkwright.dev/requirements.html#what-a-commit-costs).
 - **Every step of the install**, run by hand: [Manual steps](https://checkwright.dev/manual-install.html).
 - **Managing, uninstalling and upgrading**: [Maintenance](https://checkwright.dev/maintenance.html).
+- **CI from the binary alone**: [Binary-only CI](https://checkwright.dev/binary-only.html).
 - **One session hook alone**, with no repository: [the turn-end hook](https://checkwright.dev/hooks/subagent-stop-liveness.html).
 
 Back to the [kit map](https://checkwright.dev/#the-kits) or [why Checkwright](https://checkwright.dev/methodology.html).
@@ -689,6 +691,80 @@ An upgrade has two phases:
 Every release note opens with **In brief**: a table linking each section below with its entry count and who acts on it, then a few plain bullets on what you get and whether you must act. Its **New and tightened gates**, **Knob changes**, **Gate-authoring changes**, **Platforms** and **Behavior changes** sections list what you reconcile. Each says "None." when there is nothing. The [releases page](https://checkwright.dev/releases.html) tabulates every note, with whether each needs action on upgrade. The bump rules and the note grammar: [Versioning](https://checkwright.dev/installer/SPEC.html#versioning) and [The upgrade contract](https://checkwright.dev/installer/SPEC.html#the-upgrade-contract).
 
 An installed tree checks for a newer release once a week with `git ls-remote`, which shows the upstream host your IP address, and `doctor` and the session-context hook say when one exists. Set `GATE_SDK_UPDATE_CHECK = off` in your gates directory's `gate-sdk-config.knobs` to turn it off.
+
+Source: https://checkwright.dev/binary-only.html
+
+# Running gates from the binary alone
+
+## When this page applies
+
+This page is for a CI job holding the gate binary and a checkout of your repository, and nothing else: no `init` has run and no kit is vendored in the tree. The checkout may be read-only. A tree `init` installed runs its battery through the CI action instead ([`installer/SPEC.md` §The CI action](https://checkwright.dev/installer/SPEC.html#the-ci-action)).
+
+Both forms below are held by [`gate-sdk/gate-tests/binary-only-recipe.test.sh`](https://github.com/checkwright/checkwright/blob/master/gate-sdk/gate-tests/binary-only-recipe.test.sh), which runs them on a scratch checkout holding no kit and reds when either stops doing what this page says.
+
+## Getting the binary
+
+Download and verify the Release tarball as [Installing step by step](https://checkwright.dev/manual-install.html) does, into `$cw`, outside the checkout, and run no `init`. The binary is `package/payload/artifact/<target>/checkwright-gates`, `<target>` naming your system ([`installer/SPEC.md` §Layout](https://checkwright.dev/installer/SPEC.html#layout)); [Requirements](https://checkwright.dev/requirements.html#supported-systems) lists the systems a binary is published for. The commands below take it from `cwg`, set here for a Linux runner on x86_64:
+
+```sh
+cwg="$cw/package/payload/artifact/x86_64-unknown-linux-gnu/checkwright-gates"
+```
+
+## Running one gate
+
+From the checkout's root:
+
+```sh
+"$cwg" check-spec-fence-balance
+```
+
+This direct form runs one gate compiled into the binary, with no registry, no descriptor and no knob file. Exit `0` is clean, `1` a finding, and `2` a gate that could not run ([`gate-sdk/SPEC.md` §Fail-closed contract](https://checkwright.dev/gate-sdk/SPEC.html#fail-closed-contract)). It writes nothing, so it runs on a read-only checkout, and it prints its verdict with no Static Analysis Results Interchange Format (SARIF) log.
+
+These gates need neither a kit nor a knob:
+
+- `check-spec-dod-singleton`: no `SPEC.md` carries its Definition of Done twice, or none ([`canon-kit/SPEC.md` §check-spec-dod-singleton](https://checkwright.dev/canon-kit/SPEC.html#check-spec-dod-singleton)).
+- `check-amendment-update-target`: each amendment's update targets cite deltas it defines ([`canon-kit/SPEC.md` §check-amendment-update-target](https://checkwright.dev/canon-kit/SPEC.html#check-amendment-update-target)).
+- `check-amendment-retired-spelling`: a spelling an amendment retires survives only where its roster says ([`canon-kit/SPEC.md` §check-amendment-retired-spelling](https://checkwright.dev/canon-kit/SPEC.html#check-amendment-retired-spelling)).
+- `check-spec-fence-balance`: no governed markdown file ends inside an open code fence ([`canon-kit/SPEC.md` §check-spec-fence-balance](https://checkwright.dev/canon-kit/SPEC.html#check-spec-fence-balance)).
+
+A gate that scans for YAML takes the directory to scan as its argument, so `"$cwg" check-action-pinning ci` reads `ci` and nothing outside it ([`gate-sdk/SPEC.md` §check-action-pinning](https://checkwright.dev/gate-sdk/SPEC.html#check-action-pinning)).
+
+## Running a set with a SARIF verdict
+
+A set runs through a registry, and the registry can sit outside the checkout. Make a directory there holding a `gates.list`, one gate name per line, and beside it each member's `.gate` descriptor, copied from the tarball's `package/payload/<kit>/checks/`:
+
+```sh
+gates="$RUNNER_TEMP/gates" \
+  && mkdir -p "$gates" \
+  && printf '%s\n' check-spec-dod-singleton check-spec-fence-balance > "$gates/gates.list" \
+  && cp "$cw/package/payload/canon-kit/checks/check-spec-dod-singleton.gate" \
+       "$cw/package/payload/canon-kit/checks/check-spec-fence-balance.gate" "$gates/" \
+  && GATE_SDK_SARIF_FILE="$RUNNER_TEMP/gates.sarif" GATE_SDK_TMP_DIR="$RUNNER_TEMP/gates-tmp" \
+     "$cwg" --run --gates-dir "$gates"
+```
+
+`$RUNNER_TEMP` is GitHub Actions' scratch directory; any directory outside the checkout serves. Both paths the run writes are absolute and outside the checkout, so the checkout's status stays empty and the SARIF log is where your upload step reads it ([`gate-sdk/SPEC.md` §run-gates](https://checkwright.dev/gate-sdk/SPEC.html#run-gates)).
+
+The descriptor is the cost of this form: one file copied per member. A name with no descriptor beside it fails as unresolved even when the binary carries that gate, because the descriptor is where the member's manifest, its install disposition and the knob that arms it are declared, and a run that skipped them would report a disarmed gate as coverage.
+
+## Configuring a gate without writing to the tree
+
+A gate reads its kit's knobs from the file `<KIT>_KNOB_FILE` names, such as `CANON_KIT_KNOB_FILE` for the gates above. It may name a file the checkout tracks or one outside it, and a name that resolves to no file is exit 2 rather than a silent default ([`gate-sdk/SPEC.md` §The knob file](https://checkwright.dev/gate-sdk/SPEC.html#the-knob-file)).
+
+A top-level directory holding `checks/` or `smoke/` reads as a kit, and a gate that leaves a kit's own files out of its scan, `check-spec-dod-singleton` among them, skips it. Where such a directory is yours, set `GATE_SDK_KIT_DIRS` to `gate-sdk` alone so it is scanned like the rest of the tree ([`gate-sdk/SPEC.md` §Layout and configuration](https://checkwright.dev/gate-sdk/SPEC.html#layout-and-configuration)).
+
+## What the container must provide
+
+- **git**, the one tool every host needs ([`gate-sdk/SPEC.md` §The adopter constraints](https://checkwright.dev/gate-sdk/SPEC.html#the-adopter-constraints)).
+- **A git worktree** for `check-amendment-retired-spelling` where an amendment declares a spelling, since it lists the tree through git. Outside one it exits 2.
+- **A checkout git trusts.** git refuses a repository owned by a user other than the job's as dubious ownership. The remedy is git's own, the [`safe.directory`](https://git-scm.com/docs/git-config#Documentation/git-config.txt-safedirectory) setting; this is git's documented behavior, not measured here.
+- **A task queue for `check-amendment-queue`.** It exits 2 on a tree with no `TASK-QUEUE.md`, so don't run it on one.
+
+## Which files a gate reads
+
+A gate that reads CI workflows or commit messages is opt-in: registering it is your choice, and `init` registers none of them ([`gate-sdk/SPEC.md` §The install disposition](https://checkwright.dev/gate-sdk/SPEC.html#the-install-disposition)). An action gate reads the directory you hand it, and a commit-message gate reads only the message being committed, handed to it by the `commit-msg` hook.
+
+A gate in a registry scans from the checkout's root, since a `gates.list` line carries no argument. To scope an action gate there, leave it out and register a script of your own under a name of its own, which runs the direct form with your directory.
 
 Source: https://checkwright.dev/hooks/subagent-stop-liveness.html
 

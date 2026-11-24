@@ -6,30 +6,10 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; [binary-only-ci-recipe](#binary-only-ci-recipe), with [meta-gate-ownership-scope](#meta-gate-ownership-scope) paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; `statement-out-of-tree-store`; and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; `binary-only-ci-recipe`, with `meta-gate-ownership-scope` paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; `statement-out-of-tree-store`; and [rule-id-coverage](#rule-id-coverage), reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
 ---
 
 ## New Features
-
-### binary-only-ci-recipe
-
-[spec: SPEC-binary-only-recipe.md]
-
-An adopter running gates from the binary alone, in a read-only CI container with no vendored kit, has no documented route. The direct form `checkwright-gates <gate-name> [root]` already runs a compiled-in gate with no registry and writes nothing (gate-sdk/SPEC.md §run-gates), but emits no SARIF; `--run --only` needs `gates.list` and descriptors and writes the scratch dir unless `GATE_SDK_TMP_DIR` is absolute; `check-amendment-retired-spelling` needs a git worktree; and a child directory holding `checks/` or `smoke/` reads as a kit root unless `GATE_SDK_KIT_DIRS` is set. Neither docs/orchestration.md nor docs/choosing.md carries an install recipe for that adopter.
-
-**Deliverable:** design-pending, a feature: a binary-only CI recipe page linked from both pages, and, where spec rules it, a registry-free `--run` over compiled-in gates so the SARIF verdict survives. It names the ownership scope the direct form already gives, which is [meta-gate-ownership-scope](#meta-gate-ownership-scope)'s deliverable, so spec pairs that entry with this amendment.
-
-**Cost while deferred:** each binary-only adopter re-derives the route from source, and it blocks the canon pilot that [design-partner-preview](#design-partner-preview) waits on. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 4, and its install-recipe feedback); filed at this scope, re-verified from source there (.workflow/survey-record.md). Owner lookup: `recipe`, `binary-only`, `container` in this file, none; owner gate-sdk/SPEC.md §run-gates.
-
-### meta-gate-ownership-scope
-
-[spec: SPEC-binary-only-recipe.md]
-
-An adopter predicts, from reading rather than a firing, that meta-gates will read files it does not own, such as upstream-owned `.github/workflows` and commit subjects, and asks that they be scoped to paths it declares.
-
-**Deliverable:** design-pending, a feature: an ownership scope for the meta-gates, or the existing knob that already gives one, named.
-
-**Cost while deferred:** a red on a file the adopter cannot change reads as a false positive and invites a bypass. Surfaced 2026-11-14 by a production adopter's handoff (ask 9b); filed at liveness-arm-adoption-pass' scope. Owner lookup: `ownership scope` in this file, none; owner gate-sdk/SPEC.md.
 
 ### rule-id-coverage
 
@@ -1169,4 +1149,6 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - verify-gate-run-strictness
 - evidence-blank-semantics
 - statement-out-of-tree-store
+- binary-only-ci-recipe
+- meta-gate-ownership-scope
 
