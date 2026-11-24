@@ -1,8 +1,1 @@
 # contract: lifecycle-kit/SPEC.md §The survey record — carried surveys, one block per survey; boundary-truncated, cited only behind a passing witness.
-
-## 2026-11-24 scope — Which of a peer adopter's 2026-11-24 asks does the tree already answer?
-- corpus: evidence-kit/SPEC.md canon-kit/SPEC.md gate-sdk/SPEC.md installer/SPEC.md docs/footprint.md docs/orchestration.md docs/choosing.md docs/manual-install.md native/src
-- oracle: grep -n 'judge\|ahead' native/src/emit/verify_gate_run.rs; GIT_CONFIG_NOSYSTEM=1 native/target/release/checkwright-gates --run-gate-tests gate-sdk/gate-tests gate-sdk/checks
-- rev: 8f4474d63fb39b2aaa5ac696f91b66e50188c97c
-- finding: verify-gate-run exits 0 at ahead>0, never judges a suite verdict, reads tree with --untracked-files=no; a binary-only CI route exists as the direct form 'checkwright-gates <gate> [root]' (no registry, no SARIF) but no page documents it, and --run --only needs gates.list plus descriptors and writes the scratch dir; check-spec-pointer is forward-only by SPEC design; a clean '(not applicable: <reason>)' form exists and check-amendment-queue does not use it; 'consult' is a default seam marker but reds only beside a date in a declared surface; check-comment-tier has no id-shaped directive and its extras are substrings; no --json, SARIF on --run only; no files/bytes footprint figure, gate-tests ship in the payload; no orchestrator install recipe
-- inferred: asks 4-9 read from source by a worktree child, not run: the direct gate form writes nothing; amendment-retired-spelling needs a git worktree; check-amendment-queue exits 2 on an absent queue

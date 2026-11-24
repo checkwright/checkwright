@@ -1,12 +1,9 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: peer-adoption-channel-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
-  **Set record**
-
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then `peer-request-channel`, kit mechanism in lifecycle-kit; `binary-only-ci-recipe`, with `meta-gate-ownership-scope` paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; `statement-out-of-tree-store`; and `rule-id-coverage`, reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
 ---
 
 ## New Features
