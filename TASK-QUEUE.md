@@ -284,7 +284,39 @@ The crate's integration tests (native/tests/*.rs) isolate git from host config p
 
 **Deliverable:** debt: a shared native/tests common module whose git and binary spawn builder applies the §check-crate-arms pin, every integration test routed through it, and a proc unit-test scan refusing a `Command::new` in native/tests outside that module.
 
+**A second site, and a false SPEC sentence:** native/tests/hook_tree_free.rs reads `core.hooksPath` through a raw `Command` setting only `GIT_CONFIG_NOSYSTEM`, so a host-global `core.hooksPath` fails its 'core.hooksPath was set' assertion though nothing was installed; and gate-sdk/SPEC.md §check-crate-arms says the integration tests isolate each git spawn themselves, false at that site and in grant_link_reach.rs `git`. The module's landing makes the sentence true, or the sentence goes. Sharpened 2026-11-24 by peer-adoption-channel-pass' second-vendor review, read, not probed on a hostile host.
+
 **Cost while deferred:** a host-config-sensitive integration test reds only on such a host, after the fact. Filed 2026-11-24 by peer-adoption-channel-pass' close. Re-verified there: grant_link_reach.rs spawns git with no isolation and no file under native/tests names `GIT_CONFIG_GLOBAL`. Owner lookup: `native/tests`, `GIT_CONFIG_GLOBAL`, `Command::new` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-crate-arms.
+
+### peer-reply-unbound-channel
+
+[cost: iteration/low] [surface: lifecycle-kit]
+
+lifecycle-kit/templates/stages/close.md runs `--emit peer-reply --landed` and `--shipped` unconditionally, while `LIFECYCLE_KIT_PEER_CHANNEL` defaults empty and the writing arms refuse at exit 2 when it is unset, so every close on a consumer with no channel bound meets refusals it judges by hand. lifecycle-kit/SPEC.md contradicts itself: its closing paragraph says the two close steps 'need no slot, since an unbound channel prints nothing', while §The peer request channel and the knob line state the refusal native/src/emit/peer_channel.rs implements. .workflow/release-declarations.md's knob line repeats the 'nothing to do' claim into the next release note.
+
+**Deliverable:** one of two, an envelope choice: the writing arms print nothing and exit 0 when unset, as the reading arms do; or the close steps run only where a channel is bound, and the SPEC sentence goes. Either way the declaration line moves with it.
+
+**Cost while deferred:** each close here, and on any consumer binding no channel, judges one refusal per done slug. Surfaced 2026-11-24 at peer-adoption-channel-pass' close, three gap bullets; filed at the next scope. Probed there: eight `--landed` runs each refused 'LIFECYCLE_KIT_PEER_CHANNEL is unset'. Owner lookup: `peer-reply`, `PEER_CHANNEL` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §The peer request channel.
+
+### peer-channel-input-shape
+
+[cost: event/low] [surface: lifecycle-kit]
+
+Three input shapes in native/src/emit/peer_channel.rs break lifecycle-kit/SPEC.md §The peer request channel's promises. `is_utc_stamp` slices the filing time at byte 10 after a byte-length check, so a 20-byte `filed:` value with a multibyte character across byte 10 panics every reading arm (probed: `peer-list` exit 101) where a malformed record refuses at exit 2 naming its file. `peer-list` prints the need line and a refused reason verbatim into a tab-separated row, and neither the request grammar nor `peer-reply refused` refuses a tab. The SPEC says the same ask filed twice gets two ids, but the filing time is whole-second, so two identical filings within one second collide.
+
+**Deliverable:** debt: a char-boundary-safe stamp check, a tab refused at both writers, and the id rule made true or its limit stated, each with a case.
+
+**Cost while deferred:** a malformed or tabbed request stops or skews every reading arm. Surfaced 2026-11-24 by peer-adoption-channel-pass' second-vendor review at its close; filed at the next scope. Owner lookup: `is_utc_stamp`, `peer-list`, `tab` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §The peer request channel.
+
+### untracked-count-symlink
+
+[cost: event/low] [surface: evidence-kit]
+
+native/src/emit/run_validate.rs `counted_clean` resolves each untracked path physically before `own_write`'s under-the-tmp-dir test, so under `EVIDENCE_KIT_TREE_UNTRACKED=count` an untracked symlink outside the tmp dir whose target lies inside it is exempted as the run's own write and the suite reads `tree=clean`. evidence-kit/SPEC.md §Evidence manifest exempts paths under the tmp dir or at the Statement path, a directory-entry test, and states no target-based exemption.
+
+**Deliverable:** debt: resolve the parent and keep the leaf, with a case.
+
+**Cost while deferred:** a merge predicate selecting `count` can pass a tree carrying an uncommitted symlink. Surfaced 2026-11-24 by peer-adoption-channel-pass' second-vendor review at its close, read from walk::physical_against's deepest-existing-prefix resolution; filed at the next scope. **Inferred, not run:** the symlink case end to end. Owner lookup: `counted_clean`, `own_write`, `symlink` in this file and the disposed-findings record, none on this read; owner evidence-kit/SPEC.md §Evidence manifest.
 
 ## Icebox
 
