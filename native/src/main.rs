@@ -53,7 +53,6 @@ mod provenance;
 mod queue;
 mod registry;
 mod release_sections;
-#[cfg(test)]
 mod release_stamp;
 mod runner;
 mod sarif;

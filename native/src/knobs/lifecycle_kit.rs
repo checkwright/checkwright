@@ -147,6 +147,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("LIFECYCLE_KIT_WORKTREE_LOCK_PID_RE", ""),
         Row::indexed("LIFECYCLE_KIT_ENTRY_PREFLIGHT", &[]),
         Row::scalar("LIFECYCLE_KIT_PREFLIGHT_VALVE_FILE", ""),
+        Row::scalar("LIFECYCLE_KIT_PEER_CHANNEL", ""),
     ],
     validate: Some(("stage-machine config", validate)),
     open_family: false,

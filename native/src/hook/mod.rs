@@ -402,6 +402,12 @@ pub fn observed() -> bool {
     std::env::var_os(OBSERVED_VAR).is_some_and(|v| !v.is_empty())
 }
 
+// spec: lifecycle-kit/SPEC.md §The peer request channel — the two peer arms raise the mark for
+// themselves where no repository answers
+pub(crate) fn raise_tree_free() {
+    TREE_FREE.with(|m| m.set(true));
+}
+
 #[cfg(test)]
 pub fn set_tree_free(on: bool) {
     TREE_FREE.with(|m| m.set(on));
@@ -652,6 +658,18 @@ mod tests {
         for r in context {
             assert!(r.is_err_and(|e| e.contains("absolute paths only")), "a context-dependent spelling passed");
         }
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — the peer arms' raise is the mark every
+    // knob layer reads; the stray `scripts/` case it closes is driven end to end by the kit's gate
+    // test, since a unit test cannot move the process's working directory
+    #[test]
+    fn the_peer_arms_raise_is_the_mark() {
+        assert!(!tree_free());
+        raise_tree_free();
+        let raised = tree_free();
+        set_tree_free(false);
+        assert!(raised);
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — the owner column is checked against the

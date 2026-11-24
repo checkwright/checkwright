@@ -81,6 +81,10 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit file-gap "<gap>"   # route a work-shaped finding to the gap inbox
 "$gates" --emit file-consult "<item>"   # route a ruling to reconsider or a request for advice to the consult inbox
 "$gates" --emit consult-count           # one line counting the consult inbox, nothing when it is empty
+"$gates" --emit peer-file <peer> <request.md   # a peer files a request to the peer channel; prints its id
+"$gates" --emit peer-list                       # one row per peer request: id, peer, date, state, need
+"$gates" --emit peer-reply <id> filed <slug>    # record a request's state; also refused, landed, --landed <slug>, --shipped <tag>
+"$gates" --emit peer-ready <peer>               # a peer's shipped requests this binary does not carry yet
 "$gates" --emit file-survey "<question>" "<corpus>" "<oracle>" "<inferred>" "<finding>"
 "$gates" --emit journal "<finding>"   # append to the resume journal of the stage you entered
 "$gates" --emit journal --lead "<finding>"   # a lead session: append to the lead journal its opener opened

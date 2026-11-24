@@ -6,20 +6,10 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then [peer-request-channel](#peer-request-channel), kit mechanism in lifecycle-kit; `binary-only-ci-recipe`, with `meta-gate-ownership-scope` paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; `statement-out-of-tree-store`; and `rule-id-coverage`, reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** six units on the theme of reducing friction between this project and the projects adopting it. `gate-test-system-gitconfig` is the lead unit, built first. Then `peer-request-channel`, kit mechanism in lifecycle-kit; `binary-only-ci-recipe`, with `meta-gate-ownership-scope` paired into its amendment; `verify-gate-run-strictness`, with `evidence-blank-semantics` beside it; `statement-out-of-tree-store`; and `rule-id-coverage`, reopened now rather than deferred. The handoff's asks 6 and 7b and its footprint feedback are deferred as [amendment-queue-not-applicable](#amendment-queue-not-applicable), [comment-tier-id-directive](#comment-tier-id-directive) and [adopter-footprint-figure](#adopter-footprint-figure).
 ---
 
 ## New Features
-
-### peer-request-channel
-
-[spec: SPEC-peer-request-channel.md]
-
-A peer project relaying feedback or a feature ask has no channel: each ask arrives as a hand-carried handoff file, carries no reply state, and the peer learns a requested feature shipped only by reading release notes. An external orchestrator's handoff asks for an intake inbox with reply states (ask 1), whose four fields match its own intake. Operator direction 2026-11-24, lead-relayed (not a ruling), adds the notify-on-ready-for-adoption half and makes the channel kit mechanism in lifecycle-kit rather than this repo's binding alone.
-
-**Deliverable:** design-pending, a feature: a request record grammar (need, repro, wanted, evidence) with a per-request reply state (received, filed `<slug>`, refused `<reason>`, landed, shipped `<tag>`); a filing arm a peer runs outside any tree; a listing arm; scope's intake lane and close's shipped stamp; and a peer-side read that notifies at session start once a request reaches shipped. The channel path is a consumer knob, absolute and untracked, so a request body never enters a public tree and a queue entry cites an opaque request id. Spec rules its order against [user-install-update-notice](#user-install-update-notice), whose installed-version read the notify half also needs.
-
-**Cost while deferred:** every peer ask costs a hand-written handoff and reply, and a shipped ask is adopted only when the peer happens to look. Surfaced 2026-11-24 by an external orchestrator's handoff and the operator's direction; filed at this scope. Owner lookup: `peer`, `request channel`, `intake` in this file, none; owner lifecycle-kit/SPEC.md.
 
 ## Technical Debt
 
@@ -1142,4 +1132,5 @@ No arm exports a developer's workflow commits off a vendored tree they do not ow
 - binary-only-ci-recipe
 - meta-gate-ownership-scope
 - rule-id-coverage
+- peer-request-channel
 

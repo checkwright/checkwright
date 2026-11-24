@@ -51,6 +51,7 @@ pub mod parse_gates_log;
 pub mod overhead_meter;
 pub mod pack_installer;
 pub mod parse_smoke_log;
+pub mod peer_channel;
 pub mod projection_witness;
 pub mod port_blockers;
 pub mod price_coverage;
@@ -623,6 +624,31 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-consult-count",
         Arm::Emit(consult_count::emit, Grammar::Flags(&[])),
         consult_count::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — the peer's filing arm
+    (
+        "--emit-peer-file",
+        Arm::Emit(peer_channel::file, Grammar::Parsed(peer_channel::FILE_USAGE)),
+        peer_channel::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — the receiver's read, a brief command
+    (
+        "--emit-peer-list",
+        Arm::Emit(peer_channel::list, Grammar::Flags(&[])),
+        peer_channel::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — the receiver's state writer
+    (
+        "--emit-peer-reply",
+        Arm::Emit(peer_channel::reply, Grammar::Parsed(peer_channel::REPLY_USAGE)),
+        peer_channel::KNOBS,
+    ),
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — the peer's adoption notice, a brief
+    // command
+    (
+        "--emit-peer-ready",
+        Arm::Emit(peer_channel::ready, Grammar::Parsed(peer_channel::READY_USAGE)),
+        peer_channel::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The knowledge-friction loop — the capture affordance, riding the same
     // argv-shape split as `--emit-file-survey`: the refusal and the `--` escape cross the port with

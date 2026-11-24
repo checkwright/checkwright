@@ -506,4 +506,16 @@ gp_seed_state close
 gp_run scope >/dev/null || { echo "smoke(enter-stage): a header-only gap inbox should not refuse a boundary entry" >&2; exit 1; }
 grep -q "^## Iteration: —\$" "$gpq" || { echo "smoke(enter-stage): gap-inbox pass did not reset the header" >&2; exit 1; }
 
+# spec: lifecycle-kit/SPEC.md §The peer request channel — the vendored install's front-end answers the arms over a scratch channel outside the tree: a request files and prints its id, lists as received, and takes a filed reply
+pc="$(mktemp -d)"
+pc_run() { LIFECYCLE_KIT_PEER_CHANNEL="$pc" bash "$SDK/bin/run-gates.sh" --emit "$@"; }
+pc_id="$(printf '## need\nan ask\n\n## repro\nrun it\n\n## wanted\nadmit it\n\n## evidence\nthe log\n' | pc_run peer-file smoke-peer)" \
+    || { echo "smoke(peer): --emit peer-file did not file a request -- $pc_id" >&2; rm -rf "$pc"; exit 1; }
+[[ -f "$pc/$pc_id.md" ]] || { echo "smoke(peer): the printed id names no request: $pc_id" >&2; rm -rf "$pc"; exit 1; }
+pc_row="$(pc_run peer-list)"
+[[ "$pc_row" == "$pc_id"$'\tsmoke-peer\t'*$'\treceived\tan ask' ]] || { echo "smoke(peer): --emit peer-list did not list the request as received -- $pc_row" >&2; rm -rf "$pc"; exit 1; }
+pc_out="$(pc_run peer-reply "$pc_id" filed smoke-slug)"
+[[ "$pc_out" == "$pc_id filed smoke-slug" ]] || { echo "smoke(peer): --emit peer-reply did not record the move -- $pc_out" >&2; rm -rf "$pc"; exit 1; }
+rm -rf "$pc"
+
 rm -rf "$es"

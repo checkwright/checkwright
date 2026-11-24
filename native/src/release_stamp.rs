@@ -4,6 +4,7 @@
 
 // spec: gate-sdk/SPEC.md §run-gates — the build input outranks the describe answer, each loses a
 // leading `v`, and the stamp is exact for a build input or a describe answer with no distance
+#[cfg_attr(not(test), allow(dead_code))]
 pub fn stamp(build_input: Option<&str>, describe: Option<&str>) -> (String, bool) {
     if let Some(v) = build_input.map(str::trim).filter(|v| !v.is_empty()) {
         return (strip_v(v).to_string(), true);
@@ -22,7 +23,7 @@ fn strip_v(s: &str) -> &str {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — `git describe`'s distance suffix, `-<n>-g<hash>`
-fn has_distance(s: &str) -> bool {
+pub fn has_distance(s: &str) -> bool {
     let mut parts = s.rsplitn(3, '-');
     let (Some(hash), Some(n), Some(_)) = (parts.next(), parts.next(), parts.next()) else {
         return false;
