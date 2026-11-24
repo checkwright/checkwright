@@ -241,6 +241,16 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 
 **Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
 
+### absent-queue-liveness-gates
+
+[cost: event/low] [surface: canon-kit]
+
+`check-todo-task-liveness` and `check-deprecation-task` exit 2 'queue file not found' on an absent `CANON_KIT_QUEUE_FILE` before scanning for any marker, the absent-subject shape `check-amendment-queue` now reports as not applicable (canon-kit/SPEC.md §check-amendment-queue).
+
+**Deliverable:** design-pending, debt: an absent queue with no marker on the surface reads not applicable; whether a marker with no queue to resolve against still refuses is the open call. Both SPEC sections and `check-deprecation-task.test.sh`'s `queue-missing-fail-closed` case assert the refusal today, so the change moves stated contract.
+
+**Cost while deferred:** an adopter tracking work outside the queue grammar leaves both gates unregistered. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified there: both gates return the error before reading the surface. Owner lookup: `todo-task-liveness`, `deprecation-task`, `absent queue` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md §check-todo-task-liveness and §check-deprecation-task.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
