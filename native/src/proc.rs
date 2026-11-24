@@ -2186,6 +2186,27 @@ pub(crate) mod tests {
         assert!(named.lines().any(|l| l == "global\t/hostile-global"), "the caller's own global file went unread: {:?}", named);
     }
 
+    // spec: gate-sdk/SPEC.md §check-crate-arms — an integration test starts its children through
+    // the shared module that pins them; the scan is a floor, and a spawn through an alias evades it
+    #[test]
+    fn no_integration_test_builds_a_child_outside_the_shared_module() {
+        let tests = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests");
+        let shared = tests.join("common");
+        let files = walk::find_files(&tests, &["rs"]).expect("cannot enumerate the integration tests");
+        assert!(files.iter().any(|f| f.starts_with(&shared)), "the shared spawn module is gone");
+        let offenders: Vec<String> = files
+            .iter()
+            .filter(|f| !f.starts_with(&shared))
+            .filter(|f| {
+                std::fs::read_to_string(f)
+                    .unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e))
+                    .contains("Command::new")
+            })
+            .map(|f| f.display().to_string())
+            .collect();
+        assert!(offenders.is_empty(), "an integration test spawns outside tests/common: {:?}", offenders);
+    }
+
     // spec: gate-sdk/SPEC.md §upgrade-smoke — a member writing scratch registers nothing
     // outside the scratch base; a linked worktree fails this. The scan is a floor, never a
     // proof: a worktree added through a variable or through `bash -c` evades it.

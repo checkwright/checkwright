@@ -3,9 +3,11 @@
 // every other setting sit in its own config, never the process environment
 #![cfg(unix)]
 
+mod common;
+
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 const BIN: &str = env!("CARGO_BIN_EXE_checkwright-gates");
 
@@ -47,24 +49,12 @@ fn scratch(case: &str) -> Scratch {
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — a file a case spawns is written by a
 // child process, so no sibling test's fork holds its write descriptor into the spawn as ETXTBSY
 fn by_a_child(script: &str, args: &[&OsStr]) {
-    let out = Command::new("sh").arg("-c").arg(script).arg("sh").args(args).output().expect("sh did not spawn");
+    let out = common::command("sh").arg("-c").arg(script).arg("sh").args(args).output().expect("sh did not spawn");
     assert!(out.status.success(), "the writer failed: {}", String::from_utf8_lossy(&out.stderr));
 }
 
-// spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — a setup or assertion read aims at the scratch
-// repository alone, never at the one an exported `GIT_DIR` or `GIT_WORK_TREE` names
-fn unset_git_env(c: &mut Command) {
-    for (name, _) in std::env::vars_os() {
-        if name.to_string_lossy().starts_with("GIT_") {
-            c.env_remove(&name);
-        }
-    }
-}
-
 fn git(s: &Scratch, args: &[&str]) -> String {
-    let mut c = Command::new("git");
-    unset_git_env(&mut c);
-    let out = c.arg("-C").arg(&s.repo).args(args).output().expect("git did not spawn");
+    let out = common::without_git_env("git").arg("-C").arg(&s.repo).args(args).output().expect("git did not spawn");
     String::from_utf8_lossy(&out.stdout).into_owned()
 }
 
@@ -76,18 +66,10 @@ fn verb(s: &Scratch, bin: &Path, args: &[&str]) -> (Option<i32>, String, String)
 
 // spec: installer/SPEC.md §init — `verb` with variables the case itself exports, set after the scrub
 fn verb_with(s: &Scratch, bin: &Path, args: &[&str], env: &[(&str, &str)]) -> (Option<i32>, String, String) {
-    let mut c = Command::new(bin);
-    c.args(args).current_dir(&s.repo).stdin(Stdio::null());
-    unset_git_env(&mut c);
-    for (name, _) in std::env::vars_os() {
-        let n = name.to_string_lossy();
-        if n.starts_with("GATE_") || n.contains("_KIT_") || n == "EMAIL" {
-            c.env_remove(&name);
-        }
-    }
+    let mut c = common::scrubbed(bin);
+    c.args(args).current_dir(&s.repo).stdin(Stdio::null()).env_remove("EMAIL");
     c.env("HOME", s.dir.join("home"))
         .env("XDG_CONFIG_HOME", s.dir.join("home"))
-        .env("GIT_CONFIG_NOSYSTEM", "1")
         .env("GATE_SDK_UPDATE_CHECK", "off")
         .env("GIT_CEILING_DIRECTORIES", &s.dir);
     for (k, v) in env {

@@ -2,6 +2,8 @@
 // builds for this test run with a stdout that is a pipe whose reader has already gone, and its
 // bound on a child handed that stdout
 
+mod common;
+
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
 
@@ -33,14 +35,8 @@ impl Scratch {
     // spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the case reads no knob of the invoking
     // environment: every kit's and the harness's names are dropped, then the scratch registry set
     fn command(&self, args: &[&str]) -> Command {
-        let mut c = Command::new(BIN);
+        let mut c = common::scrubbed(BIN);
         c.args(args).current_dir(&self.0).stdin(Stdio::null()).stderr(Stdio::piped());
-        for (name, _) in std::env::vars_os() {
-            let n = name.to_string_lossy();
-            if n.starts_with("GATE_") || n.contains("_KIT_") || n.starts_with("GIT_") {
-                c.env_remove(&name);
-            }
-        }
         let queue_kit = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .expect("the crate sits under the repository root")
@@ -70,7 +66,7 @@ impl Drop for Scratch {
 // spec: gate-sdk/SPEC.md §The non-gate arm — a pipe whose reader has gone, never a closed
 // descriptor: the write end of a child's stdin, kept past that child's exit
 fn departed() -> Stdio {
-    let mut reader = Command::new(BIN)
+    let mut reader = common::command(BIN)
         .arg("--source-stamp")
         .stdin(Stdio::piped())
         .stdout(Stdio::null())

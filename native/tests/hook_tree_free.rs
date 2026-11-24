@@ -2,8 +2,10 @@
 // tree-free member started outside any repository runs in place on absolute knobs and declines on a
 // relative one, and every other no-tree call keeps the notice
 
+mod common;
+
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 const BIN: &str = env!("CARGO_BIN_EXE_checkwright-gates");
 
@@ -43,15 +45,9 @@ struct Fired {
 // spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the run reads no knob or git setting of the invoking
 // environment, and git's discovery stops at the scratch dir
 fn fire(s: &Scratch, from: &Path, args: &[&str], env: &[(&str, String)], payload: &str) -> Fired {
-    let mut c = Command::new(BIN);
+    let mut c = common::scrubbed(BIN);
     c.arg("--hook").args(args).current_dir(from).stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
-    for (name, _) in std::env::vars_os() {
-        let n = name.to_string_lossy();
-        if n.starts_with("GATE_") || n.contains("_KIT_") || n.starts_with("GIT_") {
-            c.env_remove(&name);
-        }
-    }
-    c.env("HOME", s.at("home")).env("GIT_CONFIG_NOSYSTEM", "1").env("GIT_CEILING_DIRECTORIES", &s.0).env("PWD", from);
+    c.env("HOME", s.at("home")).env("GIT_CEILING_DIRECTORIES", &s.0).env("PWD", from);
     for (k, v) in env {
         c.env(k, v);
     }
@@ -174,11 +170,10 @@ mod unspelled {
     }
 
     fn git(dir: &Path, args: &[&str]) -> String {
-        let out = Command::new("git")
+        let out = common::command("git")
             .arg("-C")
             .arg(dir)
             .args(args)
-            .env("GIT_CONFIG_NOSYSTEM", "1")
             .output()
             .expect("git did not spawn");
         assert!(out.status.success(), "git {:?}: {}", args, String::from_utf8_lossy(&out.stderr));
@@ -205,7 +200,7 @@ mod unspelled {
     #[test]
     fn an_argument_with_no_utf8_spelling_exits_two_without_a_panic() {
         let s = Scratch::new("argv");
-        let out = Command::new(BIN).arg("--hook").arg(OsStr::from_bytes(b"x\xff")).output().expect("spawn");
+        let out = common::command(BIN).arg("--hook").arg(OsStr::from_bytes(b"x\xff")).output().expect("spawn");
         let err = String::from_utf8_lossy(&out.stderr);
         assert_eq!(out.status.code(), Some(2), "{}", err);
         assert!(err.contains("argument 2") && err.contains("x\\xff") && !err.contains("panicked"), "{}", err);
@@ -213,7 +208,7 @@ mod unspelled {
         let hooks = s.at("hooks");
         std::fs::create_dir_all(&hooks).expect("hooks dir");
         std::os::unix::fs::symlink(BIN, hooks.join("pre-commit")).expect("served start name");
-        let out = Command::new(hooks.join("pre-commit")).arg(OsStr::from_bytes(b"\xfe")).output().expect("spawn");
+        let out = common::command(hooks.join("pre-commit")).arg(OsStr::from_bytes(b"\xfe")).output().expect("spawn");
         let err = String::from_utf8_lossy(&out.stderr);
         assert_eq!(out.status.code(), Some(2), "{}", err);
         assert!(err.contains("argument 1") && err.contains("--no-verify") && err.contains("core.hooksPath"), "{}", err);
@@ -239,20 +234,13 @@ mod unspelled {
         let bin = art.join(Path::new(BIN).file_name().expect("a binary name"));
         // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the binary is placed by a child
         // process, so no sibling test's fork holds its write descriptor into the spawn as ETXTBSY
-        let placed = Command::new("cp").arg(BIN).arg(&bin).status().expect("cp did not spawn");
+        let placed = common::command("cp").arg(BIN).arg(&bin).status().expect("cp did not spawn");
         assert!(placed.success(), "cannot place the binary under test");
         let run = |verb: &str, at: &Path| {
-            let mut c = Command::new(&bin);
-            c.arg(verb).current_dir(at).stdin(Stdio::null());
-            for (name, _) in std::env::vars_os() {
-                let n = name.to_string_lossy();
-                if n.starts_with("GATE_") || n.contains("_KIT_") || n.starts_with("GIT_") || n == "EMAIL" {
-                    c.env_remove(&name);
-                }
-            }
+            let mut c = common::scrubbed(&bin);
+            c.arg(verb).current_dir(at).stdin(Stdio::null()).env_remove("EMAIL");
             c.env("HOME", s.at("home"))
                 .env("XDG_CONFIG_HOME", s.at("home"))
-                .env("GIT_CONFIG_NOSYSTEM", "1")
                 .env("GATE_SDK_UPDATE_CHECK", "off")
                 .env("GIT_CEILING_DIRECTORIES", &s.0);
             c.output().expect("cannot run the binary under test")
@@ -270,11 +258,10 @@ mod unspelled {
             assert_eq!(out.status.code(), Some(2), "{}: {}", verb, err);
             assert!(err.contains("main-\\xff") && !err.contains("panicked"), "{}: {}", verb, err);
             assert!(!common.join("gate-hooks").exists(), "{}: a hooks directory was placed", verb);
-            let pointed = Command::new("git")
+            let pointed = common::command("git")
                 .arg("-C")
                 .arg(s.at("wt"))
                 .args(["config", "core.hooksPath"])
-                .env("GIT_CONFIG_NOSYSTEM", "1")
                 .output()
                 .expect("git");
             assert!(pointed.stdout.is_empty(), "{}: core.hooksPath was set", verb);

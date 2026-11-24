@@ -2,8 +2,10 @@
 // scratch consumer registers a passing and a failing member of one start, and the battery built for
 // this test run starts them, or refuses the member that cannot start
 
+mod common;
+
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 const BIN: &str = env!("CARGO_BIN_EXE_checkwright-gates");
 
@@ -30,14 +32,8 @@ fn scratch(case: &str) -> PathBuf {
 
 // spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the case reads no knob of the invoking environment
 fn run(dir: &Path, host: &str) -> String {
-    let mut c = Command::new(BIN);
+    let mut c = common::scrubbed(BIN);
     c.arg("--run").current_dir(dir).stdin(Stdio::null());
-    for (name, _) in std::env::vars_os() {
-        let n = name.to_string_lossy();
-        if n.starts_with("GATE_") || n.contains("_KIT_") || n.starts_with("GIT_") {
-            c.env_remove(&name);
-        }
-    }
     let sdk = Path::new(env!("CARGO_MANIFEST_DIR")).parent().expect("repository root").join("gate-sdk");
     c.env("GATE_SDK_GATES_DIR", dir.join("gates"))
         .env("GATE_SDK_KIT_DIRS", sdk)
@@ -137,7 +133,7 @@ fn rustc() -> PathBuf {
 fn build(src: &str, out: &Path) {
     let file = out.with_extension("rs");
     std::fs::write(&file, src).expect("program source");
-    let done = Command::new(rustc())
+    let done = common::command(rustc())
         .arg("--edition=2021")
         .arg("-o")
         .arg(out)
@@ -180,7 +176,7 @@ const SH_FAIL: &str = "#!/usr/bin/env bash\n# spec: docs/gates.md §live — the
 fn shell_member(path: &Path, body: &str) {
     #[cfg(unix)]
     {
-        let out = Command::new("sh")
+        let out = common::command("sh")
             .args(["-c", "printf '%s' \"$1\" > \"$2\" && chmod 755 \"$2\"", "sh", body])
             .arg(path)
             .output()
@@ -213,14 +209,8 @@ fn a_shell_member_starts_under_the_battery_and_the_fixture_runner() {
         }
     }
     let sdk = Path::new(env!("CARGO_MANIFEST_DIR")).parent().expect("repository root").join("gate-sdk");
-    let mut c = Command::new(BIN);
+    let mut c = common::scrubbed(BIN);
     c.arg("--run-gate-tests").arg(&pairs).arg(&gates).current_dir(&dir).stdin(Stdio::null());
-    for (name, _) in std::env::vars_os() {
-        let n = name.to_string_lossy();
-        if n.starts_with("GATE_") || n.contains("_KIT_") || n.starts_with("GIT_") {
-            c.env_remove(&name);
-        }
-    }
     c.env("GATE_SDK_ROOT", &sdk)
         .env("GATE_SDK_KIT_DIRS", &sdk)
         .env("GATE_SDK_GATES_DIR", &gates)

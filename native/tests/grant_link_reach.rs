@@ -2,8 +2,10 @@
 // `bounded_write`'s bounds clause (e), held where the host makes a link: a write through one takes
 // no grant, and the same write to a plain scratch target is granted
 
+mod common;
+
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 const BIN: &str = env!("CARGO_BIN_EXE_checkwright-gates");
 
@@ -16,7 +18,7 @@ impl Drop for Scratch {
 }
 
 fn git(root: &Path, args: &[&str]) {
-    let done = Command::new("git")
+    let done = common::without_git_env("git")
         .arg("-C")
         .arg(root)
         .args(args)
@@ -61,14 +63,8 @@ fn link(target: &Path, at: &Path, dir: bool) -> bool {
 // spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the case reads no knob of the invoking environment
 fn granted(root: &Path, command: &str) -> bool {
     let payload = serde_json::json!({"tool_name": "Bash", "tool_input": {"command": command}}).to_string();
-    let mut c = Command::new(BIN);
+    let mut c = common::scrubbed(BIN);
     c.args(["--hook", "shell-guard"]).current_dir(root).stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
-    for (name, _) in std::env::vars_os() {
-        let n = name.to_string_lossy();
-        if n.starts_with("GATE_") || n.contains("_KIT_") || n.starts_with("GIT_") {
-            c.env_remove(&name);
-        }
-    }
     c.env("GATE_SDK_NATIVE_BIN", BIN)
         .env("GUARD_KIT_LOG", root.join("friction.log"))
         .env("PWD", root)

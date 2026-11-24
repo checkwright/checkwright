@@ -2,8 +2,10 @@
 // re-run as a child, its would-be decision logged, the call allowed silently, and a log that cannot
 // be written declining
 
+mod common;
+
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 const BIN: &str = env!("CARGO_BIN_EXE_checkwright-gates");
 
@@ -23,11 +25,10 @@ impl Scratch {
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(dir.join("repo")).expect("cannot make the scratch dir");
         std::fs::create_dir_all(dir.join("free")).expect("cannot make the scratch dir");
-        let init = Command::new("git")
+        let init = common::command("git")
             .arg("-C")
             .arg(dir.join("repo"))
             .args(["init", "-q"])
-            .env("GIT_CONFIG_NOSYSTEM", "1")
             .output()
             .expect("git did not spawn");
         assert!(init.status.success(), "git init: {}", String::from_utf8_lossy(&init.stderr));
@@ -52,15 +53,9 @@ struct Fired {
 // spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the run reads no knob or git setting of the invoking
 // environment, and git's discovery stops at the scratch dir
 fn fire(s: &Scratch, from: &Path, args: &[&str], env: &[(&str, String)], payload: &str) -> Fired {
-    let mut c = Command::new(BIN);
+    let mut c = common::scrubbed(BIN);
     c.arg("--hook").args(args).current_dir(from).stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
-    for (name, _) in std::env::vars_os() {
-        let n = name.to_string_lossy();
-        if n.starts_with("GATE_") || n.contains("_KIT_") || n.starts_with("GIT_") {
-            c.env_remove(&name);
-        }
-    }
-    c.env("HOME", s.at("home")).env("GIT_CONFIG_NOSYSTEM", "1").env("GIT_CEILING_DIRECTORIES", &s.0).env("PWD", from);
+    c.env("HOME", s.at("home")).env("GIT_CEILING_DIRECTORIES", &s.0).env("PWD", from);
     for (k, v) in env {
         c.env(k, v);
     }
@@ -118,7 +113,7 @@ fn an_observed_session_context_sweeps_no_scratch() {
     std::fs::create_dir_all(repo.join(".tmp")).expect("scratch root");
     let aged = repo.join(".tmp/aged.txt");
     std::fs::write(&aged, "x").expect("scratch file");
-    let touched = Command::new("touch").args(["-t", "200001010000"]).arg(&aged).status().expect("touch must be spawnable");
+    let touched = common::command("touch").args(["-t", "200001010000"]).arg(&aged).status().expect("touch must be spawnable");
     assert!(touched.success(), "touch could not age {}", aged.display());
     let mut env = log_env(&s);
     env.push(("CONTEXT_KIT_SWEEP_HORIZON_HOURS", "1".to_string()));

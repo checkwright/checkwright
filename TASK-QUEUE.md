@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and `untracked-count-symlink`, with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; `adopter-footprint-figure`; and `non-gate-arm-json`, narrowed to `--verify-gate-run`, the one arm an adopter has named.
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then `amendment-queue-not-applicable` and `untracked-count-symlink`, with `integration-test-git-isolation` joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; `adopter-footprint-figure`; and `non-gate-arm-json`, narrowed to `--verify-gate-run`, the one arm an adopter has named.
 
   **The release (2026-11-24, operator direction, lead-relayed, not a ruling):** this iteration's close cuts v0.37.0, since adopters take the landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push and the release tag push.
 ---
@@ -14,16 +14,6 @@
 ## New Features
 
 ## Technical Debt
-
-### integration-test-git-isolation
-
-The crate's integration tests (native/tests/*.rs) isolate git from host config per spawn by hand, outside proc's `cfg(test)` pin: grant_link_reach.rs's git helper sets no isolation, none sets `GIT_CONFIG_GLOBAL`, and no catcher holds the next raw `Command::new("git")` there.
-
-**Deliverable:** debt: a shared native/tests common module whose git and binary spawn builder applies the §check-crate-arms pin, every integration test routed through it, and a proc unit-test scan refusing a `Command::new` in native/tests outside that module.
-
-**A second site, and a false SPEC sentence:** native/tests/hook_tree_free.rs reads `core.hooksPath` through a raw `Command` setting only `GIT_CONFIG_NOSYSTEM`, so a host-global `core.hooksPath` fails its 'core.hooksPath was set' assertion though nothing was installed; and gate-sdk/SPEC.md §check-crate-arms says the integration tests isolate each git spawn themselves, false at that site and in grant_link_reach.rs `git`. The module's landing makes the sentence true, or the sentence goes. Sharpened 2026-11-24 by peer-adoption-channel-pass' second-vendor review, read, not probed on a hostile host.
-
-**Cost while deferred:** a host-config-sensitive integration test reds only on such a host, after the fact. Filed 2026-11-24 by peer-adoption-channel-pass' close. Re-verified there: grant_link_reach.rs spawns git with no isolation and no file under native/tests names `GIT_CONFIG_GLOBAL`. Owner lookup: `native/tests`, `GIT_CONFIG_GLOBAL`, `Command::new` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-crate-arms.
 
 ## Deferred
 
@@ -1020,4 +1010,5 @@ The drift trend report cannot take a KPI series held outside the tree.
 - untracked-count-symlink
 - non-gate-arm-json
 - adopter-footprint-figure
+- integration-test-git-isolation
 

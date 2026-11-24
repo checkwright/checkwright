@@ -2,8 +2,10 @@
 // named file is the only file layer inside a repository and outside one, a file the arm cannot use
 // declines naming it, and the token on a member that reads a repository is refused
 
+mod common;
+
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 const BIN: &str = env!("CARGO_BIN_EXE_checkwright-gates");
 
@@ -55,15 +57,9 @@ struct Fired {
 // spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the run reads no knob or git setting of the invoking
 // environment, and git's discovery stops at the scratch dir
 fn fire(s: &Scratch, from: &Path, args: &[&str], env: &[(&str, String)], payload: &str) -> Fired {
-    let mut c = Command::new(BIN);
+    let mut c = common::scrubbed(BIN);
     c.arg("--hook").args(args).current_dir(from).stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped());
-    for (name, _) in std::env::vars_os() {
-        let n = name.to_string_lossy();
-        if n.starts_with("GATE_") || n.contains("_KIT_") || n.starts_with("GIT_") {
-            c.env_remove(&name);
-        }
-    }
-    c.env("HOME", s.at("home")).env("GIT_CONFIG_NOSYSTEM", "1").env("GIT_CEILING_DIRECTORIES", &s.0).env("PWD", from);
+    c.env("HOME", s.at("home")).env("GIT_CEILING_DIRECTORIES", &s.0).env("PWD", from);
     for (k, v) in env {
         c.env(k, v);
     }
@@ -104,10 +100,9 @@ fn declined(f: &Fired, names: &[&str]) {
 }
 
 fn git_init(dir: &Path) {
-    let ok = Command::new("git")
+    let ok = common::command("git")
         .args(["init", "-q"])
         .current_dir(dir)
-        .env("GIT_CONFIG_NOSYSTEM", "1")
         .status()
         .is_ok_and(|s| s.success());
     assert!(ok, "git init failed in {}", dir.display());
