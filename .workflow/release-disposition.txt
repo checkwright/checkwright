@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+adopter-asks-pass release v0.37.0 — minor by the declarations (new check-test-control and check-rule-id-coverage, the SARIF verdict contract, gate-run Statements with verify and import arms, evidence manifest v2), no decommission; cut on operator direction 2026-11-24, lead-relayed, discharging the prior deferred:v0.37.0
