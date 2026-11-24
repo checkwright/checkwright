@@ -7,3 +7,4 @@
 peer-adoption-channel-pass scope ab2bbda2 2026-11-24 13f33fd9f
 peer-adoption-channel-pass spec a155b9e0 2026-11-24 f1cd1bf93
 peer-adoption-channel-pass align a09a63c6 2026-11-24 254062a79
+peer-adoption-channel-pass build a2b5e1f6 2026-11-24 170e3e674
