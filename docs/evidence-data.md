@@ -315,4 +315,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | verdict-contract-residue-pass | sc sp · b v c | 2f/4d | 1 · ≤1d | 21s clean | 158 |
 | input-shape-refusal-pass | sc · · b v c | 0f/7d | 0 | 21s clean | 158 |
 | peer-adoption-channel-pass | sc sp a b v c | 9f/1d | 5 · ≤0d | 21s clean | 159 |
-| adopter-asks-pass | sc sp a b v c | 6f/3d | 3 · ≤0d | 21s clean | 160 |
+| adopter-asks-pass | sc sp a b v c | 6f/3d | 3 · ≤0d | 42s clean | 160 |
