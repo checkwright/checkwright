@@ -13,6 +13,16 @@
 
 ## New Features
 
+### comment-tier-id-directive
+
+[spec: canon-kit/SPEC-comment-tier-id-directive.md]
+
+With its surface widened to source, `check-comment-tier` reads an id-shaped directive such as `rule <id>:` as a restatement, and the extras knobs match substrings, so blessing the word blesses every comment holding it.
+
+**Deliverable:** design-pending, a feature: an id-shaped directive pattern knob, with fixtures.
+
+**Cost while deferred:** an adopter citing rule ids in comments either sees false reds or over-blesses. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 7b); filed at this scope. Owner lookup: `comment-tier`, `directive` in this file, none; owner canon-kit/SPEC.md §check-comment-tier.
+
 ## Technical Debt
 
 ### peer-reply-unbound-channel
@@ -292,16 +302,6 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 **Deliverable:** debt: shape checks at both producers, and the composition rule stated or removed.
 
 **Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
-
-### comment-tier-id-directive
-
-[cost: event/low] [surface: canon-kit]
-
-With its surface widened to source, `check-comment-tier` reads an id-shaped directive such as `rule <id>:` as a restatement, and the extras knobs match substrings, so blessing the word blesses every comment holding it.
-
-**Deliverable:** design-pending, a feature: an id-shaped directive pattern knob, with fixtures.
-
-**Cost while deferred:** an adopter citing rule ids in comments either sees false reds or over-blesses. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 7b); filed at this scope. Owner lookup: `comment-tier`, `directive` in this file, none; owner canon-kit/SPEC.md §check-comment-tier.
 
 ### adopter-footprint-figure
 
