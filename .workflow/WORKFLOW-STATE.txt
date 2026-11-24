@@ -9,3 +9,4 @@ adopter-asks-pass spec a1f494c8 2026-11-24 1ac65961f
 adopter-asks-pass align a3bb5e25 2026-11-24 e925bf4b4
 adopter-asks-pass build a458b23e 2026-11-24 4d18a0338
 adopter-asks-pass build adde5470 2026-11-24 0f7789106
+adopter-asks-pass build af0306fd 2026-11-24 6fc223ed5
