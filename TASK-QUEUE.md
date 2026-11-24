@@ -6,22 +6,12 @@
 
   **Set record**
 
-  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then [amendment-queue-not-applicable](#amendment-queue-not-applicable) and [untracked-count-symlink](#untracked-count-symlink), with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: [comment-tier-id-directive](#comment-tier-id-directive), reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
+  **The unit set (2026-11-24, operator direction, lead-relayed, not a ruling):** eight units completing the asks adopting projects still hold open. `peer-reply-unbound-channel` leads, its per-close cost the set's only iteration-class row, with `peer-channel-input-shape` beside it. Then [amendment-queue-not-applicable](#amendment-queue-not-applicable) and [untracked-count-symlink](#untracked-count-symlink), with [integration-test-git-isolation](#integration-test-git-isolation) joining on gate-sdk. Three features for spec to author and pair: `comment-tier-id-directive`, reading check-rule-id-coverage's declared id shapes rather than a new knob; [adopter-footprint-figure](#adopter-footprint-figure); and [non-gate-arm-json](#non-gate-arm-json), narrowed to `--verify-gate-run`, the one arm an adopter has named.
 
   **The release (2026-11-24, operator direction, lead-relayed, not a ruling):** this iteration's close cuts v0.37.0, since adopters take the landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push and the release tag push.
 ---
 
 ## New Features
-
-### comment-tier-id-directive
-
-[spec: canon-kit/SPEC-comment-tier-id-directive.md]
-
-With its surface widened to source, `check-comment-tier` reads an id-shaped directive such as `rule <id>:` as a restatement, and the extras knobs match substrings, so blessing the word blesses every comment holding it.
-
-**Deliverable:** design-pending, a feature: an id-shaped directive pattern knob, with fixtures.
-
-**Cost while deferred:** an adopter citing rule ids in comments either sees false reds or over-blesses. Surfaced 2026-11-24 by an external orchestrator's handoff (ask 7b); filed at this scope. Owner lookup: `comment-tier`, `directive` in this file, none; owner canon-kit/SPEC.md §check-comment-tier.
 
 ### non-gate-arm-json
 
@@ -1061,4 +1051,5 @@ The drift trend report cannot take a KPI series held outside the tree.
 
 - peer-reply-unbound-channel
 - peer-channel-input-shape
+- comment-tier-id-directive
 

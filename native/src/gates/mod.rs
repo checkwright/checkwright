@@ -221,6 +221,15 @@ const COMMENT_SURFACE_ROOTS: &[RootDecl] = &[
     (".", "ext:lit:yml,yaml", "", ""),
 ];
 
+// spec: canon-kit/SPEC.md §check-comment-tier — the comment surface beside the rule-id declaring
+// set, whose walk is the one `check-rule-id-coverage` makes
+const COMMENT_TIER_ROOTS: &[RootDecl] = &[
+    (".", "glob:knob:CANON_KIT_COMMENT_SURFACE", "", ""),
+    (".", "else:CANON_KIT_COMMENT_SURFACE:ext:lit:sh,gate", "", ""),
+    (".", "ext:lit:yml,yaml", "", ""),
+    (".", "glob:knob:CANON_KIT_RULE_ID_DECLARE_GLOBS", "", ""),
+];
+
 // spec: gate-sdk/SPEC.md §check-reads-couples — `MANIFEST_ROOTS` and `COMMENT_SURFACE_ROOTS`
 // together: this member walks twice, through both shared helpers, and a declaration per member
 // rather than per walk is what drops the second walk silently.
@@ -1121,7 +1130,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-comment-tier",
         comment_tier::run,
-        COMMENT_SURFACE_ROOTS,
+        COMMENT_TIER_ROOTS,
         &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
@@ -1138,6 +1147,11 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_COUNT_COLLECTIONS",
             "CANON_KIT_COUNT_WEDGE_WORDS",
             "CANON_KIT_COUNT_ALLOWED_PHRASES",
+            "CANON_KIT_RULE_ID_DECLARE_GLOBS",
+            "CANON_KIT_RULE_ID_SPEC_GLOBS",
+            "CANON_KIT_RULE_ID_DECLARES",
+            "CANON_KIT_RULE_ID_CITES",
+            "CANON_KIT_RULE_ID_HOMES",
         ],
         "canon-kit",
         &[("git", "")],

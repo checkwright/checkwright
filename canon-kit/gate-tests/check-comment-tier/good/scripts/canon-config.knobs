@@ -4,3 +4,8 @@ CANON_KIT_COMMENT_ACTIONS = on
 CANON_KIT_COMMENT_SURFACE[] = **/*.sh
 CANON_KIT_COMMENT_SURFACE[] = **/*.gate
 CANON_KIT_COMMENT_SURFACE[] = **/*.rs
+# spec: canon-kit/SPEC.md §check-comment-tier — a rule family whose declaring comments under src/ are reason directives
+CANON_KIT_RULE_ID_DECLARE_GLOBS[] = src/*.rs
+CANON_KIT_RULE_ID_SPEC_GLOBS[] = specs/*.md
+CANON_KIT_RULE_ID_DECLARES[rule] = rule (R-[0-9]+):
+CANON_KIT_RULE_ID_CITES[rule] = \[(R-[0-9]+)\]

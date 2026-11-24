@@ -1,8 +1,10 @@
 // spec: canon-kit/SPEC.md §check-comment-tier — every full-line comment on a governed surface
 // is a machine/reason directive, rides a directive's bounded window, is comment-tier-exempt,
 // or justifies a positional construct
+use super::rule_id_coverage::Declaring;
 use crate::spec;
 use crate::walk;
+use std::collections::BTreeSet;
 use std::path::Path;
 
 // spec: canon-kit/SPEC.md §check-comment-tier — the built-in kit-mechanism roster (the
@@ -118,6 +120,7 @@ struct Walk<'a> {
     pos: &'a [String],
     cap: usize,
     grammar: &'a spec::CountGrammar,
+    declaring: BTreeSet<usize>,
     block: Vec<Rec>,
     window: usize,
     xwindow: usize,
@@ -129,8 +132,10 @@ struct Walk<'a> {
 impl<'a> Walk<'a> {
     // spec: canon-kit/SPEC.md §check-comment-tier — a directive opens a CAP-wide window
     // blessing its line plus continuations; the count-shape override rides the shared adapter
+    // spec: canon-kit/SPEC.md §check-comment-tier — a rule-id declaration is a reason directive,
+    // tested ahead of every roster so each comment style and surface takes it
     fn record(&mut self, body: &str, fnr: usize) {
-        if self.bless.blesses(body) {
+        if self.bless.blesses(body) || self.declaring.contains(&fnr) {
             self.window = self.cap;
         }
         if body.contains(EXEMPT) {
@@ -351,6 +356,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .map_err(|_| "CANON_KIT_COMMENT_RUN_CAP is not a number".to_string())?;
     let grammar = spec::CountGrammar::resolve()?;
     let wf = spec::knob_pub("GATE_SDK_WORKFLOW_DIR")?;
+    let declaring = Declaring::resolve(root)?;
     let no_pos: Vec<String> = Vec::new();
 
     // spec: canon-kit/SPEC.md §check-comment-tier — the governed surface via the shared
@@ -366,6 +372,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         let (style, bless, linepos, mdhead) = classify(&rel, &wf, &shell_bless, &txt_bless);
         scanned += 1;
+        let text = spec::read_text(Path::new(f))?;
         let mut w = Walk {
             file: rel.clone(),
             style,
@@ -374,6 +381,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             pos: if linepos { &pos } else { &no_pos },
             cap,
             grammar: &grammar,
+            declaring: declaring.as_ref().map(|d| d.lines(&rel, &text)).unwrap_or_default(),
             block: Vec::new(),
             window: 0,
             xwindow: 0,
@@ -381,7 +389,6 @@ fn rule(args: &[String]) -> Result<i32, String> {
             inblock: false,
             out: Vec::new(),
         };
-        let text = spec::read_text(Path::new(f))?;
         for (idx, raw) in text.lines().enumerate() {
             w.line(raw, idx + 1);
         }
@@ -428,4 +435,67 @@ fn classify<'a>(
         }
     }
     (Style::Hash, shell, true, false)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const DECLARE: &str = "rule (R-[0-9]+):";
+
+    fn flagged(rel: &str, style: Style, text: &str, declaring: Option<&Declaring>) -> Vec<String> {
+        let bless = Bless::new(SHELL_COLON, SHELL_WORD, &[]);
+        let grammar = spec::CountGrammar::default();
+        let mut w = Walk {
+            file: rel.to_string(),
+            style,
+            mdhead: false,
+            bless: &bless,
+            pos: &[],
+            cap: 3,
+            grammar: &grammar,
+            declaring: declaring.map(|d| d.lines(rel, text)).unwrap_or_default(),
+            block: Vec::new(),
+            window: 0,
+            xwindow: 0,
+            hd: String::new(),
+            inblock: false,
+            out: Vec::new(),
+        };
+        for (i, raw) in text.lines().enumerate() {
+            w.line(raw, i + 1);
+        }
+        w.flush(false);
+        w.out
+    }
+
+    #[test]
+    fn a_declaring_comment_opens_a_reason_window_in_every_comment_style() {
+        let d = Declaring::of(DECLARE, &["src/a.rs", "bin/a.sh"]);
+        let slash = "// rule R-1: a request carries one owner\n// and names it\n// third\n// fourth\nfn main() {}\n";
+        assert_eq!(flagged("src/a.rs", Style::Slash, slash, Some(&d)), vec!["src/a.rs:4: fourth"]);
+        let block = "/* rule R-2: one owner\n * per request */\nfn main() {}\n";
+        assert!(flagged("src/a.rs", Style::Slash, block, Some(&d)).is_empty());
+        let hash = "# rule R-3: one owner\n# per request\ntrue\n";
+        assert!(flagged("bin/a.sh", Style::Hash, hash, Some(&d)).is_empty());
+    }
+
+    #[test]
+    fn the_same_comment_outside_the_declaring_set_is_prose() {
+        let d = Declaring::of(DECLARE, &["src/a.rs"]);
+        let text = "// rule R-1: a request carries one owner\n// and names it\nfn main() {}\n";
+        assert_eq!(
+            flagged("src/b.rs", Style::Slash, text, Some(&d)),
+            vec!["src/b.rs:1: rule R-1: a request carries one owner", "src/b.rs:2: and names it"]
+        );
+    }
+
+    #[test]
+    fn no_rule_family_changes_nothing() {
+        let text = "// rule R-1: a request carries one owner\nfn main() {}\n";
+        assert_eq!(
+            flagged("src/a.rs", Style::Slash, text, None),
+            vec!["src/a.rs:1: rule R-1: a request carries one owner"]
+        );
+    }
 }

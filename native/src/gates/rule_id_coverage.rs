@@ -193,6 +193,44 @@ fn scan(file: &str, text: &str, families: &[Family], pick: Pick) -> Vec<Occurren
     out
 }
 
+// spec: canon-kit/SPEC.md §check-comment-tier — the declaring set and the declare match this gate
+// reads, shared so a declaring comment is blessed on exactly this gate's terms
+pub(crate) struct Declaring {
+    families: Vec<Family>,
+    files: BTreeSet<String>,
+}
+
+impl Declaring {
+    pub(crate) fn resolve(root: &str) -> Result<Option<Declaring>, String> {
+        let declares = walk::knob_map(DECLARES)?;
+        if declares.is_empty() {
+            return Ok(None);
+        }
+        let families = families(&declares, &walk::knob_map(CITES)?)?;
+        let files = files(root, &spec::knob_array_pub(DECLARE_GLOBS)?)?
+            .iter()
+            .map(|p| spec::strip_dot_slash(walk::rel_under(root, p).unwrap_or(p)))
+            .collect();
+        Ok(Some(Declaring { families, files }))
+    }
+
+    pub(crate) fn lines(&self, rel: &str, text: &str) -> BTreeSet<usize> {
+        if !self.files.contains(rel) {
+            return BTreeSet::new();
+        }
+        scan(rel, text, &self.families, declare_side).iter().map(|o| o.line).collect()
+    }
+
+    #[cfg(test)]
+    pub(crate) fn of(declare: &str, files: &[&str]) -> Declaring {
+        let pair = vec![("rule".to_string(), declare.to_string())];
+        Declaring {
+            families: families(&pair, &pair).expect("the family compiles"),
+            files: files.iter().map(|f| f.to_string()).collect(),
+        }
+    }
+}
+
 struct Report {
     findings: Vec<String>,
     declared: usize,

@@ -1169,6 +1169,7 @@ pub fn text_without(text: &str, cuts: &[(usize, usize)]) -> String {
     String::from_utf8_lossy(&bytes).into_owned()
 }
 
+#[cfg_attr(test, derive(Default))]
 pub struct CountGrammar {
     nouns: Vec<String>,
     wedge: usize,
