@@ -29,8 +29,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Some(q) => q.clone(),
         None => spec::knob_pub("CANON_KIT_QUEUE_FILE")?,
     };
+    // spec: canon-kit/SPEC.md §check-deprecation-task — an absent queue is an absent subject, and a
+    // queue path naming anything but a file still refuses
+    if !spec::queue_present(&queue)? {
+        println!(
+            "DEPRECATION-TASK: clean (not applicable: no queue file at {} — work tracked outside the queue grammar has no task for a marker to bind)",
+            queue
+        );
+        return Ok(0);
+    }
     if !Path::new(&queue).is_file() {
-        return Err(format!("queue file not found: {}", queue));
+        return Err(format!("not a file: {}", queue));
     }
 
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the consumer vocabulary is joined into

@@ -7,7 +7,7 @@
 # failure classes at once (stale done slug, absent slug, unbound marker); this
 # unit pins the paths that pair cannot: the empty-roster clean skip, that each
 # failure class is reported under its own heading with the right slug, and that
-# an unreadable queue is fail-closed.
+# an absent queue is not applicable while a non-file queue path is fail-closed.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -89,13 +89,18 @@ if grep -qF -- "live-teardown" <<<"$out"; then
     fails=$((fails + 1))
 fi
 
-# An unreadable queue is a fail-closed harness error (exit 2), never a silent pass.
-check_case "queue-missing-fail-closed" 2 "queue file not found" \
+# An absent queue is an absent subject: not applicable even with markers on the surface.
+check_case "queue-absent-not-applicable" 0 "clean (not applicable: no queue file at" \
     CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" CANON_KIT_QUEUE_FILE="$SANDBOX/nope.md"
+
+# A queue path naming anything but a file is a fail-closed harness error (exit 2).
+mkdir -p "$SANDBOX/dirqueue"
+check_case "queue-non-file-fail-closed" 2 "not a file" \
+    CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" CANON_KIT_QUEUE_FILE="$SANDBOX/dirqueue"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-deprecation-task.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-deprecation-task.test.sh: clean (empty-roster skip + stale/absent/unbound classes + live-bound clean + missing-queue fail-closed)"
+echo "check-deprecation-task.test.sh: clean (empty-roster skip + stale/absent/unbound classes + live-bound clean + absent-queue not-applicable + non-file-queue fail-closed)"
 exit 0

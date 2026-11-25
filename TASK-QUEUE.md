@@ -68,14 +68,6 @@ The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (ga
 
 ## Technical Debt
 
-### absent-queue-liveness-gates
-
-`check-todo-task-liveness` and `check-deprecation-task` exit 2 'queue file not found' on an absent `CANON_KIT_QUEUE_FILE` before scanning for any marker, the absent-subject shape `check-amendment-queue` now reports as not applicable (canon-kit/SPEC.md §check-amendment-queue).
-
-**Deliverable:** debt: an absent queue reads not applicable whether or not a marker is on the surface, the clean line naming the path, and each SPEC section's honest limit says markers go unresolved there (operator direction 2026-11-25, lead-relayed, not a ruling, settling the open call on check-amendment-queue's absent-subject shape). Both SPEC sections and `check-deprecation-task.test.sh`'s `queue-missing-fail-closed` case assert the refusal today, so the change moves stated contract.
-
-**Cost while deferred:** an adopter tracking work outside the queue grammar leaves both gates unregistered. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified there: both gates return the error before reading the surface. Owner lookup: `todo-task-liveness`, `deprecation-task`, `absent queue` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md §check-todo-task-liveness and §check-deprecation-task.
-
 ### observe-plain-text-context
 
 [not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
@@ -1050,4 +1042,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - attribution-trailer-ban
 - knobs-lock-test-race
 - amendment-queue-dangling-link
+- absent-queue-liveness-gates
 

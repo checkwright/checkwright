@@ -341,6 +341,15 @@ pub fn comment_whitelisted(rel: &str, whitelist: &[String]) -> bool {
     whitelist.iter().any(|g| walk::pattern_match(g, rel))
 }
 
+// spec: canon-kit/SPEC.md §check-amendment-queue — presence is probed on the link itself, so a dangling link is present
+pub fn queue_present(queue: &str) -> Result<bool, String> {
+    match std::fs::symlink_metadata(queue) {
+        Ok(_) => Ok(true),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
+        Err(e) => Err(format!("cannot stat {}: {}", queue, e)),
+    }
+}
+
 // spec: canon-kit/SPEC.md §The shared spec adapters — `spec_queue_slugs`: one walk emitting live for an
 // entry heading in an active or deferred section and done for a bare-slug bullet outside them
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the format is written again here

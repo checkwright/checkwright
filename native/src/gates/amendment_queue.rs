@@ -235,12 +235,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let root = args.get(1).map(String::as_str).unwrap_or(".");
     // spec: canon-kit/SPEC.md §check-amendment-queue — an absent queue is an absent subject, and a
     // queue path naming anything but a file still refuses
-    let present = match std::fs::symlink_metadata(&queue) {
-        Ok(_) => true,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => false,
-        Err(e) => return Err(format!("cannot stat {}: {}", queue, e)),
-    };
-    if !present {
+    if !spec::queue_present(&queue)? {
         println!(
             "AMENDMENT-QUEUE: clean (not applicable: no queue file at {} — work tracked outside the queue grammar has no entry to pair)",
             queue

@@ -84,7 +84,7 @@ A repository install commits the profile's kit files, the gate binary and a hand
 
 | Kit | Files | Of which gate-tests | Size |
 | --- | --- | --- | --- |
-| canon-kit | 430 | 390 | 220 kB |
+| canon-kit | 430 | 390 | 230 kB |
 | context-kit | 69 | 47 | 48 kB |
 | delegation-kit | 36 | 24 | 130 kB |
 | doctrine-kit | 12 | 9 | 64 kB |

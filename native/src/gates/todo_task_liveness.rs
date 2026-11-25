@@ -22,8 +22,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Some(q) => q.clone(),
         None => spec::knob_pub("CANON_KIT_QUEUE_FILE")?,
     };
+    // spec: canon-kit/SPEC.md §check-todo-task-liveness — an absent queue is an absent subject, and a
+    // queue path naming anything but a file still refuses
+    if !spec::queue_present(&queue)? {
+        println!(
+            "TODO-TASK-LIVENESS: clean (not applicable: no queue file at {} — work tracked outside the queue grammar has no task for a marker to resolve to)",
+            queue
+        );
+        return Ok(0);
+    }
     if !Path::new(&queue).is_file() {
-        return Err(format!("queue file not found: {}", queue));
+        return Err(format!("not a file: {}", queue));
     }
 
     let slugs = spec::queue_slugs(Path::new(&queue))?;
