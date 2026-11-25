@@ -1062,7 +1062,7 @@ Each is a declaration only: no front-end resolves a union from it, since every a
 
 - a **gates-dir positional**, which names the registry and the first resolve dir (`check-kit-enum`, `check-root-tiering`);
 - a **rule input** such as `check-gate-binary-fresh`'s tree-stamp file, or the file a rule writes into (`--install-lifecycle`'s `[agent-file]`, [lifecycle-kit/SPEC.md §bin/install-lifecycle.sh](../lifecycle-kit/SPEC.md#bininstall-lifecyclesh));
-- an **input-corpus selector** no knob resolves: `check-gate-tamper`'s `--fixture <dir>`, `check-reads-couples`' gate-source paths, `check-gate-exemption-tasks`' scan dirs;
+- an **input-corpus selector** no knob resolves: `check-gate-tamper`'s `--fixture <dir>` and `--range <base>..<head>`, `check-reads-couples`' gate-source paths, `check-gate-exemption-tasks`' scan dirs;
 - a **scan-root positional** the rule composes with its knob globs (`check-prose-tells`, `check-spec-embedded-source`, `check-template-copy-parity`);
 - a **queue-file or state-file positional** falling back to a knob (`check-amendment-queue`, `check-evidence-manifest`, `check-todo-task-liveness`).
 

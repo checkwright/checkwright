@@ -62,7 +62,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 
 With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per call; `--emit usage-trend` reads that log and reports per-window footprint evolution and weekly headroom (advisory — exit 0/2, never a pause verdict).
 
-`check-gate-tamper` runs from the pre-commit hook and the battery; invoke it directly with `--fixture <dir>` only for testing.
+`check-gate-tamper` runs from the pre-commit hook and the battery. A supervisor checks a range of commits it received with `checkwright-gates check-gate-tamper --range <base>..<head>`; `--fixture <dir>` is for testing.
 
 ## Test
 

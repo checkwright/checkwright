@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Behavioral test of check-gate-tamper's LIVE arm — the one the good/bad pair cannot reach.
+# Behavioral test of check-gate-tamper's LIVE and RANGE arms — the ones the good/bad pair cannot reach.
 # The pair injects both lists through --fixture, so the function that reads a staged gate
 # file's bytes out of the object store (`git show :<path>` against `git show HEAD:<path>`) is
 # exercised by no fixture case at all, and assertion B's added-exemption derivation with it.
 #
-# Each case builds a throwaway git repo, stages a commit shape, and runs the gate inside it, so
-# the corpus is a real index rather than an injected list.
+# Each case builds a throwaway git repo, stages a commit shape (or commits a series and names it
+# with --range), and runs the gate inside it, so the corpus is a real index or history rather than
+# an injected list.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -33,10 +34,11 @@ new_repo() {
     printf '%s\n' "$d"
 }
 
-# case_run <name> <want> <expect>  — the repo's index is already staged by the caller
+# case_run <dir> <name> <want> <expect> [gate args…]  — the repo's index or history is already built by the caller
 case_run() {
     local d="$1" name="$2" want="$3" expect="$4" out rc
-    out="$( cd "$d" && gate_run check-gate-tamper "$CHECKS" 2>&1 )"; rc=$?
+    shift 4
+    out="$( cd "$d" && gate_run check-gate-tamper "$CHECKS" "$@" 2>&1 )"; rc=$?
     if [[ "$rc" -ne "$want" ]]; then
         echo "  FAIL: $name expected exit $want, got $rc: $out"; fails=$((fails + 1)); return
     fi
@@ -156,9 +158,91 @@ case_run "$d" a-descriptor-exemption-excusing-a-co-staged-file 1 "product/*.md -
 d="$(descriptor_repo descriptor-unmatched 'nowhere/*.md')"
 case_run "$d" a-descriptor-exemption-matching-nothing-staged 0 "GATE-TAMPER: clean"
 
+# J — the range arm judges each commit as its own pre-commit would: a gate-only commit beside a
+#     product-only commit is clean, where the same two changes in one commit red.
+d="$(new_repo range-split)"
+printf '# edited\n' >>"$d/scripts/check-sample.sh"
+git -C "$d" commit -q -am gate-only
+printf 'x\n' >"$d/product/thing.txt"
+git -C "$d" add product/thing.txt
+git -C "$d" commit -q -m product-only
+case_run "$d" a-range-of-shape-holding-commits 0 "2 commit(s) in HEAD~2..HEAD; 0 merge(s) not judged" --range HEAD~2..HEAD
+
+d="$(new_repo range-joined)"
+printf '# edited\n' >>"$d/scripts/check-sample.sh"
+printf 'x\n' >"$d/product/thing.txt"
+git -C "$d" add -A
+git -C "$d" commit -q -m joined
+joined="$(git -C "$d" rev-parse --short HEAD)"
+case_run "$d" the-same-changes-in-one-commit 1 "gate edit not isolated in commit $joined" --range HEAD~1..HEAD
+
+# K — an exemption added beside the file it excuses reds, naming that commit and not its clean
+#     predecessor; a root commit is read against the empty tree, so its whole set is added.
+d="$(new_repo range-self-serving)"
+printf 'ok\n' >"$d/README.md"
+git -C "$d" commit -q -am clean-first
+printf '#!/usr/bin/env bash\n# exception-list: the gate this repo already had\nEXEMPT=(\n    "product/*.txt"\n    "product/*.md"\n)\n' \
+    >"$d/scripts/check-sample.sh"
+printf 'y\n' >"$d/product/excused.md"
+git -C "$d" add -A
+git -C "$d" commit -q -m self-serving
+bad="$(git -C "$d" rev-parse --short HEAD)"
+case_run "$d" a-range-carrying-a-self-serving-exemption 1 "self-serving exemption in commit $bad" --range HEAD~2..HEAD
+out="$( cd "$d" && gate_run check-gate-tamper "$CHECKS" --range HEAD~2..HEAD 2>&1 )"
+if grep -qF "in commit $(git -C "$d" rev-parse --short HEAD~1)" <<<"$out"; then
+    echo "  FAIL: range-self-serving named its clean predecessor: $out"; fails=$((fails + 1))
+fi
+
+d="$(new_repo range-root)"
+seed="$(git -C "$d" rev-parse HEAD)"
+git -C "$d" checkout -q --orphan unrelated
+git -C "$d" rm -rfq .
+mkdir -p "$d/scripts" "$d/product"
+printf '#!/usr/bin/env bash\n# exception-list: seeded at the root\nEXEMPT=(\n    "product/*.txt"\n)\n' >"$d/scripts/check-sample.sh"
+printf 'x\n' >"$d/product/thing.txt"
+git -C "$d" add -A
+git -C "$d" commit -q -m root
+case_run "$d" a-root-commit-read-against-the-empty-tree 1 "product/*.txt -> product/thing.txt" --range "$seed..unrelated"
+
+# L — a merge is counted and not judged, and the commits it brings in are judged one by one.
+d="$(new_repo range-merge)"
+git -C "$d" checkout -q -b side
+printf '# edited\n' >>"$d/scripts/check-sample.sh"
+printf 'x\n' >"$d/product/side.txt"
+git -C "$d" add -A
+git -C "$d" commit -q -m side-joined
+side="$(git -C "$d" rev-parse --short HEAD)"
+git -C "$d" checkout -q -
+mkdir -p "$d/product"
+printf 'z\n' >"$d/product/main.txt"
+git -C "$d" add -A
+git -C "$d" commit -q -m main-product
+git -C "$d" merge -q --no-edit side
+case_run "$d" a-merge-brings-its-commits-in 1 "gate edit not isolated in commit $side" --range HEAD~1~1..HEAD
+
+d="$(new_repo range-merge-clean)"
+git -C "$d" checkout -q -b side
+printf 'x\n' >"$d/product/side.txt"
+git -C "$d" add -A
+git -C "$d" commit -q -m side-product
+git -C "$d" checkout -q -
+printf '# edited\n' >>"$d/scripts/check-sample.sh"
+git -C "$d" commit -q -am main-gate-only
+git -C "$d" merge -q --no-edit side
+case_run "$d" a-merge-of-two-clean-branches 0 "2 commit(s) in HEAD~1~1..HEAD; 1 merge(s) not judged" --range HEAD~1~1..HEAD
+
+# M — the range spelling's refusals: a malformed range, an unknown revision, --range beside --fixture.
+d="$(new_repo range-refusals)"
+case_run "$d" a-bare-revision 2 "--range takes <base>..<head>" --range HEAD
+case_run "$d" a-symmetric-range 2 "--range takes <base>..<head>" --range HEAD...HEAD
+case_run "$d" an-empty-side 2 "--range takes <base>..<head>" --range ..HEAD
+case_run "$d" an-unknown-revision 2 "'no-such-rev' names no commit" --range no-such-rev..HEAD
+case_run "$d" range-beside-fixture 2 "give one, once" --range HEAD..HEAD --fixture "$tmp"
+case_run "$d" an-empty-range 0 "0 commit(s) in HEAD..HEAD" --range HEAD..HEAD
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-gate-tamper.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-gate-tamper.test: ok (live arm: HEAD-resident exemptions excluded, a newly added one excusing a co-staged file rejected, an unmatched one silent, a descriptor's # exception: element read alike, a gate-file deletion read as empty, a registered gate outside every glob covered, the toplevel install manifest meta-layer and a nested namesake not)"
+echo "check-gate-tamper.test: ok (range arm: each commit judged as its own pre-commit, the offending commit named, a root commit read against the empty tree, a merge counted and its commits judged, the range spelling's refusals; live arm: HEAD-resident exemptions excluded, a newly added one excusing a co-staged file rejected, an unmatched one silent, a descriptor's # exception: element read alike, a gate-file deletion read as empty, a registered gate outside every glob covered, the toplevel install manifest meta-layer and a nested namesake not)"
 exit 0

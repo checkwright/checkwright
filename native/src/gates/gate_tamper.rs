@@ -206,65 +206,176 @@ fn rule(args: &[String]) -> Result<i32, String> {
         meta.push(manifest);
     }
 
-    let mut fixture: Option<String> = None;
+    let mut corpus = Corpus::Index;
     let mut i = 0usize;
     while i < args.len() {
-        if args[i] == "--fixture" {
+        let next = match args[i].as_str() {
             // spec: delegation-kit/SPEC.md §Verify after every agent commit — a trailing
             // `--fixture` names the empty directory and refuses rather than hanging
-            fixture = Some(args.get(i + 1).cloned().unwrap_or_default());
-            i += 2;
-            continue;
+            "--fixture" => Corpus::Fixture(args.get(i + 1).cloned().unwrap_or_default()),
+            "--range" => Corpus::Range(args.get(i + 1).cloned().unwrap_or_default()),
+            other => return Err(format!("unknown argument: {}", other)),
+        };
+        if !matches!(corpus, Corpus::Index) {
+            return Err("--range and --fixture each select the corpus: give one, once".to_string());
         }
-        return Err(format!("unknown argument: {}", args[i]));
+        corpus = next;
+        i += 2;
     }
 
-    let (staged, added) = match &fixture {
-        Some(d) => collect_fixture(d)?,
-        None => collect_live(&globs)?,
+    let (findings, read) = match corpus {
+        Corpus::Index => {
+            let (staged, added) = collect_live(&globs)?;
+            (vec![judge(&staged, &added, &globs, &meta, None)], format!("{} staged path(s)", staged.len()))
+        }
+        Corpus::Fixture(d) => {
+            let (staged, added) = collect_fixture(&d)?;
+            (vec![judge(&staged, &added, &globs, &meta, None)], format!("{} staged path(s)", staged.len()))
+        }
+        Corpus::Range(r) => {
+            let (base, head) = parse_range(&r)?;
+            let span = format!("{}..{}", commit_id(base)?, commit_id(head)?);
+            let commits = rev_list(&["rev-list", "--reverse", "--no-merges", &span])?;
+            let merges = rev_list(&["rev-list", "--merges", &span])?.len();
+            let mut findings: Vec<Finding> = Vec::new();
+            for c in &commits {
+                let (changed, added) = collect_commit(c, &globs)?;
+                findings.push(judge(&changed, &added, &globs, &meta, Some(c)));
+            }
+            (findings, format!("{} commit(s) in {}; {} merge(s) not judged", commits.len(), r, merges))
+        }
     };
+    Ok(verdict(&findings, &declared, &meta, &read, derived.len()))
+}
 
+enum Corpus {
+    Index,
+    Range(String),
+    Fixture(String),
+}
+
+struct Finding {
+    commit: Option<String>,
+    viol_a: Vec<String>,
+    viol_b: Vec<String>,
+}
+
+// spec: delegation-kit/SPEC.md §Verify after every agent commit — the range spelling is
+// `<base>..<head>`, both sides non-empty; a bare revision and a symmetric `...` are refused
+fn parse_range(r: &str) -> Result<(&str, &str), String> {
+    let refuse = || format!("--range takes <base>..<head>, got '{}'", r);
+    let (base, head) = r.split_once("..").ok_or_else(refuse)?;
+    if base.is_empty() || head.is_empty() || head.starts_with('.') || head.contains("..") {
+        return Err(refuse());
+    }
+    Ok((base, head))
+}
+
+// spec: delegation-kit/SPEC.md §Verify after every agent commit — each side resolves to a commit
+// id before any listing reads it, so no caller spelling reaches git as an option
+fn commit_id(rev: &str) -> Result<String, String> {
+    let refuse = || format!("--range: '{}' names no commit", rev);
+    if rev.starts_with('-') {
+        return Err(refuse());
+    }
+    let c = proc::run(&programs::GIT, &["rev-parse", "--verify", "--quiet", &format!("{}^{{commit}}", rev)])?;
+    let id = c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()).unwrap_or_default();
+    if id.is_empty() {
+        return Err(refuse());
+    }
+    Ok(id)
+}
+
+// spec: delegation-kit/SPEC.md §Verify after every agent commit — a listing git cannot produce
+// refuses rather than degrading to an empty range
+fn rev_list(args: &[&str]) -> Result<Vec<String>, String> {
+    let c = proc::run(&programs::GIT, args)?;
+    match c.stdout() {
+        Some(out) => Ok(String::from_utf8_lossy(out).split_whitespace().map(String::from).collect()),
+        None => Err(crate::fresh::fail_closed("git-rev-list", c.code())),
+    }
+}
+
+fn abbreviated(c: &str) -> String {
+    proc::run(&programs::GIT, &["rev-parse", "--short", c])
+        .ok()
+        .and_then(|r| r.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()))
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| c.to_string())
+}
+
+// spec: delegation-kit/SPEC.md §Verify after every agent commit — a commit is judged against its
+// first parent and a root commit against the empty tree; a deleted gate file reads as an empty set
+fn collect_commit(c: &str, globs: &[String]) -> Result<(Vec<String>, Vec<String>), String> {
+    let changed = crate::listing::names(None, &["diff-tree", "-r", "-z", "--no-commit-id", "--name-only", "--root", c])
+        .map_err(|e| e.text_or(|code| crate::fresh::fail_closed("git-diff-tree", code)))?;
+    let mut added: Vec<String> = Vec::new();
+    for f in &changed {
+        if !is_gate_file(f, globs) {
+            continue;
+        }
+        let new = git_blob(&format!("{}:{}", c, f))?;
+        let old = git_blob(&format!("{}^:{}", c, f))?;
+        for v in added_between(f, &old, &new) {
+            if !added.contains(&v) {
+                added.push(v);
+            }
+        }
+    }
+    added.sort();
+    Ok((changed, added))
+}
+
+fn judge(staged: &[String], added: &[String], globs: &[String], meta: &[String], commit: Option<&String>) -> Finding {
     let mut viol_a: Vec<String> = Vec::new();
-    if staged.iter().any(|f| is_gate_file(f, &globs)) {
-        for f in &staged {
-            if !is_meta(f, &meta) {
+    if staged.iter().any(|f| is_gate_file(f, globs)) {
+        for f in staged {
+            if !is_meta(f, meta) {
                 viol_a.push(f.clone());
             }
         }
     }
 
     let mut viol_b: Vec<String> = Vec::new();
-    for e in &added {
+    for e in added {
         if !is_pathlike(e) {
             continue;
         }
-        for f in &staged {
+        for f in staged {
             if walk::pattern_match(e, f) {
                 viol_b.push(format!("{} -> {}", e, f));
             }
         }
     }
+    Finding { commit: commit.cloned(), viol_a, viol_b }
+}
 
-    if !viol_a.is_empty() || !viol_b.is_empty() {
-        if !viol_a.is_empty() {
-            println!("check-gate-tamper: gate edit not isolated — a commit touching a gate file ({} plus every registered gate and the gate library) may touch only meta-layer paths; these co-staged paths are not:", declared);
-            for v in &viol_a {
+fn verdict(findings: &[Finding], declared: &str, meta: &[String], read: &str, covered: usize) -> i32 {
+    let mut red = false;
+    for f in findings {
+        let at = f.commit.as_deref().map(|c| format!(" in commit {}", abbreviated(c))).unwrap_or_default();
+        if !f.viol_a.is_empty() {
+            red = true;
+            println!("check-gate-tamper: gate edit not isolated{} — a commit touching a gate file ({} plus every registered gate and the gate library) may touch only meta-layer paths; these co-staged paths are not:", at, declared);
+            for v in &f.viol_a {
                 println!("  {}", v);
             }
             println!("  help: split the gate change into its own commit (meta-layer paths only: {} and root *.md); land the product change in a separate commit", meta.join(" "));
         }
-        if !viol_b.is_empty() {
-            println!("check-gate-tamper: self-serving exemption — a newly added path/glob exemption matches a file staged in the same commit:");
-            for v in &viol_b {
+        if !f.viol_b.is_empty() {
+            red = true;
+            println!("check-gate-tamper: self-serving exemption{} — a newly added path/glob exemption matches a file staged in the same commit:", at);
+            for v in &f.viol_b {
                 println!("  {}", v);
             }
             println!("  help: an exemption must not excuse the very change it lands with; add the exemption in a separate commit, or drop the matched file from this commit");
         }
-        return Ok(1);
     }
-
-    println!("GATE-TAMPER: clean ({} staged path(s); {} registered gate file(s) covered; gate edits meta-isolated, no self-serving path-exemption)", staged.len(), derived.len());
-    Ok(0)
+    if red {
+        return 1;
+    }
+    println!("GATE-TAMPER: clean ({}; {} registered gate file(s) covered; gate edits meta-isolated, no self-serving path-exemption)", read, covered);
+    0
 }
 
 #[cfg(test)]
@@ -359,6 +470,20 @@ BAR=(
             ]
         );
         let _ = std::fs::remove_dir_all(&scratch);
+    }
+
+    #[test]
+    fn a_range_is_two_non_empty_sides_joined_by_two_dots() {
+        assert_eq!(parse_range("main..topic").unwrap(), ("main", "topic"));
+        assert_eq!(parse_range("HEAD~3..HEAD").unwrap(), ("HEAD~3", "HEAD"));
+        for bad in ["", "HEAD", "..HEAD", "HEAD..", "a...b", "a..b..c", ".."] {
+            assert!(parse_range(bad).is_err(), "{:?} was accepted", bad);
+        }
+    }
+
+    #[test]
+    fn a_side_spelled_as_an_option_names_no_commit() {
+        assert!(commit_id("--output=x").unwrap_err().contains("names no commit"));
     }
 
     #[test]

@@ -14,16 +14,6 @@
 
 ## New Features
 
-### gate-tamper-range-arm
-
-[spec: SPEC-gate-tamper-range.md] [recurrence: 2026-11-25]
-
-`check-gate-tamper` reads only the index (delegation-kit/SPEC.md §check-gate-tamper), so a supervisor receiving an agent's commits cannot run it over the range they span.
-
-**Deliverable:** design-pending, a feature: a range form with a machine verdict, its fixture pair, and the index form unchanged.
-
-**Cost while deferred:** a handed-back range is checked for tamper only commit by commit at its own pre-commit, which an agent's hook bypass skips. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `gate-tamper`, `range` in this file, the icebox's coverage entry only; owner delegation-kit/SPEC.md §check-gate-tamper.
-
 ### foreign-run-verb
 
 [spec: SPEC-foreign-run-sandbox.md] [recurrence: 2026-11-25]
@@ -1016,4 +1006,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - install-size-contract-drift
 - tree-free-hook-roster-widening
 - observe-plain-text-context
+- gate-tamper-range-arm
 
