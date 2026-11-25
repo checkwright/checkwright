@@ -45,18 +45,18 @@ Pairs `adopter-content-checks` (text) and `deny-term-names` (names). A consumer 
 
 **Not yet applied**: a new section, §check-path-names, after §The deny-term list:
 
-> `checks/check-path-names.gate` (`precommit`, binary-dispatched). Invariant: no tracked path has a component carrying a deny term as its stem. Its corpus is `git ls-files` under the shared prune dirs, each path split on `/` into file and directory names; identifiers inside a file are never read. A component hits a term when, ASCII case folded, it equals the term or opens with the term followed by `-` or `_`: `foo` hits `foo`, `foo-cli` and `foo_x`, never `food`.
+> `checks/check-path-names.gate` (`precommit`, binary-dispatched). Invariant: no tracked path has a component carrying a deny term as its stem. Its corpus is `git ls-files` under the shared prune dirs, each path split on `/` into file and directory names; identifiers inside a file are never read. A component hits a term when, ASCII case folded, it equals the term or opens with the term followed by `-`, `_` or `.`: `foo` hits `foo`, `foo-cli`, `foo_x`, `foo.rs` and `foo.d`, never `food` or `foobar.rs`.
 >
 > The record is `<path>: [<ID>]`, `<path>` the shortest prefix of a tracked path whose last component hits, printed once however many paths lie under it, `<ID>` the term's id else `NAMES-DENIED`. Two terms of one id on one prefix give one record. It takes no valve: a name is renamed, never excused.
 >
 > Its terms are `GATE_SDK_DENY_TERMS` (§The deny-term list). With no live term it prints `not applicable: no deny term configured` and exits 0, and declares `# install: on-surface` and `# armed-by: content GATE_SDK_DENY_TERMS`. Outside a work tree it refuses at exit 2; an unreadable list is exit 3. Born native, no shell form; criterion 4 clears, its corpus being path names, never a descriptor's content.
 >
-> **Honest limit.** A stem followed by `.` does not hit, so `foo.rs` passes where `foo_x.rs` reds. A manifest's package or binary name is outside the corpus.
+> **Honest limit.** A manifest's package or binary name is outside the corpus.
 >
-> The pair: `bad/` holds a directory hit with two files under it (one record), a file hit by `-` and one by `_`, and a mixed-case hit; `good/` holds a component the term only prefixes (`food`) and a term inside a component (`xfoo`). The knob file in each case points `GATE_SDK_DENY_TERMS` at a case-local list.
+> The pair: `bad/` holds a directory hit with two files under it (one record), a file hit by `-`, one by `_` and one by `.`, and a mixed-case hit; `good/` holds components the term only prefixes (`food`, `foobar.rs`) and a term inside a component (`xfoo`). The knob file in each case points `GATE_SDK_DENY_TERMS` at a case-local list.
 
 - **Why the shortest prefix.** A directory named for a term holds every file under it, and one record per file would bury the one rename that fixes them all.
-- **Why `.` is not a separator.** The adopter's rule names `-` and `_` alone; the limit is stated rather than widened here.
+- **Why `.` is a boundary.** A file named for a term carries the term as its stem before an extension, so `foo.rs` and `foo.d` name the term as plainly as `foo-cli` does; `foobar.rs` stays clean, its stem being `foobar`.
 
 ## Producers and consumers
 

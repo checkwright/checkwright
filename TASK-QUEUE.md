@@ -78,7 +78,7 @@ The strings family of [adopter-content-checks](#adopter-content-checks): built b
 
 The names family of [adopter-content-checks](#adopter-content-checks): tracked path components against the shared deny-term list.
 
-**Adopter input (2026-11-25, peer channel, lead-relayed):** the corpus is tracked path components, file and directory names, never identifiers in code; a manifest's package and binary names would be welcome, not required. A term is a literal stem matched case-insensitively, a component hitting when it equals the stem or opens with the stem and `-` or `_` (`foo` hits `foo`, `foo-cli` and `foo_x`, never `food`). Record `<path>: [NAMES-DENIED]`, no waiver, config the shared deny list.
+**Adopter input (2026-11-25, peer channel, lead-relayed):** the corpus is tracked path components, file and directory names, never identifiers in code; a manifest's package and binary names would be welcome, not required. A term is a literal stem matched case-insensitively, a component hitting when it equals the stem or opens with the stem and `-` or `_` (`foo` hits `foo`, `foo-cli` and `foo_x`, never `food`). Record `<path>: [NAMES-DENIED]`, no waiver, config the shared deny list. Answered on spec's recorded limit (2026-11-25, peer channel, lead-relayed): `.` is a boundary too, so `foo.rs` and `foo.d` hit and `foobar.rs` does not.
 
 **Deliverable:** check-path-names, born native with its pair, reading the deny-term list.
 
