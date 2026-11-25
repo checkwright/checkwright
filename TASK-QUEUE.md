@@ -14,16 +14,6 @@
 
 ## New Features
 
-### orchestrator-arm-json
-
-[spec: gate-sdk/SPEC-run-json.md]
-
-The orchestrator adopter calls checkwright as a verdict-returning step, and names two arms it reads by machine (adopter input 2026-11-25): `--run` and the verdict lookup. `--verify-gate-run` alone has a `--json` form today, and gate-sdk/SPEC.md §The non-gate arm mints one per arm with its named caller. The adopter calls `--enter-stage`, `--foreign-run` and `--foreign-resume` not yet, so they take none.
-
-**Deliverable:** design-pending, a feature: a `--json` form on `--run`, its keys reconciled with the battery's SARIF log, and a golden in its unit test; the lookup's document is verdict-lookup's. A further arm takes one when the adopter names it. **Shape answered (adopter input 2026-11-25):** the document spec proposed, members in gate-set order, and `members.kind` and `omitted.reason` drawn from sets the contract declares; findings stay in the SARIF log.
-
-**Cost while deferred:** the adopter reads a battery's verdict from the SARIF log or from prose, with no document on stdout. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `--json`, `enter-stage` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
-
 ## Technical Debt
 
 ### foreign-run-sandbox-record
@@ -1045,4 +1035,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - verdict-identity-fields
 - exit-code-tool-error
 - verdict-lookup
+- orchestrator-arm-json
 

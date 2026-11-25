@@ -8,6 +8,7 @@ use crate::provenance::Provenance;
 use crate::registry;
 use crate::sarif;
 use crate::walk;
+use serde_json::{json, Map, Value};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -20,7 +21,7 @@ const TOOL: &str = "run-gates";
 // spec: gate-sdk/SPEC.md §run-gates — the one usage text, the stdout body of a help request and the
 // stderr body of an unrecognized-option refusal, per §The bin/-tool contract. It lives beside the
 // arm table it describes, because it grows by a paragraph per configured arm.
-pub const USAGE: &str = r#"usage: --run [gates-dir]                       run every registered gate
+pub const USAGE: &str = r#"usage: --run [--json] [gates-dir]              run every registered gate
        --only <name> [<name>...]               run only the named gates
        --only <name> -- <arg>...               run one named gate, forwarding <arg>...
        --for <path> [<path>...]                run only gates coupling to those paths
@@ -68,6 +69,12 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           of the given repo-relative paths. The placed hooks' --git-hook
           arm calls the same selector. A path no gate couples to is a note,
           not a failure.
+  --json  leads the other options (--run --json --only <name>...) and prints
+          the run's verdict as one versioned JSON object on stdout, written
+          last: its verdict, scope, provenance, each member's kind and
+          status, and the declared omissions. The transcript moves to stderr
+          and the exit status is unchanged; a refused or failed run prints
+          the error document instead.
   --emit  dispatches the named non-gate arm of the native binary, handing it
           every remaining argument.
   --hook  dispatches the named harness hook member: the harness payload passes
@@ -290,6 +297,9 @@ pub(crate) struct Outcome {
     // spec: gate-sdk/SPEC.md §run-gates — a member that failed without judging the tree: a status
     // other than 0 and 1, resolved nowhere, or never started
     pub(crate) errored: bool,
+    // spec: gate-sdk/SPEC.md §run-gates — the member's status: its own where it ran, 3 where it could
+    // not be started, as its dispatch tail reads, and none where it resolved nowhere
+    exit: Option<i32>,
     ms: u128,
 }
 
@@ -305,6 +315,7 @@ struct Args {
     // separator is the caller's assertion that one gate is selected, and it is checked as one.
     only_args: Option<Vec<String>>,
     help: bool,
+    json: bool,
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a refusal decidable from argv alone, and whether the usage
@@ -329,20 +340,36 @@ fn unrecognized(option: &str) -> Refusal {
     }
 }
 
-fn parse(args: &[String]) -> Result<Args, Refusal> {
+// spec: gate-sdk/SPEC.md §run-gates — a refusal reports whether `--json` was already read, so an
+// argv refused after the option still answers with the error document
+fn parse(args: &[String]) -> Result<Args, (Refusal, bool)> {
     let mut out = Args {
         gates_dir: None,
         only: Vec::new(),
         paths: Vec::new(),
         only_args: None,
         help: false,
+        json: false,
     };
+    match parse_into(args, &mut out) {
+        Ok(()) => Ok(out),
+        Err(r) => Err((r, out.json)),
+    }
+}
+
+fn parse_into(args: &[String], out: &mut Args) -> Result<(), Refusal> {
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
             "-h" | "--help" => {
                 out.help = true;
-                return Ok(out);
+                return Ok(());
+            }
+            // spec: gate-sdk/SPEC.md §run-gates — a leading option: `--only` and `--for` take every
+            // token after them, so it is read only before a selector
+            "--json" => {
+                out.json = true;
+                i += 1;
             }
             "--gates-dir" => {
                 i += 1;
@@ -374,14 +401,14 @@ fn parse(args: &[String]) -> Result<Args, Refusal> {
                 if j < args.len() {
                     out.only_args = Some(args[j + 1..].to_vec());
                 }
-                return Ok(out);
+                return Ok(());
             }
             "--for" => {
                 out.paths = args[i + 1..].to_vec();
                 if out.paths.is_empty() {
                     return Err(plain("--for needs at least one path"));
                 }
-                return Ok(out);
+                return Ok(());
             }
             // spec: gate-sdk/SPEC.md §run-gates — `--` ends option processing, so a gates-dir
             // legitimately spelled with a leading dash stays reachable
@@ -389,16 +416,16 @@ fn parse(args: &[String]) -> Result<Args, Refusal> {
                 if let Some(d) = args.get(i + 1) {
                     out.gates_dir = Some(d.clone());
                 }
-                return Ok(out);
+                return Ok(());
             }
             other if other.starts_with('-') => return Err(unrecognized(other)),
             other => {
                 out.gates_dir = Some(other.to_string());
-                return Ok(out);
+                return Ok(());
             }
         }
     }
-    Ok(out)
+    Ok(())
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — worker count: `GATE_SDK_JOBS` where the environment carries a
@@ -528,20 +555,21 @@ pub(crate) fn select(
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — `--for`: the selection, and an uncovered path as a note on
-// stdout, never a failure
+// the transcript, never a failure
 fn select_for(
+    w: &mut dyn Write,
     members: &[String],
     resolve_dirs: &[String],
     kit_roots_here: &[String],
     paths: &[String],
-) -> Result<Vec<Selected>, i32> {
+) -> Result<Vec<Selected>, exit::Kind> {
     let s = select(members, resolve_dirs, kit_roots_here, paths, None).map_err(|e| {
         eprintln!("{}: --for {}", TOOL, e);
-        exit::REFUSED
+        exit::Kind::Refused
     })?;
     for (p, c) in paths.iter().zip(&s.covered) {
         if !c {
-            println!("{}: no registered gate couples to {}", TOOL, p);
+            let _ = writeln!(w, "{}: no registered gate couples to {}", TOOL, p);
         }
     }
     Ok(s.run)
@@ -556,11 +584,11 @@ fn select_only(
     resolve_dirs: &[String],
     only: &[String],
     forwarded: Option<&[String]>,
-) -> Result<Vec<Selected>, i32> {
+) -> Result<Vec<Selected>, exit::Kind> {
     if only.len() == 1 && !members.iter().any(|m| m == &only[0]) {
         if registry::resolve(&only[0], resolve_dirs).is_none() {
             eprintln!("{}: --only: '{}' is not registered in {}", TOOL, only[0], list);
-            return Err(exit::REFUSED);
+            return Err(exit::Kind::Refused);
         }
         return Ok(vec![Selected {
             name: only[0].clone(),
@@ -570,7 +598,7 @@ fn select_only(
     for n in only {
         if !members.iter().any(|m| m == n) {
             eprintln!("{}: --only: '{}' is not registered in {}", TOOL, n, list);
-            return Err(exit::REFUSED);
+            return Err(exit::Kind::Refused);
         }
     }
     let picked: Vec<&String> = members
@@ -590,7 +618,7 @@ fn select_only(
         eprintln!(
             "  help: name exactly one gate before the '--'; broadcasting one argument vector across a selection is refused, not narrowed"
         );
-        return Err(exit::USAGE);
+        return Err(exit::Kind::Usage);
     }
     let args = forwarded.unwrap_or(&[]);
     Ok(picked
@@ -703,6 +731,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
         output: body.into_bytes(),
         failed: true,
         errored: true,
+        exit: (tail == DISPATCH_TAIL).then_some(exit::TOOL),
         ms,
     };
     let src = match registry::resolve(&sel.name, d.resolve_dirs) {
@@ -757,6 +786,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
                     output: done.output,
                     failed: false,
                     errored: false,
+                    exit: Some(done.code),
                     ms,
                 }
             } else {
@@ -770,6 +800,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
                     output: done.output,
                     failed: true,
                     errored: done.code != 1,
+                    exit: Some(done.code),
                     ms,
                 }
             }
@@ -779,7 +810,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
 
 // spec: gate-sdk/SPEC.md §run-gates — a declared omission keeps `All N gates passed.` honest as the
 // roster-collapse tripwire, reported on its own line beside the summary and never inside it
-fn report_omissions(list_text: &str) {
+fn report_omissions(w: &mut dyn Write, list_text: &str) {
     let mut reasons: Vec<&str> = registry::omissions(list_text).into_iter().map(|(_, _, r)| r).collect();
     reasons.sort_unstable();
     let mut i = 0;
@@ -789,7 +820,7 @@ fn report_omissions(list_text: &str) {
         // spec: gate-sdk/SPEC.md §run-gates — the class is reason-agnostic and belongs to any
         // consumer omitting a member for any cause, so the reason is reported as written and no
         // remedy is invented for it (installer/SPEC.md §The gate binary).
-        println!("{} gate(s) omitted ({}).", n, r);
+        let _ = writeln!(w, "{} gate(s) omitted ({}).", n, r);
         i += n;
     }
 }
@@ -858,15 +889,18 @@ fn write_timings(path: &Path, order: &[Selected], outcomes: &[Outcome]) {
     let _ = std::fs::write(path, body);
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — the `--json` document's version, under the verdict-contract rule
+const CONTRACT: &str = "1.0.0";
+
 pub fn run(args: &[String]) -> i32 {
     let parsed = match parse(args) {
         Ok(p) => p,
-        Err(e) => {
+        Err((e, json)) => {
             eprintln!("{}: {}", TOOL, e.message);
             if e.usage {
                 eprintln!("{}", USAGE);
             }
-            return exit::USAGE;
+            return answer(json, Err(exit::Kind::Usage));
         }
     };
     // spec: gate-sdk/SPEC.md §The bin/-tool contract — a help request is the usage text on stdout at
@@ -876,12 +910,41 @@ pub fn run(args: &[String]) -> i32 {
         println!("{}", USAGE);
         return 0;
     }
+    answer(parsed.json, battery(&parsed))
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — under `--json` the document is the arm's last write: the run's
+// at its verdict status, or the error document where the arm itself refused or failed
+fn answer(json: bool, result: Result<(i32, String), exit::Kind>) -> i32 {
+    match result {
+        Ok((code, document)) => {
+            if json {
+                print!("{}", document);
+            }
+            code
+        }
+        Err(kind) => {
+            if json {
+                print!("{}", exit::error_document(CONTRACT, kind));
+            }
+            kind.status()
+        }
+    }
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the run itself: its verdict status and, under `--json`, its
+// document; every refusal and failure before the verdict names its kind
+fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
+    let json = parsed.json;
+    // spec: gate-sdk/SPEC.md §run-gates — under `--json` the transcript moves to stderr, so stdout
+    // carries the document alone
+    let mut w: Box<dyn Write> = if json { Box::new(std::io::stderr()) } else { Box::new(std::io::stdout()) };
     let knob = |n: &str| walk::knob_scalar(n);
     let configured_dir = match knob("GATE_SDK_GATES_DIR") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return exit::REFUSED;
+            return Err(exit::Kind::Refused);
         }
     };
     let gates_dir = parsed.gates_dir.clone().unwrap_or_else(|| configured_dir.clone());
@@ -895,13 +958,13 @@ pub fn run(args: &[String]) -> i32 {
             if explicit {
                 steer(&gates_dir, &configured_dir);
             }
-            return exit::REFUSED;
+            return Err(exit::Kind::Refused);
         }
     };
     let members = registry::members(&list_text);
     if members.is_empty() {
         eprintln!("{}: {} names no gates", TOOL, list);
-        return exit::REFUSED;
+        return Err(exit::Kind::Refused);
     }
 
     // spec: gate-sdk/SPEC.md §Layout and configuration — the kit roots absolutized, so the
@@ -910,7 +973,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return exit::REFUSED;
+            return Err(exit::Kind::Refused);
         }
     };
     let resolve_dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
@@ -925,7 +988,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(s) => s,
             Err(e) => {
                 eprintln!("{}: {}", TOOL, e);
-                return exit::REFUSED;
+                return Err(exit::Kind::Refused);
             }
         }
     };
@@ -933,15 +996,12 @@ pub fn run(args: &[String]) -> i32 {
         Ok(s) => s,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return e.status();
+            return Err(e.kind);
         }
     };
 
     let selected: Vec<Selected> = if !parsed.only.is_empty() {
-        match select_only(&members, &list, &resolve_dirs, &parsed.only, parsed.only_args.as_deref()) {
-            Ok(s) => s,
-            Err(c) => return c,
-        }
+        select_only(&members, &list, &resolve_dirs, &parsed.only, parsed.only_args.as_deref())?
     } else if !parsed.paths.is_empty() {
         // spec: gate-sdk/SPEC.md §run-gates — the kit roots relative to the working directory the door
         // set to the toplevel, since the given paths are repo-relative
@@ -949,23 +1009,24 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("{}: {}", TOOL, e);
-                return exit::REFUSED;
+                return Err(exit::Kind::Refused);
             }
         };
-        let s = match select_for(&members, &resolve_dirs, &kit_roots_here, &parsed.paths) {
-            Ok(s) => s,
-            Err(c) => return c,
-        };
+        let s = select_for(&mut *w, &members, &resolve_dirs, &kit_roots_here, &parsed.paths)?;
         if s.is_empty() {
-            print!("\n===== gates summary =====\nno coupled gate for the given path(s); nothing to run.\n");
+            let _ = write!(w, "\n===== gates summary =====\nno coupled gate for the given path(s); nothing to run.\n");
+            let _ = w.flush();
+            if sarif_path.is_empty() && !json {
+                return Ok((0, String::new()));
+            }
+            let provenance = provenance_of(sarif::Scope::For, &[], &resolve_dirs);
             if !sarif_path.is_empty() {
-                let provenance = provenance_of(sarif::Scope::For, &[], &resolve_dirs);
                 if let Err(e) = write_log(&sarif_path, &list, &provenance, sarif::Scope::For, selection, &[], &[]) {
                     eprintln!("{}: {}", TOOL, e);
-                    return exit::TOOL;
+                    return Err(exit::Kind::Tool);
                 }
             }
-            return 0;
+            return Ok((0, document(0, sarif::Scope::For, &provenance, Vec::new(), &[])));
         }
         s
     } else {
@@ -982,14 +1043,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return exit::REFUSED;
+            return Err(exit::Kind::Refused);
         }
     };
     let scratch = match run_scratch(&tmp_dir) {
         Ok(s) => s,
         Err(e) => {
             eprintln!("{}: {} — treating as failure (not clean)", TOOL, e);
-            return exit::TOOL;
+            return Err(exit::Kind::Tool);
         }
     };
 
@@ -1000,7 +1061,7 @@ pub fn run(args: &[String]) -> i32 {
                 "{}: cannot resolve this binary's own path: {} — treating as failure (not clean)",
                 TOOL, e
             );
-            return exit::TOOL;
+            return Err(exit::Kind::Tool);
         }
     };
 
@@ -1008,7 +1069,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return exit::REFUSED;
+            return Err(exit::Kind::Refused);
         }
     };
     let scratch_path = scratch.to_path_buf();
@@ -1033,8 +1094,6 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     let verbose = std::env::var("GATE_SDK_VERBOSE").map(|v| !v.is_empty()).unwrap_or(false);
-    let stdout = std::io::stdout();
-    let mut w = stdout.lock();
     for (s, o) in selected.iter().zip(&outcomes) {
         if !o.failed && !verbose {
             continue;
@@ -1048,8 +1107,7 @@ pub fn run(args: &[String]) -> i32 {
         let _ = writeln!(w, "{}", o.tail);
     }
     let _ = write!(w, "\n===== gates summary =====\n");
-    let _ = w.flush();
-    report_omissions(&list_text);
+    report_omissions(&mut *w, &list_text);
     let failed: Vec<&str> = selected
         .iter()
         .zip(&outcomes)
@@ -1057,10 +1115,11 @@ pub fn run(args: &[String]) -> i32 {
         .map(|(s, _)| s.name.as_str())
         .collect();
     let code = if failed.is_empty() {
-        println!("All {} gates passed.", selected.len());
+        let _ = writeln!(w, "All {} gates passed.", selected.len());
         0
     } else {
-        println!(
+        let _ = writeln!(
+            w,
             "{} of {} gates FAILED: {}",
             failed.len(),
             selected.len(),
@@ -1068,6 +1127,7 @@ pub fn run(args: &[String]) -> i32 {
         );
         verdict_status(&outcomes)
     };
+    let _ = w.flush();
     let (scope, omissions) = if !parsed.only.is_empty() {
         (sarif::Scope::Only, Vec::new())
     } else if !parsed.paths.is_empty() {
@@ -1080,7 +1140,8 @@ pub fn run(args: &[String]) -> i32 {
             .collect();
         (sarif::Scope::Registry, omissions)
     };
-    let provenance = (!sarif_path.is_empty() || store.is_some()).then(|| provenance_of(scope, &selected, &resolve_dirs));
+    let provenance =
+        (!sarif_path.is_empty() || store.is_some() || json).then(|| provenance_of(scope, &selected, &resolve_dirs));
     // spec: gate-sdk/SPEC.md §run-gates — the SARIF log is written once after the verdict lines,
     // and only an unwritable path changes the exit status
     if let Some(provenance) = provenance.as_ref().filter(|_| !sarif_path.is_empty()) {
@@ -1100,7 +1161,7 @@ pub fn run(args: &[String]) -> i32 {
             .collect();
         if let Err(e) = write_log(&sarif_path, &list, provenance, scope, selection, &members, &omissions) {
             eprintln!("{}: {}", TOOL, e);
-            return exit::TOOL;
+            return Err(exit::Kind::Tool);
         }
     }
     // spec: gate-sdk/SPEC.md §run-gates — the store follows the log, keeping a judged registry run
@@ -1108,11 +1169,65 @@ pub fn run(args: &[String]) -> i32 {
         if let Some((name, body)) = crate::verdict_store::entry(scope, code, provenance) {
             if let Err(e) = crate::verdict_store::write(dir, &name, &body) {
                 eprintln!("{}: {}", TOOL, e);
-                return exit::TOOL;
+                return Err(exit::Kind::Tool);
             }
         }
     }
-    code
+    let document = match provenance.filter(|_| json) {
+        Some(p) => {
+            let entries = selected.iter().zip(&outcomes).map(|(s, o)| member_entry(&s.name, o)).collect();
+            document(code, scope, &p, entries, &omissions)
+        }
+        None => String::new(),
+    };
+    Ok((code, document))
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — one member's entry: its kind, its status where it ran, and an
+// `error` member's cause, `refused` for an exit 2 or a member resolved nowhere and `tool` otherwise
+fn member_entry(name: &str, o: &Outcome) -> Value {
+    let kind = if !o.failed {
+        sarif::green(&o.output, &o.tail).0
+    } else if !o.errored {
+        "fail"
+    } else {
+        "error"
+    };
+    let mut m = Map::new();
+    m.insert("name".into(), json!(name));
+    m.insert("kind".into(), json!(kind));
+    if let Some(c) = o.exit {
+        m.insert("exit".into(), json!(c));
+    }
+    if o.failed && o.errored {
+        let cause = match o.exit {
+            None => exit::Kind::Refused,
+            Some(c) if c == exit::REFUSED => exit::Kind::Refused,
+            Some(_) => exit::Kind::Tool,
+        };
+        m.insert("error".into(), json!(cause.word()));
+    }
+    Value::Object(m)
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the `--json` document: one object, keys sorted, no
+// insignificant whitespace
+fn document(code: i32, scope: sarif::Scope, provenance: &Provenance, members: Vec<Value>, omissions: &[sarif::Omission]) -> String {
+    let verdict = match code {
+        0 => "pass",
+        1 => "fail",
+        _ => "error",
+    };
+    let omitted: Vec<Value> = omissions.iter().map(|o| json!({ "name": o.name, "reason": o.reason })).collect();
+    let doc = json!({
+        "contract": CONTRACT,
+        "verdict": verdict,
+        "scope": scope.word(),
+        "provenance": provenance.block(),
+        "members": members,
+        "omitted": omitted,
+    });
+    format!("{}\n", doc)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the run's verdict: `fail` where any member exited 1, else
@@ -1249,6 +1364,7 @@ fn dispatch_all(d: &Dispatch, selected: &[Selected]) -> Vec<Outcome> {
                     output: b"the worker pool returned no result for this member".to_vec(),
                     failed: true,
                     errored: true,
+                    exit: Some(exit::TOOL),
                     ms: 0,
                 })
         })
@@ -1401,6 +1517,7 @@ mod tests {
             output: Vec::new(),
             failed,
             errored,
+            exit: None,
             ms: 0,
         };
         assert_eq!(verdict_status(&[o(false, false), o(false, false)]), 0);
@@ -1408,5 +1525,49 @@ mod tests {
         assert_eq!(verdict_status(&[o(false, false), o(true, true)]), exit::TOOL);
         assert_eq!(verdict_status(&[o(true, true), o(true, false)]), 1);
         assert_eq!(verdict_status(&[]), 0);
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the four goldens are the documents byte for byte, each
+    // kind, cause and scope carried by at least one
+    #[test]
+    fn the_goldens_are_the_documents() {
+        let p = crate::sarif::tests::fixed();
+        let ran = |code: i32, output: &str| Outcome {
+            tail: String::new(),
+            output: output.as_bytes().to_vec(),
+            failed: code != 0,
+            errored: code != 0 && code != 1,
+            exit: Some(code),
+            ms: 0,
+        };
+        let unjudged = |exit: Option<i32>| Outcome {
+            tail: String::new(),
+            output: Vec::new(),
+            failed: true,
+            errored: true,
+            exit,
+            ms: 0,
+        };
+        let names = ["check-a", "check-b"];
+        let doc = |scope: sarif::Scope, outcomes: [Outcome; 2], omissions: &[sarif::Omission]| {
+            let entries = names.iter().zip(&outcomes).map(|(n, o)| member_entry(n, o)).collect();
+            document(verdict_status(&outcomes), scope, &p, entries, omissions)
+        };
+        let pass = doc(
+            sarif::Scope::Registry,
+            [ran(0, "CHECK-A: clean (3 files)\n"), ran(0, "CHECK-B: clean (not applicable: CHECK_B_GLOBS is unset)\n")],
+            &[sarif::Omission { line: 3, name: "check-c", reason: "unshipped" }],
+        );
+        let fail = doc(sarif::Scope::Only, [ran(1, "a.md:1: finding\n"), ran(2, "check-b: refused\n")], &[]);
+        let error = doc(sarif::Scope::For, [unjudged(None), unjudged(Some(exit::TOOL))], &[]);
+        let refusal = exit::error_document(CONTRACT, exit::Kind::Refused);
+        for (got, golden) in [
+            (pass, include_str!("../../docs/contracts/run/v1/pass.json")),
+            (fail, include_str!("../../docs/contracts/run/v1/fail.json")),
+            (error, include_str!("../../docs/contracts/run/v1/error.json")),
+            (refusal, include_str!("../../docs/contracts/run/v1/refusal.json")),
+        ] {
+            assert_eq!(got, golden);
+        }
     }
 }

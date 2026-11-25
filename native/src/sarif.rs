@@ -183,12 +183,12 @@ fn rule(name: &str, invariant: Option<&Invariant>, kit: Option<&str>) -> Value {
 // spec: gate-sdk/SPEC.md §run-gates — a green member's kind and message: its last clean line, a
 // `not applicable: ` parenthetical making it `notApplicable`; no clean line is a `pass` carrying
 // its verdict line, since the exit status is the verdict
-fn green(m: &Member) -> (&'static str, String) {
-    let text = String::from_utf8_lossy(m.output);
+pub(crate) fn green(output: &[u8], tail: &str) -> (&'static str, String) {
+    let text = String::from_utf8_lossy(output);
     match text.lines().rev().find(|l| output::clean_line(l)) {
         Some(l) if output::not_applicable(l) => ("notApplicable", l.to_string()),
         Some(l) => ("pass", l.to_string()),
-        None => ("pass", m.tail.trim().to_string()),
+        None => ("pass", tail.trim().to_string()),
     }
 }
 
@@ -244,7 +244,7 @@ pub fn render(run: &Run, members: &[Member], omissions: &[Omission], is_file: &d
         rules.push(rule(m.name, m.invariant.as_ref(), m.kit.as_deref()));
         let row = m.registry_line.map(|n| n as u64);
         if !m.failed {
-            let (kind, message) = green(m);
+            let (kind, message) = green(m.output, m.tail);
             results.push(result(idx, m.name, kind, &message, at(&registry, row, None)));
             continue;
         }
