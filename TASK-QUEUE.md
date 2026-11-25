@@ -8,7 +8,7 @@
 
   **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, on scope's recommendation widened to the whole ask):** the orchestrator adopter's remaining asks. Debt: `verdict-key-before-dispatch` leads, `exit-status-site-unification` lands before the new gates so they are born on its one exit rule, and `verdict-fix-release-notify` rides to close. Feature for spec to author: `adopter-content-checks`, all nine checks, in the adopter's order: the redacted record with its rule id, then strings and text, names, ghpin, then the rest.
 
-  **The release and pushes (2026-11-25, operator grant, lead-relayed):** cut v0.39.0 at this iteration's close. Push need 2 against 2, inside the budget: the closing push, and the release tag whose publish run ships the store fix.
+  **The release and pushes (2026-11-25, operator grant, lead-relayed):** cut v0.39.0 at this iteration's close. **One cut at close (2026-11-25, operator direction, lead-relayed, not a ruling),** carrying the store fix together with the content gates, over the adopter's ask that the fix ship on its own; the release notice says so. Push need 2 against 2, inside the budget: the closing push, and the release tag whose publish run ships the store fix.
 
 ---
 
@@ -38,7 +38,7 @@ The exit-status cut (usage and refused at 2, input and tool at 3) leaves one cas
 
 The orchestrator adopter aligns with released checkwright only and keeps `GATE_SDK_VERDICT_STORE` off until a release ships [verdict-key-before-dispatch](#verdict-key-before-dispatch); it asked to be told when that release is cut. This entry is the notify obligation on that release, never the defect.
 
-**Deliverable:** at the close whose release carries that fix, the cut and a notice to the adopter naming the tag. The adopter asked (2026-11-25, peer channel, lead-relayed) that the fix ship on its own at this iteration's close, untied to the content-check gates.
+**Deliverable:** at the close whose release carries that fix, the cut and a notice to the adopter naming the tag. The adopter asked (2026-11-25, peer channel, lead-relayed) that the fix ship on its own at this iteration's close, untied to the content-check gates; the operator directed one cut at close carrying both (2026-11-25, lead-relayed, not a ruling), so the notice tells the adopter the fix ships beside the gates.
 
 **Push need (2026-11-25, inside the budget):** the v0.39.0 tag push at close, whose publish run ships the fix the notice names.
 
