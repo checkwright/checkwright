@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-install-claim — exactly one governed doc declares the
 // primary install transport, and no scanned install section leads with a different one; the
 // transport vocabulary is the consumer's command knob's output, never a crate literal
+use crate::exit::{self, Fault};
 use crate::spec::{self, compile_pattern as compile, declared_id, governed_docs};
 use std::path::Path;
 
@@ -9,38 +10,38 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-install-claim: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
 
     // spec: canon-kit/SPEC.md §check-install-claim — the transport vocabulary and the
     // install-section regex are consumer config with no kit default, so either left empty is
     // the clean skip for a consumer that documents no install path
-    let section_re = spec::knob_pub("CANON_KIT_INSTALL_SECTION_RE")?;
-    if spec::command("CANON_KIT_INSTALL_TRANSPORTS_CMD")?.is_empty() || section_re.is_empty() {
+    let section_re = spec::knob_pub("CANON_KIT_INSTALL_SECTION_RE").map_err(Fault::refused)?;
+    if spec::command("CANON_KIT_INSTALL_TRANSPORTS_CMD").map_err(Fault::refused)?.is_empty() || section_re.is_empty() {
         println!("INSTALL-CLAIM: clean (not applicable: no transport vocabulary or install-section regex configured — nothing to hold)");
         return Ok(0);
     }
-    let transports = spec::claim_vocabulary("CANON_KIT_INSTALL_TRANSPORTS_CMD")?;
+    let transports = spec::claim_vocabulary("CANON_KIT_INSTALL_TRANSPORTS_CMD").map_err(Fault::refused)?;
     if transports.is_empty() {
         println!("INSTALL-CLAIM: clean (not applicable: CANON_KIT_INSTALL_TRANSPORTS_CMD declared no transports)");
         return Ok(0);
     }
 
-    let files = governed_docs(root, "CANON_KIT_INSTALL_CLAIM_EXCLUDE")?;
+    let files = governed_docs(root, "CANON_KIT_INSTALL_CLAIM_EXCLUDE").map_err(Fault::refused)?;
     if files.is_empty() {
         println!("INSTALL-CLAIM: clean (not applicable: 0 governed doc(s) found)");
         return Ok(0);
     }
 
-    let decls = spec::declarations(&files, "install-primary:")?;
+    let decls = spec::declarations(&files, "install-primary:").map_err(Fault::input)?;
     if decls.is_empty() {
         println!("check-install-claim: no governed doc declares the primary install transport:");
         println!(
@@ -79,14 +80,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for (id, _) in &transports {
             eprintln!("  {}", id);
         }
-        return Ok(2);
+        return Ok(exit::REFUSED);
     }
 
-    let sect = compile(&section_re, "CANON_KIT_INSTALL_SECTION_RE")?;
+    let sect = compile(&section_re, "CANON_KIT_INSTALL_SECTION_RE").map_err(Fault::refused)?;
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — delta (5)'s production reader of the
     // span API: the heading's own text is `substr($0, RSTART + RLENGTH)` off a leftmost-longest
     // match, so the port routes it through `find` rather than hand-writing a second scanner
-    let head_re = compile(HEADING_RE, "check-install-claim's heading grammar")?;
+    let head_re = compile(HEADING_RE, "check-install-claim's heading grammar").map_err(Fault::tool)?;
 
     // assertion B: a scanned section's earliest transport-matching line is its leading claim
     // spec: canon-kit/SPEC.md §check-install-claim — later matches are never flagged, a fenced
@@ -94,7 +95,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut findings: Vec<String> = Vec::new();
     let mut scanned = 0usize;
     for f in &files {
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         let mut fence = spec::Fence::with_tilde();
         let mut inscope = false;
         let mut settled = false;

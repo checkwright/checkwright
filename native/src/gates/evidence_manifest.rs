@@ -2,6 +2,7 @@
 // scoping; with lifecycle configured also (A) close-entry green block and (C) validate-stamp↔
 // evidence coupling
 use crate::evidence;
+use crate::exit::Fault;
 use crate::walk;
 use std::path::Path;
 
@@ -112,16 +113,16 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-evidence-manifest: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let manifest = knob_or(args, 0, "EVIDENCE_KIT_MANIFEST_FILE")?;
-    let queue = knob_or(args, 1, "EVIDENCE_KIT_QUEUE_FILE")?;
-    let state = knob_or(args, 2, "EVIDENCE_KIT_STATE_FILE")?;
-    let suites = walk::knob_array("EVIDENCE_KIT_SUITES")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let manifest = knob_or(args, 0, "EVIDENCE_KIT_MANIFEST_FILE").map_err(Fault::refused)?;
+    let queue = knob_or(args, 1, "EVIDENCE_KIT_QUEUE_FILE").map_err(Fault::refused)?;
+    let state = knob_or(args, 2, "EVIDENCE_KIT_STATE_FILE").map_err(Fault::refused)?;
+    let suites = walk::knob_array("EVIDENCE_KIT_SUITES").map_err(Fault::refused)?;
 
     if !Path::new(&manifest).is_file() {
         println!("EVIDENCE-MANIFEST: manifest not found: {}", manifest);

@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-prose-enum — within one manifest-prose paragraph, naming
 // two or more members of a declared governed set must name every member, unless an exempt
 // site holds; the vocabulary is the consumer command's output, spawned once through the adapter
+use crate::exit::Fault;
 use crate::spec;
 use std::path::Path;
 
@@ -9,7 +10,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-prose-enum: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -20,16 +21,16 @@ struct Set {
     lowered: Vec<String>,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    if spec::command("CANON_KIT_ENUM_SETS_CMD")?.is_empty() {
+    if spec::command("CANON_KIT_ENUM_SETS_CMD").map_err(Fault::refused)?.is_empty() {
         println!("PROSE-ENUM: clean (not applicable: CANON_KIT_ENUM_SETS_CMD unset — no declared sets to check)");
         return Ok(0);
     }
-    let lines = spec::enum_sets()?;
+    let lines = spec::enum_sets().map_err(Fault::refused)?;
     if lines.is_empty() {
         println!("PROSE-ENUM: clean (not applicable: CANON_KIT_ENUM_SETS_CMD declared no members)");
         return Ok(0);
@@ -49,7 +50,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let manifests = spec::manifest_files_sorted_stripped(root)?;
+    let manifests = spec::manifest_files_sorted_stripped(root).map_err(Fault::refused)?;
     if manifests.is_empty() {
         println!("PROSE-ENUM: clean (not applicable: 0 manifest file(s) found)");
         return Ok(0);
@@ -122,7 +123,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         sets,
         out: Vec::new(),
     };
-    spec::walk_prose(&manifests, "prose-enum-exempt:", &mut sink)?;
+    spec::walk_prose(&manifests, "prose-enum-exempt:", &mut sink).map_err(Fault::input)?;
 
     if !sink.out.is_empty() {
         println!("check-prose-enum: incomplete prose enumeration of a governed set — naming a subset drifts silently when the set grows:");

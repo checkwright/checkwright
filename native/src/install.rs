@@ -1,5 +1,6 @@
 // spec: installer/SPEC.md §The install boundary — the `--install <op>` arm family: the seam
 // both bootstraps call, so the bash caller and its PowerShell twin issue byte-identical argv.
+use crate::exit;
 use crate::sha256;
 // spec: installer/SPEC.md §The manifest — the recorded hash has one owner, the schema module's
 // own `hash`, so this op and the `--init` arm that shares its claim rule cannot disagree about
@@ -21,7 +22,7 @@ fn usage_error(what: &str) -> i32 {
         what
     );
     eprintln!("{}", USAGE);
-    2
+    exit::USAGE
 }
 
 // spec: installer/SPEC.md §The install boundary — `--install <op> [--<key> <value>]…`, each op
@@ -369,8 +370,14 @@ fn place_artifact(args: &[String]) -> i32 {
         Some(rel) if !rel.is_empty() => Recorded::read(&placement.root.join(rel)),
         _ => Ok(Recorded::none()),
     };
-    let outcome = recorded.and_then(|r| place(&placement, &r));
-    match outcome {
+    let recorded = match recorded {
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("checkwright-gates: --install place-artifact: {}", e);
+            return exit::INPUT;
+        }
+    };
+    match place(&placement, &recorded) {
         Ok(records) => {
             for r in records {
                 println!("{}", r);
@@ -379,7 +386,7 @@ fn place_artifact(args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("checkwright-gates: --install place-artifact: {}", e);
-            2
+            exit::TOOL
         }
     }
 }

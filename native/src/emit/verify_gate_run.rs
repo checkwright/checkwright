@@ -1,9 +1,10 @@
 // spec: evidence-kit/SPEC.md §verify-gate-run — one Statement judged against this tree and its
 // commit: its shape, its subject, and each suite's binding, command and tree. It writes nothing.
-// spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because 1 a contradiction and 2 an
+// spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because 1 a contradiction and 3 an
 // unreadable Statement are different answers, which the `--emit-` collapse would merge.
 use crate::evidence::{self, Statement};
 use crate::programs::{self, Program};
+use crate::exit::{self, Fault};
 use crate::{proc, walk};
 use std::io::Read;
 
@@ -18,12 +19,12 @@ pub const KNOBS: &[&str] = &[
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — the `--json` document's version, under gate-sdk/SPEC.md
 // §run-gates' verdict-contract rule
-const DOCUMENT_CONTRACT: &str = "1.0.0";
+const DOCUMENT_CONTRACT: &str = "1.1.0";
 
 pub fn run(args: &[String]) -> i32 {
     let (json, args) = json_option(args);
     let judged = read_input("--verify-gate-run [--json]", &args).and_then(|bytes| judge(&bytes)).and_then(|mut j| {
-        let words = walk::knob_scalar("EVIDENCE_KIT_VERIFY_REQUIRE")?;
+        let words = walk::knob_scalar("EVIDENCE_KIT_VERIFY_REQUIRE").map_err(Fault::refused)?;
         let extra = required(&j, &words);
         j.findings.extend(extra);
         Ok(j)
@@ -31,8 +32,11 @@ pub fn run(args: &[String]) -> i32 {
     let judged = match judged {
         Ok(j) => j,
         Err(e) => {
-            eprintln!("verify-gate-run: {}", e);
-            return 2;
+            eprintln!("verify-gate-run: {}", e.message);
+            if json {
+                print!("{}", exit::error_document(DOCUMENT_CONTRACT, e.kind));
+            }
+            return e.status();
         }
     };
     if json {
@@ -96,7 +100,7 @@ fn required(j: &Judged, words: &str) -> Vec<String> {
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — the input forms: a file, stdin for `-`, else the
 // stdout of the consumer's command knob, its argv spawned with no shell
-pub(crate) fn read_input(spelling: &str, args: &[String]) -> Result<Vec<u8>, String> {
+pub(crate) fn read_input(spelling: &str, args: &[String]) -> Result<Vec<u8>, Fault> {
     let usage = format!("usage: {} [<file> | -]", spelling);
     match args {
         [] => {}
@@ -104,26 +108,26 @@ pub(crate) fn read_input(spelling: &str, args: &[String]) -> Result<Vec<u8>, Str
             let mut buf = Vec::new();
             std::io::stdin()
                 .read_to_end(&mut buf)
-                .map_err(|e| format!("cannot read stdin: {}", e))?;
+                .map_err(|e| Fault::input(format!("cannot read stdin: {}", e)))?;
             return Ok(buf);
         }
         [one] if !one.starts_with("--") => {
-            return std::fs::read(one).map_err(|e| format!("cannot read {}: {}", one, e));
+            return std::fs::read(one).map_err(|e| Fault::input(format!("cannot read {}: {}", one, e)));
         }
-        _ => return Err(format!("takes at most one operand (got: {}) — {}", args.join(" "), usage)),
+        _ => return Err(Fault::usage(format!("takes at most one operand (got: {}) — {}", args.join(" "), usage))),
     }
-    let cmd = walk::knob_array("EVIDENCE_KIT_STATEMENT_CMD")?;
+    let cmd = walk::knob_array("EVIDENCE_KIT_STATEMENT_CMD").map_err(Fault::refused)?;
     if cmd.is_empty() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "no Statement given: name a <file> or - on the command line, or set EVIDENCE_KIT_STATEMENT_CMD — {}",
             usage
-        ));
+        )));
     }
     let program = Program::consumer("EVIDENCE_KIT_STATEMENT_CMD", cmd[0].as_str());
     let rest: Vec<&str> = cmd[1..].iter().map(String::as_str).collect();
-    let out = proc::run_streamed(&program, &rest, b"", proc::Stderr::Inherit)?;
+    let out = proc::run_streamed(&program, &rest, b"", proc::Stderr::Inherit).map_err(Fault::tool)?;
     if out.code() != 0 {
-        return Err(format!("EVIDENCE_KIT_STATEMENT_CMD exited {} — no Statement read", out.code()));
+        return Err(Fault::tool(format!("EVIDENCE_KIT_STATEMENT_CMD exited {} — no Statement read", out.code())));
     }
     Ok(out.stdout().to_vec())
 }
@@ -153,18 +157,19 @@ impl Judged {
     }
 }
 
-fn git(args: &[&str]) -> Result<proc::Completed, String> {
-    proc::run(&programs::GIT, args)
+fn git(args: &[&str]) -> Result<proc::Completed, Fault> {
+    proc::run(&programs::GIT, args).map_err(Fault::tool)
 }
 
-// spec: evidence-kit/SPEC.md §verify-gate-run — the checks in their order: shape refuses (`Err`,
-// exit 2), and every later check is a finding naming the suite and the field
-pub(crate) fn judge(bytes: &[u8]) -> Result<Judged, String> {
-    let st = evidence::read_statement(bytes).map_err(|e| format!("not a gate-run Statement this reader can judge: {}", e))?;
+// spec: evidence-kit/SPEC.md §verify-gate-run — the checks in their order: shape is an input
+// error (`Err`, exit 3), and every later check is a finding naming the suite and the field
+pub(crate) fn judge(bytes: &[u8]) -> Result<Judged, Fault> {
+    let st = evidence::read_statement(bytes)
+        .map_err(|e| Fault::input(format!("not a gate-run Statement this reader can judge: {}", e)))?;
     let mut findings: Vec<String> = Vec::new();
     let subject = st.subject.clone();
     let head = crate::provenance::head()
-        .ok_or("HEAD names no commit here — the subject cannot be ordered against it")?;
+        .ok_or_else(|| Fault::refused("HEAD names no commit here — the subject cannot be ordered against it"))?;
     let mut ahead = "-".to_string();
     let mut subject_tree = None;
     let resolves = git(&["rev-parse", "--verify", "--quiet", &format!("{}^{{commit}}", subject)])?;
@@ -175,7 +180,7 @@ pub(crate) fn judge(bytes: &[u8]) -> Result<Judged, String> {
                 tree.stdout()
                     .map(|b| String::from_utf8_lossy(b).trim().to_string())
                     .filter(|t| tree.code() == Some(0) && crate::provenance::object_id(t))
-                    .ok_or_else(|| format!("cannot read the subject {}'s tree", subject))?,
+                    .ok_or_else(|| Fault::tool(format!("cannot read the subject {}'s tree", subject)))?,
             );
             let anc = git(&["merge-base", "--is-ancestor", &subject, &head])?;
             match anc.code() {
@@ -185,20 +190,20 @@ pub(crate) fn judge(bytes: &[u8]) -> Result<Judged, String> {
                         .stdout()
                         .map(|b| String::from_utf8_lossy(b).trim().to_string())
                         .filter(|n| evidence::is_digits(n))
-                        .ok_or("cannot count the commits HEAD is ahead of the subject")?;
+                        .ok_or_else(|| Fault::tool("cannot count the commits HEAD is ahead of the subject"))?;
                 }
                 Some(1) => findings.push(format!("subject {} is neither HEAD nor an ancestor of it", subject)),
-                _ => return Err(format!("cannot order the subject {} against HEAD", subject)),
+                _ => return Err(Fault::tool(format!("cannot order the subject {} against HEAD", subject))),
             }
         }
         Some(1) => findings.push(format!("subject {} names no commit in this repository", subject)),
-        _ => return Err(format!("cannot look the subject {} up", subject)),
+        _ => return Err(Fault::tool(format!("cannot look the subject {} up", subject))),
     }
     let cfg = Resolution {
-        suites: walk::knob_array("EVIDENCE_KIT_SUITES")?,
-        run_family: walk::knob_prefix("EVIDENCE_KIT_RUN_")?,
-        parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_")?,
-        parser: walk::knob_scalar("EVIDENCE_KIT_PARSER")?,
+        suites: walk::knob_array("EVIDENCE_KIT_SUITES").map_err(Fault::refused)?,
+        run_family: walk::knob_prefix("EVIDENCE_KIT_RUN_").map_err(Fault::refused)?,
+        parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_").map_err(Fault::refused)?,
+        parser: walk::knob_scalar("EVIDENCE_KIT_PARSER").map_err(Fault::refused)?,
     };
     findings.extend(field_findings(&st, &cfg, subject_tree.as_deref()));
     Ok(Judged { statement: st, findings, ahead })
@@ -264,6 +269,7 @@ fn field_findings(st: &Statement, cfg: &Resolution, subject_tree: Option<&str>) 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::exit::Kind;
 
     const TREE: &str = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
@@ -353,9 +359,23 @@ mod tests {
     #[test]
     fn more_than_one_operand_or_a_flag_is_refused() {
         let two = ["a".to_string(), "b".to_string()];
-        assert!(read_input("--verify-gate-run", &two).unwrap_err().contains("at most one operand"));
+        let err = read_input("--verify-gate-run", &two).unwrap_err();
+        assert!(err.contains("at most one operand"));
+        assert_eq!(err.kind, Kind::Usage);
         let flag = ["--help".to_string()];
         assert!(read_input("--verify-gate-run", &flag).unwrap_err().contains("usage"));
+    }
+
+    // spec: evidence-kit/SPEC.md §verify-gate-run — the error golden is the document for an unreadable
+    // Statement file, an input error at exit 3
+    #[test]
+    fn an_unreadable_statement_is_an_input_error_and_matches_its_golden() {
+        let absent = std::env::temp_dir().join(format!("cw-verify-absent-{}.json", std::process::id()));
+        let err = read_input("--verify-gate-run", &[absent.display().to_string()]).unwrap_err();
+        assert_eq!((err.kind, err.status()), (Kind::Input, exit::INPUT));
+        let golden = include_str!("../../../docs/contracts/verify-gate-run/v1/error.json");
+        assert_eq!(exit::error_document(DOCUMENT_CONTRACT, err.kind), golden);
+        assert_eq!(judge(b"not json").err().map(|f| f.kind), Some(Kind::Input));
     }
 
     // spec: evidence-kit/SPEC.md §verify-gate-run — `--json` is taken in either position and once; a

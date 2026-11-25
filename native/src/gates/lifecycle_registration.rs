@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-lifecycle-registration — the always-loaded agent file
 // carries a lifecycle-kit marker block whose content byte-matches the block regenerated from
 // the live stage machine, fail-closed when the target or a marker is missing
+use crate::exit;
 use crate::diff;
 use crate::stages;
 use crate::walk;
@@ -16,7 +17,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-lifecycle-registration: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -25,13 +26,13 @@ pub fn run(args: &[String]) -> i32 {
             "check-lifecycle-registration: agent file not found: {}",
             agent
         );
-        return 2;
+        return exit::REFUSED;
     }
     let text = match std::fs::read(&agent) {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(e) => {
             eprintln!("check-lifecycle-registration: cannot read {}: {}", agent, e);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -41,7 +42,7 @@ pub fn run(args: &[String]) -> i32 {
             agent
         );
         let Some(door) = super::door_or_report("check-lifecycle-registration", "--install-lifecycle") else {
-            return 2;
+            return exit::REFUSED;
         };
         println!("  help: install the resident registration block into the always-loaded agent file —");
         println!("        {} — so a session that loads it", door);
@@ -53,7 +54,7 @@ pub fn run(args: &[String]) -> i32 {
             "check-lifecycle-registration: begin marker present but end marker missing in {} — the block bounds are unreadable",
             agent
         );
-        return 2;
+        return exit::INPUT;
     }
 
     let mut present: Vec<&str> = Vec::new();
@@ -76,7 +77,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(b) => b,
         Err(e) => {
             eprintln!("check-lifecycle-registration: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let expected: Vec<&str> = block.lines().collect();
@@ -84,7 +85,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v.len(),
         Err(e) => {
             eprintln!("check-lifecycle-registration: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -94,7 +95,7 @@ pub fn run(args: &[String]) -> i32 {
             agent
         );
         let Some(door) = super::door_or_report("check-lifecycle-registration", "--install-lifecycle") else {
-            return 2;
+            return exit::REFUSED;
         };
         for l in diff::normal_diff(&expected, &present) {
             println!("  {}", l);

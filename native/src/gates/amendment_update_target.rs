@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-amendment-update-target — every entry under an amendment's
 // `## Existing sections updated` cites at least one delta, and every cited delta is defined
 // under `## What changes` in the same amendment
+use crate::exit::Fault;
 use crate::spec;
 use std::path::Path;
 
@@ -17,7 +18,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-amendment-update-target: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -139,15 +140,15 @@ fn lead(text: &str) -> String {
     s
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
     // spec: canon-kit/SPEC.md §check-amendment-update-target — the strict finder, where
     // §check-amendment-queue takes the best-effort one: an empty amendment set hides every
     // violation here, because this gate has no second surface to contradict it
-    let files: Vec<String> = spec::amendments_strict(root)?
+    let files: Vec<String> = spec::amendments_strict(root).map_err(Fault::input)?
         .into_iter()
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
         .collect();
@@ -160,13 +161,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut targets = 0usize;
 
     for f in &files {
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         let s = scan(&text);
         if s.has_updated && !s.has_what {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "{}: carries '{}' but no '{}' — no delta can own an update target here",
                 f, UPDATED, WHAT_CHANGES
-            ));
+            )));
         }
         for (line, heading) in &s.malformed {
             bad_grammar.push(format!("  {}:{}: {}", f, line, heading));

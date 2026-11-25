@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §check-queue-wrap — no queue line exceeds the wrap budget (Unicode
 // code points), so a runaway never reflows a tag off its tag line
+use crate::exit;
 use crate::queue;
 
 // comment-tier-exempt: the shell side reaches code-point width by making awk bytewise under
@@ -96,7 +97,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-queue-wrap: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let budget: usize = match budget_raw.parse() {
@@ -106,14 +107,14 @@ pub fn run(args: &[String]) -> i32 {
                 "check-queue-wrap: QUEUE_KIT_WRAP_BUDGET is not a positive integer: {}",
                 budget_raw
             );
-            return 2;
+            return exit::REFUSED;
         }
     };
     let deferred = match queue::knob_scalar("QUEUE_KIT_DEFERRED_SECTION") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-queue-wrap: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let file = match args.first() {
@@ -122,7 +123,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-queue-wrap: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -130,7 +131,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-queue-wrap: file not found: {}", file);
-            return 2;
+            return exit::REFUSED;
         }
     };
 

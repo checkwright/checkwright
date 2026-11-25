@@ -2,6 +2,7 @@
 // registries. Two levels: `measure` produces the sections and their per-row kit attribution,
 // `emit` renders them, so the value-rollup join consumes data rather than re-parsing the page.
 use crate::emit::self_repo_prefix;
+use crate::exit::Fault;
 use crate::fresh;
 use crate::{proc, programs};
 use crate::registry;
@@ -132,9 +133,9 @@ fn tier_of(src: &str) -> String {
     "?".to_string()
 }
 
-fn check_dirs(gates_dir: &str) -> Result<Vec<String>, String> {
+fn check_dirs(gates_dir: &str) -> Result<Vec<String>, Fault> {
     let mut dirs = vec![gates_dir.to_string()];
-    for k in walk::kit_roots()? {
+    for k in walk::kit_roots().map_err(Fault::refused)? {
         dirs.push(format!("{}/checks", k.trim_end_matches('/')));
     }
     Ok(dirs)
@@ -142,7 +143,7 @@ fn check_dirs(gates_dir: &str) -> Result<Vec<String>, String> {
 
 // spec: gate-sdk/SPEC.md §enforcement-map — Blocking gates: gates.list membership, tier from each
 // gate's `# graph:` line, grouped by tier and in gates.list order within a tier
-fn gate_section(gates_dir: &str) -> Result<Option<Section>, String> {
+fn gate_section(gates_dir: &str) -> Result<Option<Section>, Fault> {
     let list = format!("{}/gates.list", gates_dir);
     if !Path::new(&list).is_file() {
         return Ok(None);
@@ -150,7 +151,7 @@ fn gate_section(gates_dir: &str) -> Result<Option<Section>, String> {
     let dirs = check_dirs(gates_dir)?;
     let (mut pre, mut msg, mut align): (Vec<Row>, Vec<Row>, Vec<Row>) =
         (Vec::new(), Vec::new(), Vec::new());
-    for name in registry::members(&read_file(&list)?) {
+    for name in registry::members(&read_file(&list).map_err(Fault::input)?) {
         let src = match registry::resolve(&name, &dirs) {
             Some(s) => s,
             None => continue,
@@ -183,14 +184,14 @@ fn gate_section(gates_dir: &str) -> Result<Option<Section>, String> {
 // spec: gate-sdk/SPEC.md §enforcement-map — Advisory KPIs: the drift-kit KPI registry, kit from
 // where each member resolves — the gates dir, then each kit's `kpis/`, then native dispatch, which
 // is drift-kit/SPEC.md §The extensibility contract's own three tiers read for attribution
-fn kpi_section(gates_dir: &str) -> Result<Option<Section>, String> {
-    let file = walk::knob_scalar(KPIS_KNOB)?;
+fn kpi_section(gates_dir: &str) -> Result<Option<Section>, Fault> {
+    let file = walk::knob_scalar(KPIS_KNOB).map_err(Fault::refused)?;
     if file.is_empty() || !Path::new(&file).is_file() {
         return Ok(None);
     }
-    let roots = walk::kit_roots()?;
+    let roots = walk::kit_roots().map_err(Fault::refused)?;
     let mut rows: Vec<Row> = Vec::new();
-    for name in registry::members(&read_file(&file)?) {
+    for name in registry::members(&read_file(&file).map_err(Fault::input)?) {
         let direct = format!("{}/{}.sh", gates_dir, name);
         let mut src = crate::emit::drift_report::member_file(gates_dir, &name)
             .or_else(|| {
@@ -244,18 +245,18 @@ fn hook_row(tokens: &[&str]) -> (String, String, bool) {
 // spec: gate-sdk/SPEC.md §enforcement-map — Session warnings from the `SessionStart` command hooks,
 // Guards from every other event's, and Observed hooks apart whatever their event; events sorted and
 // hooks in registration order, the rows read with serde_json so the battery needs no non-floor program
-fn hook_sections(settings: &str, set: bool) -> Result<(Vec<Section>, Option<Section>), String> {
+fn hook_sections(settings: &str, set: bool) -> Result<(Vec<Section>, Option<Section>), Fault> {
     if settings.is_empty() || !Path::new(settings).is_file() {
         return Ok((Vec::new(), None));
     }
-    let doc: Value = match serde_json::from_str(&read_file(settings)?) {
+    let doc: Value = match serde_json::from_str(&read_file(settings).map_err(Fault::input)?) {
         Ok(v) => v,
         Err(_) if !set => return Ok((Vec::new(), None)),
         Err(e) => {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "CONTEXT_KIT_SETTINGS_FILE unparseable: {}: {}",
                 settings, e
-            ))
+            )))
         }
     };
     let mut out: Vec<Section> = Vec::new();
@@ -319,23 +320,23 @@ fn hook_sections(settings: &str, set: bool) -> Result<(Vec<Section>, Option<Sect
 // spec: gate-sdk/SPEC.md §enforcement-map — Validate suites: evidence-kit's suite registry. The
 // roster is EVIDENCE_KIT_SUITES and each run command is looked up *by name* in the
 // EVIDENCE_KIT_RUN_ family, because a prefix is a resolution set and never a roster.
-fn suite_section() -> Result<Option<Section>, String> {
-    let suites = walk::knob_array(SUITES_KNOB)?;
+fn suite_section() -> Result<Option<Section>, Fault> {
+    let suites = walk::knob_array(SUITES_KNOB).map_err(Fault::refused)?;
     if suites.is_empty() {
         return Ok(None);
     }
-    let family = walk::knob_prefix(RUN_PREFIX)?;
+    let family = walk::knob_prefix(RUN_PREFIX).map_err(Fault::refused)?;
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the reader holds the roster, so the reader is what
     // fail-closes: a suite the roster named with no `RUN_` entry is adopted-but-broken and refuses
     // naming it. An *empty* roster never reaches here, which is the not-adopted case degrading.
     let mut rows: Vec<Row> = Vec::new();
     for s in &suites {
         let cmd = walk::knob_in_family(&family, s).ok_or_else(|| {
-            format!(
+            Fault::refused(format!(
                 "EVIDENCE_KIT_SUITES names suite '{}' but no {}{} resolved — the suite registry \
                  is adopted and incomplete; treating as failure (not clean)",
                 s, RUN_PREFIX, s
-            )
+            ))
         })?;
         rows.push(Row {
             kit: attribute_kit(&command_path(&cmd)),
@@ -353,19 +354,19 @@ fn suite_section() -> Result<Option<Section>, String> {
 // spec: gate-sdk/SPEC.md §enforcement-map — Monitors: the one class with no parseable registry, so
 // a non-gate surface declares itself with a line-start `# enforce: class=monitor` marker. A marker
 // under templates/ is an inert copy-source and is pruned, atop the gate-tests exclusion.
-fn monitor_section(scan: &str) -> Result<Option<Section>, String> {
+fn monitor_section(scan: &str) -> Result<Option<Section>, Fault> {
     // spec: gate-sdk/SPEC.md §enforcement-map — a scan root that is not a directory refuses
     // *naming the knob* rather than the path, and the default `.` is always a directory, so the
     // arm is reachable only for an explicitly-set value.
     if !fresh::is_dir(scan) {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "GATE_SDK_ENFORCE_SCAN_DIR not found: {} — the monitor registry could not be \
              scanned; treating as failure (not clean)",
             scan
-        ));
+        )));
     }
-    let prune = walk::prune_dirs()?;
-    let files = walk::find_with_prune(Path::new(scan), &|n| prune.iter().any(|d| d == n))?;
+    let prune = walk::prune_dirs().map_err(Fault::refused)?;
+    let files = walk::find_with_prune(Path::new(scan), &|n| prune.iter().any(|d| d == n)).map_err(Fault::input)?;
     let mut hits: Vec<(String, String)> = Vec::new();
     for f in files {
         let rel = f.display().to_string();
@@ -467,10 +468,14 @@ fn class_roster(prefix: &str) -> String {
 }
 
 pub fn measure() -> Result<EnforcementMap, String> {
-    let gates_dir = walk::knob_scalar(GATES_DIR_KNOB)?;
-    let settings = walk::knob_scalar(SETTINGS_KNOB)?;
-    let scan = walk::knob_scalar(SCAN_KNOB)?;
-    let blob_ref = walk::knob_scalar(BLOB_REF_KNOB)?;
+    measure_fault().map_err(|f| f.message)
+}
+
+pub fn measure_fault() -> Result<EnforcementMap, Fault> {
+    let gates_dir = walk::knob_scalar(GATES_DIR_KNOB).map_err(Fault::refused)?;
+    let settings = walk::knob_scalar(SETTINGS_KNOB).map_err(Fault::refused)?;
+    let scan = walk::knob_scalar(SCAN_KNOB).map_err(Fault::refused)?;
+    let blob_ref = walk::knob_scalar(BLOB_REF_KNOB).map_err(Fault::refused)?;
 
     let mut sections: Vec<Section> = Vec::new();
     if let Some(s) = gate_section(&gates_dir)? {
@@ -479,7 +484,7 @@ pub fn measure() -> Result<EnforcementMap, String> {
     if let Some(s) = kpi_section(&gates_dir)? {
         sections.push(s);
     }
-    let (_, settings_origin) = crate::knobs::resolve(SETTINGS_KNOB)?;
+    let (_, settings_origin) = crate::knobs::resolve(SETTINGS_KNOB).map_err(Fault::refused)?;
     let (hooks, observed) = hook_sections(&settings, settings_origin.is_set())?;
     sections.extend(hooks);
     if let Some(s) = suite_section()? {
@@ -543,9 +548,9 @@ pub fn render(m: &EnforcementMap, linked: &[String]) -> String {
     out
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    let m = measure()?;
-    let page = walk::knob_scalar("GATE_SDK_ENFORCEMENT_FILE")?;
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
+    let m = measure_fault()?;
+    let page = walk::knob_scalar("GATE_SDK_ENFORCEMENT_FILE").map_err(Fault::refused)?;
     let linked = kits_with_tracked_page(&m, &page);
     Ok(render(&m, &linked))
 }

@@ -1,10 +1,11 @@
 // spec: gate-sdk/SPEC.md §install-hooks — the per-clone hook opt-in: place both hooks in the
 // clone's git directory, point core.hooksPath at them, verify the git identity once, and report
 // what was placed.
-// spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the contract is three-state and
+// spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the contract is four-state and
 // every code is load-bearing: `check-identity`'s 1 propagates through, and an emitting arm cannot
 // carry it.
 use super::hook_launcher;
+use crate::exit::{self, Fault};
 use crate::{proc, programs};
 use crate::registry;
 use crate::walk;
@@ -40,7 +41,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("install-hooks: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -52,44 +53,44 @@ fn absent(bin: &str) -> String {
 // spec: gate-sdk/SPEC.md §install-hooks — the hooks directory `--refresh` re-places into: `None`
 // off the work-tree top, where the binary's path and the directory would resolve against another
 // tree, and in a clone not opted in, which a refresh never opts in
-fn refresh_target(here: &str) -> Result<Option<PathBuf>, String> {
-    let Some(top) = walk::toplevel_in_opt(here)? else {
+fn refresh_target(here: &str) -> Result<Option<PathBuf>, Fault> {
+    let Some(top) = walk::toplevel_in_opt(here).map_err(Fault::tool)? else {
         return Ok(None);
     };
     if !hook_launcher::same_dir(Path::new(&top), Path::new(here)) {
         return Ok(None);
     }
-    match hook_launcher::hooks_dir(here)? {
-        Some(dir) if hook_launcher::opted_in(here, &dir)? => Ok(Some(dir)),
+    match hook_launcher::hooks_dir(here).map_err(Fault::refused)? {
+        Some(dir) if hook_launcher::opted_in(here, &dir).map_err(Fault::refused)? => Ok(Some(dir)),
         _ => Ok(None),
     }
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — the files re-placed and nothing else: no config write, no
 // identity rung, no receipt
-fn refresh() -> Result<i32, String> {
-    let Some(hooks_dir) = refresh_target(&walk::cwd()?)? else {
+fn refresh() -> Result<i32, Fault> {
+    let Some(hooks_dir) = refresh_target(&walk::cwd().map_err(Fault::tool)?)? else {
         return Ok(0);
     };
-    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
+    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(Fault::refused)?;
     if !Path::new(&bin).is_file() {
-        return Err(absent(&bin));
+        return Err(Fault::input(absent(&bin)));
     }
     refresh_place(Path::new(&bin), &hooks_dir)?;
     println!("install-hooks: refreshed {}", hooks_dir.display());
     Ok(0)
 }
 
-fn refresh_place(bin: &Path, hooks_dir: &Path) -> Result<(), String> {
-    let chain = hook_launcher::read_chain(hooks_dir)?;
-    place(bin, hooks_dir, &recorded_forwards(chain.as_ref())?)
+fn refresh_place(bin: &Path, hooks_dir: &Path) -> Result<(), Fault> {
+    let chain = hook_launcher::read_chain(hooks_dir).map_err(Fault::input)?;
+    place(bin, hooks_dir, &recorded_forwards(chain.as_ref())?).map_err(Fault::tool)
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — a re-run and `--refresh` place a forwarding hook for each
 // live hook the recorded directory holds now, so one added there since is reached
-fn recorded_forwards(chain: Option<&hook_launcher::Chain>) -> Result<Vec<String>, String> {
+fn recorded_forwards(chain: Option<&hook_launcher::Chain>) -> Result<Vec<String>, Fault> {
     match chain {
-        Some(c) => Ok(forwarded(&live_hooks(&c.dir)?)),
+        Some(c) => Ok(forwarded(&live_hooks(&c.dir).map_err(Fault::input)?)),
         None => Ok(Vec::new()),
     }
 }
@@ -115,29 +116,30 @@ struct Plan {
     restore: Option<hook_launcher::Chain>,
 }
 
-fn dispatch(args: &[String]) -> Result<i32, String> {
+fn dispatch(args: &[String]) -> Result<i32, Fault> {
     if args.first().map(String::as_str) == Some(REFRESH) {
         return match args.get(1) {
-            Some(a) => Err(format!("{} takes no arguments (got: {})\n{}", REFRESH, a, USAGE)),
+            Some(a) => Err(Fault::usage(format!("{} takes no arguments (got: {})\n{}", REFRESH, a, USAGE))),
             None => refresh(),
         };
     }
     let surplus = super::file_survey::positionals(args, "argument")
-        .map_err(|e| format!("{}\n{}", e, USAGE))?;
+        .map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     if let Some(a) = surplus.first() {
-        return Err(format!("takes no arguments (got: {})\n{}", a, USAGE));
+        return Err(Fault::usage(format!("takes no arguments (got: {})\n{}", a, USAGE)));
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — both knobs and the hooks directory are resolved
     // before any write, so a configuration failure refuses without half-installing.
-    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
-    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(Fault::refused)?;
+    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
     if !Path::new(&bin).is_file() {
-        return Err(absent(&bin));
+        return Err(Fault::input(absent(&bin)));
     }
-    let here = walk::cwd()?;
-    let hooks_dir = hook_launcher::hooks_dir(&here)?
-        .ok_or_else(|| "not inside a git repository — there is no clone to place the hooks in".to_string())?;
+    let here = walk::cwd().map_err(Fault::tool)?;
+    let hooks_dir = hook_launcher::hooks_dir(&here).map_err(Fault::refused)?.ok_or_else(|| {
+        Fault::refused("not inside a git repository — there is no clone to place the hooks in")
+    })?;
     let plan = plan(&here, &hooks_dir, &bin)?;
 
     wire(Path::new(&bin), &hooks_dir, &plan)?;
@@ -154,11 +156,11 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §install-hooks — an unwired clone is no opt-in: the refusal comes
     // ahead of the receipt, which would read as one
     config("core.hooksPath", &hooks_dir.display().to_string()).map_err(|e| {
-        format!(
+        Fault::tool(format!(
             "{} — the hooks are placed in {} and git is not pointed at them, so no hook runs; clear the cause and re-run",
             e,
             hooks_dir.display()
-        )
+        ))
     })?;
     // spec: gate-sdk/SPEC.md §install-hooks — the blame guard stays a file-existence test, so a
     // consumer without the file gets the same one-line output it always got; its failed write is
@@ -186,18 +188,18 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
 // spec: gate-sdk/SPEC.md §install-hooks — a re-run keeps the record and re-places its forwarding
 // hooks; a first run records the prior directory, and over a live hook on native Windows it first
 // probes that this git can chain it
-fn plan(here: &str, hooks_dir: &Path, bin: &str) -> Result<Plan, String> {
-    let top = walk::toplevel_in_opt(here)?.unwrap_or_else(|| here.to_string());
-    let (dir, chained, replaced) = match prior(here, hooks_dir)? {
+fn plan(here: &str, hooks_dir: &Path, bin: &str) -> Result<Plan, Fault> {
+    let top = walk::toplevel_in_opt(here).map_err(Fault::tool)?.unwrap_or_else(|| here.to_string());
+    let (dir, chained, replaced) = match prior_fault(here, hooks_dir)? {
         Prior::Own => {
-            let chain = hook_launcher::read_chain(hooks_dir)?;
+            let chain = hook_launcher::read_chain(hooks_dir).map_err(Fault::input)?;
             let forwards = recorded_forwards(chain.as_ref())?;
             return Ok(Plan { record: None, forwards, chained: None, replaced: None, restore: chain });
         }
         Prior::Quiet { dir, set } => (dir, None, set),
         Prior::Live { dir, names } => {
             if !chain_probe() {
-                return Err(live_refusal(&dir, &names, bin));
+                return Err(Fault::refused(live_refusal(&dir, &names, bin)));
             }
             (dir.clone(), Some((dir, names)), None)
         }
@@ -205,10 +207,10 @@ fn plan(here: &str, hooks_dir: &Path, bin: &str) -> Result<Plan, String> {
     let restore = local_hooks_path(&top)?;
     if hook_launcher::Shell::host() == hook_launcher::Shell::PowerShell {
         if let Some(refusal) = powershell_altered(&restore) {
-            return Err(refusal);
+            return Err(Fault::refused(refusal));
         }
     }
-    let record = record_text(&dir, &restore)?;
+    let record = record_text(&dir, &restore).map_err(Fault::refused)?;
     let forwards = chained.as_ref().map(|(_, names)| forwarded(names)).unwrap_or_default();
     Ok(Plan {
         record: Some(record),
@@ -221,33 +223,40 @@ fn plan(here: &str, hooks_dir: &Path, bin: &str) -> Result<Plan, String> {
 
 // spec: gate-sdk/SPEC.md §install-hooks — the record lands after the hooks and before git is
 // pointed at them, so a failed write leaves no clone running hooks without it
-fn wire(bin: &Path, hooks_dir: &Path, plan: &Plan) -> Result<(), String> {
-    place(bin, hooks_dir, &plan.forwards)?;
+fn wire(bin: &Path, hooks_dir: &Path, plan: &Plan) -> Result<(), Fault> {
+    place(bin, hooks_dir, &plan.forwards).map_err(Fault::tool)?;
     let Some(text) = &plan.record else {
         return Ok(());
     };
     write_record(hooks_dir, text, &run_tag()).map_err(|e| {
-        format!(
+        Fault::tool(format!(
             "{} — the hooks are placed in {} and git is not pointed at them, so no hook runs; clear the cause and re-run",
             e,
             hooks_dir.display()
-        )
+        ))
     })
 }
 
 // spec: gate-sdk/SPEC.md §install-hooks — `core.hooksPath`'s local-scope value before the run, as
 // git prints it, empty where that scope set none
-fn local_hooks_path(top: &str) -> Result<String, String> {
-    let got = proc::run(&programs::GIT, &["-C", top, "config", "--local", "--get", "core.hooksPath"])?;
+fn local_hooks_path(top: &str) -> Result<String, Fault> {
+    let got = proc::run(&programs::GIT, &["-C", top, "config", "--local", "--get", "core.hooksPath"])
+        .map_err(Fault::tool)?;
     match (got.stdout(), got.code()) {
         (Some(out), _) => {
             let value = git_value(out);
             String::from_utf8(value.to_vec()).map_err(|_| {
-                not_utf8(&format!("core.hooksPath is set locally to '{}'", walk::escaped_bytes(value)), LOCAL_UNSET)
+                Fault::refused(not_utf8(
+                    &format!("core.hooksPath is set locally to '{}'", walk::escaped_bytes(value)),
+                    LOCAL_UNSET,
+                ))
             })
         }
         (None, Some(1)) => Ok(String::new()),
-        (None, _) => Err(format!("cannot read core.hooksPath ({})", got.failure_report().unwrap_or_default())),
+        (None, _) => Err(Fault::tool(format!(
+            "cannot read core.hooksPath ({})",
+            got.failure_report().unwrap_or_default()
+        ))),
     }
 }
 
@@ -382,42 +391,62 @@ pub(crate) enum Prior {
 }
 
 pub(crate) fn prior(here: &str, hooks_dir: &Path) -> Result<Prior, String> {
-    let top = walk::toplevel_in_opt(here)?.unwrap_or_else(|| here.to_string());
-    let got = proc::run(&programs::GIT, &["-C", &top, "config", "--path", "--get", "core.hooksPath"])?;
+    prior_fault(here, hooks_dir).map_err(|f| f.message)
+}
+
+fn prior_fault(here: &str, hooks_dir: &Path) -> Result<Prior, Fault> {
+    let top = walk::toplevel_in_opt(here).map_err(Fault::tool)?.unwrap_or_else(|| here.to_string());
+    let got = proc::run(&programs::GIT, &["-C", &top, "config", "--path", "--get", "core.hooksPath"])
+        .map_err(Fault::tool)?;
     let set = match (got.stdout(), got.code()) {
         (Some(out), _) => {
             let value = git_value(out);
             let value = String::from_utf8(value.to_vec()).map_err(|_| {
-                not_utf8(&format!("core.hooksPath is set to '{}'", walk::escaped_bytes(value)), EFFECTIVE_UNSET)
+                Fault::refused(not_utf8(
+                    &format!("core.hooksPath is set to '{}'", walk::escaped_bytes(value)),
+                    EFFECTIVE_UNSET,
+                ))
             })?;
             if value.is_empty() {
-                return Err(EMPTY_REFUSAL.to_string());
+                return Err(Fault::refused(EMPTY_REFUSAL));
             }
             Some(value)
         }
         (None, Some(1)) => None,
-        (None, _) => return Err(format!("cannot read core.hooksPath ({})", got.failure_report().unwrap_or_default())),
+        (None, _) => {
+            return Err(Fault::tool(format!(
+                "cannot read core.hooksPath ({})",
+                got.failure_report().unwrap_or_default()
+            )))
+        }
     };
     let dir = match &set {
         Some(value) => PathBuf::from(walk::physical_against_strict(&top, value).map_err(|dir| {
-            not_utf8(&format!("core.hooksPath '{}' resolves to '{}'", value, walk::escaped_os(dir.as_os_str())), EFFECTIVE_UNSET)
+            Fault::refused(not_utf8(
+                &format!("core.hooksPath '{}' resolves to '{}'", value, walk::escaped_os(dir.as_os_str())),
+                EFFECTIVE_UNSET,
+            ))
         })?),
         None => {
-            let out = proc::run(&programs::GIT, &["-C", &top, "rev-parse", "--git-path", "hooks"])?;
+            let out = proc::run(&programs::GIT, &["-C", &top, "rev-parse", "--git-path", "hooks"])
+                .map_err(Fault::tool)?;
             let path = out.stdout().ok_or_else(|| {
-                format!("cannot resolve git's hooks directory ({})", out.failure_report().unwrap_or_default())
+                Fault::tool(format!(
+                    "cannot resolve git's hooks directory ({})",
+                    out.failure_report().unwrap_or_default()
+                ))
             })?;
             // spec: gate-sdk/SPEC.md §install-hooks — an answer with no UTF-8 spelling names no prior
             // hooks directory, never a replaced spelling
             let path = std::str::from_utf8(path)
-                .map_err(|_| walk::not_utf8("git's hooks directory", &walk::escaped_bytes(path)))?;
+                .map_err(|_| Fault::refused(walk::not_utf8("git's hooks directory", &walk::escaped_bytes(path))))?;
             PathBuf::from(walk::physical_against(&top, path.trim()))
         }
     };
     if hook_launcher::same_dir(&dir, hooks_dir) {
         return Ok(Prior::Own);
     }
-    let names = live_hooks(&dir)?;
+    let names = live_hooks(&dir).map_err(Fault::input)?;
     if names.is_empty() {
         Ok(Prior::Quiet { dir, set })
     } else {
@@ -554,7 +583,7 @@ fn identity_rung(gates_dir: &str) -> i32 {
         Ok(r) => r,
         Err(e) => {
             eprintln!("install-hooks: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let dirs = registry::resolve_dirs(gates_dir, &roots);
@@ -575,14 +604,14 @@ fn identity_rung(gates_dir: &str) -> i32 {
         Ok(p) => p.display().to_string(),
         Err(e) => {
             eprintln!("install-hooks: cannot resolve this binary's own path: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     };
     let inv = match registry::invocation(IDENTITY, &src, &exe) {
         Ok(i) => i,
         Err(e) => {
             eprintln!("install-hooks: {} at {} — {}", IDENTITY, src, e);
-            return 2;
+            return exit::TOOL;
         }
     };
     let args: Vec<&str> = inv.args.iter().map(String::as_str).collect();
@@ -594,7 +623,7 @@ fn identity_rung(gates_dir: &str) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("install-hooks: {}", e);
-            2
+            exit::TOOL
         }
     }
 }
@@ -681,10 +710,11 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §install-hooks — a bare run's placement, record and config write
-    fn bare_run(top: &str, hooks: &Path, bin: &Path) -> Result<Plan, String> {
+    fn bare_run(top: &str, hooks: &Path, bin: &Path) -> Result<Plan, Fault> {
         let plan = plan(top, hooks, &bin.display().to_string())?;
         wire(bin, hooks, &plan)?;
-        proc::run(&programs::GIT, &["-C", top, "config", "core.hooksPath", &hooks.display().to_string()])?;
+        proc::run(&programs::GIT, &["-C", top, "config", "core.hooksPath", &hooks.display().to_string()])
+            .map_err(Fault::tool)?;
         Ok(plan)
     }
 

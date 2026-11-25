@@ -1,6 +1,7 @@
 // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the generator of every agent
 // definition's `model:` line, and its `effort:` line where the class binds one: the pair bound to
 // the class its `tier:` field declares.
+use crate::exit::Fault;
 use crate::walk;
 use std::path::Path;
 
@@ -79,17 +80,17 @@ pub fn rewrite(text: &str, expected: &str, effort: Option<&str>) -> String {
 // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — every tiered definition under the
 // directory, resolved against the binding before anything is written: an unbound class is an
 // error naming the definition, and an untiered definition is left out.
-pub fn plan(dir: &str, binding: &[String]) -> Result<Vec<Tiered>, String> {
+pub fn plan(dir: &str, binding: &[String]) -> Result<Vec<Tiered>, Fault> {
     let root = Path::new(dir);
     if !root.is_dir() {
         return Ok(Vec::new());
     }
-    let mut files = walk::find_files(root, &["md"])?;
+    let mut files = walk::find_files(root, &["md"]).map_err(Fault::input)?;
     files.sort();
     let mut out: Vec<Tiered> = Vec::new();
     let mut unbound: Vec<String> = Vec::new();
     for f in &files {
-        let before = std::fs::read_to_string(f).map_err(|e| format!("cannot read {}: {}", f.display(), e))?;
+        let before = std::fs::read_to_string(f).map_err(|e| Fault::input(format!("cannot read {}: {}", f.display(), e)))?;
         let Some(class) = field(&before, "tier") else {
             continue;
         };
@@ -110,31 +111,31 @@ pub fn plan(dir: &str, binding: &[String]) -> Result<Vec<Tiered>, String> {
         });
     }
     if !unbound.is_empty() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "{}\n  help: bind the class in DELEGATION_KIT_TIER_MODEL, or declare a bound class in the definition's tier: field",
             unbound.join("\n")
-        ));
+        )));
     }
     Ok(out)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let write = args.iter().any(|a| a == "--write");
-    let binding = walk::knob_array("DELEGATION_KIT_TIER_MODEL")?;
-    let dir = walk::knob_scalar("DELEGATION_KIT_AGENT_DIR")?;
+    let binding = walk::knob_array("DELEGATION_KIT_TIER_MODEL").map_err(Fault::refused)?;
+    let dir = walk::knob_scalar("DELEGATION_KIT_AGENT_DIR").map_err(Fault::refused)?;
     generate(dir.trim_end_matches('/'), &binding, write)
 }
 
 // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — an empty binding is off: nothing is
 // read or written
-fn generate(dir: &str, binding: &[String], write: bool) -> Result<String, String> {
+fn generate(dir: &str, binding: &[String], write: bool) -> Result<String, Fault> {
     if binding.is_empty() {
         return Ok("binding off\n".to_string());
     }
     report(&plan(dir, binding)?, write)
 }
 
-fn report(defs: &[Tiered], write: bool) -> Result<String, String> {
+fn report(defs: &[Tiered], write: bool) -> Result<String, Fault> {
     let mut out = String::new();
     for d in defs {
         if d.before == d.after {
@@ -154,7 +155,7 @@ fn report(defs: &[Tiered], write: bool) -> Result<String, String> {
     }
     if write {
         for d in defs.iter().filter(|d| d.before != d.after) {
-            std::fs::write(&d.path, &d.after).map_err(|e| format!("cannot write {}: {}", d.path, e))?;
+            std::fs::write(&d.path, &d.after).map_err(|e| Fault::tool(format!("cannot write {}: {}", d.path, e)))?;
         }
     }
     Ok(out)
@@ -250,6 +251,7 @@ mod tests {
         std::fs::write(format!("{}/z.md", dir), "---\ntier: routing\n---\n").unwrap();
         let err = plan(&dir, &binding()).err().expect("an unbound class refuses");
         assert!(err.contains("z.md: tier 'routing' names no bound class"), "{}", err);
+        assert_eq!(err.status(), 2);
         assert_eq!(std::fs::read_to_string(format!("{}/a.md", dir)).unwrap(), stale);
         let _ = std::fs::remove_dir_all(&dir);
     }

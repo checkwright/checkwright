@@ -2,6 +2,7 @@
 // measurement lives in a member. Advisory by construction, so the arm's exit is always 0 and a
 // member that fails yields a visible row rather than a missing one.
 use super::kpi::{self, Ctx};
+use crate::exit::Fault;
 use crate::{proc, programs, substrate};
 use crate::stages;
 use crate::walk;
@@ -182,10 +183,10 @@ fn render_rows(rows: &[(String, String)]) -> String {
     out
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let trend = args.iter().any(|a| a == "--trend");
-    let fam = family()?;
-    let kit_roots = walk::kit_roots_abs()?;
+    let fam = family().map_err(Fault::refused)?;
+    let kit_roots = walk::kit_roots_abs().map_err(Fault::refused)?;
 
     let ctx = Ctx {
         iteration_start: iteration_start(&fam),
@@ -194,10 +195,10 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         timings_file: scalar(&fam, "TIMINGS_FILE"),
         overhead_log: scalar(&fam, "OVERHEAD_LOG"),
         price_table: scalar(&fam, "PRICE_TABLE"),
-        gates_dir: walk::knob_scalar("GATE_SDK_GATES_DIR")?,
-        guard_log: walk::knob_scalar("GUARD_KIT_LOG")?,
-        settings: walk::knob_scalar("GUARD_KIT_SETTINGS")?,
-        settings_local: walk::knob_scalar("GUARD_KIT_SETTINGS_LOCAL")?,
+        gates_dir: walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?,
+        guard_log: walk::knob_scalar("GUARD_KIT_LOG").map_err(Fault::refused)?,
+        settings: walk::knob_scalar("GUARD_KIT_SETTINGS").map_err(Fault::refused)?,
+        settings_local: walk::knob_scalar("GUARD_KIT_SETTINGS_LOCAL").map_err(Fault::refused)?,
         done_section: scalar(&fam, "DONE_SECTION"),
         deferred_section: scalar(&fam, "DEFERRED_SECTION"),
         icebox_section: scalar(&fam, "ICEBOX_SECTION"),
@@ -210,7 +211,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let env = child_env(&fam, &ctx);
     let kpi_dirs = walk::knob_array("DRIFT_KIT_KPI_DIRS").unwrap_or_default();
     let registry = members(&scalar(&fam, "KPIS_FILE"));
-    let host = walk::knob_scalar(substrate::KNOB)?;
+    let host = walk::knob_scalar(substrate::KNOB).map_err(Fault::refused)?;
 
     if trend {
         let mut frags: Vec<String> = Vec::new();

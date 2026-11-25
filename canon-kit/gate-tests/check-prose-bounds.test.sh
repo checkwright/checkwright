@@ -81,11 +81,11 @@ check_case "below" 1 "lower the row to '2 a.md'" "$out" "$rc"
 
 ceiling "2 a.md" "1 b.md" "1 b.md"
 out="$(run)"; rc=$?
-check_case "duplicate-row" 2 "a second row for 'b.md'" "$out" "$rc"
+check_case "duplicate-row" 3 "a second row for 'b.md'" "$out" "$rc"
 
 rm -f "$SANDBOX/ceiling.txt"
 out="$(run)"; rc=$?
-check_case "absent-file" 2 "cannot be read" "$out" "$rc"
+check_case "absent-file" 3 "cannot be read" "$out" "$rc"
 
 out="$(run CANON_KIT_PROSE_BOUND_CEILING_FILE=)"; rc=$?
 check_case "worklist" 1 "3 finding(s) across 2 governed file(s)" "$out" "$rc"

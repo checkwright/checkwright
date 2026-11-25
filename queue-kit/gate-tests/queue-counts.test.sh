@@ -110,7 +110,7 @@ grep -qxF "$(printf 'Technical Debt\t0')" <<<"$plain" \
 # --- a missing queue file is a refusal, never an empty clean answer ---
 checks=$((checks + 1))
 ( cd "$ROOT" && bash "$RUN_GATES" --emit queue-counts "$SANDBOX/nope.md" >/dev/null 2>&1 )
-[[ "$?" -eq 2 ]] || note missing-file "a missing queue file did not exit 2"
+[[ "$?" -eq 3 ]] || note missing-file "a missing queue file did not exit 3"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "queue-counts.test.sh: $fails case(s) failed"

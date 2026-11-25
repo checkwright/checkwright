@@ -2,6 +2,7 @@
 // and moded: no undeclared capture surface, every declaration carries a mode with a well-formed
 // forced= citation, every capture-tier declaration names a reclaim command that rotates
 use crate::emit::close_surfaces;
+use crate::exit::Fault;
 
 fn is_space(b: u8) -> bool {
     matches!(b, b' ' | b'\t' | b'\n' | 0x0b | 0x0c | b'\r')
@@ -64,16 +65,16 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-close-surfaces: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     // spec: lifecycle-kit/SPEC.md §check-close-surfaces — the derivation is a function call, not a
     // spawn, so the roster the gate rules on and the roster close reads can never be two
     // computations that disagree
-    let roster = close_surfaces::derive(args)?;
+    let roster = close_surfaces::derive_fault(args)?;
 
     let mut errors: Vec<String> = Vec::new();
     let mut declarations = 0usize;

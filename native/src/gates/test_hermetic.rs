@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-test-hermetic — a bespoke test is pinned to kit defaults and a
 // credential-managing smoke script cannot reach the ambient credential
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -32,7 +33,7 @@ fn scan_tests(dirs: &[String], out: &mut Outcome) -> Result<(), i32> {
             Ok(v) => v.into_iter().map(|k| format!("{}/gate-tests", k)).collect(),
             Err(e) => {
                 eprintln!("check-test-hermetic: {}", e);
-                return Err(2);
+                return Err(exit::REFUSED);
             }
         }
     };
@@ -46,7 +47,7 @@ fn scan_tests(dirs: &[String], out: &mut Outcome) -> Result<(), i32> {
                     "check-test-hermetic: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return Err(2);
+                return Err(exit::INPUT);
             }
         }
     }
@@ -55,7 +56,7 @@ fn scan_tests(dirs: &[String], out: &mut Outcome) -> Result<(), i32> {
             "check-test-hermetic: no *.test.sh under: {}",
             scan_dirs.join(" ")
         );
-        return Err(2);
+        return Err(exit::REFUSED);
     }
 
     let mut leaky: Vec<String> = Vec::new();
@@ -68,7 +69,7 @@ fn scan_tests(dirs: &[String], out: &mut Outcome) -> Result<(), i32> {
                     "check-test-hermetic: cannot read {} ({}) — the check could not run; treating as failure (not clean)",
                     f, e
                 );
-                return Err(2);
+                return Err(exit::INPUT);
             }
         };
         if text.contains("lib/test-hermetic.sh") {
@@ -111,7 +112,7 @@ fn scan_smoke(dirs: &[String], out: &mut Outcome) -> Result<(), i32> {
                 .collect(),
             Err(e) => {
                 eprintln!("check-test-hermetic: {}", e);
-                return Err(2);
+                return Err(exit::REFUSED);
             }
         }
     };
@@ -127,7 +128,7 @@ fn scan_smoke(dirs: &[String], out: &mut Outcome) -> Result<(), i32> {
                 Ok(b) => String::from_utf8_lossy(&b).into_owned(),
                 Err(_) => {
                     eprintln!("check-test-hermetic: unreadable smoke script: {}", f);
-                    return Err(2);
+                    return Err(exit::INPUT);
                 }
             };
             out.smoke_total += 1;

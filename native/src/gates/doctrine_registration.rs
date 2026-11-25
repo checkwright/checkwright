@@ -1,5 +1,6 @@
 // spec: doctrine-kit/SPEC.md §check-doctrine-registration — the always-loaded agent file links
 // the doctrine file and holds its methodology-rule digest in per-rule lockstep with DOCTRINE.md
+use crate::exit;
 use crate::section;
 use crate::walk;
 
@@ -201,21 +202,21 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-doctrine-registration: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let doctrine_file = match arg_or_knob(1, "DOCTRINE_KIT_DOCTRINE_FILE") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-doctrine-registration: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let digest_section = match walk::knob_scalar("DOCTRINE_KIT_DIGEST_SECTION") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-doctrine-registration: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -224,7 +225,7 @@ pub fn run(args: &[String]) -> i32 {
             "check-doctrine-registration: agent file not found: {}",
             agent_file
         );
-        return 2;
+        return exit::REFUSED;
     };
 
     if !agent_text.contains(&format!("]({}", doctrine_file)) {
@@ -233,7 +234,7 @@ pub fn run(args: &[String]) -> i32 {
             agent_file
         );
         let Some(door) = super::door_or_report("check-doctrine-registration", "--install-doctrine") else {
-            return 2;
+            return exit::REFUSED;
         };
         println!("  {}", doctrine_file);
         println!("  help: install the doctrine reference block into the always-loaded agent file —");
@@ -248,7 +249,7 @@ pub fn run(args: &[String]) -> i32 {
             "check-doctrine-registration: doctrine file not found: {}",
             doctrine_file
         );
-        return 2;
+        return exit::REFUSED;
     };
 
     let doctrine_lines = section::split_lines(&doctrine_text);
@@ -264,7 +265,7 @@ pub fn run(args: &[String]) -> i32 {
             "  help: the methodology-maintenance section heading is kit mechanism; restore it \
              in the doctrine file"
         );
-        return 2;
+        return exit::INPUT;
     };
 
     let Some((digest_bullets, trims)) = digest_entries(&agent_lines, &digest_section) else {
@@ -276,7 +277,7 @@ pub fn run(args: &[String]) -> i32 {
             "  help: a renamed or deleted digest section silently disarms this gate — repoint \
              DOCTRINE_KIT_DIGEST_SECTION at the live heading, or restore the heading it names"
         );
-        return 2;
+        return exit::REFUSED;
     };
 
     let Some(craft) = trailer_walk(&doctrine_lines, CRAFT_SECTION, "Stages", true) else {
@@ -289,7 +290,7 @@ pub fn run(args: &[String]) -> i32 {
             "  help: the engineering-craft section heading is kit mechanism; restore it in the \
              doctrine file"
         );
-        return 2;
+        return exit::INPUT;
     };
 
     let mut craft_findings: Vec<String> = Vec::new();
@@ -428,7 +429,7 @@ pub fn run(args: &[String]) -> i32 {
     }
     if !text_findings.is_empty() {
         let Some(door) = super::door_or_report("check-doctrine-registration", "--install-doctrine") else {
-            return 2;
+            return exit::REFUSED;
         };
         println!(
             "check-doctrine-registration: a digest bullet's text is not the doctrine's summary in {}:",

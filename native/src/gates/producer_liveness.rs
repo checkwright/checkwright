@@ -2,7 +2,7 @@
 // named by the record, or by any '*.run' record in the directory, is still alive. On a non-unix
 // build it is a wrapper through `evidence::pid_alive`, not by own text.
 use crate::evidence::{self, LockRead, PidProbe};
-use crate::walk;
+use crate::{exit, walk};
 
 const NAME: &str = "check-producer-liveness";
 
@@ -14,7 +14,7 @@ fn refuse_absent_ps() -> i32 {
     eprintln!("{}: ps not found on PATH — the gate cannot run.", NAME);
     eprintln!("  A gate that cannot run is not clean (fail-closed): without ps a PID that exists");
     eprintln!("  but cannot be signalled is indistinguishable from one that is gone.");
-    2
+    exit::TOOL
 }
 
 // spec: evidence-kit/SPEC.md §check-producer-liveness — the per-record verdict, shared by both
@@ -67,13 +67,13 @@ fn probe_failed(e: PidProbe) -> i32 {
         PidProbe::PsAbsent => refuse_absent_ps(),
         PidProbe::Unanswered(msg) => {
             eprintln!("{}: {}", NAME, msg);
-            2
+            exit::TOOL
         }
     }
 }
 
 // spec: evidence-kit/SPEC.md §check-producer-liveness — set mode: the `*.run` glob quantifies the
-// per-record verdict, and the aggregation is the mode's one new decision — exit 2 wins over red
+// per-record verdict, and the aggregation is the mode's one new decision — exit 3 wins over red
 // wins over green, so one corrupt record is never averaged away by clean ones.
 fn set_mode(lock: &str) -> i32 {
     let records = walk::glob_entries(&format!("{}/*.run", lock));
@@ -103,7 +103,7 @@ fn set_mode(lock: &str) -> i32 {
                 NAME, rec
             );
         }
-        return 2;
+        return exit::INPUT;
     }
 
     if !blocking.is_empty() {
@@ -139,7 +139,7 @@ fn path_mode(lock: &str) -> i32 {
                 "{}: {} carries no readable 'pid=<n> run=<key>[ handoff=<path>]' record",
                 NAME, lock
             );
-            2
+            exit::INPUT
         }
         Ok(Verdict::Free) => {
             println!(
@@ -182,7 +182,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("{}: {}", NAME, e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -253,7 +253,7 @@ mod tests {
     }
 
     // spec: evidence-kit/SPEC.md §check-producer-liveness — an absent lock is green, never the
-    // exit 2 an unreadable or unparseable one takes
+    // exit 3 an unreadable or unparseable one takes
     #[test]
     fn an_absent_lock_is_free_and_never_corruption() {
         let d = scratch("absent");

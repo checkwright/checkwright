@@ -54,12 +54,12 @@ if [[ "$rc" -ne 1 ]] || [[ "$out" != *"still running (pid $live)"* ]]; then
     echo "  FAIL: the reader did not red on a live PID the test owns (rc=$rc): $out"; fails=$((fails + 1))
 fi
 
-# B — a lock that does not parse is exit 2, never a free reading. The claim
+# B — a lock that does not parse is exit 3, never a free reading. The claim
 #     publishes the record whole, so an unparseable lock is corruption.
 printf 'garbage\n' >"$tmp/b.lock"
 out="$(gate_run check-producer-liveness "$CHECKS" "$tmp/b.lock" 2>&1)"; rc=$?
-if [[ "$rc" -ne 2 ]]; then
-    echo "  FAIL: an unparseable lock must be exit 2, got rc=$rc: $out"; fails=$((fails + 1))
+if [[ "$rc" -ne 3 ]]; then
+    echo "  FAIL: an unparseable lock must be exit 3, got rc=$rc: $out"; fails=$((fails + 1))
 fi
 
 # B2 — set mode's four verdicts. The gate's fixture pair holds exactly one good
@@ -86,12 +86,12 @@ if [[ "$rc" -ne 1 ]] || [[ "$out" != *"run key 'owned-set-run' is still running 
     echo "  FAIL: one live record among dead ones must red and name it (rc=$rc): $out"; fails=$((fails + 1))
 fi
 
-# The aggregation rule: exit 2 wins over red, so a corrupt record is never
+# The aggregation rule: exit 3 wins over red, so a corrupt record is never
 # averaged away by the clean ones beside it — nor by the live one still red here.
 printf 'garbage\n' >"$set_dir/broken.run"
 out="$(gate_run check-producer-liveness "$CHECKS" "$set_dir" 2>&1)"; rc=$?
-if [[ "$rc" -ne 2 ]] || [[ "$out" != *"broken.run carries no readable"* ]]; then
-    echo "  FAIL: an unparseable record must win over red with exit 2 (rc=$rc): $out"; fails=$((fails + 1))
+if [[ "$rc" -ne 3 ]] || [[ "$out" != *"broken.run carries no readable"* ]]; then
+    echo "  FAIL: an unparseable record must win over red with exit 3 (rc=$rc): $out"; fails=$((fails + 1))
 fi
 
 # A non-'.run' file in the same directory is not a record and is not read: the
@@ -159,5 +159,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "producer-lock.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "producer-lock.test: ok (live-PID red, unparseable lock exit 2, set mode's four verdicts and its suffix bound, writer refusal on a live lock, bounded reclaim of a dead one, conditional release)"
+echo "producer-lock.test: ok (live-PID red, unparseable lock exit 3, set mode's four verdicts and its suffix bound, writer refusal on a live lock, bounded reclaim of a dead one, conditional release)"
 exit 0

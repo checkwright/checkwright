@@ -4,6 +4,7 @@
 // bound model of the class its `tier:` declares, beside that class's effort where it binds one
 // (assertion B)
 use crate::emit::agent_tiers;
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -42,7 +43,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-agent-tier-explicit: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -63,7 +64,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(f) => f,
         Err(e) => {
             eprintln!("check-agent-tier-explicit: {}", e);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -79,7 +80,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(b) => b,
         Err(e) => {
             eprintln!("check-agent-tier-explicit: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -90,7 +91,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(t) => t,
             Err(e) => {
                 eprintln!("check-agent-tier-explicit: cannot read {}: {}", f.display(), e);
-                return 2;
+                return exit::INPUT;
             }
         };
         if !has_explicit_model(&text) {
@@ -115,7 +116,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         if !unbound.is_empty() {
             let Some(door) = super::door_or_report("check-agent-tier-explicit", "--emit agent-tiers --write") else {
-                return 2;
+                return exit::REFUSED;
             };
             println!("check-agent-tier-explicit: agent definition(s) whose model: or effort: is not what their tier class binds:");
             for f in &unbound {

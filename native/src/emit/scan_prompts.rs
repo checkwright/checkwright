@@ -1,6 +1,7 @@
 // spec: guard-kit/SPEC.md §scan-prompts — the ranker: fall-throughs split three ways, the prompting
 // share grouped by the ranking key with its rows (never its count) partitioned by allowlist
 // reachability. A table member, because it reads three consumer knobs.
+use crate::exit::Fault;
 use crate::guard;
 use crate::walk;
 use serde_json::Value;
@@ -522,7 +523,7 @@ fn closing_line(log: &str) -> String {
 // spec: gate-sdk/SPEC.md §The non-gate arm — the log positional selects the rule's input corpus
 // rather than resolved config, so it composes with `--count` in either order; an unrecognized
 // `-`-prefixed positional is a refusal and `--` ends option processing.
-fn parse(args: &[String]) -> Result<(bool, Option<&str>), String> {
+fn parse(args: &[String]) -> Result<(bool, Option<&str>), Fault> {
     let mut count_only = false;
     let mut log_arg: Option<&str> = None;
     let mut options = true;
@@ -537,7 +538,7 @@ fn parse(args: &[String]) -> Result<(bool, Option<&str>), String> {
                 continue;
             }
             if a.starts_with('-') {
-                return Err(format!("unrecognized option: {}\n{}", a, USAGE));
+                return Err(Fault::usage(format!("unrecognized option: {}\n{}", a, USAGE)));
             }
         }
         if a.is_empty() {
@@ -548,14 +549,14 @@ fn parse(args: &[String]) -> Result<(bool, Option<&str>), String> {
     Ok((count_only, log_arg))
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let (count_only, log_arg) = parse(args)?;
     let log = match log_arg {
         Some(l) => l.to_string(),
-        None => walk::knob_scalar("GUARD_KIT_LOG")?,
+        None => walk::knob_scalar("GUARD_KIT_LOG").map_err(Fault::refused)?,
     };
-    let settings = walk::knob_scalar("GUARD_KIT_SETTINGS")?;
-    let settings_local = walk::knob_scalar("GUARD_KIT_SETTINGS_LOCAL")?;
+    let settings = walk::knob_scalar("GUARD_KIT_SETTINGS").map_err(Fault::refused)?;
+    let settings_local = walk::knob_scalar("GUARD_KIT_SETTINGS_LOCAL").map_err(Fault::refused)?;
     Ok(render(&log, &settings, &settings_local, count_only))
 }
 

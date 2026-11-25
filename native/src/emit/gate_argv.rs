@@ -1,30 +1,32 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — `--emit gate-argv`, `gate_command`'s answer for a `.gate`
 // declaration: the invocation the battery starts the member with, one element per line, so no
 // shell caller holds a second copy of the `# exec:` grammar or the host's arguments
+use crate::exit::Fault;
 use crate::registry;
 
 pub const KNOBS: &[&str] = &["GATE_SDK_POWERSHELL"];
 
 pub const USAGE: &str = "usage: --emit gate-argv <declaration>
   <declaration> is a resolved <dir>/<name>.sh or <dir>/<name>.gate; prints its invocation argv,
-  one element per line, and refuses at exit 2 where the member cannot start.";
+  one element per line, and refuses at exit 2 where the member cannot start, or fails at exit 3
+  where this binary's own path cannot be resolved.";
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let [decl] = args else {
-        return Err(USAGE.to_string());
+        return Err(Fault::usage(USAGE));
     };
     if decl.starts_with('-') {
-        return Err(format!("unrecognized option: {}\n{}", decl, USAGE));
+        return Err(Fault::usage(format!("unrecognized option: {}\n{}", decl, USAGE)));
     }
     let base = decl.rsplit('/').next().unwrap_or(decl);
     let Some(name) = base.strip_suffix(".gate").or_else(|| base.strip_suffix(".sh")) else {
-        return Err(format!("{} is neither a .sh nor a .gate declaration\n{}", decl, USAGE));
+        return Err(Fault::usage(format!("{} is neither a .sh nor a .gate declaration\n{}", decl, USAGE)));
     };
     let exe = crate::proc::self_image()
-        .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
+        .map_err(|e| Fault::tool(format!("cannot resolve this binary's own path: {}", e)))?
         .display()
         .to_string();
-    argv(name, decl, &exe)
+    argv(name, decl, &exe).map_err(Fault::refused)
 }
 
 fn argv(name: &str, decl: &str, exe: &str) -> Result<String, String> {

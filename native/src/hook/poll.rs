@@ -1,6 +1,7 @@
 // spec: delegation-kit/SPEC.md §The usage.txt contract — the timer-driven poll producer: one poll
 // cycle per invocation, an atomic snapshot rewrite, fail-soft. Its caller is a refresh command or a
 // session rather than a gate on a tool call, so it keeps exit 2 where the guard arms fail open.
+use crate::exit;
 use crate::hook::usage::{self, Snapshot};
 use crate::{proc, programs};
 use crate::walk;
@@ -34,7 +35,7 @@ pub fn run(args: &[String]) -> i32 {
             "usage-poller: takes no argument (got: {}) — usage: --usage-poll   (it takes no argument)",
             a
         );
-        return 2;
+        return exit::USAGE;
     }
     let knob = |name: &str| walk::knob_scalar(name).unwrap_or_default();
     let usage::Paths { usage_file, cred_file, account_config } = usage::paths().unwrap_or_default();

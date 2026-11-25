@@ -1,32 +1,34 @@
 // spec: gate-sdk/SPEC.md §check-smoke-entry-guard — every mutating smoke script (install.sh,
 // violation.sh) carries the ${SMOKE_KIT_ROOT:?} entry-point guard so a bare run refuses instead
 // of mutating the caller's tree
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
 const GUARD: &str = "${SMOKE_KIT_ROOT:?";
 
 // spec: gate-sdk/SPEC.md §check-smoke-entry-guard — bare: sweep gate_kit_roots against the git
-// toplevel; a positional root resolves relative kit roots against a fixture tree instead
-pub fn scan_root(args: &[String], gate: &str) -> Option<String> {
+// toplevel; a positional root resolves relative kit roots against a fixture tree instead, and
+// the refusal's status rides the `Err` (git failing a tool error, no repository a refusal)
+pub fn scan_root_or_status(args: &[String], gate: &str) -> Result<String, i32> {
     if let Some(r) = args.first().filter(|a| !a.is_empty()) {
-        return Some(r.clone());
+        return Ok(r.clone());
     }
     // spec: gate-sdk/SPEC.md §Fail-closed contract — every arm that yields no root says so: a
     // non-zero `git rev-parse` is what a non-repo cwd looks like, and returning it silently
-    // would exit 2 with nothing on stderr for the caller to act on
+    // would exit non-zero with nothing on stderr for the caller to act on
     let s = match walk::toplevel_opt() {
         Ok(t) => t.unwrap_or_default(),
         Err(e) => {
             eprintln!("{}: {}", gate, e);
-            return None;
+            return Err(exit::TOOL);
         }
     };
     if s.is_empty() {
         eprintln!("{}: not a git repository and no root argument", gate);
-        return None;
+        return Err(exit::REFUSED);
     }
-    Some(s)
+    Ok(s)
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — a kit root may be spelled absolute or relative to the
@@ -48,25 +50,25 @@ pub fn kit_name(r: &str) -> &str {
 }
 
 pub fn run(args: &[String]) -> i32 {
-    let root = match scan_root(args, "check-smoke-entry-guard") {
-        Some(r) => r,
-        None => return 2,
+    let root = match scan_root_or_status(args, "check-smoke-entry-guard") {
+        Ok(r) => r,
+        Err(status) => return status,
     };
     if !Path::new(&root).is_dir() {
         eprintln!("check-smoke-entry-guard: root not found: {}", root);
-        return 2;
+        return exit::REFUSED;
     }
 
     let kit_roots = match walk::kit_roots() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-smoke-entry-guard: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if kit_roots.is_empty() {
         eprintln!("check-smoke-entry-guard: no kit roots enumerated");
-        return 2;
+        return exit::REFUSED;
     }
 
     let mut findings: Vec<String> = Vec::new();
@@ -90,7 +92,7 @@ pub fn run(args: &[String]) -> i32 {
                         "check-smoke-entry-guard: unreadable smoke script: {}/smoke/{}",
                         kit, name
                     );
-                    return 2;
+                    return exit::INPUT;
                 }
             };
             swept += 1;

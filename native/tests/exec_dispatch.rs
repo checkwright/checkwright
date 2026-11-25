@@ -92,7 +92,7 @@ fn an_exec_member_with_no_host_is_a_dispatch_refusal() {
     let dir = scratch("off");
     let out = run(&dir, "");
     let _ = std::fs::remove_dir_all(&dir);
-    assert!(out.contains("  FAIL: check-pspass (dispatch harness error, exit 2)"), "{}", out);
+    assert!(out.contains("  FAIL: check-pspass (dispatch harness error, exit 3)"), "{}", out);
     assert!(out.contains("GATE_SDK_POWERSHELL is empty"), "{}", out);
 }
 
@@ -164,7 +164,7 @@ fn an_executable_exec_member_starts_directly_and_an_unbuilt_one_refuses() {
     let out = run(&dir, "");
     let _ = std::fs::remove_dir_all(&dir);
     assert_live(&out, "check-rspass", "check-rsfail");
-    assert!(out.contains("  FAIL: check-rsgone (dispatch harness error, exit 2)"), "{}", out);
+    assert!(out.contains("  FAIL: check-rsgone (dispatch harness error, exit 3)"), "{}", out);
     assert!(out.contains("is not an executable file"), "{}", out);
 }
 

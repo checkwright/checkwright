@@ -50,13 +50,13 @@ err="$(<"$scratch/err.txt")"
 [[ -z "$err" ]] || { echo "FAIL [stdout-argv]: stderr was '$err'"; fails=$((fails + 1)); }
 [[ "$rc" -eq 0 ]] || { echo "FAIL [stdout-argv]: expected exit 0, got $rc"; fails=$((fails + 1)); }
 
-# Arm 2 — the stderr the split must not discard: an absent binary is gate_command's exit 2, whose
+# Arm 2 — the stderr the split must not discard: an absent binary is gate_command's exit 3, whose
 # diagnostic body is stderr. Deleting the capture rather than splitting it would empty this report.
 gate_command_argv "$scratch/absent-bin" >/dev/null; rc=$?
 err="$(<"$scratch/err.txt")"
 assert_has dispatch-err 'absent or not executable' "$err"
 assert_has dispatch-err 'build-native.sh'          "$err"
-[[ "$rc" -eq 2 ]] || { echo "FAIL [dispatch-err]: expected exit 2, got $rc"; fails=$((fails + 1)); }
+[[ "$rc" -eq 3 ]] || { echo "FAIL [dispatch-err]: expected exit 3, got $rc"; fails=$((fails + 1)); }
 
 # Arm 3 — the arm's own tails over a hermetic registry, run through the real binary: a shell member
 # that passes earns the exact green phrase, and a `.gate` naming a subcommand the binary does not
@@ -87,10 +87,10 @@ mkdir -p "$red"
 printf 'check-noisy\n' > "$red/gates.list"
 cp "$scratch/check-noisy.gate" "$red/check-noisy.gate"
 out="$(run_battery "$red")"; rc=$?
-assert_has arm-red '  FAIL: check-noisy (dispatch harness error, exit 2)' "$out"
+assert_has arm-red '  FAIL: check-noisy (dispatch harness error, exit 3)' "$out"
 assert_has arm-red 'no such gate subcommand'                              "$out"
 assert_has arm-red '1 of 1 gates FAILED: check-noisy'                     "$out"
-[[ "$rc" -eq 1 ]] || { echo "FAIL [arm-red]: expected exit 1, got $rc"; fails=$((fails + 1)); }
+[[ "$rc" -eq 3 ]] || { echo "FAIL [arm-red]: expected exit 3 (an errored member alone is the error verdict), got $rc"; fails=$((fails + 1)); }
 
 [[ "$fails" -eq 0 ]] || { echo "run-dispatch-streams.test: $fails assertion(s) failed"; exit 1; }
 echo "run-dispatch-streams.test: clean (argv taken from stdout alone as the two-element binary form; the exit-2 diagnostic body still reaches the caller; the arm's green phrase and dispatch-harness-error tail hold over a hermetic registry)"

@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-gate-assertions — couple each §<gate> enumerated-assertion
 // span+count to the gate code's `# assertion` markers
 use crate::ere::Ere;
+use crate::exit::{self, Fault};
 use crate::fresh;
 use crate::gates::gate_output::{native_module, resolve_declaration};
 use crate::walk;
@@ -309,18 +310,18 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}", msg);
-            2
+            msg.status()
         }
     }
 }
 
-fn inner(args: &[String]) -> Result<i32, String> {
-    let rx = Rx::new()?;
+fn inner(args: &[String]) -> Result<i32, Fault> {
+    let rx = Rx::new().map_err(Fault::tool)?;
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")
-        .map_err(|e| format!("check-gate-assertions: {}", e))?;
-    let kit_roots = walk::kit_roots_abs().map_err(|e| format!("check-gate-assertions: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-gate-assertions: {}", e)))?;
+    let kit_roots = walk::kit_roots_abs().map_err(|e| Fault::refused(format!("check-gate-assertions: {}", e)))?;
     let crate_dir = walk::knob_scalar("GATE_SDK_NATIVE_CRATE")
-        .map_err(|e| format!("check-gate-assertions: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-gate-assertions: {}", e)))?;
     let crate_manifest = format!("{}/Cargo.toml", crate_dir);
 
     let specs: Vec<String> = match args.first() {
@@ -343,14 +344,14 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let scripts_dir = args.get(1).cloned().unwrap_or_default();
 
     if specs.is_empty() {
-        return Err("check-gate-assertions: no SPEC.md found (run from repo root)".into());
+        return Err(Fault::refused("check-gate-assertions: no SPEC.md found (run from repo root)"));
     }
     for s in &specs {
         if !Path::new(s).is_file() {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "check-gate-assertions: not found: {} (run from repo root)",
                 s
-            ));
+            )));
         }
     }
 
@@ -366,10 +367,10 @@ fn inner(args: &[String]) -> Result<i32, String> {
         let text = std::fs::read(spec)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
             .map_err(|_| {
-                format!(
+                Fault::input(format!(
                     "check-gate-assertions: {}",
-                    fresh::fail_closed("awk", Some(2))
-                )
+                    fresh::fail_closed("awk", Some(exit::INPUT))
+                ))
             })?;
         for c in extract(&rx, &text) {
             coupled += 1;
@@ -388,7 +389,8 @@ fn inner(args: &[String]) -> Result<i32, String> {
                 &resolve_dirs,
                 &crate_dir,
                 &crate_manifest,
-            )? {
+            )
+            .map_err(Fault::input)? {
                 // spec: gate-sdk/SPEC.md §check-gate-assertions — a tree with no crate skips those
                 // members and counts them: an internal sentinel, not a failure path
                 Resolved::OutOfReach => {

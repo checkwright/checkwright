@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — while the dispatch marker holds a line, a
 // commit adds a stamp
+use crate::exit;
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -65,18 +66,18 @@ pub fn run(args: &[String]) -> i32 {
     };
     if args.len() != 1 && args.len() != 5 {
         eprintln!("check-dispatch-entry: usage: check-dispatch-entry <message-file> [<marker> <staged-state> <head-state> <staged-paths>]");
-        return 2;
+        return exit::USAGE;
     }
     if !Path::new(msg).is_file() {
         eprintln!("check-dispatch-entry: message file not found: {}", msg);
-        return 2;
+        return exit::REFUSED;
     }
     let got = if args.len() == 5 { fixture(&args[1..]) } else { live() };
     let inputs = match got {
         Ok(i) => i,
         Err(e) => {
             eprintln!("check-dispatch-entry: {} — the check could not run; treating as failure (not clean)", e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let outstanding: Vec<&str> = inputs.marker.as_deref().map(stages::marker_lines).unwrap_or_default();
@@ -91,7 +92,7 @@ pub fn run(args: &[String]) -> i32 {
         (Ok(g), Ok(c)) => [("gap", g), ("consult", c)],
         (Err(e), _) | (_, Err(e)) => {
             eprintln!("check-dispatch-entry: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     // spec: lifecycle-kit/SPEC.md §check-dispatch-entry — a lead's sanctioned capture commit
@@ -108,7 +109,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(s) => s,
         Err(e) => {
             eprintln!("check-dispatch-entry: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if let Some(staged) = &inputs.staged {

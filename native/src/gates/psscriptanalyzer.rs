@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-psscriptanalyzer — PSScriptAnalyzer lint of the PowerShell family
 // at Warning and above (the self-lint contract), the wrapper class `check-shellcheck` is: the
 // analyser is a declared requirement this starts through the consumer's host and refuses without
+use crate::exit::{self, Fault};
 use crate::{proc, registry, substrate, walk};
 
 const NAME: &str = "check-psscriptanalyzer";
@@ -30,13 +31,13 @@ if ($found -gt 0) { exit 1 }; exit 0";
 // spec: gate-sdk/SPEC.md §check-psscriptanalyzer — the derived corpus: §check-shellcheck's
 // directories, then each registered exec member's PowerShell target; positional dirs replace the
 // whole set, the hermetic fixture affordance
-fn targets(args: &[String]) -> Result<(Vec<String>, Vec<String>), String> {
+fn targets(args: &[String]) -> Result<(Vec<String>, Vec<String>), Fault> {
     let (dirs, exec) = if !args.is_empty() {
         (args.to_vec(), Vec::new())
     } else {
-        let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
-        let dirs = super::shellcheck::lint_dirs()?;
-        (dirs, exec_targets(&gates_dir, &walk::kit_roots_abs()?)?)
+        let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
+        let dirs = super::shellcheck::lint_dirs().map_err(Fault::refused)?;
+        (dirs, exec_targets(&gates_dir, &walk::kit_roots_abs().map_err(Fault::refused)?).map_err(Fault::input)?)
     };
     let mut out: Vec<String> = Vec::new();
     for d in &dirs {
@@ -75,17 +76,17 @@ fn exec_targets(gates_dir: &str, kit_roots: &[String]) -> Result<Vec<String>, St
     Ok(out)
 }
 
-fn refuse(lines: &[String]) -> i32 {
+fn refuse(status: i32, lines: &[String]) -> i32 {
     for l in lines {
         eprintln!("{}", l);
     }
-    2
+    status
 }
 
 pub fn run(args: &[String]) -> i32 {
     let host = match walk::knob_scalar(substrate::KNOB) {
         Ok(h) => h,
-        Err(e) => return refuse(&[format!("{}: {}", NAME, e)]),
+        Err(e) => return refuse(exit::REFUSED, &[format!("{}: {}", NAME, e)]),
     };
     if host.is_empty() {
         println!("PSSCRIPTANALYZER: clean (not applicable: the PowerShell host is off — {} is empty, so no PowerShell is linted)", substrate::KNOB);
@@ -96,7 +97,7 @@ pub fn run(args: &[String]) -> i32 {
     let program = match substrate::resolve_host("GATE_SDK_POWERSHELL", &host) {
         Ok(p) => p,
         Err(e) => {
-            return refuse(&[
+            return refuse(exit::TOOL, &[
                 format!("{}: {} — the gate cannot run.", NAME, e),
                 "  A gate that cannot run is not clean (fail-closed).".to_string(),
                 format!("  help: install PowerShell, or set {} to a host that resolves, or empty to switch the lint off.", substrate::KNOB),
@@ -105,20 +106,20 @@ pub fn run(args: &[String]) -> i32 {
     };
     let (dirs, files) = match targets(args) {
         Ok(t) => t,
-        Err(e) => return refuse(&[format!("{}: {}", NAME, e)]),
+        Err(e) => return refuse(e.status(), &[format!("{}: {}", NAME, e)]),
     };
     if files.is_empty() {
-        return refuse(&[format!("{}: no *.ps1 found under: {} — nothing to lint.", NAME, dirs.join(" "))]);
+        return refuse(exit::REFUSED, &[format!("{}: no *.ps1 found under: {} — nothing to lint.", NAME, dirs.join(" "))]);
     }
     let exclude = match walk::knob_words(EXCLUDE_KNOB) {
         Ok(e) => e,
-        Err(e) => return refuse(&[format!("{}: {}", NAME, e)]),
+        Err(e) => return refuse(exit::REFUSED, &[format!("{}: {}", NAME, e)]),
     };
     let env = vec![(TARGETS_VAR.to_string(), files.join("\n")), (EXCLUDE_VAR.to_string(), exclude.join("\n"))];
     let argv = ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", SCRIPT];
     let done = match proc::run_merged_in(&program, &argv, &env, None) {
         Ok(d) => d,
-        Err(e) => return refuse(&[format!("{}: {}", NAME, e)]),
+        Err(e) => return refuse(exit::TOOL, &[format!("{}: {}", NAME, e)]),
     };
     let report = String::from_utf8_lossy(done.output()).trim_end_matches(['\n', '\r']).to_string();
     match done.code() {
@@ -135,12 +136,12 @@ pub fn run(args: &[String]) -> i32 {
             println!("      a rule your tree contradicts on every script goes in {}.", EXCLUDE_KNOB);
             1
         }
-        Some(3) => refuse(&[
+        Some(3) => refuse(exit::TOOL, &[ // status-literal-exempt: the PowerShell script's own exit code for an absent PSScriptAnalyzer module, read from the child
             format!("{}: the PSScriptAnalyzer module is not installed for {} — the gate cannot run.", NAME, program.invocation()),
             "  A gate that cannot run is not clean (fail-closed).".to_string(),
             "  help: install it for that host: Install-Module PSScriptAnalyzer -Scope CurrentUser".to_string(),
         ]),
-        other => refuse(&[
+        other => refuse(exit::TOOL, &[
             format!("{}: {} exited {:?} — the check could not run; treating as failure (not clean)", NAME, program.invocation(), other),
             report,
         ]),
@@ -181,7 +182,7 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §check-psscriptanalyzer — the exit mapping over a stub host: off is
-    // clean, the analyser's 0 and 1 pass through, its absent module and any other status are 2
+    // clean, the analyser's 0 and 1 pass through, its absent module and any other status are 3
     #[cfg(unix)]
     #[test]
     fn the_exit_mapping_over_a_stub_host() {
@@ -207,7 +208,7 @@ mod tests {
         env.remove(substrate::KNOB);
         crate::knobs::reset(&env);
         let _ = std::fs::remove_dir_all(&d);
-        assert_eq!(got, vec![0, 0, 1, 2, 2, 2]);
+        assert_eq!(got, vec![0, 0, 1, 3, 3, 3]);
     }
 
     // spec: gate-sdk/SPEC.md §check-psscriptanalyzer — positional dirs replace the derived set, and

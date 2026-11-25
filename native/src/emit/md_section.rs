@@ -1,6 +1,7 @@
 // spec: context-kit/SPEC.md §Index-first reading — one Markdown section by heading.
 // spec: gate-sdk/SPEC.md §The non-gate arm — the class's first member whose table row exists for
 // reachability rather than for configuration, its declared roster being empty.
+use crate::exit::Fault;
 use crate::section;
 
 pub const KNOBS: &[&str] = &[];
@@ -53,19 +54,19 @@ fn locate(lines: &[&str], query: &str) -> Option<(usize, usize)> {
     Some((at, at + first.end))
 }
 
-// spec: context-kit/SPEC.md §Index-first reading — the three refusals, all exit 2 once the
-// dispatcher maps an error arm; that section carries which of them moved and why no caller read it.
-pub fn emit(args: &[String]) -> Result<String, String> {
+// spec: context-kit/SPEC.md §Index-first reading — the three refusals; that section carries
+// the exit each takes.
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let (file, query) = match (args.first(), args.get(1)) {
         (Some(f), Some(q)) if !f.is_empty() && !q.is_empty() => (f, q),
-        _ => return Err(USAGE.to_string()),
+        _ => return Err(Fault::usage(USAGE)),
     };
     if !std::path::Path::new(file).is_file() {
-        return Err(format!("file not found: {}", file));
+        return Err(Fault::input(format!("file not found: {}", file)));
     }
-    let text = super::read_text(file)?;
+    let text = super::read_text(file).map_err(Fault::input)?;
     let lines = section::split_lines(&text);
-    let (start, end) = locate(&lines, query).ok_or(format!("no heading matched: {}", query))?;
+    let (start, end) = locate(&lines, query).ok_or_else(|| Fault::refused(format!("no heading matched: {}", query)))?;
     let mut out = String::new();
     for line in &lines[start..end] {
         out.push_str(line);

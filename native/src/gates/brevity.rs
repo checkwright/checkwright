@@ -1,6 +1,7 @@
 // spec: context-kit/SPEC.md §The brevity gate — an over-budget bullet in a governed always-loaded
 // section that admits its detail lives elsewhere
 use crate::ere::Ere;
+use crate::exit;
 use crate::section;
 use crate::walk;
 
@@ -77,7 +78,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => distinct(v),
         Err(e) => {
             eprintln!("check-brevity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if section_names.is_empty() {
@@ -86,19 +87,19 @@ pub fn run(args: &[String]) -> i32 {
             "check-brevity: help: name at least one heading of the governed file, or unregister \
              check-brevity to opt out of the brevity check"
         );
-        return 2;
+        return exit::REFUSED;
     }
     let budget: usize = match knob("CONTEXT_KIT_BREVITY_CAP") {
         Ok(v) => match v.parse() {
             Ok(n) => n,
             Err(_) => {
                 eprintln!("check-brevity: CONTEXT_KIT_BREVITY_CAP is not an integer: {}", v);
-                return 2;
+                return exit::REFUSED;
             }
         },
         Err(e) => {
             eprintln!("check-brevity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let pointer_re = match knob("CONTEXT_KIT_BREVITY_POINTER_RE") {
@@ -106,12 +107,12 @@ pub fn run(args: &[String]) -> i32 {
             Ok(re) => re,
             Err(e) => {
                 eprintln!("check-brevity: CONTEXT_KIT_BREVITY_POINTER_RE: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
         Err(e) => {
             eprintln!("check-brevity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -122,7 +123,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-brevity: {}", e);
-                    return 2;
+                    return exit::REFUSED;
                 }
             };
             // spec: context-kit/SPEC.md §The brevity gate — the knob spells the governed file
@@ -131,14 +132,14 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(t) => t,
                 Err(e) => {
                     eprintln!("check-brevity: {}", e);
-                    return 2;
+                    return exit::TOOL;
                 }
             };
             match completed {
                 Some(top) => format!("{}/{}", top, file),
                 None => {
                     eprintln!("check-brevity: not inside a git repository");
-                    return 2;
+                    return exit::REFUSED;
                 }
             }
         }
@@ -148,7 +149,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-brevity: file not found: {}", brevity_file);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -175,7 +176,7 @@ pub fn run(args: &[String]) -> i32 {
              repoint the CONTEXT_KIT_BREVITY_SECTIONS element at the live heading, or restore the \
              heading it names"
         );
-        return 2;
+        return exit::REFUSED;
     }
 
     let mut total = 0usize;

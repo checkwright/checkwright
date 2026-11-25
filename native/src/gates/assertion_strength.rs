@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-assertion-strength — a guard over a call to a script whose
 // declared `# exit:` header binds a verdict token to one non-zero code must not name that token
 // in its failure message while comparing no status to that token's code
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -250,7 +251,7 @@ fn scan_file(path: &str, text: &str, kitroot: &str, scan: &mut Scan) -> Result<(
         };
         let callee = format!("{}/bin/{}", kitroot, name);
         // spec: gate-sdk/SPEC.md §Fail-closed contract — the shell form read the callee through
-        // `awk` under `fail_closed`, so a callee that exists and cannot be read is exit 2 rather
+        // `awk` under `fail_closed`, so a callee that exists and cannot be read is exit 3 rather
         // than a member silently dropped from the map
         let callee_text = match std::fs::read(&callee) {
             Ok(b) => String::from_utf8_lossy(&b).into_owned(),
@@ -354,7 +355,7 @@ pub fn run(args: &[String]) -> i32 {
             }
             Err(e) => {
                 eprintln!("check-assertion-strength: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         }
     };
@@ -364,7 +365,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(w) => w,
             Err(e) => {
                 eprintln!("check-assertion-strength: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
         declaring: 0,
@@ -375,7 +376,7 @@ pub fn run(args: &[String]) -> i32 {
     for d in &scan_dirs {
         if !Path::new(d).is_dir() {
             eprintln!("check-assertion-strength: not a directory: {}", d);
-            return 2;
+            return exit::REFUSED;
         }
         let kitroot = match parent_abs(d) {
             Ok(k) => k,
@@ -384,7 +385,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-assertion-strength: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::TOOL;
             }
         };
         let files = match walk::glob_files(Path::new(d), &["*.sh".to_string()]) {
@@ -394,7 +395,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-assertion-strength: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         for f in &files {
@@ -403,7 +404,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(b) => String::from_utf8_lossy(&b).into_owned(),
                 Err(_) => {
                     eprintln!("check-assertion-strength: unreadable script: {}", path);
-                    return 2;
+                    return exit::INPUT;
                 }
             };
             scanned += 1;
@@ -412,7 +413,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-assertion-strength: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         }
     }

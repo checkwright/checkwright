@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-provenance-seam — no kit SPEC carries a publisher-provenance
 // marker or quotes a roster one consumer configured
+use crate::exit::Fault;
 use crate::ere::Ere;
 use crate::registry;
 use crate::spec::{self, compile_pattern as compile, Para, ProseSink};
@@ -11,14 +12,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-provenance-seam: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(_args: &[String]) -> Result<i32, String> {
-    let kit_on = spec::knob_pub("CANON_KIT_SCAN_KIT_ROOTS")? == "1";
-    let surface_globs: Vec<String> = spec::knob_array_pub("CANON_KIT_SEAM_SURFACE_GLOBS")?
+fn rule(_args: &[String]) -> Result<i32, Fault> {
+    let kit_on = spec::knob_pub("CANON_KIT_SCAN_KIT_ROOTS").map_err(Fault::refused)? == "1";
+    let surface_globs: Vec<String> = spec::knob_array_pub("CANON_KIT_SEAM_SURFACE_GLOBS").map_err(Fault::refused)?
         .into_iter()
         .filter(|s| !s.is_empty())
         .collect();
@@ -26,43 +27,43 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         println!("PROVENANCE-SEAM: clean (not applicable: CANON_KIT_SCAN_KIT_ROOTS is 0: kit roots are a dependency's, so no kit SPEC is scanned; CANON_KIT_SEAM_SURFACE_GLOBS is empty, so no seam surface is either)");
         return Ok(0);
     }
-    let floor_raw = spec::knob_pub("CANON_KIT_SEAM_SLUG_MIN_LEN")?;
+    let floor_raw = spec::knob_pub("CANON_KIT_SEAM_SLUG_MIN_LEN").map_err(Fault::refused)?;
     let floor = match floor_raw.parse::<usize>() {
         Ok(n) if n > 0 && floor_raw.bytes().all(|b| b.is_ascii_digit()) => n,
         _ => {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "CANON_KIT_SEAM_SLUG_MIN_LEN must be a positive integer (got '{}') — treating as failure (not clean)",
                 floor_raw
-            ))
+            )))
         }
     };
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — every consumer pattern compiles before the
     // first corpus line is read
     let mut markers: Vec<(String, Ere)> = Vec::new();
-    for m in spec::vocabulary("CANON_KIT_SEAM_AUTHORITY_MARKERS", "CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA")? {
+    for m in spec::vocabulary("CANON_KIT_SEAM_AUTHORITY_MARKERS", "CANON_KIT_SEAM_AUTHORITY_MARKERS_EXTRA").map_err(Fault::refused)? {
         if m.is_empty() {
             continue;
         }
-        let re = compile(&m, "CANON_KIT_SEAM_AUTHORITY_MARKERS")?;
+        let re = compile(&m, "CANON_KIT_SEAM_AUTHORITY_MARKERS").map_err(Fault::refused)?;
         markers.push((m, re));
     }
     if markers.is_empty() {
-        return Err("CANON_KIT_SEAM_AUTHORITY_MARKERS is empty — treating as failure (not clean)".to_string());
+        return Err(Fault::refused("CANON_KIT_SEAM_AUTHORITY_MARKERS is empty — treating as failure (not clean)"));
     }
-    let agent_files: Vec<String> = spec::knob_array_pub("CANON_KIT_SEAM_AGENT_FILES")?
+    let agent_files: Vec<String> = spec::knob_array_pub("CANON_KIT_SEAM_AGENT_FILES").map_err(Fault::refused)?
         .into_iter()
         .filter(|s| !s.is_empty())
         .collect();
-    let private: Vec<String> = spec::knob_array_pub("CANON_KIT_SEAM_PRIVATE_SURFACES")?
+    let private: Vec<String> = spec::knob_array_pub("CANON_KIT_SEAM_PRIVATE_SURFACES").map_err(Fault::refused)?
         .into_iter()
         .filter(|s| !s.is_empty())
         .collect();
 
-    let roots = walk::kit_roots()?;
-    let queue = spec::knob_pub("CANON_KIT_QUEUE_FILE")?;
+    let roots = walk::kit_roots().map_err(Fault::refused)?;
+    let queue = spec::knob_pub("CANON_KIT_QUEUE_FILE").map_err(Fault::refused)?;
     let slugs: Option<Vec<String>> = if Path::new(&queue).exists() {
-        let text = spec::read_text(Path::new(&queue))?;
-        let mechanism = Mechanism::load(&roots)?;
+        let text = spec::read_text(Path::new(&queue)).map_err(Fault::input)?;
+        let mechanism = Mechanism::load(&roots).map_err(Fault::refused)?;
         let mut v: Vec<String> = lead_slugs(&text)
             .into_iter()
             .filter(|s| s.len() >= floor)
@@ -75,7 +76,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         None
     };
 
-    let spec_name = spec::spec_name()?;
+    let spec_name = spec::spec_name().map_err(Fault::refused)?;
     let mut files: Vec<String> = Vec::new();
     for r in roots.iter().filter(|_| kit_on) {
         let r = r.trim_end_matches('/');
@@ -84,13 +85,13 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         }
         let f = format!("{}/{}", r, spec_name);
         if Path::new(&f).exists() {
-            spec::read_text(Path::new(&f))?;
+            spec::read_text(Path::new(&f)).map_err(Fault::input)?;
             files.push(spec::strip_dot_slash(&f));
         }
     }
     // spec: canon-kit/SPEC.md §check-provenance-seam — a file both sets reach is scanned once, as
     // a kit SPEC
-    let mut surfaces: Vec<String> = walk::glob_corpus(Path::new("."), &surface_globs)?
+    let mut surfaces: Vec<String> = walk::glob_corpus(Path::new("."), &surface_globs).map_err(Fault::input)?
         .into_iter()
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
         .filter(|f| !files.contains(f))
@@ -98,12 +99,12 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     surfaces.sort();
     surfaces.dedup();
     for f in &surfaces {
-        spec::read_text(Path::new(f))?;
+        spec::read_text(Path::new(f)).map_err(Fault::input)?;
     }
     let kit_count = files.len();
     files.extend(surfaces.iter().cloned());
 
-    let rosters: Vec<(&str, Vec<String>)> = crate::knobs::consumer_elements()?
+    let rosters: Vec<(&str, Vec<String>)> = crate::knobs::consumer_elements().map_err(Fault::refused)?
         .into_iter()
         .map(|(k, v)| (k, v.into_iter().filter(|e| e.contains('/') || e.contains('=')).collect::<Vec<_>>()))
         .filter(|(_, v)| v.len() >= 2)
@@ -118,7 +119,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         surfaces: &surfaces,
         out: Vec::new(),
     };
-    spec::walk_prose_multi(&files, &[], &mut sink)?;
+    spec::walk_prose_multi(&files, &[], &mut sink).map_err(Fault::input)?;
 
     if !sink.out.is_empty() {
         println!("check-provenance-seam: provenance-seam finding(s) in a kit SPEC or seam surface — a published rule is stated undated and impersonally, a pointer that resolves only in the publisher's tree is dead in every vendored copy, and a roster one consumer configured is that tree's content:");

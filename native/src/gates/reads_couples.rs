@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-reads-couples — every statically resolvable recursive walk in a
 // registered gate has its tracked read set covered by the gate's expanded couples; the
 // undecidable remainder is skipped-and-counted
+use crate::exit::Fault;
 use crate::gates;
 use crate::walk;
 use std::path::Path;
@@ -10,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-reads-couples: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -391,8 +392,8 @@ fn manifest_field(text: &str, key: &str) -> String {
     String::new()
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
     let list = format!("{}/gates.list", gates_dir);
 
     let mut sources: Vec<String> = Vec::new();
@@ -400,20 +401,20 @@ fn rule(args: &[String]) -> Result<i32, String> {
         sources = args.to_vec();
     } else {
         if !Path::new(&list).is_file() {
-            return Err(format!("no registry at {}", list));
+            return Err(Fault::refused(format!("no registry at {}", list)));
         }
         // spec: gate-sdk/SPEC.md §lib/gate.sh — `gate_check_dirs`' own spelling: the gates dir as
         // configured, then each kit root absolutised, because the resolved source path travels
         // into every finding
         let mut resolve_dirs = vec![gates_dir.clone()];
-        for k in walk::kit_roots_abs()? {
+        for k in walk::kit_roots_abs().map_err(Fault::refused)? {
             if k.is_empty() {
                 continue;
             }
             resolve_dirs.push(format!("{}/checks", k.trim_end_matches('/')));
         }
         let listing = std::fs::read(&list)
-            .map_err(|e| format!("cannot read {}: {}", list, e))?;
+            .map_err(|e| Fault::input(format!("cannot read {}: {}", list, e)))?;
         for line in String::from_utf8_lossy(&listing).lines() {
             let t = lstrip(line);
             if t.is_empty() || t.starts_with('#') {
@@ -436,9 +437,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: gate-sdk/SPEC.md §Layout and configuration — the working-directory spelling, the one the
     // `git ls-files` corpus these globs are compared with is spelled in
-    let kit_roots_here = walk::kit_roots()?;
+    let kit_roots_here = walk::kit_roots().map_err(Fault::refused)?;
     let mut ctx = Ctx {
-        prune: walk::prune_dirs()?,
+        prune: walk::prune_dirs().map_err(Fault::refused)?,
         findings: Vec::new(),
     };
     let mut analyzed = 0usize;
@@ -458,12 +459,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
             .to_string();
         let text = std::fs::read(Path::new(src))
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .map_err(|e| format!("cannot read {}: {}", src, e))?;
+            .map_err(|e| Fault::input(format!("cannot read {}: {}", src, e)))?;
         // spec: gate-sdk/SPEC.md §check-reads-couples — one expansion, shared with every trigger
         // reader rather than copied here: a token form one reader knows and the other does not
         // diverges the coverage reader from the selector silently
         let couples =
-            crate::registry::expand_couples(&manifest_field(&text, "couples"), &kit_roots_here)?;
+            crate::registry::expand_couples(&manifest_field(&text, "couples"), &kit_roots_here).map_err(Fault::input)?;
         let globs: Vec<String> = couples.split(',').map(String::from).collect();
 
         // spec: gate-sdk/SPEC.md §check-reads-couples — a `.gate` member's walks are unreadable to
@@ -471,14 +472,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // call rather than a spawn of the arm, which is what dissolves this member's own `c7`.
         // spec: gate-sdk/SPEC.md §check-reads-couples — an exec member's reads are undecidable to
         // any reader here, so it is counted and skipped, never asked to answer by argv
-        let substrate = crate::registry::substrate(src)?;
+        let substrate = crate::registry::substrate(src).map_err(Fault::input)?;
         if let crate::registry::Substrate::Exec(_) = substrate {
             exec_members += 1;
             continue;
         }
         if substrate == crate::registry::Substrate::Compiled {
             let roots = gates::roots(&gname).ok_or_else(|| {
-                format!(
+                Fault::refused(format!(
                     "{} dispatches to the binary, but no registered subcommand answers for '{}' — \
                      the gate's own read set is unavailable, so this check could not run; treating \
                      as failure (not clean).\n  help: every descriptor must name a subcommand the \
@@ -486,7 +487,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                      that could opt out of this in a sentence would end the assertion it must \
                      replace.",
                     src, gname
-                )
+                ))
             })?;
             for (root, fspec, pspec, _) in roots {
                 // spec: gate-sdk/SPEC.md §check-reads-couples — '?' is the substrate's own honesty
@@ -498,13 +499,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 // spec: gate-sdk/SPEC.md §check-reads-couples — a guarded branch the consumer's
                 // configuration does not select is not a walk this tree performs, so it is neither
                 // analyzed nor skipped-and-counted: there is nothing undecided about it
-                let Some((filter, where_)) = resolve_filter(&gname, root, fspec)? else {
+                let Some((filter, where_)) = resolve_filter(&gname, root, fspec).map_err(Fault::refused)? else {
                     continue;
                 };
                 // spec: gate-sdk/SPEC.md §check-reads-couples — the member's own declared prune,
                 // honoured exactly as the global set is: a walk's third dimension is where it refuses
                 // to descend, and a demand over a subtree its own walk skips is that same failure
-                let declared_prune: Vec<String> = declared_prune(pspec)?;
+                let declared_prune: Vec<String> = declared_prune(pspec).map_err(Fault::refused)?;
                 analyzed += 1;
                 ctx.cover_root(&Demand {
                     root,
@@ -515,7 +516,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                     where_: &where_,
                     globs: &globs,
                     couples: &couples,
-                })?;
+                }).map_err(Fault::tool)?;
             }
             continue;
         }
@@ -551,7 +552,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 where_: &where_,
                 globs: &globs,
                 couples: &couples,
-            })?;
+            }).map_err(Fault::tool)?;
         }
     }
 

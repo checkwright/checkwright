@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-template-registry-parity — a kit's shipped `.list` registry
 // template names exactly the artifacts of its sibling directory, both directions
-use crate::gates::smoke_entry_guard::{kit_name, scan_root};
+use crate::exit;
+use crate::gates::smoke_entry_guard::{kit_name, scan_root_or_status};
 use crate::walk;
 use std::path::Path;
 
@@ -49,25 +50,25 @@ fn only_in(a: &[String], b: &[String]) -> Vec<String> {
 }
 
 pub fn run(args: &[String]) -> i32 {
-    let root = match scan_root(args, "check-template-registry-parity") {
-        Some(r) => r,
-        None => return 2,
+    let root = match scan_root_or_status(args, "check-template-registry-parity") {
+        Ok(r) => r,
+        Err(status) => return status,
     };
     if !Path::new(&root).is_dir() {
         eprintln!("check-template-registry-parity: root not found: {}", root);
-        return 2;
+        return exit::REFUSED;
     }
 
     let kit_roots = match walk::kit_roots() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-template-registry-parity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if kit_roots.is_empty() {
         eprintln!("check-template-registry-parity: no kit roots enumerated");
-        return 2;
+        return exit::REFUSED;
     }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — every kit root's `templates/*.list` listing
@@ -92,7 +93,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-template-registry-parity: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         }
     }
@@ -104,7 +105,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-template-registry-parity: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         }
     }
@@ -143,7 +144,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-template-registry-parity: template not readable: {}",
                     tpl
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         let mut shipped: Vec<String> = Vec::new();
@@ -153,7 +154,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-template-registry-parity: sibling directory not readable: {}",
                     dir
                 );
-                return 2;
+                return exit::INPUT;
             }
             let listing = match crate::listing::tracked(Some(&dir), &["*.sh"]) {
                 Ok(names) => names,
@@ -162,7 +163,7 @@ pub fn run(args: &[String]) -> i32 {
                         "check-template-registry-parity: {}",
                         e.text_or(|_| format!("git ls-files failed under {}", dir))
                     );
-                    return 2;
+                    return exit::TOOL;
                 }
             };
             shipped.extend(

@@ -113,10 +113,10 @@ assert_clean "run, scoped member"
 printf 'check-spec-dod-singleton\ncheck-spec-fence-balance\n' > "$gates/gates.list"
 rm -f "$gates/owned-action-pinning.sh" "$gates/check-action-pinning.gate"
 
-# the descriptor is the registry's: a list naming compiled-in gates with no descriptor beside it resolves nothing
+# the descriptor is the registry's: a list naming compiled-in gates with no descriptor beside it resolves nothing, an error verdict
 rm -f "$gates"/*.gate
 out="$(cd "$repo" && container GATE_SDK_TMP_DIR="$scratch/run" "$BIN" --run --gates-dir "$gates" 2>&1)"; rc=$?
-assert_rc "run, no descriptor" "$rc" 1 "$out"
+assert_rc "run, no descriptor" "$rc" 3 "$out"
 grep -qF '(unresolved)' <<<"$out" || { echo "FAIL [run, no descriptor]: no member reported unresolved"; printf '%s\n' "$out"; fails=$((fails + 1)); }
 assert_clean "run, no descriptor"
 

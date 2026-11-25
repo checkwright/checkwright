@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-spec-derivable-section — a banned-heading section may not
 // be a fenced code dump above the density budget; the pointer exemption is a consumer ERE,
 // so the engine applies it rather than a hand-compiled kit literal
+use crate::exit::Fault;
 use crate::spec::{self, compile_pattern as compile};
 use std::path::Path;
 
@@ -9,7 +10,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-spec-derivable-section: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -28,38 +29,39 @@ struct Section {
     fenced_nonblank: usize,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let spec_name = spec::knob_pub("CANON_KIT_SPEC_NAME")?;
-    let specs = spec::canonical_specs_sorted(root)?;
+    let spec_name = spec::knob_pub("CANON_KIT_SPEC_NAME").map_err(Fault::refused)?;
+    let specs = spec::canonical_specs_sorted(root).map_err(Fault::input)?;
     if specs.is_empty() {
         println!("SPEC-DERIVABLE-SECTION: clean (not applicable: 0 {} found)", spec_name);
         return Ok(0);
     }
 
-    let banned_headings = spec::knob_array_pub("CANON_KIT_BANNED_HEADINGS")?;
+    let banned_headings = spec::knob_array_pub("CANON_KIT_BANNED_HEADINGS").map_err(Fault::refused)?;
     let banned: Vec<String> = banned_headings
         .iter()
         .map(|h| h.to_ascii_lowercase())
         .collect();
-    let density: u64 = spec::knob_pub("CANON_KIT_DERIVABLE_DENSITY")?
+    let density: u64 = spec::knob_pub("CANON_KIT_DERIVABLE_DENSITY")
+        .map_err(Fault::refused)?
         .parse()
-        .map_err(|_| "CANON_KIT_DERIVABLE_DENSITY is not a number".to_string())?;
+        .map_err(|_| Fault::refused("CANON_KIT_DERIVABLE_DENSITY is not a number"))?;
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — the consumer pattern compiles before the
     // first corpus line is read, so a construct the substrate refuses exits 2 naming the knob
     // rather than scanning clean past the sections it meant to exempt
-    let pointer_src = spec::knob_pub("CANON_KIT_DERIVABLE_POINTER_REGEX")?;
-    let pointer = compile(&pointer_src, "CANON_KIT_DERIVABLE_POINTER_REGEX")?;
+    let pointer_src = spec::knob_pub("CANON_KIT_DERIVABLE_POINTER_REGEX").map_err(Fault::refused)?;
+    let pointer = compile(&pointer_src, "CANON_KIT_DERIVABLE_POINTER_REGEX").map_err(Fault::refused)?;
 
     let mut findings: Vec<String> = Vec::new();
     let mut cur = Section::default();
     for f in &specs {
         flush(&mut cur, &mut findings, density);
         let mut fence = spec::Fence::default();
-        for (idx, raw) in spec::read_text(Path::new(f))?.lines().enumerate() {
+        for (idx, raw) in spec::read_text(Path::new(f)).map_err(Fault::input)?.lines().enumerate() {
             let fnr = idx + 1;
             let delimits = fence.delimits(raw);
             let in_fence = fence.is_open();

@@ -1,7 +1,8 @@
 // spec: lifecycle-kit/SPEC.md §The stage-contract arm — a stage's contract as one document for a
 // reader that loads no skill and holds no commit path: the frame, a separator line, the stage skill
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Emit` because the contract is a document and
-// every failure is exit 2, the variant's own collapse
+// every failure is exit 2 or 3, the variant's own collapse
+use crate::exit::Fault;
 use crate::stages;
 use crate::walk;
 
@@ -32,7 +33,7 @@ impl Mode {
 
 // spec: lifecycle-kit/SPEC.md §The stage-contract arm — `--mode` is lifted out ahead of a `--`
 // separator, so every other dash-led token meets the positional refusal it met before
-fn mode_of(args: &[String]) -> Result<(Mode, Vec<String>), String> {
+fn mode_of(args: &[String]) -> Result<(Mode, Vec<String>), Fault> {
     let mut mode: Option<Mode> = None;
     let mut rest: Vec<String> = Vec::with_capacity(args.len());
     let mut it = args.iter();
@@ -47,13 +48,15 @@ fn mode_of(args: &[String]) -> Result<(Mode, Vec<String>), String> {
             continue;
         }
         if mode.is_some() {
-            return Err(format!("--mode is taken once\n{}", USAGE));
+            return Err(Fault::usage(format!("--mode is taken once\n{}", USAGE)));
         }
         mode = Some(match it.next().map(String::as_str) {
             Some("audit") => Mode::Audit,
             Some("sweep") => Mode::Sweep,
-            None | Some("--") => return Err(format!("--mode takes a value, audit or sweep\n{}", USAGE)),
-            Some(other) => return Err(format!("'{}' is not a mode; --mode takes audit or sweep\n{}", other, USAGE)),
+            None | Some("--") => return Err(Fault::usage(format!("--mode takes a value, audit or sweep\n{}", USAGE))),
+            Some(other) => {
+                return Err(Fault::usage(format!("'{}' is not a mode; --mode takes audit or sweep\n{}", other, USAGE)))
+            }
         });
     }
     Ok((mode.unwrap_or(Mode::Audit), rest))
@@ -72,43 +75,50 @@ pub fn compose(frame: &str, stage: &str, skill: &str) -> String {
     out
 }
 
-fn stage_of<'a>(args: &'a [String], known: &[String]) -> Result<&'a str, String> {
-    let fields = super::file_survey::positionals(args, "stage").map_err(|e| format!("{}\n{}", e, USAGE))?;
+fn stage_of<'a>(args: &'a [String], known: &[String]) -> Result<&'a str, Fault> {
+    let fields = super::file_survey::positionals(args, "stage").map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     match fields {
         [one] if stages::stage_known(known, one) => Ok(one),
-        [one] => Err(format!(
+        [one] => Err(Fault::refused(format!(
             "'{}' is not a stage in LIFECYCLE_KIT_STAGES ({})\n{}",
             one,
             known.join(" "),
             USAGE
-        )),
-        [] => Err(USAGE.to_string()),
-        _ => Err(format!("one stage is taken, and {} operands were given\n{}", fields.len(), USAGE)),
+        ))),
+        [] => Err(Fault::usage(USAGE)),
+        _ => Err(Fault::usage(format!("one stage is taken, and {} operands were given\n{}", fields.len(), USAGE))),
     }
 }
 
 // spec: lifecycle-kit/SPEC.md §The stage-contract arm — the arm resolves no template: a shim's
 // directive names its template by a path the reader opens in its clone
-fn document(stage: &str, skills_dir: &str, frame_path: &str, frame_knob: &str) -> Result<String, String> {
+fn document(stage: &str, skills_dir: &str, frame_path: &str, frame_knob: &str) -> Result<String, Fault> {
     let skill_path = format!("{}/{}.md", skills_dir.trim_end_matches('/'), stage);
-    let skill = super::read_text(&skill_path)
-        .map_err(|_| format!("no skill file for stage '{}' at {} (LIFECYCLE_KIT_SKILLS_DIR)", stage, skill_path))?;
-    let frame = super::read_text(frame_path).map_err(|_| format!("no frame file at {} ({})", frame_path, frame_knob))?;
+    let skill = super::read_text(&skill_path).map_err(|_| {
+        Fault::input(format!("no skill file for stage '{}' at {} (LIFECYCLE_KIT_SKILLS_DIR)", stage, skill_path))
+    })?;
+    let frame = super::read_text(frame_path)
+        .map_err(|_| Fault::input(format!("no frame file at {} ({})", frame_path, frame_knob)))?;
     if frame.trim().is_empty() {
-        return Err(format!("the frame file {} is empty ({})", frame_path, frame_knob));
+        return Err(Fault::input(format!("the frame file {} is empty ({})", frame_path, frame_knob)));
     }
     Ok(compose(&frame, stage, &skill))
 }
 
-fn contract(args: &[String], known: &[String], path_of: impl Fn(&str) -> Result<String, String>) -> Result<String, String> {
+fn contract(args: &[String], known: &[String], path_of: impl Fn(&str) -> Result<String, String>) -> Result<String, Fault> {
     let (mode, rest) = mode_of(args)?;
     let stage = stage_of(&rest, known)?;
     let knob = mode.frame_knob();
-    document(stage, &path_of("LIFECYCLE_KIT_SKILLS_DIR")?, &path_of(knob)?, knob)
+    document(
+        stage,
+        &path_of("LIFECYCLE_KIT_SKILLS_DIR").map_err(Fault::refused)?,
+        &path_of(knob).map_err(Fault::refused)?,
+        knob,
+    )
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let known = stages::stages()?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let known = stages::stages().map_err(Fault::refused)?;
     contract(args, &known, |knob| super::enter_stage::repo_anchored(&walk::knob_scalar(knob)?))
 }
 

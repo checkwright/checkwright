@@ -1,5 +1,6 @@
 // spec: context-kit/SPEC.md §check-settings-paths — every path the committed settings file tells
 // the harness to run resolves in the working tree, and every `--hook` operand is a member
+use crate::exit;
 use crate::hook::binding::PROJECT_DIR_VAR;
 use crate::hook::{self, Registration};
 use crate::walk;
@@ -145,13 +146,13 @@ pub fn run(args: &[String]) -> i32 {
                 fixture = args.get(i + 1).cloned();
                 if fixture.is_none() {
                     eprintln!("check-settings-paths: --fixture needs a directory");
-                    return 2;
+                    return exit::USAGE;
                 }
                 i += 2;
             }
             a => {
                 eprintln!("check-settings-paths: unexpected argument: {}", a);
-                return 2;
+                return exit::USAGE;
             }
         }
     }
@@ -160,7 +161,7 @@ pub fn run(args: &[String]) -> i32 {
         Some(d) => {
             if !std::path::Path::new(d).is_dir() {
                 eprintln!("check-settings-paths: fixture dir not found: {}", d);
-                return 2;
+                return exit::REFUSED;
             }
             (format!("{}/settings.json", d), d.clone())
         }
@@ -169,7 +170,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-settings-paths: {}", e);
-                    return 2;
+                    return exit::REFUSED;
                 }
             };
             (sf, ".".to_string())
@@ -186,14 +187,14 @@ pub fn run(args: &[String]) -> i32 {
                 "check-settings-paths: settings file not readable: {}",
                 settings_file
             );
-            return 2;
+            return if std::path::Path::new(&settings_file).exists() { exit::INPUT } else { exit::REFUSED };
         }
     };
     let doc: Value = match serde_json::from_str(&text) {
         Ok(v) => v,
         Err(_) => {
             eprintln!("check-settings-paths: {} is not valid JSON", settings_file);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -273,7 +274,7 @@ pub fn run(args: &[String]) -> i32 {
             let Some(door) =
                 super::door_or_report("check-settings-paths", "--emit knob-values GATE_SDK_NATIVE_BIN")
             else {
-                return 2;
+                return exit::REFUSED;
             };
             println!(
                 "  help: a hook merged from a kit template skipped its placeholder step — replace {}",

@@ -139,7 +139,7 @@ Rules live in [DOCTRINE.md](DOCTRINE.md) — re-vendor to upgrade.
 
 - **Content-tiering / SSOT** — one tier per surface.
 EOF
-check_case "methodology-section-missing-failclosed" "$m" 2 "Methodology-maintenance rules"
+check_case "methodology-section-missing-failclosed" "$m" 3 "Methodology-maintenance rules"
 
 # A reusable full-digest agent file: all three methodology rules present, so a
 # craft-side finding fires alone.
@@ -212,7 +212,7 @@ cat >"$c/DOCTRINE.md" <<'EOF'
 3. **De-literalization.** Prose cites names; code owns values.
    *Digest:* prose cites names.
 EOF
-check_case "craft-section-missing-failclosed" "$c" 2 "Engineering-craft rules"
+check_case "craft-section-missing-failclosed" "$c" 3 "Engineering-craft rules"
 
 # --- meth-untrailered: a methodology rule with no *Digest:* trailer (assertion E) ---
 # The defect this assertion exists for: the rule reaches the doctrine, the digest

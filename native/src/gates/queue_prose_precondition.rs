@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §check-queue-prose-precondition — no active entry states a forward
 // precondition in prose without a blocked-by tag (selection trusts tags, not prose)
+use crate::exit::Fault;
 use crate::ere::Ere;
 use crate::queue;
 
@@ -90,27 +91,27 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-queue-prose-precondition: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let sec = queue::Sections::active_and_deferred()?;
-    let trig_src = queue::knob_scalar("QUEUE_KIT_PRECONDITION_REGEX")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let sec = queue::Sections::active_and_deferred().map_err(Fault::refused)?;
+    let trig_src = queue::knob_scalar("QUEUE_KIT_PRECONDITION_REGEX").map_err(Fault::refused)?;
     let trig = Ere::compile(&trig_src)
-        .map_err(|e| format!("QUEUE_KIT_PRECONDITION_REGEX failed to compile: {}", e))?;
+        .map_err(|e| Fault::refused(format!("QUEUE_KIT_PRECONDITION_REGEX failed to compile: {}", e)))?;
     let bracket = Ere::compile(BRACKET_RE_SRC)
-        .map_err(|e| format!("the bracket pattern failed to compile: {}", e))?;
-    let past_tense = past_tense(&queue::knob_scalar("QUEUE_KIT_PRECONDITION_PAST_REGEX")?)?;
+        .map_err(|e| Fault::tool(format!("the bracket pattern failed to compile: {}", e)))?;
+    let past_tense = past_tense(&queue::knob_scalar("QUEUE_KIT_PRECONDITION_PAST_REGEX").map_err(Fault::refused)?).map_err(Fault::refused)?;
     let tag_word = Ere::compile(TAG_WORD_RE_SRC)
-        .map_err(|e| format!("the state-name pattern failed to compile: {}", e))?;
+        .map_err(|e| Fault::tool(format!("the state-name pattern failed to compile: {}", e)))?;
 
     let file = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?,
+        None => queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?,
     };
-    let text = std::fs::read_to_string(&file).map_err(|_| format!("file not found: {}", file))?;
+    let text = std::fs::read_to_string(&file).map_err(|_| Fault::refused(format!("file not found: {}", file)))?;
 
     let mut findings: Vec<(usize, String, String)> = Vec::new();
 
@@ -153,7 +154,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             lead: lines[e.start].to_string(),
             body: extent.join(" "),
             hasblock: extent.iter().any(|l| carries_block_tag(l)),
-        }))?;
+        })).map_err(Fault::tool)?;
     }
 
     if !findings.is_empty() {

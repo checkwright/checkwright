@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-lesson-disposition — every Lessons entry present at HEAD
 // and gone from the worktree leaves a well-formed disposition stamp in the evidence file
+use crate::exit;
 use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
@@ -62,14 +63,14 @@ pub fn run(args: &[String]) -> i32 {
         ] {
             if p.is_empty() || !Path::new(p).is_file() {
                 eprintln!("check-lesson-disposition: {} not found: {}", label, p);
-                return 2;
+                return exit::REFUSED;
             }
         }
         match (read(&head), read(&work)) {
             (Ok(h), Ok(w)) => (h, w, evid),
             (Err(e), _) | (_, Err(e)) => {
                 eprintln!("check-lesson-disposition: {}", e);
-                return 2;
+                return exit::INPUT;
             }
         }
     } else {
@@ -77,7 +78,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-lesson-disposition: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         match walk::toplevel_opt() {
@@ -88,7 +89,7 @@ pub fn run(args: &[String]) -> i32 {
             }
             Err(e) => {
                 eprintln!("check-lesson-disposition: {}", e);
-                return 2;
+                return exit::TOOL;
             }
         }
         let spec = format!("HEAD:{}", queue);
@@ -96,7 +97,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(c) => c.stdout().map(|b| String::from_utf8_lossy(b).into_owned()),
             Err(e) => {
                 eprintln!("check-lesson-disposition: {}", e);
-                return 2;
+                return exit::TOOL;
             }
         };
         let Some(head) = shown else {
@@ -111,24 +112,24 @@ pub fn run(args: &[String]) -> i32 {
                 "check-lesson-disposition: worktree queue not found: {}",
                 queue
             );
-            return 2;
+            return exit::REFUSED;
         }
         let evid = match walk::knob_scalar("LIFECYCLE_KIT_LESSON_EVIDENCE_FILE") {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-lesson-disposition: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         if !Path::new(&evid).is_file() {
             eprintln!("check-lesson-disposition: evidence file not found: {}", evid);
-            return 2;
+            return exit::REFUSED;
         }
         match read(&queue) {
             Ok(w) => (head, w, evid),
             Err(e) => {
                 eprintln!("check-lesson-disposition: {}", e);
-                return 2;
+                return exit::INPUT;
             }
         }
     };
@@ -137,7 +138,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(e) => {
             eprintln!("check-lesson-disposition: {}", e);
-            return 2;
+            return exit::INPUT;
         }
     };
 

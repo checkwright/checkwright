@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-merge-attrs — bidirectional parity between the derived
 // iteration-scoped supersede set and the merge=iteration-scoped lines in .gitattributes, plus
 // forward-only parity for the derived union set
+use crate::exit;
 use crate::stages;
 use std::path::Path;
 
@@ -45,23 +46,23 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => sorted_unique(v),
         Err(e) => {
             eprintln!("check-merge-attrs: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if derived.is_empty() {
         eprintln!("check-merge-attrs: the derived iteration-scoped supersede set is empty — the state machine names no boundary-truncated surface (a lifecycle always owns at least its state + lesson-evidence files)");
-        return 2;
+        return exit::REFUSED;
     }
     let union_derived = match stages::union_set() {
         Ok(v) => sorted_unique(v),
         Err(e) => {
             eprintln!("check-merge-attrs: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if union_derived.is_empty() {
         eprintln!("check-merge-attrs: the derived union-merge set is empty — the state machine names no append-only union surface (a lifecycle always owns at least its gap and consult inboxes)");
-        return 2;
+        return exit::REFUSED;
     }
 
     let (have, union_have) = if Path::new(&attrs).exists() {
@@ -72,7 +73,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-merge-attrs: {} exists but is not readable — the parity cannot be checked",
                     attrs
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         (
@@ -92,7 +93,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if !missing.is_empty() || !extra.is_empty() || !union_missing.is_empty() {
         let Some(door) = super::door_or_report("check-merge-attrs", "--install-lifecycle") else {
-            return 2;
+            return exit::REFUSED;
         };
         println!(
             "check-merge-attrs: {} merge attributes are out of parity with the derived supersede/union sets:",

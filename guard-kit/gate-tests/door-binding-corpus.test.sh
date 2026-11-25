@@ -54,7 +54,7 @@ want "absent-entry" "no/such/page.md" 2 "resolves to neither a tracked file nor 
 printf 'untracked\n' >"$tmp/loose.md"
 want "untracked-entry" "loose.md" 2 "resolves to neither a tracked file nor a directory"
 
-# --- an unreadable configured surface: exit 2 rather than a clean over a corpus
+# --- an unreadable configured surface: exit 3 rather than a clean over a corpus
 # the gate could not read. Skipped for a caller that reads a mode-000 file anyway.
 mkdir -p "$tmp/locked"
 printf 'bash gate-sdk/bin/run-gates.sh --run-demo\n' >"$tmp/locked/page.md"
@@ -64,7 +64,7 @@ chmod 000 "$tmp/locked/page.md"
 if head -c1 "$tmp/locked/page.md" >/dev/null 2>&1; then
     echo "  note: skipping the unreadable-surface case — this caller reads a mode-000 file"
 else
-    want "unreadable-surface" "locked" 2 "unreadable corpus file"
+    want "unreadable-surface" "locked" 3 "unreadable corpus file"
 fi
 chmod 644 "$tmp/locked/page.md"
 

@@ -1,6 +1,7 @@
 // spec: docs/site-architecture.md §The license line — every README's License section and the
 // site footer carry the one line the source renders for that site, and every package manifest's
 // license field the source's license
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -36,7 +37,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {} — the check could not run; treating as failure (not clean)", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -271,26 +272,26 @@ fn site_key(p: &Path) -> String {
         .join("/")
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let source = fresh::positional_or_knob(args, 0, "GATE_LOCAL_LICENSE_CONF")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let source = fresh::positional_or_knob(args, 0, "GATE_LOCAL_LICENSE_CONF").map_err(Fault::refused)?;
     let source = source.as_str();
     let root = fresh::strip_trailing_slash(fresh::positional(args, 1, ".")).to_string();
     if !fresh::is_dir(&root) {
-        return Err(format!("root not found: {}", root));
+        return Err(Fault::refused(format!("root not found: {}", root)));
     }
     let conf = parse(
         source,
-        &fresh::read_captured(source).map_err(|e| format!("{}: {}", source, e))?,
-    )?;
-    let heading = walk::knob_scalar("GATE_LOCAL_LICENSE_HEADING")?;
+        &fresh::read_captured(source).map_err(|e| Fault::input(format!("{}: {}", source, e)))?,
+    ).map_err(Fault::refused)?;
+    let heading = walk::knob_scalar("GATE_LOCAL_LICENSE_HEADING").map_err(Fault::refused)?;
     let heading = heading.as_str();
-    let readme = walk::knob_scalar("GATE_LOCAL_README_FILE")?;
+    let readme = walk::knob_scalar("GATE_LOCAL_README_FILE").map_err(Fault::refused)?;
     let at_root = |p: &str| Path::new(&root).join(p).display().to_string();
 
     let mut findings: Vec<String> = Vec::new();
     for (site, form) in &conf.sites {
-        let want = render(&conf, site, form)?;
-        let text = fresh::read_captured(&at_root(site)).map_err(|e| format!("{}: {}", site, e))?;
+        let want = render(&conf, site, form).map_err(Fault::refused)?;
+        let text = fresh::read_captured(&at_root(site)).map_err(|e| Fault::input(format!("{}: {}", site, e)))?;
         let got: Vec<&str> = if is_html(site) {
             let lines: Vec<&str> = fresh::file_lines(&text)
                 .into_iter()
@@ -332,9 +333,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     let mut covered = 0usize;
-    for p in walk::find_named(Path::new(&root), &[readme.as_str()])? {
+    for p in walk::find_named(Path::new(&root), &[readme.as_str()]).map_err(Fault::input)? {
         let rel = site_key(p.strip_prefix(&root).unwrap_or(&p));
-        let text = fresh::read_captured(&p.display().to_string()).map_err(|e| format!("{}: {}", rel, e))?;
+        let text = fresh::read_captured(&p.display().to_string()).map_err(|e| Fault::input(format!("{}: {}", rel, e)))?;
         if generated(&text) || !fresh::file_lines(&text).iter().any(|l| l.trim_end() == heading) {
             continue;
         }
@@ -352,12 +353,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // there is the coverage walk's above
     let mut pages = 0usize;
     if let Some(dir) = &conf.pages {
-        for p in walk::find_files(&Path::new(&root).join(dir), &["md"])? {
+        for p in walk::find_files(&Path::new(&root).join(dir), &["md"]).map_err(Fault::input)? {
             let rel = site_key(p.strip_prefix(&root).unwrap_or(&p));
             if p.file_name().is_some_and(|n| n == readme.as_str()) {
                 continue;
             }
-            let text = fresh::read_captured(&p.display().to_string()).map_err(|e| format!("{}: {}", rel, e))?;
+            let text = fresh::read_captured(&p.display().to_string()).map_err(|e| Fault::input(format!("{}: {}", rel, e)))?;
             if generated(&text) {
                 continue;
             }
@@ -371,9 +372,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let read_manifest = |rel: &str, k: Kind| -> Result<Option<String>, String> {
-        let text = fresh::read_captured(&at_root(rel)).map_err(|e| format!("{}: {}", rel, e))?;
-        manifest_license(k, &text).map_err(|e| format!("{}: {}", rel, e))
+    let read_manifest = |rel: &str, k: Kind| -> Result<Option<String>, Fault> {
+        let text = fresh::read_captured(&at_root(rel)).map_err(|e| Fault::input(format!("{}: {}", rel, e)))?;
+        manifest_license(k, &text).map_err(|e| Fault::input(format!("{}: {}", rel, e)))
     };
     for (m, k) in &conf.manifests {
         match read_manifest(m, *k)? {
@@ -385,15 +386,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
             Some(_) => {}
         }
     }
-    let manifest_names = walk::knob_array("GATE_LOCAL_LICENSE_MANIFEST_NAMES")?;
+    let manifest_names = walk::knob_array("GATE_LOCAL_LICENSE_MANIFEST_NAMES").map_err(Fault::refused)?;
     let manifest_names: Vec<&str> = manifest_names.iter().map(String::as_str).collect();
-    for p in walk::find_named(Path::new(&root), &manifest_names)? {
+    for p in walk::find_named(Path::new(&root), &manifest_names).map_err(Fault::input)? {
         let rel = site_key(p.strip_prefix(&root).unwrap_or(&p));
         let k = kind(&rel).ok_or_else(|| {
-            format!(
+            Fault::refused(format!(
                 "{}: GATE_LOCAL_LICENSE_MANIFEST_NAMES names a kind with no reader (Cargo.toml, .json, .yml, .yaml)",
                 rel
-            )
+            ))
         })?;
         if read_manifest(&rel, k)?.is_some() && !conf.manifests.iter().any(|(m, _)| *m == rel) {
             findings.push(format!(

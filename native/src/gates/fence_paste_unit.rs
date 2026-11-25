@@ -2,6 +2,7 @@
 // and every PowerShell fence of more than one statement is one script block
 use super::fence_command_head::{fences_of, SHELL_LANGS};
 use crate::bashscan::{self, Sep};
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -16,21 +17,21 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-fence-paste-unit: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let globs = spec::knob_array_pub(PAGES_KNOB)?;
+    let globs = spec::knob_array_pub(PAGES_KNOB).map_err(Fault::refused)?;
     let mut pages: Vec<String> = if globs.is_empty() {
         Vec::new()
     } else {
-        walk::glob_corpus(Path::new(root), &globs)?
+        walk::glob_corpus(Path::new(root), &globs).map_err(Fault::input)?
             .into_iter()
             .filter(|p| p.is_file())
             .map(|p| spec::strip_dot_slash(&p.display().to_string()))
@@ -44,7 +45,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let (mut nshell, mut npwsh) = (0usize, 0usize);
     for page in &pages {
         let text = spec::read_text(Path::new(page))
-            .map_err(|e| format!("cannot read declared page {}: {}", page, e))?;
+            .map_err(|e| Fault::input(format!("cannot read declared page {}: {}", page, e)))?;
         for (open, body) in fences_of(&text, &SHELL_LANGS) {
             nshell += 1;
             for ln in unstopped_lists(&body) {

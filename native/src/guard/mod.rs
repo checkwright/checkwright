@@ -167,7 +167,7 @@ pub fn json_arm(args: &[String]) -> i32 {
         _ => {
             eprintln!("checkwright-gates: --guard-json needs a mode and exactly its operands — nothing could be read or rendered; treating as failure (not clean)");
             eprintln!("{}", usage);
-            return 2;
+            return crate::exit::USAGE;
         }
     };
     for line in out.unwrap_or_default() {

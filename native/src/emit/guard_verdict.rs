@@ -2,6 +2,7 @@
 // command, asked of the running binary or the one `--bin` names, in the tree or in the decision
 // table's sandbox, through `--run-guard-tests`' own builder, spawn and ladder.
 use super::run_guard_tests::{self as table, Sandbox};
+use crate::exit::{self, Fault};
 use crate::hook::binding::{TOOL_BASH, TOOL_POWERSHELL};
 use crate::{proc, walk};
 use std::path::Path;
@@ -47,7 +48,7 @@ pub fn run(args: &[String]) -> i32 {
         Err(e) => {
             eprintln!("checkwright-gates: --guard-verdict: {}", e);
             eprintln!("{}", USAGE);
-            return 2;
+            return exit::USAGE;
         }
     };
     match verdict(ask) {
@@ -58,7 +59,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("checkwright-gates: --guard-verdict: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -114,13 +115,13 @@ fn render(code: i32, out: &str, err: &str) -> (String, String) {
     (format!("{}\n{}", class, out), err.to_string())
 }
 
-fn verdict(ask: Ask) -> Result<(String, String), String> {
-    let here = walk::cwd()?;
+fn verdict(ask: Ask) -> Result<(String, String), Fault> {
+    let here = walk::cwd().map_err(Fault::tool)?;
     let bin = match &ask.bin {
         Some(b) => {
             let abs = walk::abs_against(&here, b);
             if !proc::is_executable(Path::new(&abs)) {
-                return Err(format!("--bin {} is not an executable file", b));
+                return Err(Fault::refused(format!("--bin {} is not an executable file", b)));
             }
             abs
         }
@@ -133,17 +134,22 @@ fn verdict(ask: Ask) -> Result<(String, String), String> {
             let mut bytes = Vec::new();
             std::io::stdin()
                 .read_to_end(&mut bytes)
-                .map_err(|e| format!("cannot read the command from stdin: {}", e))?;
+                .map_err(|e| Fault::input(format!("cannot read the command from stdin: {}", e)))?;
             from_stdin(&bytes)
         }
     };
-    let top = walk::toplevel_opt()?;
+    let top = walk::toplevel_opt().map_err(Fault::tool)?;
     let base = top.clone().unwrap_or_else(|| here.clone());
-    let tmp_dir = walk::knob_scalar(TMP_KNOB)?;
+    let tmp_dir = walk::knob_scalar(TMP_KNOB).map_err(Fault::refused)?;
     let tmp = walk::abs_against(&base, &tmp_dir);
-    std::fs::create_dir_all(&tmp).map_err(|e| format!("cannot create the scratch dir {}: {}", tmp, e))?;
+    std::fs::create_dir_all(&tmp)
+        .map_err(|e| Fault::tool(format!("cannot create the scratch dir {}: {}", tmp, e)))?;
     let log = format!("{}/guard-verdict.{}.log", tmp, std::process::id());
-    let held = if ask.sandbox { Some(crate::runner::run_scratch_in(&base, &tmp_dir)?) } else { None };
+    let held = if ask.sandbox {
+        Some(crate::runner::run_scratch_in(&base, &tmp_dir).map_err(Fault::tool)?)
+    } else {
+        None
+    };
     let sandbox: Option<Sandbox> = match &held {
         Some(h) => Some(table::build_sandbox(h)?),
         None => None,
@@ -151,7 +157,7 @@ fn verdict(ask: Ask) -> Result<(String, String), String> {
     let root = match (&sandbox, top) {
         (Some(s), _) => s.root.clone(),
         (None, Some(t)) => t,
-        (None, None) => return Err("not inside a git repository; ask with --sandbox".to_string()),
+        (None, None) => return Err(Fault::refused("not inside a git repository; ask with --sandbox")),
     };
     let tool = if ask.powershell { TOOL_POWERSHELL } else { TOOL_BASH };
     let payload = table::payload(&table::substitute(&raw, &root), ask.background.then_some("true"), tool);

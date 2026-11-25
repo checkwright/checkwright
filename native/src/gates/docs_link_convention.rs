@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-docs-link-convention — docs pages cite downward: no
 // directory-target relative link, a kit page's back-link to its own README/SPEC carries a
 // #section anchor, no relative link to a target resolving outside the docs root
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -111,26 +112,26 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}", msg);
-            2
+            msg.status()
         }
     }
 }
 
-fn inner(args: &[String]) -> Result<i32, String> {
+fn inner(args: &[String]) -> Result<i32, Fault> {
     let knob = walk::knob_scalar("CANON_KIT_LINK_ROOT")
-        .map_err(|e| format!("check-docs-link-convention: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-docs-link-convention: {}", e)))?;
     let root = fresh::strip_trailing_slash(fresh::positional(args, 0, &knob)).to_string();
     if !Path::new(&root).is_dir() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "check-docs-link-convention: not a directory: {}",
             root
-        ));
+        )));
     }
 
     // spec: canon-kit/SPEC.md §check-docs-link-convention — the shell form reaches for a bare
     // `find`, so no prune set applies and the walk is the whole docs tree
     let pages = walk::find_with_prune(Path::new(&root), &|_| false)
-        .map_err(|e| format!("check-docs-link-convention: {}", e))?;
+        .map_err(|e| Fault::input(format!("check-docs-link-convention: {}", e)))?;
     let pages: Vec<String> = pages
         .into_iter()
         .map(|p| p.display().to_string())
@@ -141,7 +142,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    let spec_name = crate::spec::spec_name().map_err(|e| format!("check-docs-link-convention: {}", e))?;
+    let spec_name = crate::spec::spec_name().map_err(|e| Fault::refused(format!("check-docs-link-convention: {}", e)))?;
     let mut bad: Vec<String> = Vec::new();
     // spec: canon-kit/SPEC.md §check-docs-link-convention — which of the three rules fired, so the
     // report carries each fired rule's own remedy and no other rule's
@@ -157,7 +158,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
         };
         let text = std::fs::read(f)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .map_err(|e| format!("check-docs-link-convention: cannot read {}: {}", f, e))?;
+            .map_err(|e| Fault::input(format!("check-docs-link-convention: cannot read {}: {}", f, e)))?;
         let lines = fresh::file_lines(&text);
         for (idx, line) in lines.iter().enumerate() {
             let lno = idx + 1;
@@ -184,7 +185,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
                     }
                     continue;
                 }
-                let p = resolve(&base, path)?;
+                let p = resolve(&base, path).map_err(Fault::tool)?;
                 if p.is_empty() {
                     continue;
                 }

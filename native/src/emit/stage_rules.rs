@@ -2,8 +2,10 @@
 // to every rule whose `*Stages:*` trailer routes to it, one line each, read from the doctrine file
 // at run time so no rule content and no stage vocabulary is baked here
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Emit` because the contract is a document and
-// both failures are already exit 2, which is exactly what that variant collapses to
+// a missing `<stage>` is exit 2 and an unreadable doctrine file exit 3, which is exactly what that
+// variant collapses to
 use crate::emit;
+use crate::exit::Fault;
 use crate::walk;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — one declared knob: a hardcoded top-level flag would
@@ -104,19 +106,19 @@ pub fn render(text: &str, stage: &str, path: &str) -> String {
 // spec: doctrine-kit/SPEC.md §stage-rules — `<stage>` required, `[doctrine-file]` optional and
 // overriding the knob, the shell precedence unchanged; the optional positional is kept because the
 // gate and the installer it matches still take theirs (gate-sdk/SPEC.md §The non-gate arm)
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let args = super::file_survey::positionals(args, "stage")
-        .map_err(|e| format!("{}\n{}", e, USAGE))?;
+        .map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     let stage = match args.first().filter(|a| !a.is_empty()) {
         Some(s) => s.clone(),
-        None => return Err(USAGE.to_string()),
+        None => return Err(Fault::refused(USAGE)),
     };
     let path = match args.get(1).filter(|a| !a.is_empty()) {
         Some(p) => p.clone(),
-        None => walk::knob_scalar("DOCTRINE_KIT_DOCTRINE_FILE")?,
+        None => walk::knob_scalar("DOCTRINE_KIT_DOCTRINE_FILE").map_err(Fault::refused)?,
     };
     let text = emit::read_text(&path)
-        .map_err(|_| format!("doctrine file not found: {} — treating as failure", path))?;
+        .map_err(|_| Fault::input(format!("doctrine file not found: {} — treating as failure", path)))?;
     Ok(render(&text, &stage, &path))
 }
 
@@ -184,11 +186,10 @@ mod tests {
         assert_eq!(rule_head("3.**no space**"), None);
     }
 
-    // spec: doctrine-kit/SPEC.md §stage-rules — `<stage>` is required and its absence is exit 2
-    // through `Arm::Emit`'s collapse, which is the shell form's usage status unchanged
+    // spec: doctrine-kit/SPEC.md §stage-rules — a missing `<stage>` is exit 2
     #[test]
     fn a_missing_stage_argument_refuses() {
-        assert!(emit(&[]).is_err());
-        assert!(emit(&["".to_string()]).is_err());
+        assert_eq!(emit(&[]).err().map(|f| f.status()), Some(crate::exit::USAGE));
+        assert_eq!(emit(&["".to_string()]).err().map(|f| f.status()), Some(crate::exit::USAGE));
     }
 }

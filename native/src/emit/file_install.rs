@@ -2,6 +2,7 @@
 // line per observation event, the date stamped by the producer rather than by its author.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
 // arm reads a consumer knob, which a hardcoded flag would hide from the knob-file derivation.
+use crate::exit::Fault;
 
 pub const KNOBS: &[&str] = &["DRIFT_KIT_INSTALL_RECORD", "DRIFT_KIT_AUTHOR_INSTALL_RECORD"];
 
@@ -242,13 +243,13 @@ pub fn write_line(
     Ok(false)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let (knob, args) = seat(args);
-    let argv =
-        super::file_survey::positionals(args, "field").map_err(|e| format!("{}\n{}", e, USAGE))?;
-    let name = argv.first().ok_or_else(|| USAGE.to_string())?;
+    let argv = super::file_survey::positionals(args, "field")
+        .map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
+    let name = argv.first().ok_or_else(|| Fault::usage(USAGE))?;
     let k = kind(name).ok_or_else(|| {
-        format!(
+        Fault::usage(format!(
             "unknown kind: {} — one of {}\n{}",
             name,
             KINDS
@@ -257,20 +258,20 @@ pub fn emit(args: &[String]) -> Result<String, String> {
                 .collect::<Vec<_>>()
                 .join(" | "),
             USAGE
-        )
+        ))
     })?;
     let fields = &argv[1..];
-    validate(k, fields)?;
+    validate(k, fields).map_err(Fault::usage)?;
 
-    let (record, spelled) = super::file_survey::anchored_capture(knob)?;
+    let (record, spelled) = super::file_survey::anchored_capture_fault(knob)?;
     let path = std::path::Path::new(&record);
     let line = line(&super::kpi::today_iso(), k.name, fields);
     let replaced = if k.key.is_empty() {
-        write_line(path, &spelled, &line, None)?
+        write_line(path, &spelled, &line, None).map_err(Fault::tool)?
     } else {
         let refs: Vec<&str> = fields.iter().map(String::as_str).collect();
-        let want = line_key(k, &refs).ok_or_else(|| USAGE.to_string())?;
-        write_line(path, &spelled, &line, Some(&|l: &str| keyed_as(k, &want, l)))?
+        let want = line_key(k, &refs).ok_or_else(|| Fault::usage(USAGE))?;
+        write_line(path, &spelled, &line, Some(&|l: &str| keyed_as(k, &want, l))).map_err(Fault::tool)?
     };
     Ok(format!(
         "file-install: {}{}\n",

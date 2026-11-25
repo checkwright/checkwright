@@ -44,7 +44,7 @@ cat >"$u/AGENT.md" <<'EOF'
 <!-- lifecycle-kit:begin -->
 The block opened but the end marker is gone.
 EOF
-check_case "unpaired-marker-failclosed" "$u" 2 "end marker missing"
+check_case "unpaired-marker-failclosed" "$u" 3 "end marker missing"
 
 # --- agent-file-missing: the configured target does not exist (fail-closed) ---
 m="$SANDBOX/missing"; mkdir -p "$m"

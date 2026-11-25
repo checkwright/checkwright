@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-manifest-count — two arms over manifest prose outside an exempt
 // site: (A) no bare cardinal quantifying a governed collection noun, (B) a cardinal opening a
 // list's lead-in agrees with the list
+use crate::exit::Fault;
 use super::manifest_temporal::TemporalValve;
 use crate::spec;
 use std::path::Path;
@@ -10,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-manifest-count: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -19,13 +20,13 @@ pub fn run(args: &[String]) -> i32 {
 // per-site window the exempt tag opens, for both arms
 const EXEMPTS: &[&str] = &["manifest-count-exempt:", spec::MEASURED_MARKER];
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
 
-    let manifests = spec::manifest_files_sorted_stripped(root)?;
+    let manifests = spec::manifest_files_sorted_stripped(root).map_err(Fault::refused)?;
     if manifests.is_empty() {
         println!("MANIFEST-COUNT: clean (not applicable: 0 manifest file(s) found)");
         return Ok(0);
@@ -55,23 +56,23 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
     let mut sink = Sink {
-        grammar: spec::CountGrammar::resolve()?,
+        grammar: spec::CountGrammar::resolve().map_err(Fault::refused)?,
         prev: String::new(),
         out: Vec::new(),
     };
-    spec::walk_prose_multi(&manifests, EXEMPTS, &mut sink)?;
+    spec::walk_prose_multi(&manifests, EXEMPTS, &mut sink).map_err(Fault::input)?;
     let out = sink.out;
 
     // spec: canon-kit/SPEC.md §check-manifest-count — arm B's path test is the temporal path
     // valve alone, so the member declares no section knob
     let valve = TemporalValve::new(
         Vec::new(),
-        spec::knob_array_pub("CANON_KIT_TEMPORAL_EXEMPT_PATHS")?,
+        spec::knob_array_pub("CANON_KIT_TEMPORAL_EXEMPT_PATHS").map_err(Fault::refused)?,
     );
     let mut read = 0usize;
     let mut lead: Vec<String> = Vec::new();
     for f in manifests.iter().filter(|f| !valve.path_exempt(f)) {
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         for (ln, cardinal, items) in lead_ins(&text, &mut read) {
             lead.push(format!(
                 "  {}:{}  lead-in count: '{}' over {} item(s)",

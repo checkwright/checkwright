@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-delta-agreement — every configured delta agrees with its base on
 // which items exist
 use crate::ere::EreCapture;
+use crate::exit::Fault;
 use crate::section::heading_level;
 use crate::spec;
 use crate::walk;
@@ -20,7 +21,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-delta-agreement: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -40,28 +41,29 @@ struct Config {
     families: Vec<Family>,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let path = walk::knob_scalar(PATH_KNOB)?;
+    let path = walk::knob_scalar(PATH_KNOB).map_err(Fault::refused)?;
     if path.is_empty() {
         println!("DELTA-AGREEMENT: clean (not applicable: no delta is configured: {} is empty)", PATH_KNOB);
         return Ok(0);
     }
     let cfg = config(
         &path,
-        &walk::knob_scalar(BASE_DIR_KNOB)?,
-        &walk::knob_scalar(BASE_ITEM_KNOB)?,
-        &walk::knob_map(PRESENT_KNOB)?,
-        &walk::knob_map(ABSENT_KNOB)?,
-        &walk::knob_map(ITEM_KNOB)?,
-        &walk::knob_array(REQUIRED_KNOB)?,
-    )?;
+        &walk::knob_scalar(BASE_DIR_KNOB).map_err(Fault::refused)?,
+        &walk::knob_scalar(BASE_ITEM_KNOB).map_err(Fault::refused)?,
+        &walk::knob_map(PRESENT_KNOB).map_err(Fault::refused)?,
+        &walk::knob_map(ABSENT_KNOB).map_err(Fault::refused)?,
+        &walk::knob_map(ITEM_KNOB).map_err(Fault::refused)?,
+        &walk::knob_array(REQUIRED_KNOB).map_err(Fault::refused)?,
+    )
+    .map_err(Fault::refused)?;
 
     let mut deltas: Vec<(String, String)> = Vec::new();
-    for p in walk::find_files(Path::new(root), &["md"])? {
+    for p in walk::find_files(Path::new(root), &["md"]).map_err(Fault::input)? {
         let shown = spec::strip_dot_slash(&p.display().to_string());
         let rel = walk::rel_under(root, &shown).unwrap_or(&shown).trim_start_matches('/').to_string();
         if let Some((gs, ge)) = cfg.path.capture(&rel) {
@@ -74,10 +76,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut findings: Vec<(String, Finding)> = Vec::new();
     let mut agreed = 0usize;
     for (delta, base) in &deltas {
-        let text = read(&walk::child(Path::new(root), delta))?;
+        let text = read(&walk::child(Path::new(root), delta)).map_err(Fault::input)?;
         let base_file = walk::child(Path::new(root), base);
         let items = if base_file.is_file() {
-            Some(base_items(&read(&base_file)?, &cfg.base_item))
+            Some(base_items(&read(&base_file).map_err(Fault::input)?, &cfg.base_item))
         } else {
             None
         };

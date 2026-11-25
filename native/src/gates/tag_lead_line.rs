@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §check-tag-lead-line — every governed tag sits on its entry's tag
 // line or its lesson's bullet, the only lines the tag readers scan
+use crate::exit;
 use crate::queue;
 
 // spec: queue-kit/SPEC.md §check-tag-lead-line — one class table, each entry the tag name plus
@@ -48,14 +49,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(s) => s,
         Err(e) => {
             eprintln!("check-tag-lead-line: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let lesson_tags = match queue::knob_array("QUEUE_KIT_LESSON_TAGS") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-tag-lead-line: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let file = match args.first() {
@@ -64,7 +65,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-tag-lead-line: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -72,7 +73,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-tag-lead-line: file not found: {}", file);
-            return 2;
+            return if std::path::Path::new(&file).exists() { exit::INPUT } else { exit::REFUSED };
         }
     };
 

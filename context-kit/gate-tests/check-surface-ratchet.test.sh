@@ -2,8 +2,9 @@
 # Behavioral test of the refusal axis the good/bad pair cannot hold: the pair
 # fixes the over-vs-under axis (exit 1 vs exit 0) and always supplies a
 # well-formed ceiling file, so neither case can express an absent file or an
-# unparsable row. Both are exit 2 — a ratchet with no readable ceilings is a
-# broken machine, not a clean tree — which run-gate-tests reads as a harness
+# unparsable row. An absent file is exit 2 (the surface the consumer has not
+# written) and an unparsable row exit 3 — a ratchet with no readable ceilings is
+# a broken machine, not a clean tree — which run-gate-tests reads as a harness
 # error from a bad/ tree, so it lives here. The sandbox is outside any git
 # repository, so every case leaves CONTEXT_KIT_RATCHET_PATHS empty; the git arm
 # is what the pair exercises.
@@ -54,14 +55,14 @@ check_case "absent-ceiling-file-fails-closed" 2 "cannot read the ceiling file" a
 
 # A row the reader cannot parse is refused for the same reason one row down:
 # dropping it would leave exactly that surface silently ungoverned.
-check_case "unparsable-row-fails-closed" 2 "unparsable ceiling row" unparsable
+check_case "unparsable-row-fails-closed" 3 "unparsable ceiling row" unparsable
 
 # A row in the retired line unit carries no code-point figure, so it is refused with the re-stamp
 # named rather than compared as if its number were code points.
-check_case "line-unit-row-fails-closed" 2 "--emit always-loaded --ceiling" legacy
+check_case "line-unit-row-fails-closed" 3 "--emit always-loaded --ceiling" legacy
 
 # The floor the refusals sit on: a well-formed file over a surface at its
-# ceiling is clean, so the exit 2s above are the grammar failing and not the rule.
+# ceiling is clean, so the refusals above are the grammar failing and not the rule.
 check_case "well-formed-ceiling-is-clean" 0 "SURFACE-RATCHET: clean (1 governed file" sized
 
 # A row whose file is gone is a narrowing, and a ratchet that redded on a
@@ -72,5 +73,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-surface-ratchet.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-surface-ratchet.test.sh: clean (absent file, unparsable row and line-unit row exit 2, well-formed file clean, stale row ignored, 5 cases)"
+echo "check-surface-ratchet.test.sh: clean (absent file exit 2, unparsable row and line-unit row exit 3, well-formed file clean, stale row ignored, 5 cases)"
 exit 0

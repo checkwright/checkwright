@@ -3,6 +3,7 @@
 // `GH_REPO` in scope, or `--repo` on every detected invocation
 use crate::actions::{self, Ev};
 use crate::walk;
+use crate::exit;
 use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §check-action-gh-repo — the valve's spelling is this gate's, the
@@ -144,14 +145,14 @@ pub fn run(args: &[String]) -> i32 {
     let root = Path::new(scanroot);
     if !root.is_dir() {
         eprintln!("check-action-gh-repo: scan root not found: {}", scanroot);
-        return 2;
+        return exit::REFUSED;
     }
 
     let files = match walk::find_files(root, &["yml", "yaml"]) {
         Ok(f) => f,
         Err(e) => {
             eprintln!("check-action-gh-repo: {} — the check could not run; treating as failure (not clean)", e);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -175,7 +176,7 @@ pub fn run(args: &[String]) -> i32 {
                     f.display(),
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         walked += 1;

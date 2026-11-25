@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §git-hook — the arm each placed git hook starts: the triggered subset of
 // the registry at commit time, run serially to the first failure
+use crate::exit::{self, Fault};
 use crate::runner::{self, Dispatch, Selected};
 use crate::{proc, programs, registry, walk};
 use std::path::{Path, PathBuf};
@@ -131,10 +132,12 @@ fn report(hook: &str, d: &Dispatch, selected: &[Selected], verbose: bool, out: &
     0
 }
 
-fn hook_run(hook: &Hook) -> Result<(i32, String), String> {
-    walk::toplevel_opt()?.ok_or_else(|| "not inside a git repository".to_string())?;
+fn hook_run(hook: &Hook) -> Result<(i32, String), Fault> {
+    walk::toplevel_opt()
+        .map_err(Fault::tool)?
+        .ok_or_else(|| Fault::refused("not inside a git repository"))?;
     let paths = match hook {
-        Hook::PreCommit => staged()?,
+        Hook::PreCommit => staged().map_err(Fault::tool)?,
         Hook::CommitMsg(_) => Vec::new(),
     };
     run_over(hook, &paths).map(|(code, out, _)| (code, out))
@@ -142,19 +145,27 @@ fn hook_run(hook: &Hook) -> Result<(i32, String), String> {
 
 // spec: gate-sdk/SPEC.md §git-hook — an empty staged set exits 0 printing nothing, before the registry
 // is read; the third field is the selected member count `--measure-commit` reports
-fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), String> {
+fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Fault> {
     if matches!(hook, Hook::PreCommit) && paths.is_empty() {
         return Ok((0, String::new(), 0));
     }
-    let env = pin()?;
-    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    let env = pin().map_err(Fault::tool)?;
+    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
     let list = registry::list_path(&gates_dir);
-    let text = std::fs::read_to_string(&list).map_err(|e| format!("cannot read the registry {}: {}", list, e))?;
+    let text = std::fs::read_to_string(&list)
+        .map_err(|e| Fault::input(format!("cannot read the registry {}: {}", list, e)))?;
     let members = first_seen(&text);
-    let resolve_dirs = registry::resolve_dirs(&gates_dir, &walk::kit_roots_abs()?);
+    let resolve_dirs = registry::resolve_dirs(&gates_dir, &walk::kit_roots_abs().map_err(Fault::refused)?);
     let selected = match hook {
-        Hook::PreCommit => precommit_selection(&members, &resolve_dirs, &walk::kit_roots()?, paths, Path::new("."))?,
-        Hook::CommitMsg(file) => commit_msg_selection(&members, &resolve_dirs, file)?,
+        Hook::PreCommit => precommit_selection(
+            &members,
+            &resolve_dirs,
+            &walk::kit_roots().map_err(Fault::refused)?,
+            paths,
+            Path::new("."),
+        )
+        .map_err(Fault::input)?,
+        Hook::CommitMsg(file) => commit_msg_selection(&members, &resolve_dirs, file).map_err(Fault::input)?,
     };
     // spec: gate-sdk/SPEC.md §git-hook — a registry with no `tier=commit-msg` member exits 0
     // printing nothing, the summary line included
@@ -162,10 +173,11 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Strin
         return Ok((0, String::new(), 0));
     }
     let self_exe = crate::proc::self_image()
-        .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
+        .map_err(|e| Fault::tool(format!("cannot resolve this binary's own path: {}", e)))?
         .display()
         .to_string();
-    let scratch = runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR")?)?;
+    let scratch =
+        runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?).map_err(Fault::tool)?;
     let d = Dispatch {
         resolve_dirs: &resolve_dirs,
         self_exe: &self_exe,
@@ -196,14 +208,18 @@ fn tracked() -> Result<Vec<String>, String> {
 
 // spec: gate-sdk/SPEC.md §measure-commit — git runs a hook at the top level, where `ls-files`
 // paths are the ones the selection resolves
-fn measure_run() -> Result<(i32, String), String> {
-    walk::toplevel_opt()?.ok_or_else(|| "not inside a git repository".to_string())?;
-    let prefix = proc::run(&programs::GIT, &["rev-parse", "--show-prefix"])?;
-    let prefix = prefix.stdout().ok_or_else(|| "git could not name the working directory's prefix".to_string())?;
+fn measure_run() -> Result<(i32, String), Fault> {
+    walk::toplevel_opt()
+        .map_err(Fault::tool)?
+        .ok_or_else(|| Fault::refused("not inside a git repository"))?;
+    let prefix = proc::run(&programs::GIT, &["rev-parse", "--show-prefix"]).map_err(Fault::tool)?;
+    let prefix = prefix
+        .stdout()
+        .ok_or_else(|| Fault::tool("git could not name the working directory's prefix"))?;
     if !String::from_utf8_lossy(prefix).trim().is_empty() {
-        return Err("not at the repository's top level, where git runs the hook".to_string());
+        return Err(Fault::refused("not at the repository's top level, where git runs the hook"));
     }
-    let paths = tracked()?;
+    let paths = tracked().map_err(Fault::tool)?;
     let (mut samples, mut members) = (Vec::new(), 0);
     for _ in 0..3 {
         let t = std::time::Instant::now();
@@ -242,7 +258,7 @@ fn binary_line(bytes: Option<u64>) -> String {
 pub fn measure(args: &[String]) -> i32 {
     if let Some(a) = args.first() {
         eprintln!("measure-commit: unexpected operand '{}'\n{}", a, MEASURE_USAGE);
-        return 2;
+        return exit::USAGE;
     }
     match measure_run() {
         Ok((code, out)) => {
@@ -251,7 +267,7 @@ pub fn measure(args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("measure-commit: {} — nothing was measured", e);
-            2
+            e.status()
         }
     }
 }
@@ -261,7 +277,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(h) => h,
         Err(e) => {
             eprintln!("{}", e);
-            return 2;
+            return exit::USAGE;
         }
     };
     match hook_run(&hook) {
@@ -271,7 +287,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("{}: {} — the hook could not run; treating as failure (not clean)", hook.name(), e);
-            2
+            e.status()
         }
     }
 }
@@ -294,7 +310,7 @@ mod tests {
         }
         assert!(matches!(parse(&argv(&["pre-commit"])), Ok(Hook::PreCommit)));
         assert!(matches!(parse(&argv(&["commit-msg", "m"])), Ok(Hook::CommitMsg(f)) if f == "m"));
-        assert_eq!(run(&argv(&["nope"])), 2);
+        assert_eq!(run(&argv(&["nope"])), exit::USAGE);
     }
 
     // spec: gate-sdk/SPEC.md §git-hook — a member that resolves and cannot be read refuses either
@@ -326,7 +342,7 @@ mod tests {
         assert_eq!(median(&[5, 5, 9]), 5);
         assert_eq!(median(&[7]), 7);
         assert_eq!(median(&[]), 0);
-        assert_eq!(measure(&argv(&["x"])), 2);
+        assert_eq!(measure(&argv(&["x"])), exit::USAGE);
     }
 
     #[test]

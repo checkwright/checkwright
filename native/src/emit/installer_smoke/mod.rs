@@ -1,6 +1,6 @@
 // spec: installer/SPEC.md §The consumer smoke — the installer's consumer smoke as an `Arm::Run`
-// member: 0 clean, 1 a finding about the payload or the tree it wrote, 2 a harness precondition,
-// which an emitting arm collapses
+// member: 0 clean, 1 a finding about the payload or the tree it wrote, 2 a usage error, 3 a harness
+// precondition, which an emitting arm collapses
 use crate::programs::Program;
 use crate::proc;
 use std::collections::BTreeMap;
@@ -142,7 +142,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(p) => p,
         Err(why) => {
             eprintln!("{}: {}; {}", NAME, why, USAGE);
-            return 2;
+            return crate::exit::USAGE;
         }
     };
     let mut state = Run::default();
@@ -161,7 +161,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         Err(Outcome::Refuse(why)) => {
             eprintln!("{}: {}", VERDICT, why);
-            2
+            crate::exit::TOOL
         }
     }
 }

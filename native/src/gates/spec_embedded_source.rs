@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-spec-embedded-source — a canonical spec's fenced block must not
 // verbatim-copy a tracked source file
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::collections::BTreeMap;
@@ -10,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-spec-embedded-source: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -111,21 +112,23 @@ struct Block {
     lines: Vec<String>,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("scan root not found: {}", root));
+        return Err(Fault::refused(format!("scan root not found: {}", root)));
     }
-    let l = langs()?;
-    let threshold: f64 = walk::knob_scalar("CANON_KIT_EMBED_THRESHOLD")?
+    let l = langs().map_err(Fault::refused)?;
+    let threshold: f64 = walk::knob_scalar("CANON_KIT_EMBED_THRESHOLD")
+        .map_err(Fault::refused)?
         .parse()
         .unwrap_or(0.0);
-    let minlines: usize = walk::knob_scalar("CANON_KIT_EMBED_MINLINES")?
+    let minlines: usize = walk::knob_scalar("CANON_KIT_EMBED_MINLINES")
+        .map_err(Fault::refused)?
         .parse()
         .unwrap_or(0);
-    let wirekind = walk::knob_scalar("CANON_KIT_EMBED_WIRE_KIND")?;
+    let wirekind = walk::knob_scalar("CANON_KIT_EMBED_WIRE_KIND").map_err(Fault::refused)?;
 
-    let prune = walk::prune_dirs()?;
+    let prune = walk::prune_dirs().map_err(Fault::refused)?;
     let mut candidates: Vec<String> = walk::find_with_prune(Path::new(root), &|n| {
         prune.iter().any(|d| d == n)
     })
@@ -140,14 +143,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
     candidates.sort();
     candidates.dedup();
 
-    let mut amendfiles: Vec<String> = spec::amendments(root)?
+    let mut amendfiles: Vec<String> = spec::amendments(root)
+        .map_err(Fault::input)?
         .into_iter()
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
         .collect();
     amendfiles.sort();
     amendfiles.dedup();
 
-    let mut specs: Vec<String> = spec::canonical_specs(root)?
+    let mut specs: Vec<String> = spec::canonical_specs(root)
+        .map_err(Fault::input)?
         .into_iter()
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
         .collect();
@@ -165,15 +170,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // distinct non-trivial trimmed line, naming every source file carrying it
     let mut idx: BTreeMap<String, Vec<String>> = BTreeMap::new();
     let mut fkind: BTreeMap<String, String> = BTreeMap::new();
-    let spec_name = spec::spec_name()?;
-    let amendment_glob = walk::knob_scalar("CANON_KIT_AMENDMENT_GLOB")?;
+    let spec_name = spec::spec_name().map_err(Fault::refused)?;
+    let amendment_glob = walk::knob_scalar("CANON_KIT_AMENDMENT_GLOB").map_err(Fault::refused)?;
     for f in &candidates {
         if is_spec_name(f, &spec_name, &amendment_glob) {
             continue;
         }
         let text = match std::fs::read(Path::new(f)) {
             Ok(b) => String::from_utf8_lossy(&b).into_owned(),
-            Err(e) => return Err(format!("cannot read {}: {}", f, e)),
+            Err(e) => return Err(Fault::input(format!("cannot read {}: {}", f, e))),
         };
         let mut seen: Vec<String> = Vec::new();
         for line in text.lines() {
@@ -195,7 +200,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     for f in &specs {
         let text = match std::fs::read(Path::new(f)) {
             Ok(b) => String::from_utf8_lossy(&b).into_owned(),
-            Err(e) => return Err(format!("cannot read {}: {}", f, e)),
+            Err(e) => return Err(Fault::input(format!("cannot read {}: {}", f, e))),
         };
         // spec: canon-kit/SPEC.md §check-spec-embedded-source — the exemption is a path-identity
         // test against the amendment set rather than a name pattern, which is what re-arms it the

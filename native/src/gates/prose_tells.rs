@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-prose-tells — the mechanical AI-prose tells over the
 // consumer-configured prose surfaces, each threshold-gated, with the prose-tell-exempt valve
+use crate::exit::Fault;
 use crate::ere::Ere;
 use crate::spec;
 use crate::walk;
@@ -10,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-prose-tells: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -510,19 +511,19 @@ fn g_absence(file: &str, text: &str, vocab: &Absence) -> Vec<String> {
     out
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
 
     // spec: canon-kit/SPEC.md §check-prose-tells — the scanned surfaces are the consumer's
     // glob sets; both empty means nothing scanned, the unconfigured-consumer no-op
-    let corpus = |knob: &str| -> Result<Vec<String>, String> {
-        let globs = walk::knob_array(knob)?;
+    let corpus = |knob: &str| -> Result<Vec<String>, Fault> {
+        let globs = walk::knob_array(knob).map_err(Fault::refused)?;
         let mut files: Vec<String> = Vec::new();
         if !globs.is_empty() {
-            for p in walk::glob_corpus(Path::new(root), &globs)? {
+            for p in walk::glob_corpus(Path::new(root), &globs).map_err(Fault::input)? {
                 files.push(p.display().to_string());
             }
         }
@@ -537,7 +538,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    let phrases: Vec<(String, String)> = crate::spec::vocabulary("CANON_KIT_PROSE_TELL_PHRASES", "CANON_KIT_PROSE_TELL_PHRASES_EXTRA")?
+    let phrases: Vec<(String, String)> = crate::spec::vocabulary("CANON_KIT_PROSE_TELL_PHRASES", "CANON_KIT_PROSE_TELL_PHRASES_EXTRA").map_err(Fault::refused)?
         .into_iter()
         .filter(|p| !p.is_empty())
         .map(|p| {
@@ -545,30 +546,30 @@ fn rule(args: &[String]) -> Result<i32, String> {
             (p, low)
         })
         .collect();
-    let allow: Vec<String> = crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABBR_ALLOW", "CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA")?
+    let allow: Vec<String> = crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABBR_ALLOW", "CANON_KIT_PROSE_TELL_ABBR_ALLOW_EXTRA").map_err(Fault::refused)?
         .into_iter()
         .filter(|a| !a.is_empty())
         .collect();
 
-    let emdash_max_raw = walk::knob_scalar("CANON_KIT_PROSE_TELL_EMDASH_MAX")?;
-    let contrast_max_raw = walk::knob_scalar("CANON_KIT_PROSE_TELL_CONTRAST_MAX")?;
-    let tricolon_max_raw = walk::knob_scalar("CANON_KIT_PROSE_TELL_TRICOLON_MAX")?;
+    let emdash_max_raw = walk::knob_scalar("CANON_KIT_PROSE_TELL_EMDASH_MAX").map_err(Fault::refused)?;
+    let contrast_max_raw = walk::knob_scalar("CANON_KIT_PROSE_TELL_CONTRAST_MAX").map_err(Fault::refused)?;
+    let tricolon_max_raw = walk::knob_scalar("CANON_KIT_PROSE_TELL_TRICOLON_MAX").map_err(Fault::refused)?;
     let th = Thresholds {
-        emdash_max: numeric(&emdash_max_raw)?,
+        emdash_max: numeric(&emdash_max_raw).map_err(Fault::refused)?,
         emdash_max_raw,
-        contrast_max: numeric(&contrast_max_raw)?,
+        contrast_max: numeric(&contrast_max_raw).map_err(Fault::refused)?,
         contrast_max_raw,
-        rhythm_min: numeric(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES")?)?,
-        rhythm_cv_min: numeric(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN")?)?,
-        tricolon_max: numeric(&tricolon_max_raw)?,
+        rhythm_min: numeric(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_MIN_SENTENCES").map_err(Fault::refused)?).map_err(Fault::refused)?,
+        rhythm_cv_min: numeric(&walk::knob_scalar("CANON_KIT_PROSE_TELL_RHYTHM_CV_MIN").map_err(Fault::refused)?).map_err(Fault::refused)?,
+        tricolon_max: numeric(&tricolon_max_raw).map_err(Fault::refused)?,
         tricolon_max_raw,
-        abbr_min: abbr_min(&walk::knob_scalar("CANON_KIT_PROSE_TELL_ABBR_MIN_LEN")?)?,
+        abbr_min: abbr_min(&walk::knob_scalar("CANON_KIT_PROSE_TELL_ABBR_MIN_LEN").map_err(Fault::refused)?).map_err(Fault::refused)?,
     };
 
     let contrast_re = Ere::compile("not[^.]*(—|, but)[^.]*it('s| is)")
-        .map_err(|e| format!("the contrast-cadence expression failed to compile: {}", e))?;
+        .map_err(|e| Fault::tool(format!("the contrast-cadence expression failed to compile: {}", e)))?;
     let tricolon_re = Ere::compile("[A-Za-z][^,.]*, [^,.]*, and [^,.]*[A-Za-z]")
-        .map_err(|e| format!("the tricolon expression failed to compile: {}", e))?;
+        .map_err(|e| Fault::tool(format!("the tricolon expression failed to compile: {}", e)))?;
 
     let mut findings: Vec<String> = Vec::new();
     // spec: canon-kit/SPEC.md §check-prose-tells — the walk runs per file, because assertion D
@@ -586,18 +587,18 @@ fn rule(args: &[String]) -> Result<i32, String> {
             file_buf: String::new(),
             in_gen: false,
         };
-        spec::walk_prose(std::slice::from_ref(f), EXEMPT, &mut sink)?;
+        spec::walk_prose(std::slice::from_ref(f), EXEMPT, &mut sink).map_err(Fault::input)?;
         sink.flush_section(f);
         sink.flush_file(f);
         findings.extend(sink.out);
     }
     let vocab = Absence::new(
-        crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABSENCE_TOKENS", "CANON_KIT_PROSE_TELL_ABSENCE_TOKENS_EXTRA")?,
-        crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABSENCE_OPENERS", "CANON_KIT_PROSE_TELL_ABSENCE_OPENERS_EXTRA")?,
+        crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABSENCE_TOKENS", "CANON_KIT_PROSE_TELL_ABSENCE_TOKENS_EXTRA").map_err(Fault::refused)?,
+        crate::spec::vocabulary("CANON_KIT_PROSE_TELL_ABSENCE_OPENERS", "CANON_KIT_PROSE_TELL_ABSENCE_OPENERS_EXTRA").map_err(Fault::refused)?,
     );
     let mut absent: Vec<String> = Vec::new();
     for f in &absence {
-        absent.extend(g_absence(f, &spec::read_text(Path::new(f))?, &vocab));
+        absent.extend(g_absence(f, &spec::read_text(Path::new(f)).map_err(Fault::input)?, &vocab));
     }
 
     findings.retain(|l| !l.trim().is_empty());

@@ -227,7 +227,7 @@ fn a_failed_uninstall_commit_reports_a_record_it_could_not_read() {
     assert!(!out.contains("Undo that yourself with"), "a command was advised over an unknown value: {}", out);
 }
 
-// spec: installer/SPEC.md §uninstall — a refusal to stage the removal is an exit after the hooks
+// spec: installer/SPEC.md §uninstall — a git failure staging the removal is an exit after the hooks
 // directory's removal, so it prints the restore line too
 #[test]
 fn a_removal_that_cannot_be_staged_still_prints_the_restore_line() {
@@ -237,7 +237,7 @@ fn a_removal_that_cannot_be_staged_still_prints_the_restore_line() {
     opted_in(&s);
     std::fs::write(s.repo.join(".git").join("index.lock"), "").expect("cannot hold the index");
     let (code, out, err) = verb(&s, &s.bin, &["--uninstall"]);
-    assert_eq!(code, Some(2), "uninstall did not exit 2: {}", err);
+    assert_eq!(code, Some(3), "uninstall did not exit 3: {}", err);
     assert!(err.contains("could not stage the removal"), "{}", err);
     assert!(out.contains(LEFT) && out.contains("git config --unset core.hooksPath"), "the restore line was lost: {}", out);
 }

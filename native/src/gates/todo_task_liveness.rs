@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-todo-task-liveness — every TODO(task: <slug>) marker on a
 // governed source resolves to a live queue task, stale-flagged on a done slug
+use crate::exit::Fault;
 use crate::spec;
 use std::path::Path;
 
@@ -8,23 +9,23 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-todo-task-liveness: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
     let queue = match args.get(1) {
         Some(q) => q.clone(),
-        None => spec::knob_pub("CANON_KIT_QUEUE_FILE")?,
+        None => spec::knob_pub("CANON_KIT_QUEUE_FILE").map_err(Fault::refused)?,
     };
     // spec: canon-kit/SPEC.md §check-todo-task-liveness — an absent queue is an absent subject, and a
     // queue path naming anything but a file still refuses
-    if !spec::queue_present(&queue)? {
+    if !spec::queue_present(&queue).map_err(Fault::input)? {
         println!(
             "TODO-TASK-LIVENESS: clean (not applicable: no queue file at {} — work tracked outside the queue grammar has no task for a marker to resolve to)",
             queue
@@ -32,11 +33,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
     if !Path::new(&queue).is_file() {
-        return Err(format!("not a file: {}", queue));
+        return Err(Fault::refused(format!("not a file: {}", queue)));
     }
 
-    let slugs = spec::queue_slugs(Path::new(&queue))?;
-    let surface = spec::comment_surface(root, false)?;
+    let slugs = spec::queue_slugs(Path::new(&queue)).map_err(Fault::input)?;
+    let surface = spec::comment_surface(root, false).map_err(Fault::input)?;
 
     let mut stale: Vec<String> = Vec::new();
     let mut unresolved: Vec<String> = Vec::new();
@@ -44,7 +45,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     for f in &surface {
         let rel = spec::strip_dot_slash(crate::walk::rel_under(root, f).unwrap_or(f));
         scanned += 1;
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         for (ln, raw) in text.lines().enumerate() {
             for slug in markers(raw) {
                 if slugs.live.contains(&slug) {

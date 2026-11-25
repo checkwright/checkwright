@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-release-change-declared — every kit `bin/` path removed and every
 // template `init` claims changed since the nearest reachable `v*` tag is named on the release
 // declaration surface's behavior or gate-authoring section
+use crate::exit::Fault;
 use crate::declaration;
 use crate::release_sections;
 use crate::installer::{recipe, GATES_DIR};
@@ -15,7 +16,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -200,49 +201,50 @@ fn declared(bullets: &[&str], path: &str) -> bool {
         .any(|b| b.contains(path) || (!dir.is_empty() && b.contains(&dir) && b.contains(base)))
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let decl_file = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?),
+        None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?),
     };
     let decl_file = decl_file.as_str();
     let canned = match (args.get(1), args.get(2)) {
         (Some(d), Some(b)) => Some(Canned {
-            dump: read_opt(d)?.ok_or_else(|| format!("canned change dump not found: {}", d))?,
+            dump: read_opt(d).map_err(Fault::input)?.ok_or_else(|| Fault::refused(format!("canned change dump not found: {}", d)))?,
             base_dir: b.clone(),
         }),
-        (Some(_), None) => return Err("argument mode takes a change dump and a base-tree dir together".to_string()),
+        (Some(_), None) => return Err(Fault::usage("argument mode takes a change dump and a base-tree dir together")),
         _ => None,
     };
+    let src_err = |e: String| if canned.is_some() { Fault::input(e) } else { Fault::tool(e) };
     let source: &dyn Source = match &canned {
         Some(c) => c,
         None => &Git,
     };
 
-    let roots: Vec<String> = walk::kit_roots()?.iter().map(|r| clean_rel(r)).collect();
+    let roots: Vec<String> = walk::kit_roots().map_err(Fault::refused)?.iter().map(|r| clean_rel(r)).collect();
     if roots.is_empty() {
-        return Err("the kit-root set resolved empty, so no kit `bin/` path or claimed template can be recognised".to_string());
+        return Err(Fault::refused("the kit-root set resolved empty, so no kit `bin/` path or claimed template can be recognised"));
     }
 
     // spec: gate-sdk/SPEC.md §check-release-change-declared — the surface is read where the commit
     // will carry it, the index, and a surface without its header refuses rather than reading empty
     let surface = match &canned {
-        Some(_) => read_opt(decl_file)?,
-        None => source.in_index(decl_file)?,
+        Some(_) => read_opt(decl_file).map_err(Fault::input)?,
+        None => source.in_index(decl_file).map_err(src_err)?,
     };
-    let surface = surface.ok_or_else(|| format!("{} is absent, so the declaration surface cannot be read (gate-sdk/SPEC.md §upgrade-smoke owns its contract)", decl_file))?;
+    let surface = surface.ok_or_else(|| Fault::refused(format!("{} is absent, so the declaration surface cannot be read (gate-sdk/SPEC.md §upgrade-smoke owns its contract)", decl_file)))?;
     if !surface.lines().next().unwrap_or("").starts_with("# contract:") {
-        return Err(format!("{} lacks its `# contract:` header line, so the declaration surface cannot be established (gate-sdk/SPEC.md §upgrade-smoke owns its contract)", decl_file));
+        return Err(Fault::input(format!("{} lacks its `# contract:` header line, so the declaration surface cannot be established (gate-sdk/SPEC.md §upgrade-smoke owns its contract)", decl_file)));
     }
 
-    let Some(base) = source.base()? else {
+    let Some(base) = source.base().map_err(src_err)? else {
         println!("RELEASE-CHANGE-DECLARED: clean (not applicable: no v* tag is reachable from HEAD, so no released base exists to diff against and nothing was checked)");
         return Ok(0);
     };
 
-    let claimed = claimed(&roots)?;
+    let claimed = claimed(&roots).map_err(Fault::input)?;
     let mut subjects: Vec<(String, Class)> = Vec::new();
-    for (status, path) in source.changes(&base)? {
+    for (status, path) in source.changes(&base).map_err(src_err)? {
         let removed_tool = status == "D" && roots.iter().any(|r| walk::under(&format!("{}/bin", r), &path));
         if removed_tool {
             subjects.push((path, Class::Removed));
@@ -251,7 +253,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if !claimed.iter().any(|c| c == &path) {
             continue;
         }
-        let (Some(old), Some(new)) = (source.at_base(&base, &path)?, source.in_index(&path)?) else {
+        let (Some(old), Some(new)) = (source.at_base(&base, &path).map_err(src_err)?, source.in_index(&path).map_err(src_err)?) else {
             continue;
         };
         if data_lines(&old) != data_lines(&new) {
@@ -261,7 +263,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: gate-sdk/SPEC.md §check-release-change-declared — a behavior or gate-authoring bullet is
     // the declaration, either role under its heading or an alias
-    let roster = release_sections::roster()?;
+    let roster = release_sections::roster().map_err(Fault::refused)?;
     let accepting: Vec<&release_sections::Section> = roster
         .iter()
         .filter(|s| matches!(s.role, release_sections::Role::Behavior | release_sections::Role::Authoring))

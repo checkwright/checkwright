@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §The hook contract — the Antigravity binding table's spellings, in one crate
 // site a unit test holds to every row, and the adapter's two translations into and out of the
 // shipped binding.
+use crate::exit;
 use crate::hook::binding;
 use crate::{proc, programs};
 use serde_json::{Map, Value};
@@ -106,7 +107,7 @@ pub fn translate_payload(payload: &Value) -> Option<Value> {
 // spec: gate-sdk/SPEC.md §The harness-integration arm — a child's block is a deny carrying its
 // stderr, and every other outcome is no decision, a grant included
 pub fn translate_verdict(status: Option<i32>, stderr: &str) -> String {
-    if status == Some(2) {
+    if status == Some(exit::HOOK_BLOCK) {
         deny_envelope(stderr.trim_end())
     } else {
         String::new()

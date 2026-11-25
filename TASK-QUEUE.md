@@ -14,18 +14,6 @@
 
 ## New Features
 
-### exit-code-tool-error
-
-[spec: SPEC-exit-tool-error.md]
-
-The orchestrator adopter asks for exit 2 on a usage error or refusal, a new 3 on a tool or input error, and an error-kind field in the machine form. gate-sdk/SPEC.md §Output contract holds 0, 1 and 2, grounded against a fourth code by the churn every caller branching on the status pays; the operator's direction of 2026-11-25, lead-relayed (not a ruling), weighs that ground down, every adopter being in-house.
-
-**Deliverable:** design-pending, a feature, implemented as the adopter asked (operator direction 2026-11-25, lead-relayed, not a ruling): exit 2 for a usage error or refusal, 3 for a tool or input error, and an error-kind field in `--json`, across members and the non-hook arms; the front ends and CI templates that branch on status follow. The adopter has since narrowed the ask to the non-hook arms (adopter input 2026-11-25): a hook arm keeps exit 2 for refusals and tool errors alike, carrying an error kind, since failing closed matters more than the split and only the harness invokes `--hook` (gate-sdk/SPEC.md §The hook contract blocks on 2 alone). **One error-kind value for spec to weigh (lead decision 2026-11-25, provided it adds no push):** `peer-file` refusing a same-second identical filing as a collision carries its own kind and prints the id it collided with, so the caller takes the ask as already filed; distinct sub-second filings are not wanted. If it does not fit here, spec files it as its own Deferred entry. **Spec's questions answered (adopter input 2026-11-25):** exit 2 for whatever the caller sent, malformed or unset config included, and 3 for the tool's own read, write, spawn or git failure; `--run` exits 0, 1 or 3 for pass, fail or error, an undispatchable member counting as error and named; error kinds appear in `--json` only, so a hook arm carries none; the collision kind fits. **Kept whole (lead decision 2026-11-25):** the members and non-hook arms sweep stays in this unit, since splitting it would narrow the operator's direction. Its build size is far above the tag's deferral class: about 450 literal exit-2 producer sites, about 1,064 emit error sites behind one collapse, 46 test files with 114 asserts of 2, and about 40 refusal statements in installer/SPEC.md. A crate roster test that reds every literal exit 2 outside the exit module is build's worklist.
-
-**Push need (2026-11-25, inside the budget):** one mid-iteration push, since the split reaches gate-sdk/bin/run-gates.ps1, which only the Windows legs execute: its refusal of an unavailable binary exits 2 today and is a tool error under the split.
-
-**Cost while deferred:** a caller tells a refused input from a crashed tool only by parsing stderr. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `exit 3`, `fourth code` in this file, none; owner gate-sdk/SPEC.md §Output contract.
-
 ### orchestrator-arm-json
 
 [spec: gate-sdk/SPEC-run-json.md]
@@ -1065,4 +1053,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - verdict-identity-fields
+- exit-code-tool-error
 

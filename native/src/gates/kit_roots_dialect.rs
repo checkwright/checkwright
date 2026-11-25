@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the dialect rule's executable form: a kit tree
 // vendored at the root and under a subdirectory must yield one corpus, since every reader that
 // joins a root onto a path is byte-identical on both spellings only while the root is not nested
+use crate::exit::Fault;
 use crate::{proc, programs, walk};
 use std::path::Path;
 
@@ -35,7 +36,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -43,26 +44,26 @@ pub fn run(args: &[String]) -> i32 {
 // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the tree defaults to the gate's own `good/`
 // fixture, resolved off the tests dir that holds the publisher's pair; a positional overrides
 // it, which is how the fixture pair names its two trees
-fn tree_of(args: &[String]) -> Result<String, String> {
+fn tree_of(args: &[String]) -> Result<String, Fault> {
     let given = args.first().filter(|a| !a.is_empty()).cloned();
     let tree = match given {
         Some(a) => a,
         None => format!(
             "{}/{}/good/tree",
-            walk::knob_scalar("GATE_SDK_TESTS_DIR")?.trim_end_matches('/'),
+            walk::knob_scalar("GATE_SDK_TESTS_DIR").map_err(Fault::refused)?.trim_end_matches('/'),
             NAME
         ),
     };
     if !Path::new(&tree).is_dir() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "no kit tree to vendor at {} — the check could not run; treating as failure (not clean)",
             tree
-        ));
+        )));
     }
     Ok(tree)
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let tree = tree_of(args)?;
     let base = scratch()?;
     let _guard = ScratchGuard { base: base.clone() };
@@ -77,10 +78,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let flat_roots = kit_roots(&layouts[0])?;
     let nested_roots = kit_roots(&layouts[1])?;
     if flat_roots.is_empty() {
-        return Err(format!(
+        return Err(Fault::tool(format!(
             "the flat vendoring of {} enumerated no kit root — the check could not run; treating as failure (not clean)",
             tree
-        ));
+        )));
     }
     let basenames = |v: &[String]| -> Vec<String> {
         v.iter()
@@ -146,33 +147,33 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
 // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — one scratch base per process, under the same
 // knob `upgrade-smoke` takes, so a consumer repoints both with one value
-fn scratch() -> Result<String, String> {
-    let dir = walk::knob_scalar("GATE_SDK_TMP_DIR")?;
-    let here = walk::cwd()?;
+fn scratch() -> Result<String, Fault> {
+    let dir = walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?;
+    let here = walk::cwd().map_err(Fault::tool)?;
     let root = walk::abs_against(&here, dir.trim_end_matches('/'));
-    walk::make_scratch(&root).map_err(|e| format!("cannot create scratch root {}: {}", root, e))?;
+    walk::make_scratch(&root).map_err(|e| Fault::tool(format!("cannot create scratch root {}: {}", root, e)))?;
     let base = format!("{}/{}-{}", root, NAME, std::process::id());
     let _ = std::fs::remove_dir_all(&base);
     std::fs::create_dir_all(&base)
-        .map_err(|e| format!("cannot create scratch base {}: {}", base, e))?;
+        .map_err(|e| Fault::tool(format!("cannot create scratch base {}: {}", base, e)))?;
     Ok(base)
 }
 
 // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the gates directory stays at the toplevel in
 // both layouts and only the kits move, which is exactly the difference between a root-layout
 // vendoring and a subdirectory one; each becomes its own repository, since the arms read git
-fn vendor(tree: &str, base: &str, layout: &'static str) -> Result<Layout, String> {
+fn vendor(tree: &str, base: &str, layout: &'static str) -> Result<Layout, Fault> {
     let dir = format!("{}/{}", base, layout);
-    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
     let gates_leaf = gates_dir.trim_end_matches('/').rsplit('/').next().unwrap_or(crate::knobs::GATES_DIR_DEFAULT).to_string();
-    std::fs::create_dir_all(&dir).map_err(|e| format!("cannot create {}: {}", dir, e))?;
+    std::fs::create_dir_all(&dir).map_err(|e| Fault::tool(format!("cannot create {}: {}", dir, e)))?;
     let mut sdk_parent = dir.clone();
     if layout == "nested" {
         sdk_parent = format!("{}/vendor", dir);
         std::fs::create_dir_all(&sdk_parent)
-            .map_err(|e| format!("cannot create {}: {}", sdk_parent, e))?;
+            .map_err(|e| Fault::tool(format!("cannot create {}: {}", sdk_parent, e)))?;
     }
-    for (name, _) in walk::list_dir(Path::new(tree))? {
+    for (name, _) in walk::list_dir(Path::new(tree)).map_err(Fault::input)? {
         let src = format!("{}/{}", tree.trim_end_matches('/'), name);
         if !Path::new(&src).is_dir() {
             continue;
@@ -186,24 +187,24 @@ fn vendor(tree: &str, base: &str, layout: &'static str) -> Result<Layout, String
         "gate-sdk".to_string()
     };
     if !Path::new(&format!("{}/{}", dir, sdk)).is_dir() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "the {} vendoring of {} carries no gate-sdk root at {} — the check could not run; treating as failure (not clean)",
             layout, tree, sdk
-        ));
+        )));
     }
     for argv in [
         vec!["-C", &dir, "init", "-q", "."],
         vec!["-C", &dir, "add", "-A", "."],
         vec!["-C", &dir, "-c", "user.email=fixture@localhost", "-c", "user.name=fixture", "commit", "-q", "-m", "vendored"],
     ] {
-        let c = proc::run_merged_without(&programs::GIT, &argv, proc::GIT_REPO_LOCATORS)?;
+        let c = proc::run_merged_without(&programs::GIT, &argv, proc::GIT_REPO_LOCATORS).map_err(Fault::tool)?;
         if c.code() != Some(0) {
-            return Err(format!(
+            return Err(Fault::tool(format!(
                 "git {} failed (exit {}) preparing the {} vendoring — the check could not run; treating as failure (not clean)",
                 argv[2],
                 c.code().unwrap_or(-1),
                 layout
-            ));
+            )));
         }
     }
     Ok(Layout {
@@ -215,15 +216,15 @@ fn vendor(tree: &str, base: &str, layout: &'static str) -> Result<Layout, String
 
 // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — a recursive copy in-crate rather than a `cp`
 // spawn: the payload's program floor is the adopter constraint, and the fixture tree is small
-fn copy_tree(src: &str, dst: &str) -> Result<(), String> {
-    std::fs::create_dir_all(dst).map_err(|e| format!("cannot create {}: {}", dst, e))?;
-    for (name, _) in walk::list_dir(Path::new(src))? {
+fn copy_tree(src: &str, dst: &str) -> Result<(), Fault> {
+    std::fs::create_dir_all(dst).map_err(|e| Fault::tool(format!("cannot create {}: {}", dst, e)))?;
+    for (name, _) in walk::list_dir(Path::new(src)).map_err(Fault::input)? {
         let from = format!("{}/{}", src, name);
         let to = format!("{}/{}", dst, name);
         if Path::new(&from).is_dir() {
             copy_tree(&from, &to)?;
         } else {
-            std::fs::copy(&from, &to).map_err(|e| format!("cannot copy {} to {}: {}", from, to, e))?;
+            std::fs::copy(&from, &to).map_err(|e| Fault::tool(format!("cannot copy {} to {}: {}", from, to, e)))?;
         }
     }
     Ok(())
@@ -232,20 +233,20 @@ fn copy_tree(src: &str, dst: &str) -> Result<(), String> {
 // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the binary comes from the knob rather than
 // from `current_exe`, the spelling `check-gate-binary-fresh` already takes: it is the one a
 // declaration can name, and the one the battery actually dispatches every other member through
-fn binary() -> Result<String, String> {
+fn binary() -> Result<String, Fault> {
     // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — the knob's default is repo-root-relative
     // like every other, so it resolves against the toplevel rather than the cwd: every child runs
     // inside a vendoring, and this gate's own fixture cases run from a case dir
-    let anchor = match walk::toplevel_opt()? {
+    let anchor = match walk::toplevel_opt().map_err(Fault::tool)? {
         Some(top) => top,
-        None => walk::cwd()?,
+        None => walk::cwd().map_err(Fault::tool)?,
     };
-    let bin = walk::abs_against(&anchor, &walk::knob_scalar("GATE_SDK_NATIVE_BIN")?);
+    let bin = walk::abs_against(&anchor, &walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(Fault::refused)?);
     if !proc::is_executable(Path::new(&bin)) {
-        return Err(format!(
+        return Err(Fault::tool(format!(
             "{} is absent or not executable, and every compared arm runs through it — the check could not run; treating as failure (not clean)",
             bin
-        ));
+        )));
     }
     Ok(bin)
 }
@@ -253,7 +254,7 @@ fn binary() -> Result<String, String> {
 // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — every arm runs through that binary from inside
 // the vendoring, so the corpus measured is the deployed derivation rather than one this gate
 // re-implemented, and a difference between the layouts is a difference in the shipped readers
-fn emit(layout: &Layout, arm: &str) -> Result<String, String> {
+fn emit(layout: &Layout, arm: &str) -> Result<String, Fault> {
     let bin = binary()?;
     // spec: gate-sdk/SPEC.md §check-kit-roots-dialect — only the locator that names where the tree
     // was vendored is handed down. GATE_SDK_KIT_DIRS especially is not: an env value outranks a
@@ -269,19 +270,19 @@ fn emit(layout: &Layout, arm: &str) -> Result<String, String> {
             unset: &unset,
             cwd: Some(Path::new(&layout.dir)),
         },
-    )?;
+    ).map_err(Fault::tool)?;
     match c.stdout() {
         Some(o) if c.code() == Some(0) => Ok(String::from_utf8_lossy(o).into_owned()),
-        _ => Err(format!(
+        _ => Err(Fault::tool(format!(
             "{} exited {} on the {} vendoring — the check could not run; treating as failure (not clean)",
             arm,
             c.code().unwrap_or(-1),
             layout.name
-        )),
+        ))),
     }
 }
 
-fn kit_roots(layout: &Layout) -> Result<Vec<String>, String> {
+fn kit_roots(layout: &Layout) -> Result<Vec<String>, Fault> {
     Ok(emit(layout, "--emit-kit-roots")?
         .lines()
         .filter(|l| !l.trim().is_empty())
@@ -289,7 +290,7 @@ fn kit_roots(layout: &Layout) -> Result<Vec<String>, String> {
         .collect())
 }
 
-fn corpus(layout: &Layout, arm: &str) -> Result<usize, String> {
+fn corpus(layout: &Layout, arm: &str) -> Result<usize, Fault> {
     Ok(emit(layout, arm)?
         .lines()
         .filter(|l| !l.trim().is_empty())

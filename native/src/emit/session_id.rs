@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — the roster is empty and must stay empty: neither
 // name this arm reads is a row in lifecycle-kit's static table, so a declared row would fail-close
 // on the undeclared-name refusal on every invocation, and a knob file must never set a stamp id.
+use crate::exit::Fault;
 use crate::sessions::{key, resolve, Inputs};
 
 pub const KNOBS: &[&str] = &[];
@@ -12,7 +13,7 @@ fn var(name: &str) -> String {
     std::env::var(name).unwrap_or_default()
 }
 
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order and its exit-2 refusals are
+// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order and its exit-3 errors are
 // `resolve`'s; what this arm owes on top of them is the normalization every source ends in, which
 // `key` is over a resolved path and the identity over a bare id.
 pub fn derive(i: &Inputs) -> Result<String, String> {
@@ -40,8 +41,8 @@ pub fn inputs() -> Result<Inputs, String> {
     })
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    Ok(format!("{}\n", derive(&inputs()?)?))
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
+    Ok(format!("{}\n", derive(&inputs().map_err(Fault::tool)?).map_err(Fault::input)?))
 }
 
 #[cfg(test)]

@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-action-step-order — a job whose `run:` bodies spell a listed
 // program has a step on the listed action ordered before the job's first such spelling
 use crate::actions::{self, Ev};
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -60,9 +61,9 @@ impl Audit {
     }
 }
 
-fn refusal(e: &str) -> i32 {
+fn refusal(e: &str, status: i32) -> i32 {
     eprintln!("check-action-step-order: {} — the check could not run; treating as failure (not clean)", e);
-    2
+    status
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -70,16 +71,16 @@ pub fn run(args: &[String]) -> i32 {
     let root = Path::new(scanroot);
     if !root.is_dir() {
         eprintln!("check-action-step-order: scan root not found: {}", scanroot);
-        return 2;
+        return exit::REFUSED;
     }
 
     let action = match walk::knob_scalar(ACTION_KNOB) {
         Ok(a) => a,
-        Err(e) => return refusal(&e),
+        Err(e) => return refusal(&e, exit::REFUSED),
     };
     let programs = match walk::knob_array(PROGRAMS_KNOB) {
         Ok(p) => p,
-        Err(e) => return refusal(&e),
+        Err(e) => return refusal(&e, exit::REFUSED),
     };
     // spec: gate-sdk/SPEC.md §check-action-step-order — either value empty is a clean skip naming
     // the empty knob, a different sentence from a nothing-found clean
@@ -92,7 +93,7 @@ pub fn run(args: &[String]) -> i32 {
 
     let files = match walk::find_files(root, &["yml", "yaml"]) {
         Ok(f) => f,
-        Err(e) => return refusal(&e),
+        Err(e) => return refusal(&e, exit::INPUT),
     };
 
     let mut a = Audit::default();
@@ -101,7 +102,7 @@ pub fn run(args: &[String]) -> i32 {
     for f in &files {
         let text = match std::fs::read_to_string(f) {
             Ok(t) => t,
-            Err(e) => return refusal(&format!("cannot read {} ({})", f.display(), e)),
+            Err(e) => return refusal(&format!("cannot read {} ({})", f.display(), e), exit::INPUT),
         };
         walked += 1;
         // spec: gate-sdk/SPEC.md §check-action-step-order — the subject split is

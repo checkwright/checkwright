@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-action-run-shell — every GitHub Actions `run:` literal block
 // scalar in an Actions-shaped YAML file is ShellCheck-clean at -S warning under the dialect the
 // step actually runs, as the wrapper criterion 7's worked example ports to
+use crate::exit;
 use crate::actions_run::{actions_files, dialect_of, extract, print_refusal, records, ActionsFiles, Item, Runner};
 use crate::{proc, programs};
 use std::path::Path;
@@ -14,7 +15,7 @@ fn refuse_absent_program() -> i32 {
     eprintln!("{}: {} not found on PATH — the gate cannot run.", NAME, programs::SHELLCHECK);
     eprintln!("  A gate that cannot run is not clean (fail-closed).");
     eprintln!("  help: install ShellCheck (e.g. 'apt install shellcheck' / 'brew install shellcheck').");
-    2
+    exit::TOOL
 }
 
 struct Tally {
@@ -41,7 +42,7 @@ fn lint_block(
         Ok(m) => m,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return Err(2);
+            return Err(exit::TOOL);
         }
     };
     let rc = merged.code().unwrap_or(-1);
@@ -53,7 +54,7 @@ fn lint_block(
             file.display(),
             blockstart
         );
-        return Err(2);
+        return Err(exit::TOOL);
     }
     if rc == 0 {
         return Ok(());
@@ -105,7 +106,7 @@ fn scan(found: &ActionsFiles, work: &Path) -> Result<Tally, i32> {
         let fdir = work.join(format!("f{}", tally.subject));
         if let Err(e) = std::fs::create_dir_all(&fdir) {
             eprintln!("{}: could not create a scratch dir ({})", NAME, e);
-            return Err(2);
+            return Err(exit::TOOL);
         }
         for item in &ex.items {
             match item {
@@ -151,7 +152,7 @@ fn scan(found: &ActionsFiles, work: &Path) -> Result<Tally, i32> {
                     let frag = fdir.join(format!("block-{}.sh", n));
                     if let Err(e) = std::fs::write(&frag, ex.bodies[n - 1].as_bytes()) {
                         eprintln!("{}: could not write {} ({})", NAME, frag.display(), e);
-                        return Err(2);
+                        return Err(exit::TOOL);
                     }
                     lint_block(&frag, dialect, f, *line, &mut tally)?;
                 }
@@ -165,7 +166,7 @@ pub fn run(args: &[String]) -> i32 {
     let scanroot = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(scanroot).is_dir() {
         eprintln!("{}: scan root not found: {}", NAME, scanroot);
-        return 2;
+        return exit::REFUSED;
     }
 
     if !proc::on_path(&programs::SHELLCHECK) {
@@ -179,7 +180,7 @@ pub fn run(args: &[String]) -> i32 {
                 "{}: {} — the check could not run; treating as failure (not clean)",
                 NAME, e
             );
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -195,7 +196,7 @@ pub fn run(args: &[String]) -> i32 {
     let _ = std::fs::remove_dir_all(&work);
     if let Err(e) = std::fs::create_dir_all(&work) {
         eprintln!("{}: could not create a scratch dir ({})", NAME, e);
-        return 2;
+        return exit::TOOL;
     }
     let outcome = scan(&found, &work);
     let _ = std::fs::remove_dir_all(&work);

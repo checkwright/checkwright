@@ -1,7 +1,8 @@
 // spec: gate-sdk/SPEC.md §check-packed-links — a packed kit README carries no link to a path the
 // payload withholds, and with an empty base the packed README is its tracked source byte for byte
+use crate::exit;
 use crate::emit::pack_installer::resolve_spec_links;
-use crate::gates::smoke_entry_guard::{kit_abs, kit_name, scan_root};
+use crate::gates::smoke_entry_guard::{kit_abs, kit_name, scan_root_or_status};
 use crate::walk;
 use std::path::Path;
 
@@ -96,26 +97,27 @@ fn knob(name: &str, gate: &str) -> Option<String> {
 
 pub fn run(args: &[String]) -> i32 {
     const GATE: &str = "check-packed-links";
-    let Some(root) = scan_root(args, GATE) else {
-        return 2;
+    let root = match scan_root_or_status(args, GATE) {
+        Ok(r) => r,
+        Err(rc) => return rc,
     };
     if !Path::new(&root).is_dir() {
         eprintln!("{}: root not found: {}", GATE, root);
-        return 2;
+        return exit::REFUSED;
     }
     let kit_roots = match walk::kit_roots() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", GATE, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if kit_roots.is_empty() {
         eprintln!("{}: no kit roots enumerated", GATE);
-        return 2;
+        return exit::REFUSED;
     }
     let Some(withhold) = knob("GATE_SDK_PAYLOAD_WITHHOLD", GATE) else {
-        return 2;
+        return exit::REFUSED;
     };
     let withhold: Vec<String> = withhold.split_whitespace().map(String::from).collect();
     if withhold.is_empty() {
@@ -123,10 +125,10 @@ pub fn run(args: &[String]) -> i32 {
             "{}: GATE_SDK_PAYLOAD_WITHHOLD names nothing — there is no withheld path to assert against",
             GATE
         );
-        return 2;
+        return exit::REFUSED;
     }
     let Some(configured) = knob("GATE_SDK_SPEC_BASE_URL", GATE) else {
-        return 2;
+        return exit::REFUSED;
     };
     let base = if configured.is_empty() {
         PROBE_BASE
@@ -156,14 +158,14 @@ pub fn run(args: &[String]) -> i32 {
                 skipped += 1;
                 continue;
             }
-            // spec: gate-sdk/SPEC.md §Fail-closed contract — an unreadable README is exit 2, never
+            // spec: gate-sdk/SPEC.md §Fail-closed contract — an unreadable README is exit 3, never
             // a false clean and never the withheld-target finding, which asserts about bytes read
             Err(e) => {
                 eprintln!(
                     "{}: README not readable: {} ({}) — the check could not run; treating as failure (not clean)",
                     GATE, readme, e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         swept += 1;

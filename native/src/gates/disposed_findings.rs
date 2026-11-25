@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-disposed-findings — every non-blank line below the record's
 // contract header is a record: a calendar date, at least one backticked term with no empty span,
 // and non-empty prose
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -108,7 +109,7 @@ pub fn run(args: &[String]) -> i32 {
         Some(p) => {
             if !Path::new(p.as_str()).is_file() {
                 eprintln!("check-disposed-findings: record file not found: {}", p);
-                return 2;
+                return exit::REFUSED;
             }
             p.clone()
         }
@@ -116,7 +117,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-disposed-findings: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -125,12 +126,12 @@ pub fn run(args: &[String]) -> i32 {
             Ok(b) => Some(String::from_utf8_lossy(&b).into_owned()),
             Err(_) => {
                 eprintln!("check-disposed-findings: record file not readable: {}", path);
-                return 2;
+                return exit::INPUT;
             }
         }
     } else if Path::new(&path).exists() {
         eprintln!("check-disposed-findings: record file not readable: {}", path);
-        return 2;
+        return exit::INPUT;
     } else {
         None
     };

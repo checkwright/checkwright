@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-skill-binding — every binding-shim skill names an
 // existing template and binds exactly that template's slot set
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -85,20 +86,20 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-skill-binding: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
     if !Path::new(&dir).is_dir() {
         eprintln!("check-skill-binding: skills dir not found: {}", dir);
-        return 2;
+        return exit::REFUSED;
     }
 
     let files = match walk::glob_files(Path::new(&dir), &["*.md".to_string()]) {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-skill-binding: {}", e);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -109,7 +110,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(b) => String::from_utf8_lossy(&b).into_owned(),
             Err(e) => {
                 eprintln!("check-skill-binding: cannot read {}: {}", f.display(), e);
-                return 2;
+                return exit::INPUT;
             }
         };
         let base = f.file_name().and_then(|n| n.to_str()).unwrap_or_default();
@@ -128,7 +129,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(b) => String::from_utf8_lossy(&b).into_owned(),
             Err(e) => {
                 eprintln!("check-skill-binding: cannot read {}: {}", tmpl, e);
-                return 2;
+                return exit::INPUT;
             }
         };
         let slots = slots_of(&ttext);

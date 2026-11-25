@@ -1325,7 +1325,7 @@ jobs:
               Check "the other hook is still served, by one binary or the other" ($msg -eq $old -or $msg -eq $new) "commit-msg.exe is $msg"
               $which = { param($d) if ($d -eq $new) { 'second' } elseif ($d -eq $old) { 'first' } else { $d } }
               $refused = if ($rout -match 'cannot replace [^\r\n]*commit-msg') { $msg } elseif ($rout -match 'cannot replace [^\r\n]*pre-commit') { $pre } else { 'no hook named' }
-              Check "the status says which: 0 with the second binary served by both, 2 naming a hook the first still serves" (($rcode -eq 0 -and $pre -eq $new -and $msg -eq $new) -or ($rcode -eq 2 -and $refused -eq $old)) "exit $rcode, pre-commit.exe $(& $which $pre), commit-msg.exe $(& $which $msg), the hook the refusal names $(& $which $refused)"
+              Check "the status says which: 0 with the second binary served by both, 3 naming a hook the first still serves" (($rcode -eq 0 -and $pre -eq $new -and $msg -eq $new) -or ($rcode -eq 3 -and $refused -eq $old)) "exit $rcode, pre-commit.exe $(& $which $pre), commit-msg.exe $(& $which $msg), the hook the refusal names $(& $which $refused)"
               $left = @(Siblings)
               Check "no sibling is left that the run did not report" ($left.Count -eq 0 -or $rout -match 'cannot remove') "left: $($left.Name -join ', ')"
               Write-Host "::notice::re-placing a running pre-commit.exe on $env:PWSH_TARGET exited $rcode with pre-commit.exe the $(& $which $pre) binary and commit-msg.exe the $(& $which $msg); siblings left: $($left.Count)"
@@ -2224,7 +2224,7 @@ jobs:
         run: |
           set +e
           source gate-sdk/lib/gate.sh
-          # comment-tier-exempt: the binary, not the front end, whose --only folds a member's exit 2 into 1
+          # comment-tier-exempt: the binary, not the front end, so the member's own status is read before --only maps it to a verdict
           bin="$(gate_native_bin)"
           rec="$(cygpath -m "$(mktemp -d "${SMOKE_TMP:-/tmp}/liveness.XXXXXX")")"
           ps_run() { MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' "$@"; }
@@ -2400,8 +2400,8 @@ jobs:
           dn=0
           for d in "${!gd1[@]}"; do
             dn=$((dn + 1))
-            if [[ "${gd1[$d]}" != 2 || "${gd2[$d]}" != 2 ]]; then
-              echo "::error::row (d) $d read ${gd1[$d]} then ${gd2[$d]}, where corrupt (2) is owed"
+            if [[ "${gd1[$d]}" != 3 || "${gd2[$d]}" != 3 ]]; then
+              echo "::error::row (d) $d read ${gd1[$d]} then ${gd2[$d]}, where corrupt (3) is owed"
               misread=1
             fi
           done

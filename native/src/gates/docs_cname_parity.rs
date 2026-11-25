@@ -1,6 +1,7 @@
 // spec: site-kit/SPEC.md §check-docs-cname-parity — the host in the CNAME file SITE_KIT_CNAME
 // names is the single gated source of truth for the docs host; no tracked file names a configured host alias other than
 // that host in a URL
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -41,62 +42,62 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}", msg);
-            2
+            msg.status()
         }
     }
 }
 
-fn inner(args: &[String]) -> Result<i32, String> {
+fn inner(args: &[String]) -> Result<i32, Fault> {
     let scan_knob = walk::knob_scalar("SITE_KIT_SCAN_ROOT")
-        .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-docs-cname-parity: {}", e)))?;
     let cname_knob = walk::knob_scalar("SITE_KIT_CNAME")
-        .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-docs-cname-parity: {}", e)))?;
     let scanroot = fresh::strip_trailing_slash(fresh::positional(args, 0, &scan_knob)).to_string();
     let cname = fresh::positional(args, 1, &cname_knob).to_string();
 
-    let top = crate::walk::toplevel_opt().map_err(|e| format!("check-docs-cname-parity: {}", e))?;
+    let top = crate::walk::toplevel_opt().map_err(|e| Fault::tool(format!("check-docs-cname-parity: {}", e)))?;
     if top.is_none() {
-        return Err(
-            "check-docs-cname-parity: not a git repository — cannot enumerate tracked files".into(),
-        );
+        return Err(Fault::refused(
+            "check-docs-cname-parity: not a git repository — cannot enumerate tracked files",
+        ));
     }
     if !Path::new(&cname).is_file() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "check-docs-cname-parity: CNAME not found: {}",
             cname
-        ));
+        )));
     }
 
     let raw = std::fs::read(&cname)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| format!("check-docs-cname-parity: cannot read {}: {}", cname, e))?;
+        .map_err(|e| Fault::input(format!("check-docs-cname-parity: cannot read {}: {}", cname, e)))?;
     let hlines: Vec<&str> = fresh::file_lines(&raw)
         .into_iter()
         .filter(|l| !l.trim().is_empty())
         .collect();
     if hlines.len() != 1 {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "check-docs-cname-parity: {} must hold exactly one host line (found {})",
             cname,
             hlines.len()
-        ));
+        )));
     }
     let host: String = hlines[0].chars().filter(|c| !c.is_whitespace()).collect();
     if host.is_empty() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "check-docs-cname-parity: empty host in {}",
             cname
-        ));
+        )));
     }
 
     let aliases = walk::knob_array("SITE_KIT_ALIASES")
-        .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-docs-cname-parity: {}", e)))?;
     let exempt = walk::knob_array("SITE_KIT_EXEMPT_PATHS")
-        .map_err(|e| format!("check-docs-cname-parity: {}", e))?;
-    let prune = walk::prune_dirs().map_err(|e| format!("check-docs-cname-parity: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-docs-cname-parity: {}", e)))?;
+    let prune = walk::prune_dirs().map_err(|e| Fault::refused(format!("check-docs-cname-parity: {}", e)))?;
 
     let listing = crate::listing::tracked(None, &[&scanroot])
-        .map_err(|e| format!("check-docs-cname-parity: {}", e.text()))?;
+        .map_err(|e| Fault::tool(format!("check-docs-cname-parity: {}", e.text())))?;
 
     let mut files: Vec<String> = Vec::new();
     for path in listing.iter().map(String::as_str) {

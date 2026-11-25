@@ -2,6 +2,7 @@
 // descriptor/subcommand parity both ways, a disposition for every substrate-sensitive member,
 // no implementation source in the vendoring set, and one owner for the target roster
 use crate::bashscan::{self, Kind, Token};
+use crate::exit::Fault;
 use crate::fresh;
 use crate::gates;
 use crate::registry;
@@ -20,7 +21,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-gate-substrate-parity: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -598,10 +599,10 @@ fn exec_placement(
     Ok(true)
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let gates_dir = match args.first() {
         Some(a) => a.clone(),
-        None => walk::knob_scalar("GATE_SDK_GATES_DIR")?,
+        None => walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?,
     };
     let doc_given = args.get(1).is_some();
     let doc = match args.get(1) {
@@ -614,10 +615,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let list = registry::list_path(&gates_dir);
 
     if !Path::new(&list).is_file() {
-        return Err(format!("no registry at {}", list));
+        return Err(Fault::refused(format!("no registry at {}", list)));
     }
 
-    let crate_dir = walk::knob_scalar("GATE_SDK_NATIVE_CRATE")?;
+    let crate_dir = walk::knob_scalar("GATE_SDK_NATIVE_CRATE").map_err(Fault::refused)?;
     let crate_dir = crate_dir.trim_end_matches('/').to_string();
     // spec: gate-sdk/SPEC.md §check-gate-substrate-parity — the publishing test is computed once
     // and read three times: by the conservation doc's absent-doc refusal, assertion B's
@@ -629,23 +630,23 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // tree that authors the dispositions
     let doc_present = Path::new(&doc).is_file();
     if !doc_present && (doc_given || publishing) {
-        return Err(format!("conservation doc not found: {}", doc));
+        return Err(Fault::refused(format!("conservation doc not found: {}", doc)));
     }
-    let list_text = read(&list)?;
+    let list_text = read(&list).map_err(Fault::input)?;
     let members = registry::members(&list_text);
     if members.is_empty() {
-        return Err(format!("{} names no gates", list));
+        return Err(Fault::input(format!("{} names no gates", list)));
     }
 
     // spec: gate-sdk/SPEC.md §Layout and configuration — the working-directory spelling, so the check
     // dirs resolve off disk and the couples expansion paired with them matches tree paths
-    let kit_roots = walk::kit_roots()?;
+    let kit_roots = walk::kit_roots().map_err(Fault::refused)?;
     let (resolve_dirs, kit_names) = main_rule_dirs(&gates_dir, &kit_roots);
 
     let section_body = if doc_present {
-        let body = conservation_body(&read(&doc)?);
+        let body = conservation_body(&read(&doc).map_err(Fault::input)?);
         if body.is_empty() {
-            return Err(format!("no '{}' section in {}", SECTION, doc));
+            return Err(Fault::input(format!("no '{}' section in {}", SECTION, doc)));
         }
         Some(body)
     } else {
@@ -695,7 +696,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         declared += 1;
 
-        let text = read(&src)?;
+        let text = read(&src).map_err(Fault::input)?;
         // assertion G: the port declaration lives on the shell spelling and carries a cause —
         // a descriptor's existence is already the dispatch declaration, so a `# no-port:` line
         // there asserts the negation of the file it sits in
@@ -743,9 +744,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 let specpath = specpath.trim_end_matches([' ', '\t']);
                 let spechead = ltrim(spechead);
                 if std::fs::File::open(specpath).is_err() {
-                    return Err(format!("{} points its '# spec:' field at {}, which is unreadable — assertion H could not read its corpus; treating as failure (not clean)", src, specpath));
+                    return Err(Fault::input(format!("{} points its '# spec:' field at {}, which is unreadable — assertion H could not read its corpus; treating as failure (not clean)", src, specpath)));
                 }
-                let body = spec_section_body(&read(specpath)?, spechead);
+                let body = spec_section_body(&read(specpath).map_err(Fault::input)?, spechead);
                 if body.contains("port-until") {
                     portuntil_grounded += 1;
                 } else {
@@ -765,7 +766,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut tree_state = "out of scope here, this tree having authored no declaration it carries";
     if publishing {
         tree_state = "walked";
-        for f in walk::tracked_shell_tree()? {
+        for f in walk::tracked_shell_tree().map_err(Fault::tool)? {
             if declpaths.contains(&f) {
                 continue;
             }
@@ -806,10 +807,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
             let Some(stem) = base.strip_suffix(".gate") else {
                 continue;
             };
-            match registry::exec_field(&read(&f)?) {
+            match registry::exec_field(&read(&f).map_err(Fault::input)?) {
                 Ok(registry::Substrate::Compiled) => descriptors.push(stem.to_string()),
                 found => {
-                    if exec_placement(&f, d == &gates_dir, found, &mut ctx.findings)? {
+                    if exec_placement(&f, d == &gates_dir, found, &mut ctx.findings).map_err(Fault::tool)? {
                         exec_placed += 1;
                     }
                 }
@@ -878,7 +879,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 .iter()
                 .filter_map(|f| f.rsplit('/').next()?.strip_suffix(".sh").map(String::from))
                 .collect();
-            let v = smoke_registry_parity(kit, &smoke, &read(&smoke)?, &roster, &own_shell);
+            let v = smoke_registry_parity(kit, &smoke, &read(&smoke).map_err(Fault::input)?, &roster, &own_shell);
             j_registered += v.registered;
             j_declared += v.declared;
             ctx.findings.extend(v.findings);
@@ -898,7 +899,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let Some(src) = registry::resolve(m, &resolve_dirs) else {
             continue;
         };
-        let text = read(&src)?;
+        let text = read(&src).map_err(Fault::input)?;
         let Some(man) = registry::manifest_line(&text) else {
             continue;
         };
@@ -906,7 +907,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if couples.is_empty() {
             continue;
         }
-        let expanded = registry::expand_couples(&couples, &kit_roots)?;
+        let expanded = registry::expand_couples(&couples, &kit_roots).map_err(Fault::refused)?;
         let hit = expanded
             .split(',')
             .any(|g| declpaths.iter().any(|p| registry::couple_matches(p, g)));
@@ -925,14 +926,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // assertion D: manifest-class annotations live in the declaration only — a second
     // writable copy in the implementation is an SSOT violation that drifts silently,
     // and the manifest must stay readable with no build and no execution
-    let impl_dir = walk::knob_scalar("GATE_SDK_NATIVE_SRC")?;
-    let prune = walk::prune_dirs()?;
+    let impl_dir = walk::knob_scalar("GATE_SDK_NATIVE_SRC").map_err(Fault::refused)?;
+    let prune = walk::prune_dirs().map_err(Fault::refused)?;
     let mut impl_scanned = 0usize;
     if fresh::is_dir(&impl_dir) {
-        for f in walk::find_with_prune(Path::new(&impl_dir), &|n| prune.iter().any(|d| d == n))? {
+        for f in walk::find_with_prune(Path::new(&impl_dir), &|n| prune.iter().any(|d| d == n)).map_err(Fault::input)? {
             impl_scanned += 1;
             let p = f.display().to_string();
-            let text = read(&p)?;
+            let text = read(&p).map_err(Fault::input)?;
             for (i, line) in section::split_lines(&text).iter().enumerate() {
                 if manifest_class(line) {
                     ctx.findings.push(format!("manifest-class annotation in implementation source: {}:{} — the '# graph:' manifest belongs to the declaration path alone", p, i + 1));
@@ -954,7 +955,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         kit_scanned += 1;
-        for f in walk::find_with_prune(Path::new(root), &|n| prune.iter().any(|d| d == n))? {
+        for f in walk::find_with_prune(Path::new(root), &|n| prune.iter().any(|d| d == n)).map_err(Fault::input)? {
             let p = f.display().to_string();
             let base = p.rsplit('/').next().unwrap_or(&p);
             let Some((stem, ext)) = base.rsplit_once('.') else {
@@ -977,12 +978,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // platform literal in the build matrix) or a second producer of a published digest
     // is the failure this assertion exists to make impossible
     // spec: gate-sdk/SPEC.md §Consumer payload
-    let roster_file = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE")?;
+    let roster_file = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE").map_err(Fault::refused)?;
     let mut roster_targets = 0usize;
     let mut roster_state = "absent";
     if Path::new(&roster_file).is_file() {
         roster_state = "read";
-        let targets = registry::members(&read(&roster_file)?);
+        let targets = registry::members(&read(&roster_file).map_err(Fault::input)?);
         if targets.is_empty() {
             ctx.findings.push(format!("empty target roster: {} declares no target — a roster asserting no platform support cannot be the surface that asserts it", roster_file));
         }
@@ -1002,7 +1003,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         ctx.findings.push(format!("no target roster: {} is absent, but {} registered member(s) dispatch to the binary and {} carries tracked source here — a tree that builds the artifact declares the platforms it carries one for", roster_file, dispatching, crate_dir));
     }
 
-    let workflows = walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW")?;
+    let workflows = walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW").map_err(Fault::refused)?;
     let mut wf_read: Vec<&str> = Vec::new();
     let mut wf_absent: Vec<&str> = Vec::new();
     let mut wf_matrix = 0usize;
@@ -1014,13 +1015,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         wf_read.push(workflow);
-        let text = read(workflow)?;
+        let text = read(workflow).map_err(Fault::input)?;
         let (declarations, literals) = matrix_literals(&text);
         wf_matrix += declarations;
         for (lno, line) in literals {
             ctx.findings.push(format!("matrix declaration not roster-derived: {}:{} '{}' is a literal where an expression over {} belongs — a hand-written platform in a build matrix is a second spelling of the support commitment", workflow, lno, ltrim(&line), roster_file));
         }
-        for j in workflow_digests(&text, &mut wf_followed)? {
+        for j in workflow_digests(&text, &mut wf_followed).map_err(Fault::input)? {
             wf_jobs += 1;
             if j.computed > 1 {
                 ctx.findings.push(format!("digest recomputed: job '{}' in {} computes {} digests — each is emitted once, where its bytes are produced, and moved thereafter", j.job, workflow, j.computed));

@@ -1,5 +1,8 @@
 // spec: gate-sdk/SPEC.md §with-foreign-shells — a command run with `pwsh`, `dash` and `sh` on
 // `PATH`, copied out of pinned images and run natively; provisioning compiles on Linux alone
+use crate::exit;
+#[cfg(target_os = "linux")]
+use crate::exit::Fault;
 #[cfg(target_os = "linux")]
 use crate::{proc, programs, walk};
 #[cfg(target_os = "linux")]
@@ -26,7 +29,7 @@ const MARKER: &str = ".provisioned";
 pub fn run(args: &[String]) -> i32 {
     if args.is_empty() {
         eprintln!("{}: no command given, so nothing ran\n{}", NAME, USAGE);
-        return 2;
+        return exit::USAGE;
     }
     #[cfg(target_os = "linux")]
     {
@@ -52,11 +55,11 @@ fn run_on_linux(args: &[String]) -> i32 {
         eprintln!("{}", skip_line(&reason, args));
         return 0;
     }
-    let path = match provision().and_then(|bin| search_path(&bin)) {
+    let path = match provision().and_then(|bin| search_path(&bin).map_err(Fault::tool)) {
         Ok(p) => p,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return e.status();
         }
     };
     let mut argv: Vec<&str> = vec!["-c", "exec \"$@\"", "bash"];
@@ -65,7 +68,7 @@ fn run_on_linux(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            exit::TOOL
         }
     }
 }
@@ -100,20 +103,21 @@ fn search_path(bin: &Path) -> Result<String, String> {
 // spec: gate-sdk/SPEC.md §with-foreign-shells — one directory per pair of image references, reused
 // once its marker exists; a failed build removes what it copied
 #[cfg(target_os = "linux")]
-fn provision() -> Result<PathBuf, String> {
-    let pwsh = walk::knob_scalar("GATE_SDK_FOREIGN_PWSH_IMAGE")?;
-    let dash = walk::knob_scalar("GATE_SDK_FOREIGN_DASH_IMAGE")?;
-    let tmp = walk::abs_against(&walk::cwd()?, &walk::knob_scalar("GATE_SDK_TMP_DIR")?);
+fn provision() -> Result<PathBuf, Fault> {
+    let pwsh = walk::knob_scalar("GATE_SDK_FOREIGN_PWSH_IMAGE").map_err(Fault::refused)?;
+    let dash = walk::knob_scalar("GATE_SDK_FOREIGN_DASH_IMAGE").map_err(Fault::refused)?;
+    let tmp_knob = walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?;
+    let tmp = walk::abs_against(&walk::cwd().map_err(Fault::tool)?, &tmp_knob);
     let dir = Path::new(&tmp).join("foreign-shells").join(key(&pwsh, &dash));
-    walk::make_scratch(&tmp).map_err(|e| format!("cannot create {}: {}", tmp, e))?;
+    walk::make_scratch(&tmp).map_err(|e| Fault::tool(format!("cannot create {}: {}", tmp, e)))?;
     if dir.join(MARKER).is_file() {
         return Ok(dir.join("bin"));
     }
     let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
+    std::fs::create_dir_all(&dir).map_err(|e| Fault::tool(format!("cannot create {}: {}", dir.display(), e)))?;
     if let Err(e) = populate(&dir, &pwsh, &dash) {
         let _ = std::fs::remove_dir_all(&dir);
-        return Err(e);
+        return Err(Fault::tool(e));
     }
     Ok(dir.join("bin"))
 }
@@ -214,7 +218,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §with-foreign-shells — no command is the arm's own exit 2
     #[test]
     fn no_command_is_a_refusal() {
-        assert_eq!(run(&[]), 2);
+        assert_eq!(run(&[]), exit::USAGE);
     }
 
     // spec: gate-sdk/SPEC.md §with-foreign-shells — the skip line names its reason and the command

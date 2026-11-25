@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §The journal arm — the append affordance: the caller's own stamp names
 // the journal, so a stage session journals without spelling the path its entry printed.
+use crate::exit::Fault;
 use crate::stages;
 use crate::walk;
 
@@ -62,19 +63,19 @@ fn caller(state_text: &str, derived: &str, scan: &[String], stages: &[String]) -
         .find_map(|id| stages::caller_stage(state_text, &id, stages).map(|s| (id, s)))
 }
 
-fn text_of(args: &[String]) -> Result<Vec<u8>, String> {
-    let fields = super::file_survey::positionals(args, "text").map_err(|e| format!("{}\n{}", e, USAGE))?;
+fn text_of(args: &[String]) -> Result<Vec<u8>, Fault> {
+    let fields = super::file_survey::positionals(args, "text").map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     match fields {
         [] => {
             use std::io::Read;
             let mut buf = Vec::new();
             std::io::stdin()
                 .read_to_end(&mut buf)
-                .map_err(|e| format!("cannot read standard input: {}", e))?;
+                .map_err(|e| Fault::input(format!("cannot read standard input: {}", e)))?;
             Ok(buf)
         }
         [one] => Ok(one.clone().into_bytes()),
-        _ => Err(format!("one text is taken, and {} were given\n{}", fields.len(), USAGE)),
+        _ => Err(Fault::usage(format!("one text is taken, and {} were given\n{}", fields.len(), USAGE))),
     }
 }
 
@@ -106,46 +107,46 @@ fn lead_refusal(path: &str, text: Option<&str>) -> Result<(), String> {
 
 // spec: lifecycle-kit/SPEC.md §The journal arm — the lead form: the knob names the file, so no
 // stamp is read and no id derived
-fn emit_lead(body: &[u8]) -> Result<String, String> {
+fn emit_lead(body: &[u8]) -> Result<String, Fault> {
     let spelled = super::enter_stage::lead_journal_spelled(
-        &walk::knob_scalar("GATE_SDK_TMP_DIR")?,
-        &walk::knob_scalar("LIFECYCLE_KIT_LEAD_JOURNAL_FILE")?,
+        &walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?,
+        &walk::knob_scalar("LIFECYCLE_KIT_LEAD_JOURNAL_FILE").map_err(Fault::refused)?,
     );
-    let path = super::enter_stage::repo_anchored(&spelled)?;
+    let path = super::enter_stage::repo_anchored(&spelled).map_err(Fault::tool)?;
     let text = std::fs::read(&path).ok().map(|b| String::from_utf8_lossy(&b).into_owned());
-    lead_refusal(&path, text.as_deref())?;
-    append(&path, body)?;
+    lead_refusal(&path, text.as_deref()).map_err(Fault::refused)?;
+    append(&path, body).map_err(Fault::tool)?;
     Ok(format!("journal: {} lead\n", path))
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let lead = args.first().map(String::as_str) == Some(LEAD);
-    let body = shape(&text_of(&args[usize::from(lead)..])?)?;
-    worktree_refusal(walk::main_checkout_root().as_deref())?;
+    let body = shape(&text_of(&args[usize::from(lead)..])?).map_err(Fault::usage)?;
+    worktree_refusal(walk::main_checkout_root().as_deref()).map_err(Fault::refused)?;
     if lead {
         return emit_lead(&body);
     }
 
-    let inputs = super::session_id::inputs()?;
-    let derived = super::session_id::derive(&inputs)?;
-    let state = walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE")?;
-    let state_text = stamps(&super::enter_stage::repo_anchored(&state)?)?;
+    let inputs = super::session_id::inputs().map_err(Fault::tool)?;
+    let derived = super::session_id::derive(&inputs).map_err(Fault::input)?;
+    let state = walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE").map_err(Fault::refused)?;
+    let state_text = stamps(&super::enter_stage::repo_anchored(&state).map_err(Fault::tool)?).map_err(Fault::input)?;
     let scan = crate::sessions::scan_newest_first(&inputs);
-    let Some((id, stage)) = caller(&state_text, &derived, &scan, &stages::stages()?) else {
-        return Err(format!(
+    let Some((id, stage)) = caller(&state_text, &derived, &scan, &stages::stages().map_err(Fault::refused)?) else {
+        return Err(Fault::refused(format!(
             "no stage stamp in {} carries this session's id ({}), so it has no journal to append \
              to — run --enter-stage <stage> first",
             state, derived
-        ));
+        )));
     };
 
     let spelled =
-        super::enter_stage::journal_path(&walk::knob_scalar("LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN")?, &stage);
-    let path = super::enter_stage::repo_anchored(&spelled)?;
+        super::enter_stage::journal_path(&walk::knob_scalar("LIFECYCLE_KIT_STAGE_JOURNAL_PATTERN").map_err(Fault::refused)?, &stage);
+    let path = super::enter_stage::repo_anchored(&spelled).map_err(Fault::tool)?;
     if let Some(dir) = std::path::Path::new(&path).parent() {
-        std::fs::create_dir_all(dir).map_err(|e| format!("cannot create {}: {}", dir.display(), e))?;
+        std::fs::create_dir_all(dir).map_err(|e| Fault::tool(format!("cannot create {}: {}", dir.display(), e)))?;
     }
-    append(&path, &body)?;
+    append(&path, &body).map_err(Fault::tool)?;
     Ok(format!("journal: {} {} {}\n", path, stage, id))
 }
 

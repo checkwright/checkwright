@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the git-notes pair: a run stores its Statement as a note on the subject with no file configured, the read knob verifies it with no operand, the store leaves the worktree untouched, a second run's note replaces the first, and a failing store exits 2 naming the published manifest.
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the git-notes pair: a run stores its Statement as a note on the subject with no file configured, the read knob verifies it with no operand, the store leaves the worktree untouched, a second run's note replaces the first, and a failing store exits 3 naming the published manifest.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -51,14 +51,14 @@ notes="$(git -C "$t" notes --ref=gate-run list | wc -l | tr -d ' ')"
 commits="$(git -C "$t" rev-list --count refs/notes/gate-run)"
 [[ "$notes" == 1 && "$commits" == 2 ]] || fail "a second run must replace the first note (notes=$notes, notes commits=$commits)"
 
-# D — a failing store: exit 2, naming the manifest as published.
+# D — a failing store: exit 3, naming the manifest as published.
 out="$(_fe broken.knobs --run-validate)"; rc=$?
-[[ "$rc" -eq 2 && "$out" == *"EVIDENCE_KIT_STATEMENT_WRITE_CMD exited"*"the manifest"*"published, the store is not"* ]] \
-    || fail "a failing store must exit 2 naming the published manifest (rc=$rc): $out"
+[[ "$rc" -eq 3 && "$out" == *"EVIDENCE_KIT_STATEMENT_WRITE_CMD exited"*"the manifest"*"published, the store is not"* ]] \
+    || fail "a failing store must exit 3 naming the published manifest (rc=$rc): $out"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "statement-store.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "statement-store.test: ok (the run stores a note on its subject with no file written and the worktree untouched but for the fold, the verify arm reads it clean with no operand, a second run replaces the note, a failing store exits 2 naming the published manifest)"
+echo "statement-store.test: ok (the run stores a note on its subject with no file written and the worktree untouched but for the fold, the verify arm reads it clean with no operand, a second run replaces the note, a failing store exits 3 naming the published manifest)"
 exit 0

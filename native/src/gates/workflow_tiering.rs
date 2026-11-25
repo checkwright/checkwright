@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §The workflow directory — every workflow-dir member is tracked or
 // ignored, and every tracked non-directory member's first line is a ruled '# contract: ' header
+use crate::exit;
 use crate::ere::Ere;
 use crate::{proc, programs};
 use crate::walk;
@@ -13,13 +14,13 @@ pub fn run(args: &[String]) -> i32 {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
         eprintln!("check-workflow-tiering: not a directory: {}", root);
-        return 2;
+        return exit::REFUSED;
     }
     let top = match walk::toplevel_in_opt(root) {
         Ok(t) => t,
         Err(e) => {
             eprintln!("check-workflow-tiering: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     };
     if top.is_none() {
@@ -27,34 +28,34 @@ pub fn run(args: &[String]) -> i32 {
             "check-workflow-tiering: {} is not a git repository — the tracked/ignored partition is unreadable",
             root
         );
-        return 2;
+        return exit::REFUSED;
     }
 
     let wf = match walk::knob_scalar("GATE_SDK_WORKFLOW_DIR") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-workflow-tiering: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let wf_path = format!("{}/{}", root, wf);
     if !Path::new(&wf_path).is_dir() {
         eprintln!("check-workflow-tiering: workflow directory not found: {}", wf_path);
-        return 2;
+        return exit::REFUSED;
     }
 
     let pointer_re = match Ere::compile(POINTER_RE_SRC) {
         Ok(r) => r,
         Err(e) => {
             eprintln!("check-workflow-tiering: pointer pattern failed to compile: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     };
     let version_re = match Ere::compile(VERSION_RE_SRC) {
         Ok(r) => r,
         Err(e) => {
             eprintln!("check-workflow-tiering: version pattern failed to compile: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     };
 
@@ -62,7 +63,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-workflow-tiering: {}", e);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -79,7 +80,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-workflow-tiering: {}", e);
-                    return 2;
+                    return exit::TOOL;
                 }
             };
             match ls.stdout() {
@@ -90,7 +91,7 @@ pub fn run(args: &[String]) -> i32 {
                         rel,
                         ls.code().unwrap_or(-1)
                     );
-                    return 2;
+                    return exit::TOOL;
                 }
             }
         } else {
@@ -101,7 +102,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(c) => c.code() == Some(0),
                 Err(e) => {
                     eprintln!("check-workflow-tiering: {}", e);
-                    return 2;
+                    return exit::TOOL;
                 }
             }
         };
@@ -111,7 +112,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(c) => c,
                 Err(e) => {
                     eprintln!("check-workflow-tiering: {}", e);
-                    return 2;
+                    return exit::TOOL;
                 }
             };
             match ci.code() {
@@ -123,7 +124,7 @@ pub fn run(args: &[String]) -> i32 {
                         other.unwrap_or(-1),
                         rel
                     );
-                    return 2;
+                    return exit::TOOL;
                 }
             }
         };
@@ -148,7 +149,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(t) => t,
             Err(e) => {
                 eprintln!("check-workflow-tiering: member not readable: {}: {}", rel, e);
-                return 2;
+                return exit::INPUT;
             }
         };
         let first = text.lines().next().unwrap_or("");

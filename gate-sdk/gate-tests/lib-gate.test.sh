@@ -25,10 +25,10 @@ fail_closed 0 check-x awk
 reached=yes
 [[ "$reached" == yes ]] || { echo "  FAIL: fail_closed 0 aborted the caller"; fails=$((fails + 1)); }
 
-# Branch 2: non-zero status -> exit 2 + diagnostic on stderr (run in a subshell
+# Branch 2: non-zero status -> exit 3 + diagnostic on stderr (run in a subshell
 # so the exit doesn't abort this test).
 out="$( ( fail_closed 2 check-x awk ) 2>&1 )"; rc=$?
-[[ "$rc" -eq 2 ]] || { echo "  FAIL: fail_closed 2 should exit 2, exited $rc"; fails=$((fails + 1)); }
+[[ "$rc" -eq 3 ]] || { echo "  FAIL: fail_closed 2 should exit 3, exited $rc"; fails=$((fails + 1)); }
 grep -qF 'the check could not run' <<<"$out" \
     || { echo "  FAIL: fail_closed 2 missing 'the check could not run': $out"; fails=$((fails + 1)); }
 
@@ -154,16 +154,16 @@ got="$(gate_command check-rs "$sandbox/a" | paste -sd' ' -)"
 [[ "$?" -eq 2 ]] \
     || { echo "  FAIL: gate_command did not exit 2 on the arm's refusal"; fails=$((fails + 1)); }
 
-# fail-closed: an absent binary is exit 2, never a skip and never a pass
+# fail-closed: an absent binary is exit 3, never a skip and never a pass
 ( GATE_SDK_NATIVE_BIN="$sandbox/nope" gate_command check-ported "$sandbox/a" "$sandbox/b" >/dev/null 2>&1 )
-[[ "$?" -eq 2 ]] \
-    || { echo "  FAIL: gate_command did not exit 2 on an absent native binary"; fails=$((fails + 1)); }
+[[ "$?" -eq 3 ]] \
+    || { echo "  FAIL: gate_command did not exit 3 on an absent native binary"; fails=$((fails + 1)); }
 
-# fail-closed: present but non-executable is the same harness error
+# fail-closed: present but non-executable is the same tool error
 : >"$sandbox/notexec"; chmod -x "$sandbox/notexec"
 ( GATE_SDK_NATIVE_BIN="$sandbox/notexec" gate_command check-ported "$sandbox/a" "$sandbox/b" >/dev/null 2>&1 )
-[[ "$?" -eq 2 ]] \
-    || { echo "  FAIL: gate_command did not exit 2 on a non-executable native binary"; fails=$((fails + 1)); }
+[[ "$?" -eq 3 ]] \
+    || { echo "  FAIL: gate_command did not exit 3 on a non-executable native binary"; fails=$((fails + 1)); }
 
 if [[ "$fails" -gt 0 ]]; then
     echo "lib-gate.test: $fails assertion(s) failed"

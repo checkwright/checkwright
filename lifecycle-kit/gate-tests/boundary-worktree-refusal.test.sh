@@ -215,7 +215,7 @@ seed "$refused"
 printf 'gitdir: %s/absent\n' "$refused" >"$refused/.git"
 before="$(state_of "$refused")"
 out="$(run_enter "$refused" scope)"; rc=$?
-[[ "$rc" -eq 2 && "$out" == *"marks a repository"* ]] || note refused "a refused repository skipped the worktree check (want exit 2 naming the mark): rc=$rc $out"
+[[ "$rc" -eq 3 && "$out" == *"marks a repository"* ]] || note refused "a refused repository skipped the worktree check (want exit 3 naming the mark): rc=$rc $out"
 [[ "$(state_of "$refused")" == "$before" ]] || note refused-write "the refused entry wrote the state file"
 
 [[ "$fails" -eq 0 ]] || { echo "boundary-worktree-refusal.test: $fails assertion(s) failed"; exit 1; }

@@ -61,7 +61,7 @@ pub fn install_disposition(gate_file: &Path) -> String {
 }
 
 // spec: installer/SPEC.md §What init seeds — the starting roster is the subset a fresh consumer
-// begins with: a gate whose subject the adopter has not authored yet would exit 2 on their tree, so
+// begins with: a gate whose subject the adopter has not authored yet would exit non-zero on their tree, so
 // it is registered when that surface exists rather than at install.
 // spec: installer/SPEC.md §What init seeds — the roster is keyed by profile as well as by kit, so one
 // that varies by profile becomes a change to one arm rather than to this signature. Nothing varies

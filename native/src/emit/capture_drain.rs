@@ -1,17 +1,18 @@
 // spec: gate-sdk/SPEC.md §The workflow directory — the rotation drain: a capture log a close procedure
 // reads is renamed aside before the read, so a line a concurrent writer appends lands in a fresh live
 // log rather than being erased by a truncate. The log is an operand, so the arm declares no knob.
+use crate::exit::Fault;
 use std::io::Write;
 
 pub const KNOBS: &[&str] = &[];
 
 pub const USAGE: &str = "usage: --emit capture-drain [--done] [--] <log>\n  moves every unread line of <log> into <log>.drain, leaves <log> present and empty, and prints the drain's path when it holds a line; --done removes <log>.drain";
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let (done, log) = parse(args)?;
     let drain = format!("{}.drain", log);
     if done {
-        return remove_if_present(&drain).map(|_| String::new());
+        return remove_if_present(&drain).map(|_| String::new()).map_err(Fault::tool);
     }
     let part = format!("{}.drain.part", log);
     // spec: gate-sdk/SPEC.md §The workflow directory — a part file found at the start is a crash
@@ -21,10 +22,10 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     }
     if exists(&log) {
         if exists(&drain) {
-            rename(&log, &part)?;
+            rename(&log, &part).map_err(Fault::tool)?;
             fold(&part, &drain)?;
         } else {
-            rename(&log, &drain)?;
+            rename(&log, &drain).map_err(Fault::tool)?;
         }
     }
     // spec: gate-sdk/SPEC.md §The workflow directory — an append-open never truncates, so a line a
@@ -33,15 +34,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         .create(true)
         .append(true)
         .open(&log)
-        .map_err(|e| format!("cannot reopen the live log {}: {}", log, e))?;
+        .map_err(|e| Fault::tool(format!("cannot reopen the live log {}: {}", log, e)))?;
     if holds_a_line(&drain) {
         return Ok(format!("{}\n", drain));
     }
-    remove_if_present(&drain)?;
+    remove_if_present(&drain).map_err(Fault::tool)?;
     Ok(String::new())
 }
 
-fn parse(args: &[String]) -> Result<(bool, String), String> {
+fn parse(args: &[String]) -> Result<(bool, String), Fault> {
     let mut done = false;
     let mut operands: Vec<&String> = Vec::new();
     let mut options = true;
@@ -50,14 +51,14 @@ fn parse(args: &[String]) -> Result<(bool, String), String> {
             "--" if options => options = false,
             "--done" if options => done = true,
             s if options && s.starts_with('-') => {
-                return Err(format!("unknown option: {}\n{}", s, USAGE));
+                return Err(Fault::usage(format!("unknown option: {}\n{}", s, USAGE)));
             }
             _ => operands.push(a),
         }
     }
     match operands.as_slice() {
         [log] if !log.is_empty() => Ok((done, log.to_string())),
-        _ => Err(USAGE.to_string()),
+        _ => Err(Fault::usage(USAGE)),
     }
 }
 
@@ -75,16 +76,16 @@ fn rename(from: &str, to: &str) -> Result<(), String> {
 
 // spec: gate-sdk/SPEC.md §The workflow directory — append a part file's bytes to the drain, then
 // remove it; the removal comes last, so a crash between the two repeats the part on the next run
-fn fold(part: &str, drain: &str) -> Result<(), String> {
-    let body = std::fs::read(part).map_err(|e| format!("cannot read {}: {}", part, e))?;
+fn fold(part: &str, drain: &str) -> Result<(), Fault> {
+    let body = std::fs::read(part).map_err(|e| Fault::input(format!("cannot read {}: {}", part, e)))?;
     let mut f = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
         .open(drain)
-        .map_err(|e| format!("cannot open {}: {}", drain, e))?;
+        .map_err(|e| Fault::tool(format!("cannot open {}: {}", drain, e)))?;
     f.write_all(&body)
-        .map_err(|e| format!("cannot append to {}: {}", drain, e))?;
-    std::fs::remove_file(part).map_err(|e| format!("cannot remove {}: {}", part, e))
+        .map_err(|e| Fault::tool(format!("cannot append to {}: {}", drain, e)))?;
+    std::fs::remove_file(part).map_err(|e| Fault::tool(format!("cannot remove {}: {}", part, e)))
 }
 
 fn remove_if_present(p: &str) -> Result<(), String> {
@@ -125,7 +126,7 @@ mod tests {
         }
     }
 
-    fn drain(args: &[&str]) -> Result<String, String> {
+    fn drain(args: &[&str]) -> Result<String, Fault> {
         emit(&args.iter().map(|s| s.to_string()).collect::<Vec<_>>())
     }
 
@@ -214,6 +215,7 @@ mod tests {
         for bad in [&[][..], &["a", "b"][..], &["--nope", "a"][..], &[""][..], &["--done"][..]] {
             let err = drain(bad).expect_err("a malformed argv was accepted");
             assert!(err.contains("usage: --emit capture-drain"), "{:?}: {}", bad, err);
+            assert_eq!(err.status(), 2, "{:?}", bad);
         }
         let s = Sandbox::new("refuse");
         s.write("f.log", "one\n");
@@ -221,5 +223,6 @@ mod tests {
         s.write("f.log.drain.part", "x\n");
         let err = drain(&[&s.at("f.log")]).expect_err("a drain that cannot be appended to passed");
         assert!(err.contains(&s.at("f.log.drain")), "the refusal names no path: {}", err);
+        assert_eq!(err.status(), 3);
     }
 }

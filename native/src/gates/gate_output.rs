@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-gate-output — every gates.list member emits a machine-keyable
 // success line and a help: remedy
 use crate::ere::Ere;
+use crate::exit;
 use crate::fresh;
 use crate::registry;
 use crate::walk;
@@ -50,26 +51,26 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-gate-output: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
     let list = format!("{}/gates.list", dir);
     if !Path::new(&list).is_file() {
         eprintln!("check-gate-output: no registry at {}", list);
-        return 2;
+        return exit::REFUSED;
     }
     let listing = match std::fs::read(&list) {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(_) => {
             eprintln!("check-gate-output: no members parsed from {}", list);
-            return 2;
+            return exit::INPUT;
         }
     };
     let members = members(&listing);
     if members.is_empty() {
         eprintln!("check-gate-output: no members parsed from {}", list);
-        return 2;
+        return exit::INPUT;
     }
 
     let mut resolve_dirs = vec![dir.clone()];
@@ -77,7 +78,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => resolve_dirs.extend(v.into_iter().map(|k| format!("{}/checks", k))),
         Err(e) => {
             eprintln!("check-gate-output: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     }
 
@@ -85,7 +86,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-gate-output: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     // spec: gate-sdk/SPEC.md §check-gate-output — crate presence is the manifest, never the
@@ -114,7 +115,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-gate-output: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     };
 
@@ -149,7 +150,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(s) => s,
             Err(e) => {
                 eprintln!("check-gate-output: {}", e);
-                return 2;
+                return exit::INPUT;
             }
         };
         if let registry::Substrate::Exec(_) = substrate {

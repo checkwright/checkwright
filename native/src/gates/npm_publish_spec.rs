@@ -1,6 +1,7 @@
 // spec: RELEASING.md §The publish spec — every `npm publish` positional spec in a workflow is
 // unambiguously a path by its own literal text: a leading `.` or `/`, or an expansion of a
 // proven-absolute root
+use crate::exit::{self, Fault};
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -17,7 +18,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}", e);
-            2
+            e.status()
         }
     }
 }
@@ -79,15 +80,15 @@ fn spec_unambiguous(s: &str) -> bool {
     })
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let wfdir = fresh::positional_or_knob(args, 0, "GATE_LOCAL_WORKFLOWS_DIR")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let wfdir = fresh::positional_or_knob(args, 0, "GATE_LOCAL_WORKFLOWS_DIR").map_err(Fault::refused)?;
     let wfdir = wfdir.as_str();
     if !fresh::is_dir(wfdir) {
         if !args.is_empty() {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "check-npm-publish-spec: workflows dir not found: {}",
                 wfdir
-            ));
+            )));
         }
         println!(
             "NPM-PUBLISH-SPEC: clean (not applicable: no {} in this tree — 0 npm publish invocation(s) to judge)",
@@ -102,7 +103,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Path::new(wfdir),
         &["*.yml".to_string(), "*.yaml".to_string()],
     )
-    .map_err(|e| format!("check-npm-publish-spec: {}", e))?
+    .map_err(|e| Fault::input(format!("check-npm-publish-spec: {}", e)))?
     .into_iter()
     .map(|p| p.display().to_string())
     .collect();
@@ -118,7 +119,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut findings: Vec<String> = Vec::new();
 
     for f in &files {
-        let text = fresh::read_captured(f).map_err(|e| format!("check-npm-publish-spec: {}", e))?;
+        let text = fresh::read_captured(f).map_err(|e| Fault::input(format!("check-npm-publish-spec: {}", e)))?;
         for (n, line) in fresh::file_lines(&text).iter().enumerate() {
             let lineno = n + 1;
             if !line.contains("npm publish") {
@@ -135,7 +136,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 eprintln!("  {}:{}", f, lineno);
                 eprintln!("  help: join the invocation onto one line, or move the spec into a variable assigned on");
                 eprintln!("        its own line and published through a './', '/', or $PWD/-prefixed expansion.");
-                return Ok(2);
+                return Ok(exit::INPUT);
             }
 
             let tail = line.split_once("npm publish").map(|(_, r)| r).unwrap_or("");
@@ -157,7 +158,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 eprintln!("  {}:{}: {}", f, lineno, cands.join(" "));
                 eprintln!("  help: put the invocation on a line of its own carrying only flags and the one spec, or");
                 eprintln!("        teach the gate's value-taking-flag roster the flag whose value it mistook for a spec.");
-                return Ok(2);
+                return Ok(exit::INPUT);
             }
             if cands.len() != 1 {
                 continue;

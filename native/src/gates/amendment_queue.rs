@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-amendment-queue — the Task↔amendment bidirectional rule and
 // spec-readiness: the queue's section filing on one pass, then the on-disk pairing in both
 // directions
+use crate::exit::Fault;
 use crate::spec;
 use std::path::Path;
 
@@ -13,7 +14,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-amendment-queue: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -227,15 +228,15 @@ fn amendment_citations(body: &str, glob: &str) -> Vec<(usize, String)> {
     out
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let queue = match args.first() {
         Some(q) => q.clone(),
-        None => spec::knob_pub("CANON_KIT_QUEUE_FILE")?,
+        None => spec::knob_pub("CANON_KIT_QUEUE_FILE").map_err(Fault::refused)?,
     };
     let root = args.get(1).map(String::as_str).unwrap_or(".");
     // spec: canon-kit/SPEC.md §check-amendment-queue — an absent queue is an absent subject, and a
     // queue path naming anything but a file still refuses
-    if !spec::queue_present(&queue)? {
+    if !spec::queue_present(&queue).map_err(Fault::input)? {
         println!(
             "AMENDMENT-QUEUE: clean (not applicable: no queue file at {} — work tracked outside the queue grammar has no entry to pair)",
             queue
@@ -243,15 +244,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
     if !Path::new(&queue).is_file() {
-        return Err(format!("not a file: {}", queue));
+        return Err(Fault::input(format!("not a file: {}", queue)));
     }
     let sets = Sets {
-        feature: spec::knob_array_pub("CANON_KIT_FEATURE_SECTIONS")?,
-        active: spec::knob_array_pub("CANON_KIT_ACTIVE_SECTIONS")?,
-        deferred: spec::knob_pub("CANON_KIT_DEFERRED_SECTION")?,
-        icebox: spec::knob_pub("CANON_KIT_ICEBOX_SECTION")?,
+        feature: spec::knob_array_pub("CANON_KIT_FEATURE_SECTIONS").map_err(Fault::refused)?,
+        active: spec::knob_array_pub("CANON_KIT_ACTIVE_SECTIONS").map_err(Fault::refused)?,
+        deferred: spec::knob_pub("CANON_KIT_DEFERRED_SECTION").map_err(Fault::refused)?,
+        icebox: spec::knob_pub("CANON_KIT_ICEBOX_SECTION").map_err(Fault::refused)?,
     };
-    let text = spec::read_text(Path::new(&queue))?;
+    let text = spec::read_text(Path::new(&queue)).map_err(Fault::input)?;
 
     let mut missing: Vec<String> = Vec::new();
     let mut dready: Vec<String> = Vec::new();
@@ -319,7 +320,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: canon-kit/SPEC.md §check-amendment-queue — bidirectional pairing on disk. The
     // amendment set is enumerated once and reused for both directions, where the shell re-runs
     // the finder per reference; the walk is the same walk and the verdict cannot differ.
-    let disk: Vec<String> = spec::amendments(root)?
+    let disk: Vec<String> = spec::amendments(root).map_err(Fault::input)?
         .into_iter()
         .map(|p| p.display().to_string())
         .collect();
@@ -362,10 +363,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let glob = spec::knob_pub("CANON_KIT_AMENDMENT_GLOB")?;
+    let glob = spec::knob_pub("CANON_KIT_AMENDMENT_GLOB").map_err(Fault::refused)?;
     let glob = basename(&glob).to_string();
     for f in &disk {
-        let body = spec::read_text(Path::new(f))?;
+        let body = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         for (ln, tok) in amendment_citations(&body, &glob) {
             if !resolves(&tok, &disk) {
                 errors.push_str(&format!(

@@ -2,6 +2,7 @@
 // hash comparison the claim makes; changed and missing are named apart because a deletion and an
 // edit have different remedies. Exit status is the verdict: 0 all match, 1 at least one does not.
 use super::{lock, refuse, Refusal};
+use crate::exit;
 
 pub(super) fn usage() -> Vec<String> {
     vec![
@@ -37,7 +38,7 @@ fn compare() -> Result<i32, Refusal> {
         return Err(refuse(
             format!("no {} at {}", lock::FILE, root.display()),
             "init is the verb that makes an install, and the manifest it writes is what diff compares against. Without one there is nothing here to compare.",
-            2,
+            exit::REFUSED,
         ));
     }
     let manifest = lock::Manifest::read(&path)
@@ -46,7 +47,7 @@ fn compare() -> Result<i32, Refusal> {
             refuse(
                 format!("{} carries a schema this build does not know", lock::FILE),
                 "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for.",
-                2,
+                exit::INPUT,
             )
         })?;
 
@@ -116,6 +117,6 @@ mod tests {
     #[test]
     fn help_answers_outside_every_precondition() {
         assert_eq!(super::run(&["--help".to_string()]), 0);
-        assert_eq!(super::run(&["--nope".to_string()]), 2);
+        assert_eq!(super::run(&["--nope".to_string()]), crate::exit::USAGE);
     }
 }

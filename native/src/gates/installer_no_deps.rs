@@ -1,4 +1,5 @@
 // spec: installer/SPEC.md §The dependency boundary — no dependency field, no install-time lifecycle script
+use crate::exit::Fault;
 use crate::fresh;
 use serde_json::Value;
 use std::path::Path;
@@ -12,26 +13,26 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-installer-no-deps: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let pkg = fresh::positional_or_joined(args, 0, "GATE_LOCAL_INSTALLER_DIR", "package.json")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let pkg = fresh::positional_or_joined(args, 0, "GATE_LOCAL_INSTALLER_DIR", "package.json").map_err(Fault::refused)?;
     let pkg = pkg.as_str();
     if !Path::new(pkg).is_file() {
-        return Err(format!("package file not found: {}", pkg));
+        return Err(Fault::refused(format!("package file not found: {}", pkg)));
     }
-    let text = fresh::read_captured(pkg)?;
+    let text = fresh::read_captured(pkg).map_err(Fault::input)?;
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — the linked reader replaces `jq`,
     // so the `command -v jq` guard has no compiled counterpart; a document the reader cannot
     // parse keeps `fail_closed`'s exit and its wording, naming the parse rather than the program
     let doc: Value = serde_json::from_str(&text).map_err(|e| {
-        format!(
+        Fault::input(format!(
             "{} is not readable as JSON ({}) — the check could not run; treating as failure (not clean)",
             pkg, e
-        )
+        ))
     })?;
 
     let has = |v: Option<&Value>, k: &str| -> bool {

@@ -57,7 +57,7 @@ pub enum Reading {
     Unknown,
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
+pub fn emit(_args: &[String]) -> Result<String, crate::exit::Fault> {
     let settings = Settings::resolve(crate::walk::knob_scalar);
     let Ok(root) = crate::walk::toplevel() else {
         return Ok(String::new());

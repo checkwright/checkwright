@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §check-roadmap-fresh — every [roadmap:] tag names a configured horizon
 // and track and pairs with exactly one [roadmap-summary:] tag, and the projection page's
 // marker block is the byte-fresh emission of the roadmap arm
+use crate::exit::Fault;
 use crate::emit::roadmap;
 use crate::fresh;
 use crate::marker;
@@ -12,13 +13,13 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-roadmap-fresh: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let configured = queue::knob_scalar("QUEUE_KIT_ROADMAP_FILE")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let configured = queue::knob_scalar("QUEUE_KIT_ROADMAP_FILE").map_err(Fault::refused)?;
     let projection = fresh::positional(args, 0, &configured);
     let emit_src = args.get(1).map(String::as_str).unwrap_or("");
 
@@ -33,18 +34,18 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let projection = projection.to_string();
 
-    let queue_file = queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?;
+    let queue_file = queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?;
     if !Path::new(&queue_file).is_file() {
-        return Err(format!("queue file not found: {}", queue_file));
+        return Err(Fault::refused(format!("queue file not found: {}", queue_file)));
     }
 
     // spec: queue-kit/SPEC.md §check-roadmap-fresh — assertion B runs first, and that ordering is
     // a correctness property: an unconfigured horizon is silently dropped from the emission, so a
     // freshness verdict taken first would pass a page that quietly lost an item.
-    let horizons = queue::knob_array("QUEUE_KIT_HORIZONS")?;
-    let tracks = queue::knob_array("QUEUE_KIT_TRACKS")?;
-    let sec = Sections::active_and_deferred()?;
-    let text = fresh::read_captured(&queue_file)?;
+    let horizons = queue::knob_array("QUEUE_KIT_HORIZONS").map_err(Fault::refused)?;
+    let tracks = queue::knob_array("QUEUE_KIT_TRACKS").map_err(Fault::refused)?;
+    let sec = Sections::active_and_deferred().map_err(Fault::refused)?;
+    let text = fresh::read_captured(&queue_file).map_err(Fault::input)?;
     let entries = queue::roadmap_entries(&text, &sec);
 
     let mut bad: Vec<String> = Vec::new();
@@ -119,22 +120,22 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: queue-kit/SPEC.md §check-roadmap-fresh — a configured path with no page, no markers,
     // or a half marker pair is a broken install, not a clean skip
-    let name = queue::knob_scalar("QUEUE_KIT_ROADMAP_MARKER")?;
+    let name = queue::knob_scalar("QUEUE_KIT_ROADMAP_MARKER").map_err(Fault::refused)?;
     let (begin, end) = (roadmap::begin(&name), roadmap::end(&name));
     if !Path::new(&projection).is_file() {
-        return Err(format!("projection not found: {}", projection));
+        return Err(Fault::refused(format!("projection not found: {}", projection)));
     }
-    let page = fresh::read_captured(&projection)?;
+    let page = fresh::read_captured(&projection).map_err(Fault::input)?;
     // spec: queue-kit/SPEC.md §check-roadmap-fresh — the pair count is `grep -cF`'s: a line
     // *containing* the marker counts, deliberately wider than the block reader's whole-line
     // equality, so an indented second spelling refuses rather than passing as well-formed
     let nb = page.lines().filter(|l| l.contains(begin.as_str())).count();
     let ne = page.lines().filter(|l| l.contains(end.as_str())).count();
     if nb != 1 || ne != 1 {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "{} needs exactly one '{}' + '{}' pair (found {} and {})",
             projection, begin, end, nb, ne
-        ));
+        )));
     }
     let block = marker::read_block(&page, &begin, &end);
 
@@ -143,9 +144,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // bash hop is retired for this member rather than relocated.
     let emitted = if !emit_src.is_empty() {
         if !Path::new(emit_src).is_file() {
-            return Err(format!("emit source not found: {}", emit_src));
+            return Err(Fault::refused(format!("emit source not found: {}", emit_src)));
         }
-        fresh::read_captured(emit_src)?
+        fresh::read_captured(emit_src).map_err(Fault::input)?
     } else {
         roadmap::emit(&[])?
     };
@@ -157,7 +158,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             name, projection
         );
         fresh::print_capped_diff(&format!("{}\n", emitted), &format!("{}\n", block));
-        println!("  help: regenerate — {}", super::door_command("--emit roadmap --write")?);
+        println!("  help: regenerate — {}", super::door_command("--emit roadmap --write").map_err(Fault::refused)?);
         return Ok(1);
     }
     println!(

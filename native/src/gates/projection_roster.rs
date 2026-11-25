@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-projection-roster — the consumer's generated-projections roster holds
 // one keyed row per gate declaring `# projection:`, and no key names any other gate
+use crate::exit::Fault;
 use crate::fresh;
 use crate::registry;
 use crate::section;
@@ -15,8 +16,8 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}: {}", TOOL, msg);
-            eprintln!("PROJECTION-ROSTER: {}", fresh::fail_closed("projection-roster", Some(2)));
-            2
+            eprintln!("PROJECTION-ROSTER: {}", fresh::fail_closed("projection-roster", Some(2))); // status-literal-exempt: the exit code the message cites, not a status
+            msg.status()
         }
     }
 }
@@ -191,9 +192,9 @@ fn rows(section: &[(usize, &str)]) -> (Vec<Row>, Vec<(usize, String)>) {
     (rows, stray)
 }
 
-fn inner(_args: &[String]) -> Result<i32, String> {
-    let roster = walk::knob_scalar("GATE_SDK_PROJECTION_ROSTER")?;
-    let heading = walk::knob_scalar("GATE_SDK_PROJECTION_ROSTER_SECTION")?;
+fn inner(_args: &[String]) -> Result<i32, Fault> {
+    let roster = walk::knob_scalar("GATE_SDK_PROJECTION_ROSTER").map_err(Fault::refused)?;
+    let heading = walk::knob_scalar("GATE_SDK_PROJECTION_ROSTER_SECTION").map_err(Fault::refused)?;
     // spec: gate-sdk/SPEC.md §check-projection-roster — the arming knob: empty asserts nothing and says
     // so, a different sentence from a roster found complete
     if roster.is_empty() {
@@ -203,16 +204,16 @@ fn inner(_args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
     if !Path::new(&roster).is_file() {
-        return Err(format!("the configured roster {} does not exist", roster));
+        return Err(Fault::refused(format!("the configured roster {} does not exist", roster)));
     }
     let text = std::fs::read(&roster)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| format!("cannot read the roster {}: {}", roster, e))?;
+        .map_err(|e| Fault::input(format!("cannot read the roster {}: {}", roster, e)))?;
     let lines = fresh::file_lines(&text);
     let Some(sect) = section_lines(&lines, &heading) else {
-        return Err(format!("{} has no heading '{}' (GATE_SDK_PROJECTION_ROSTER_SECTION)", roster, heading));
+        return Err(Fault::input(format!("{} has no heading '{}' (GATE_SDK_PROJECTION_ROSTER_SECTION)", roster, heading)));
     };
-    let declaring = declaring_gates()?;
+    let declaring = declaring_gates().map_err(Fault::input)?;
     let (rows, stray) = rows(&sect);
 
     let mut findings: Vec<String> = Vec::new();

@@ -93,9 +93,9 @@ fi
 check_case "queue-absent-not-applicable" 0 "clean (not applicable: no queue file at" \
     CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" CANON_KIT_QUEUE_FILE="$SANDBOX/nope.md"
 
-# A queue path naming anything but a file is a fail-closed harness error (exit 2).
+# A queue path naming anything but a file is a fail-closed harness error (exit 3).
 mkdir -p "$SANDBOX/dirqueue"
-check_case "queue-non-file-fail-closed" 2 "not a file" \
+check_case "queue-non-file-fail-closed" 3 "not a file" \
     CANON_KIT_KNOB_FILE="$SANDBOX/cfg.knobs" CANON_KIT_QUEUE_FILE="$SANDBOX/dirqueue"
 
 if [[ "$fails" -gt 0 ]]; then

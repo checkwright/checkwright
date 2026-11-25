@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-harness-literal — no file on the configured corpus carries a
 // configured harness literal outside a site declaring the binding
+use crate::exit::{self, Fault};
 use crate::fresh;
 use crate::gates::portability_floor::{binary, declared, token_reason};
 use crate::listing;
@@ -18,14 +19,14 @@ pub fn run(_args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}", msg);
-            2
+            msg.status()
         }
     }
 }
 
-fn inner() -> Result<i32, String> {
-    let literals = walk::knob_words("GATE_SDK_HARNESS_LITERALS")?;
-    let paths = walk::knob_words("GATE_SDK_HARNESS_LITERAL_PATHS")?;
+fn inner() -> Result<i32, Fault> {
+    let literals = walk::knob_words("GATE_SDK_HARNESS_LITERALS").map_err(Fault::refused)?;
+    let paths = walk::knob_words("GATE_SDK_HARNESS_LITERAL_PATHS").map_err(Fault::refused)?;
 
     // spec: gate-sdk/SPEC.md §check-harness-literal — an empty knob disables the gate, in a
     // sentence a nothing-found clean never prints
@@ -41,18 +42,18 @@ fn inner() -> Result<i32, String> {
 
     let specs: Vec<&str> = paths.iter().map(String::as_str).collect();
     let listing =
-        listing::tracked(None, &specs).map_err(|e| format!("check-harness-literal: {}", e.text()))?;
+        listing::tracked(None, &specs).map_err(|e| Fault::tool(format!("check-harness-literal: {}", e.text())))?;
 
     let mut hits: Vec<String> = Vec::new();
     let mut scanned = 0usize;
     let mut skipped_binary = 0usize;
     for path in listing.iter().map(String::as_str) {
         let Ok(bytes) = std::fs::read(path) else {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "check-harness-literal: corpus member not readable: {}\nHARNESS-LITERAL: {}",
                 path,
-                fresh::fail_closed("corpus-member", Some(2))
-            ));
+                fresh::fail_closed("corpus-member", Some(exit::INPUT))
+            )));
         };
         if binary(&bytes) {
             skipped_binary += 1;

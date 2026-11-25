@@ -143,18 +143,19 @@ function Get-SkippedMark {
 # spec: gate-sdk/SPEC.md §run-gates — the stub's fail-open set on its one declaration line, held to the crate by check-front-end-fail-open and read off the leading token before the lookup and the grammar below
 $argv = @($args)
 $lead = if ($argv.Count -gt 0) { [string] $argv[0] } else { '' }
-$unavailable = 2
+$refused = 2
+$unavailable = 3
 $FailOpenArms = @('--hook', '--statusline')
-if ($FailOpenArms -ccontains $lead) { $unavailable = 0 }
+if ($FailOpenArms -ccontains $lead) { $refused = 0; $unavailable = 0 }
 
 # spec: gate-sdk/SPEC.md §The harness-integration arm — a tree whose repository git refuses or skips runs no binary, so a fail-open arm declines there as on an absent binary
 function Exit-Refused {
-    param([string] $Line)
+    param([string] $Line, [int] $Status)
     Write-StubError $Line
     if ($lead -ceq '--hook') {
         Write-StubLine -Text '{"systemMessage":"run-gates: git refuses or skips the repository this session stands in, so every hook guard in this tree is off and each guarded call is allowed. git status prints its reason, or git --git-dir=<that .git> status for a skipped one"}'
     }
-    exit $unavailable
+    exit $Status
 }
 
 # spec: gate-sdk/SPEC.md §run-gates — the one lookup, split as the crate splits it (§The crate's crosser); the mark test runs before the directory changes
@@ -168,14 +169,14 @@ if ($answer) {
     $top = if ($at -ge 0) { $text.Substring(0, $at) } else { $text }
     $prefix = if ($at -ge 0) { $text.Substring($at + 1).TrimEnd("`n") } else { '' }
     if ($top -and (Get-SkippedMark -Top $top -Prefix $prefix)) {
-        Exit-Refused 'run-gates: git skipped the repository a .git entry marks between here and the toplevel it answered, and answered the enclosing one; git --git-dir=<that .git> status prints its reason'
+        Exit-Refused 'run-gates: git skipped the repository a .git entry marks between here and the toplevel it answered, and answered the enclosing one; git --git-dir=<that .git> status prints its reason' -Status $unavailable
     }
 }
 if (-not $top -or -not (Test-Path -LiteralPath $top -PathType Container)) {
     if (Test-RepositoryMark) {
-        Exit-Refused 'run-gates: git refuses the repository marked here (GIT_DIR, or a .git entry here or above); git status prints its reason'
+        Exit-Refused 'run-gates: git refuses the repository marked here (GIT_DIR, or a .git entry here or above); git status prints its reason' -Status $unavailable
     }
-    Exit-Refused 'run-gates: not inside a git repository'
+    Exit-Refused 'run-gates: not inside a git repository' -Status $refused
 }
 Set-Location -LiteralPath $top
 $here = (Get-Location).ProviderPath

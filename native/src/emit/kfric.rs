@@ -2,6 +2,7 @@
 // per re-derivation, the grammar stamped by the producer rather than by its author.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
 // arm reads a consumer knob, which a hardcoded flag would hide from the knob-file derivation.
+use crate::exit::Fault;
 
 pub const KNOBS: &[&str] = &["DRIFT_KIT_KNOWLEDGE_LOG"];
 
@@ -27,20 +28,20 @@ pub(super) fn append_creating(path: &std::path::Path, body: &str) -> std::io::Re
     f.write_all(body.as_bytes())
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let fields =
-        super::file_survey::positionals(args, "field").map_err(|e| format!("{}\n{}", e, USAGE))?;
+        super::file_survey::positionals(args, "field").map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     if fields.len() != 2 || fields.iter().any(String::is_empty) {
-        return Err(USAGE.to_string());
+        return Err(Fault::usage(USAGE));
     }
-    let (log, spelled) = super::file_survey::anchored_capture("DRIFT_KIT_KNOWLEDGE_LOG")?;
+    let (log, spelled) = super::file_survey::anchored_capture_fault("DRIFT_KIT_KNOWLEDGE_LOG")?;
     let path = std::path::Path::new(&log);
     if let Some(dir) = path.parent() {
         let _ = std::fs::create_dir_all(dir);
     }
     let line = line(&super::kpi::today_iso(), &fields[0], &fields[1]);
     append_creating(path, &format!("{}\n", line))
-        .map_err(|e| format!("cannot append to {}: {}", spelled, e))?;
+        .map_err(|e| Fault::tool(format!("cannot append to {}: {}", spelled, e)))?;
     Ok(format!("kfric: {}\n", line))
 }
 

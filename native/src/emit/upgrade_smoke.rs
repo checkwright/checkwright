@@ -1,9 +1,10 @@
 // spec: gate-sdk/SPEC.md §upgrade-smoke — the two-phase upgrade proof, an `Arm::Run`
 // member: its contract is the exit status (2 broken tag or environment, 1 upgrade finding, 0 clean
-// with one verdict line on stdout), which `Arm::Emit` collapses to 0-or-2
+// with one verdict line on stdout), which `Arm::Emit` collapses to 0, 2 or 3
 use crate::declaration::{self, SectionVerdict, TokenRule};
 use crate::emit::csmoke;
 use crate::ere::Ere;
+use crate::exit;
 use crate::installer::{recipe, GATES_DIR};
 use crate::proc::{self, Sink, Stderr};
 use crate::programs;
@@ -37,7 +38,7 @@ struct Fail {
 
 fn broken(lines: Vec<String>) -> Fail {
     Fail {
-        code: 2,
+        code: exit::FAIL_ENV,
         report: lines,
     }
 }
@@ -84,7 +85,7 @@ pub fn run(args: &[String]) -> i32 {
     // argument is a refusal rather than a silently ignored word
     if let Some(a) = args.first() {
         eprintln!("{}: takes no arguments (got: {})", NAME, a);
-        return 2;
+        return exit::USAGE;
     }
     match smoke() {
         Ok(line) => {

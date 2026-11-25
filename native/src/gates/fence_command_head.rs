@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-fence-command-head — every command in a shell fence of the governed
 // doc set starts with a word that can run, and a word beginning with `-` never can
 use crate::bashscan::{self, Kind, Token};
+use crate::exit::Fault;
 use crate::{spec, walk};
 use std::collections::HashSet;
 use std::path::Path;
@@ -10,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-fence-command-head: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -39,14 +40,15 @@ pub(crate) struct Ctx {
     pub(crate) programs: HashSet<String>,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let top = walk::toplevel_opt()?
-        .ok_or_else(|| "not a git repository — cannot resolve tracked paths".to_string())?;
-    let exclude = spec::knob_array_pub("CANON_KIT_MDREF_EXCLUDE")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let top = walk::toplevel_opt()
+        .map_err(Fault::tool)?
+        .ok_or_else(|| Fault::refused("not a git repository — cannot resolve tracked paths"))?;
+    let exclude = spec::knob_array_pub("CANON_KIT_MDREF_EXCLUDE").map_err(Fault::refused)?;
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        spec::manifest_files(".")?
+        spec::manifest_files(".").map_err(Fault::input)?
             .into_iter()
             .map(|p| p.display().to_string())
             .filter(|f| {
@@ -56,10 +58,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
             .collect()
     };
     let ctx = Ctx {
-        tracked: tracked_files(&top)?,
-        cwd: walk::cwd()?,
+        tracked: tracked_files(&top).map_err(Fault::tool)?,
+        cwd: walk::cwd().map_err(Fault::tool)?,
         top,
-        programs: spec::vocabulary("CANON_KIT_FENCE_PROGRAMS", "CANON_KIT_FENCE_PROGRAMS_EXTRA")?
+        programs: spec::vocabulary("CANON_KIT_FENCE_PROGRAMS", "CANON_KIT_FENCE_PROGRAMS_EXTRA")
+            .map_err(Fault::refused)?
             .into_iter()
             .collect(),
     };
@@ -72,10 +75,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         let docdir = dirname(f);
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         for (open_ln, body) in shell_fences(&text) {
             nfence += 1;
-            for (ln, word, why) in judge_fence(&ctx, &docdir, &body, &mut nhead)? {
+            for (ln, word, why) in judge_fence(&ctx, &docdir, &body, &mut nhead).map_err(Fault::input)? {
                 bad.push(format!("{}:{}: '{}' {}", f, open_ln + ln, word, why));
             }
         }

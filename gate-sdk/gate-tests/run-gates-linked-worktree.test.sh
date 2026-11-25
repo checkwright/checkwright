@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open arm run inside a linked worktree with no binary of its own dispatches to the main checkout's binary: the fork ban, the workflow-state guard and the shell guard fire from the worktree; with both binaries absent the hook still declines at 0; a verdict-bearing arm still reports the binary absent at 2; an absolute pin naming nothing takes no fallback; and a capture write lands in the main checkout (gate-sdk/SPEC.md §The workflow directory)
+# spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open arm run inside a linked worktree with no binary of its own dispatches to the main checkout's binary: the fork ban, the workflow-state guard and the shell guard fire from the worktree; with both binaries absent the hook still declines at 0; a verdict-bearing arm still reports the binary absent at 3; an absolute pin naming nothing takes no fallback; and a capture write lands in the main checkout (gate-sdk/SPEC.md §The workflow directory)
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -50,9 +50,9 @@ out="$(in_wt '{"tool_name":"Bash","tool_input":{"command":"cd deploy && ls"}}' b
 [[ "$rc" -eq 2 ]] || note guard-status "want exit 2 from the shell guard on a blocked command, got $rc -- $out"
 grep -qF "shell-guard: don't use 'cd'" <<<"$out" || note guard-text "the shell guard's block text is missing: $out"
 
-# 5. a verdict-bearing arm links nothing onto a door path git does not ignore: exit 2, naming why
+# 5. a verdict-bearing arm links nothing onto a door path git does not ignore: exit 3, naming why
 out="$(in_wt '' bash gate-sdk/bin/run-gates.sh --emit knob-roster)"; rc=$?
-[[ "$rc" -eq 2 ]] || note emit-status "want exit 2 from --emit with an unignored door path, got $rc -- $out"
+[[ "$rc" -eq 3 ]] || note emit-status "want exit 3 from --emit with an unignored door path, got $rc -- $out"
 grep -qF 'is not gitignored here' <<<"$out" || note emit-text "--emit did not name the unignored door: $out"
 grep -qF 'Build it' <<<"$out" && note emit-remedy "the worktree refusal told the session to build: $out"
 [[ -e "$wt/native/target/release/checkwright-gates$(gate_exe_suffix)" ]] && note emit-linked "a binary was linked onto an unignored door path"
@@ -98,7 +98,7 @@ grep -qF 'is absent or not executable' <<<"$out" || note control-text "the absen
 git -C "$main" worktree remove --force "$wt"
 
 # 8-9. a tree tracking the crate source: a main binary whose source stamp is the worktree's is linked
-#      and runs, one line of skew refuses at 2 without linking, and neither builds
+#      and runs, one line of skew refuses at 3 without linking, and neither builds
 crate="$SANDBOX/crate"
 mkdir -p "$crate/gate-sdk"
 cp -R "$HERE/gate-sdk/bin" "$HERE/gate-sdk/lib" "$crate/gate-sdk/"
@@ -125,12 +125,12 @@ out="$( cd "$cwt" && unset GATE_SDK_NATIVE_BIN && bash gate-sdk/bin/run-gates.sh
 rm -f "$door"
 printf '// skew\n' >>"$cwt/native/src/main.rs"
 out="$( cd "$cwt" && unset GATE_SDK_NATIVE_BIN && bash gate-sdk/bin/run-gates.sh --emit knob-values GATE_SDK_NATIVE_BIN 2>&1 )"; rc=$?
-[[ "$rc" -eq 2 ]] || note skew-status "want exit 2 on a skewed crate, got $rc -- $out"
+[[ "$rc" -eq 3 ]] || note skew-status "want exit 3 on a skewed crate, got $rc -- $out"
 grep -qF "was not built from this worktree's crate source" <<<"$out" || note skew-text "the refusal did not name the skew: $out"
 [[ -e "$door" ]] && note skew-link "a skewed main binary was linked"
 [[ -e "$cwt/native/target/release/deps" ]] && note skew-build "a build ran in the worktree"
 git -C "$crate" worktree remove --force "$cwt"
 
 [[ "$fails" -eq 0 ]] || { echo "run-gates-linked-worktree.test: $fails assertion(s) failed"; exit 1; }
-echo "run-gates-linked-worktree.test: clean (from a linked worktree with no binary the fork ban, the workflow-state guard and the shell guard fire through the main checkout's binary; a verdict arm links the main binary only onto a gitignored door and, where crate source is tracked, only on a matching source stamp, refusing at 2 with the reason otherwise and never building; an absolute pin naming nothing takes no fallback; with both absent the hook declines at 0; a kfric line and a fallback lesson written from the worktree land in the main checkout, and from the main checkout in its own)"
+echo "run-gates-linked-worktree.test: clean (from a linked worktree with no binary the fork ban, the workflow-state guard and the shell guard fire through the main checkout's binary; a verdict arm links the main binary only onto a gitignored door and, where crate source is tracked, only on a matching source stamp, refusing at 3 with the reason otherwise and never building; an absolute pin naming nothing takes no fallback; with both absent the hook declines at 0; a kfric line and a fallback lesson written from the worktree land in the main checkout, and from the main checkout in its own)"
 exit 0

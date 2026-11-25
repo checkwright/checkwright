@@ -65,7 +65,7 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 "$gates" --emit queue-migrate --write TASK-QUEUE.md   # once, on upgrade: bullet entries become ### headings with a tag line
 ```
 
-Each `--queue` verb runs the gates coupled to the queue file after it writes, and never stages or commits: exit 0 is written and green, 1 is written with a red to fix before you commit, 2 is nothing written.
+Each `--queue` verb runs the gates coupled to the queue file after it writes, and never stages or commits: exit 0 is written and green, 1 is written and not green, to fix before you commit, 2 is nothing written.
 
 The roadmap projection is opt-in: it emits nothing until you set the horizon and track vocabularies and a projection page in your config (step 3 above), so an unconfigured consumer gets a clean skip rather than a kit-shaped roadmap.
 

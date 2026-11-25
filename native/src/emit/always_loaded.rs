@@ -1,6 +1,7 @@
 // spec: context-kit/SPEC.md §The always-loaded meter — the standing per-session surface against
 // the committed baseline. Two levels: `measure` produces the figures and `emit` renders the three
 // modes over them, which is what lets `kpi-always-loaded` read them as data (§bin/footprint).
+use crate::exit::Fault;
 use crate::history::Blobs;
 use crate::{proc, programs};
 use crate::section;
@@ -148,13 +149,17 @@ fn hook_cp(argv: &[String]) -> u64 {
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a `git` that could not list is an error rather
 // than an empty match, which would silently shrink the governed set to the surfaces alone.
 pub fn governed() -> Result<Vec<(String, u64)>, String> {
-    let mut paths = walk::knob_array("CONTEXT_KIT_SURFACES")?;
-    let specs = walk::knob_array("CONTEXT_KIT_RATCHET_PATHS")?;
+    governed_fault().map_err(|f| f.message)
+}
+
+fn governed_fault() -> Result<Vec<(String, u64)>, Fault> {
+    let mut paths = walk::knob_array("CONTEXT_KIT_SURFACES").map_err(Fault::refused)?;
+    let specs = walk::knob_array("CONTEXT_KIT_RATCHET_PATHS").map_err(Fault::refused)?;
     let specs: Vec<&str> = specs.iter().map(String::as_str).filter(|s| !s.is_empty()).collect();
     if !specs.is_empty() {
         paths.extend(
             crate::listing::tracked(None, &specs)
-                .map_err(|e| e.text_or(|_| "git ls-files could not list the ratchet pathspecs".to_string()))?,
+                .map_err(|e| Fault::tool(e.text_or(|_| "git ls-files could not list the ratchet pathspecs".to_string())))?,
         );
     }
     paths.sort();
@@ -175,7 +180,7 @@ pub fn governed() -> Result<Vec<(String, u64)>, String> {
 }
 
 // spec: context-kit/SPEC.md §The surface ratchet — the ceiling file: `<n>cp <path>` rows under a
-// `# contract:` header; an unparsable or line-unit row is exit 2, since a dropped row is a surface
+// `# contract:` header; an unparsable or line-unit row is refused, since a dropped row is a surface
 // silently ungoverned
 pub fn ceiling_rows(path: &str) -> Result<Vec<(u64, String)>, String> {
     let text = std::fs::read_to_string(path)
@@ -207,14 +212,14 @@ pub fn ceiling_rows(path: &str) -> Result<Vec<(u64, String)>, String> {
 // spec: context-kit/SPEC.md §The surface ratchet — the writer: every row rewritten to the current
 // size, so one act raises a grown file and locks a cut made beside it. Rows come out sorted by
 // path because the governed set is. The write is checked, the baseline arm's own refusal shape.
-pub fn write_ceiling(path: &str) -> Result<String, String> {
-    let rows = governed()?;
+pub fn write_ceiling(path: &str) -> Result<String, Fault> {
+    let rows = governed_fault()?;
     let mut body = String::from(CEILING_HEADER);
     body.push('\n');
     for (file, size) in &rows {
         body.push_str(&format!("{}cp {}\n", size, file));
     }
-    std::fs::write(path, body).map_err(|e| format!("cannot write {}: {}", path, e))?;
+    std::fs::write(path, body).map_err(|e| Fault::tool(format!("cannot write {}: {}", path, e)))?;
     Ok(format!(
         "surface ceiling updated: {} governed file(s) in {}\n",
         rows.len(),
@@ -320,7 +325,7 @@ pub fn line(m: &Measurement) -> String {
 
 // spec: context-kit/SPEC.md §The always-loaded meter — the growth worklist, from the iteration
 // start else the baseline commit; a tie breaks by descending path bytes, `sort -rn`'s last resort.
-fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
+fn growth(m: &Measurement, baseline_file: &str) -> Result<String, Fault> {
     let (from, label) = if !m.start_commit.is_empty() {
         (m.start_commit.as_str(), format!("iteration start {}", short(&m.start_commit)))
     } else if m.base_commit.is_empty() || !stages::commit_resolves(&m.base_commit) {
@@ -331,12 +336,12 @@ fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
     } else {
         (m.base_commit.as_str(), short(&m.base_commit))
     };
-    let paths = walk::knob_array("CONTEXT_KIT_GROWTH_PATHS")?;
+    let paths = walk::knob_array("CONTEXT_KIT_GROWTH_PATHS").map_err(Fault::refused)?;
     let mut args: Vec<&str> = vec!["diff", "-z", "--name-only", "--no-renames", from, "--"];
     args.extend(paths.iter().map(String::as_str));
     let changed = match crate::listing::names(None, &args) {
         Ok(names) => names,
-        Err(crate::listing::Refusal::NotUtf8(e)) => return Err(e),
+        Err(crate::listing::Refusal::NotUtf8(e)) => return Err(Fault::input(e)),
         Err(_) => Vec::new(),
     };
     // spec: context-kit/SPEC.md §The always-loaded meter — net growth is the file's code-point size
@@ -377,11 +382,11 @@ fn growth(m: &Measurement, baseline_file: &str) -> Result<String, String> {
 // spec: context-kit/SPEC.md §The always-loaded meter — the close-stage act: the header, the
 // `<total> <surface> <commit>` row and a consumer's trailing extra fields carried verbatim; the
 // write is checked, so no confirmation line can report a rewrite that did not happen.
-fn update_baseline(m: &Measurement, baseline_file: &str) -> Result<String, String> {
+fn update_baseline(m: &Measurement, baseline_file: &str) -> Result<String, Fault> {
     // spec: context-kit/SPEC.md §The surface ratchet — close lowers an armed ratchet's ceilings in
     // the same act, and only where the file already exists: seeding one here would arm the gate on
     // a consumer that never asked for it.
-    let ceiling_file = walk::knob_scalar("CONTEXT_KIT_CEILING_FILE")?;
+    let ceiling_file = walk::knob_scalar("CONTEXT_KIT_CEILING_FILE").map_err(Fault::refused)?;
     let ceiling = if std::path::Path::new(&ceiling_file).is_file() {
         Some(write_ceiling(&ceiling_file)?)
     } else {
@@ -398,7 +403,7 @@ fn update_baseline(m: &Measurement, baseline_file: &str) -> Result<String, Strin
         row.push_str(&extra);
     }
     std::fs::write(baseline_file, format!("{}\n{}\n", BASELINE_HEADER, row))
-        .map_err(|e| format!("cannot write {}: {}", baseline_file, e))?;
+        .map_err(|e| Fault::tool(format!("cannot write {}: {}", baseline_file, e)))?;
     Ok(format!(
         "always-loaded baseline updated: {} @ {}\n{}",
         parts(m),
@@ -426,14 +431,15 @@ fn mode(args: &[String]) -> Result<Option<&str>, String> {
     Ok(chosen)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let selected = mode(args)?;
-    let m = measure(&stages::iteration_start(&walk::knob_scalar("CONTEXT_KIT_STATE_FILE")?))?;
-    let baseline_file = walk::knob_scalar("CONTEXT_KIT_BASELINE_FILE")?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let selected = mode(args).map_err(Fault::usage)?;
+    let state = walk::knob_scalar("CONTEXT_KIT_STATE_FILE").map_err(Fault::refused)?;
+    let m = measure(&stages::iteration_start(&state)).map_err(Fault::refused)?;
+    let baseline_file = walk::knob_scalar("CONTEXT_KIT_BASELINE_FILE").map_err(Fault::refused)?;
     match selected {
         Some("--growth") => growth(&m, &baseline_file),
         Some("--update-baseline") => update_baseline(&m, &baseline_file),
-        Some("--ceiling") => write_ceiling(&walk::knob_scalar("CONTEXT_KIT_CEILING_FILE")?),
+        Some("--ceiling") => write_ceiling(&walk::knob_scalar("CONTEXT_KIT_CEILING_FILE").map_err(Fault::refused)?),
         _ => Ok(format!("always-loaded: {}\n", line(&m))),
     }
 }

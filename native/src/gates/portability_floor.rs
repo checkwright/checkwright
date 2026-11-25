@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-portability-floor — no file on the configured install-path
 // corpus uses a banned non-portable construct without a declared valve
+use crate::exit::Fault;
 use crate::ere::Ere;
 use crate::fresh;
 use crate::listing;
@@ -42,7 +43,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}", msg);
-            2
+            msg.status()
         }
     }
 }
@@ -62,7 +63,7 @@ fn resolve_patterns(files: &[String]) -> Result<(Vec<String>, usize), String> {
             return Err(format!(
                 "check-portability-floor: pattern file not readable: {}\nPORTABILITY-FLOOR: {}",
                 f,
-                fresh::fail_closed("portability-patterns", Some(2))
+                fresh::fail_closed("portability-patterns", Some(2)) // status-literal-exempt: the exit code the message cites, not a status
             ));
         };
         let text = String::from_utf8_lossy(&bytes).into_owned();
@@ -76,22 +77,22 @@ fn resolve_patterns(files: &[String]) -> Result<(Vec<String>, usize), String> {
     Ok((patterns, present))
 }
 
-fn inner(args: &[String]) -> Result<i32, String> {
+fn inner(args: &[String]) -> Result<i32, Fault> {
     // spec: gate-sdk/SPEC.md §check-portability-floor — positional pattern files win, the
     // override check-commit-msg's pair already takes; the corpus stays a knob, no positional
     // being able to carry an adopter's own install-path roster across the battery
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        walk::knob_words("GATE_SDK_PORTABILITY_PATTERNS")?
+        walk::knob_words("GATE_SDK_PORTABILITY_PATTERNS").map_err(Fault::refused)?
     };
-    let paths = walk::knob_words("GATE_SDK_PORTABILITY_PATHS")?;
+    let paths = walk::knob_words("GATE_SDK_PORTABILITY_PATHS").map_err(Fault::refused)?;
 
-    let (patterns, files_present) = resolve_patterns(&files)?;
+    let (patterns, files_present) = resolve_patterns(&files).map_err(Fault::input)?;
     // spec: gate-sdk/SPEC.md §check-portability-floor — a pattern file this gate resolved, or the
     // kit's own starter roster, is self-exempt
     let exempt = walk::self_exempt_paths(&files, PORTABILITY_PATTERN_FILE)
-        .map_err(|e| format!("check-portability-floor: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-portability-floor: {}", e)))?;
 
     // spec: gate-sdk/SPEC.md §check-portability-floor — a clean verdict that says *nothing is
     // configured* is a different sentence from one that says *nothing was found*, and telling
@@ -112,10 +113,10 @@ fn inner(args: &[String]) -> Result<i32, String> {
             Ok(e) => compiled.push((p.clone(), e)),
             Err(e) => {
                 eprintln!("check-portability-floor: {}: {}", p, e);
-                return Err(format!(
+                return Err(Fault::refused(format!(
                     "PORTABILITY-FLOOR: {}",
-                    fresh::fail_closed("portability-pattern-compile", Some(2))
-                ));
+                    fresh::fail_closed("portability-pattern-compile", Some(2)) // status-literal-exempt: the exit code the message cites, not a status
+                )));
             }
         }
     }
@@ -125,7 +126,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     // carries, and the payload is assembled from tracked files
     let specs: Vec<&str> = paths.iter().map(String::as_str).collect();
     let listing =
-        listing::tracked(None, &specs).map_err(|e| format!("check-portability-floor: {}", e.text()))?;
+        listing::tracked(None, &specs).map_err(|e| Fault::tool(format!("check-portability-floor: {}", e.text())))?;
 
     let mut hits: Vec<String> = Vec::new();
     let mut ascii_hits: Vec<String> = Vec::new();
@@ -137,11 +138,11 @@ fn inner(args: &[String]) -> Result<i32, String> {
             continue;
         }
         let Ok(bytes) = std::fs::read(path) else {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "check-portability-floor: corpus member not readable: {}\nPORTABILITY-FLOOR: {}",
                 path,
-                fresh::fail_closed("corpus-member", Some(2))
-            ));
+                fresh::fail_closed("corpus-member", Some(2)) // status-literal-exempt: the exit code the message cites, not a status
+            )));
         };
         if binary(&bytes) {
             skipped_binary += 1;

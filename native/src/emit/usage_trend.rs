@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Emit` because the declared contract is 0
 // report emitted / 2 fail-closed and never 1, which is that family verbatim; the *absence* of a 1
 // settles it here where its sibling `--usage-verdict`'s presence of one settled the other way.
+use crate::exit::Fault;
 use crate::walk;
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — the two names this arm resolves, both
@@ -323,14 +324,14 @@ fn segment_key(r: &Rec) -> (&str, &str, &str, &str, &str) {
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the shape half, an *addition* this port makes
 // rather than a behaviour it preserves; the scan is borrowed from the class's first free-text
 // member rather than re-spelled, so the escape has one implementation.
-fn positionals(args: &[String]) -> Result<&[String], String> {
-    super::file_survey::positionals(args, "history path").map_err(|e| format!("{}\n{}", e, USAGE))
+fn positionals(args: &[String]) -> Result<&[String], Fault> {
+    super::file_survey::positionals(args, "history path").map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))
 }
 
 // spec: delegation-kit/SPEC.md §Trend reporter — the positional overrides the knob and is
 // read first, `${1:-…}`'s own laziness; the knob's default being empty, an unset knob
 // and a configured-empty one are one reading and take the tool's own diagnostic.
-fn history(args: &[String]) -> Result<String, String> {
+fn history(args: &[String]) -> Result<String, Fault> {
     let rest = positionals(args)?;
     match rest.first() {
         Some(p) if !p.is_empty() => Ok(p.clone()),
@@ -338,17 +339,17 @@ fn history(args: &[String]) -> Result<String, String> {
     }
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let history = history(args)?;
     if history.is_empty() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "{} unset — no history to report (enable sampling first)",
             HISTORY_KNOB
-        ));
+        )));
     }
-    let body =
-        std::fs::read_to_string(&history).map_err(|_| format!("cannot read history {}", history))?;
-    let pause7 = walk::knob_scalar(PAUSE_KNOB)?;
+    let body = std::fs::read_to_string(&history)
+        .map_err(|_| Fault::input(format!("cannot read history {}", history)))?;
+    let pause7 = walk::knob_scalar(PAUSE_KNOB).map_err(Fault::refused)?;
 
     let mut recs = parse(&body);
     if recs.is_empty() {

@@ -1,1 +1,1 @@
-{"ahead":0,"contract":"1.0.0","findings":[],"subject":"cccccccccccccccccccccccccccccccccccccccc","suites":[{"name":"unit","tree":"clean","verdict":"clean"},{"name":"smoke","tree":"clean","verdict":"new-failures"}],"verdict":"clean"}
+{"ahead":0,"contract":"1.1.0","findings":[],"subject":"cccccccccccccccccccccccccccccccccccccccc","suites":[{"name":"unit","tree":"clean","verdict":"clean"},{"name":"smoke","tree":"clean","verdict":"new-failures"}],"verdict":"clean"}

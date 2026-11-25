@@ -2,6 +2,7 @@
 // than for a repository: the binary and the arm's knob file in the per-user data dir, the arm's
 // writes in the state dir, and the harness settings entry printed, never written
 use super::{refuse, Refusal, FLAGS};
+use crate::exit;
 use crate::hook::{self, binding};
 use crate::{install, sha256, toolfloor, walk};
 use serde_json::{Map, Value};
@@ -80,7 +81,7 @@ pub(super) fn parse(verb: &str, args: &[String]) -> Result<Option<Flags>, Refusa
                 };
                 if head == FLAG {
                     if seen {
-                        return Err(refuse("--user given twice", "", 2));
+                        return Err(refuse("--user given twice", "", exit::USAGE));
                     }
                     seen = true;
                     if verb != "init" {
@@ -88,7 +89,7 @@ pub(super) fn parse(verb: &str, args: &[String]) -> Result<Option<Flags>, Refusa
                             return Err(refuse(
                                 format!("{} --user takes no operand", verb),
                                 format!("{} --user acts on every arm {} records.", verb, LOCK_FILE),
-                                2,
+                                exit::USAGE,
                             ));
                         }
                     } else if let Some(v) = inline {
@@ -103,10 +104,10 @@ pub(super) fn parse(verb: &str, args: &[String]) -> Result<Option<Flags>, Refusa
                     return Err(refuse(
                         format!("{} does not combine with --user", head),
                         "a user install vendors nothing into a repository and commits nothing, so it takes only --dry-run and --force.",
-                        2,
+                        exit::USAGE,
                     ));
                 } else {
-                    return Err(refuse(format!("unknown argument: {}", a), "", 2));
+                    return Err(refuse(format!("unknown argument: {}", a), "", exit::USAGE));
                 }
             }
         }
@@ -122,7 +123,7 @@ fn member_refusal(message: &str) -> Refusal {
             "a user install serves an arm that reads no repository: {}.",
             hook::tree_free_members().join(", ")
         ),
-        2,
+        exit::REFUSED,
     )
 }
 
@@ -176,7 +177,7 @@ fn source() -> Result<Source, Refusal> {
         return Err(refuse(
             "this package carries no version stamp",
             "the version is stamped at pack time from the release tag; a package without one was not assembled by the pack step.",
-            2,
+            exit::INPUT,
         ));
     }
     let digest = sha256::file_hex(&pkg.artifact).map_err(|e| refuse(e, "", 1))?;
@@ -221,14 +222,14 @@ fn dirs(env: Env, windows: bool) -> Result<Dirs, Refusal> {
             return Err(refuse(
                 format!("the per-user {} dir is not UTF-8: {}", which, p.to_string_lossy()),
                 "the path is written into a knob file and printed as JSON, and neither can spell it. Point the variable it derives from at a UTF-8 path.",
-                2,
+                exit::REFUSED,
             ));
         };
         if text.chars().any(char::is_control) {
             return Err(refuse(
                 format!("the per-user {} dir carries a tab or another control character: {:?}", which, text),
                 "the knob file's grammar refuses such a value. Point the variable it derives from at a path without one.",
-                2,
+                exit::REFUSED,
             ));
         }
     }
@@ -238,13 +239,13 @@ fn dirs(env: Env, windows: bool) -> Result<Dirs, Refusal> {
 fn required(env: Env, var: &str, windows: bool) -> Result<PathBuf, Refusal> {
     let help = format!("the user install derives its directories from {}; set it to an absolute path, then re-run.", var);
     match env(var).filter(|v| !v.is_empty()) {
-        None => Err(refuse(format!("{} is unset", var), help, 2)),
+        None => Err(refuse(format!("{} is unset", var), help, exit::REFUSED)),
         Some(v) => {
             let p = PathBuf::from(v);
             if walk::absolute_on(&p.to_string_lossy(), windows) {
                 Ok(p)
             } else {
-                Err(refuse(format!("{} is not an absolute path: {}", var, p.to_string_lossy()), help, 2))
+                Err(refuse(format!("{} is not an absolute path: {}", var, p.to_string_lossy()), help, exit::REFUSED))
             }
         }
     }
@@ -318,7 +319,7 @@ impl UserLock {
             refuse(
                 format!("{} carries a schema this build does not know: {}", LOCK_FILE, path.display()),
                 "this manifest was written by a different Checkwright release. Run that release's uninstall --user, or upgrade the installer.",
-                2,
+                exit::INPUT,
             )
         };
         let text = std::fs::read_to_string(path).map_err(|_| unknown())?;
@@ -332,7 +333,7 @@ impl UserLock {
                 return Err(refuse(
                     format!("{} carries a files key that is not a path inside the data dir: {} ({})", LOCK_FILE, key, path.display()),
                     "init --user records only paths under the data dir, so this manifest was edited or corrupted. Restore it, or remove the user install by hand.",
-                    2,
+                    exit::INPUT,
                 ));
             }
         }
@@ -993,7 +994,7 @@ mod tests {
     }
 
     // spec: installer/SPEC.md §The user manifest — a `files` key outside the data dir refuses the
-    // manifest at exit 2 before anything is removed, a forced uninstall included; the backslash keys
+    // manifest at exit 3 before anything is removed, a forced uninstall included; the backslash keys
     // are the Windows traversal
     #[test]
     fn a_files_key_outside_the_data_dir_refuses_the_manifest() {
@@ -1010,10 +1011,10 @@ mod tests {
             doc["files"] = serde_json::json!({ key: hash });
             std::fs::write(&lock_path, doc.to_string()).expect("tamper");
             let r = uninstall(&d, &flags(false, true), &mut Vec::new()).expect_err(key);
-            assert!(r.code == 2 && r.message.contains("not a path inside the data dir"), "{:?}: {}", key, r.message);
+            assert!(r.code == exit::INPUT && r.message.contains("not a path inside the data dir"), "{:?}: {}", key, r.message);
             assert!(victim.is_file() && binary(&d).is_file(), "{:?}: a refused manifest removed a file", key);
             let r = update(&d, &flags(false, false), &mut Vec::new()).expect_err(key);
-            assert_eq!(r.code, 2, "{:?}", key);
+            assert_eq!(r.code, exit::INPUT, "{:?}", key);
         }
         std::fs::write(&lock_path, &good).expect("restore");
         uninstall(&d, &flags(false, true), &mut Vec::new()).expect("the restored manifest refused");

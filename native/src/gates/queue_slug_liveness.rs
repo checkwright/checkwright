@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §check-queue-slug-liveness — every link into the queue from a
 // configured prose surface resolves against the queue's live slug set, no configured citation
 // surface cites a retired slug, and every status parenthetical in the queue matches its slug
+use crate::exit::Fault;
 use crate::queue;
 use crate::walk;
 use std::path::{Path, PathBuf};
@@ -183,22 +184,22 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-queue-slug-liveness: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let queue_knob = queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?;
-    let sec = queue::Sections::with_done()?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let queue_knob = queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?;
+    let sec = queue::Sections::with_done().map_err(Fault::refused)?;
 
     let scanroot = args.first().map(String::as_str).unwrap_or(".");
     let root = Path::new(scanroot);
     if !root.is_dir() {
-        return Err(format!("not a directory: {}", scanroot));
+        return Err(Fault::refused(format!("not a directory: {}", scanroot)));
     }
-    let prose = surface_files(root, "QUEUE_KIT_PROSE_SURFACE_GLOBS")?;
-    let cites = surface_files(root, "QUEUE_KIT_CITATION_SURFACE_GLOBS")?;
+    let prose = surface_files(root, "QUEUE_KIT_PROSE_SURFACE_GLOBS").map_err(Fault::refused)?;
+    let cites = surface_files(root, "QUEUE_KIT_CITATION_SURFACE_GLOBS").map_err(Fault::refused)?;
 
     // spec: queue-kit/SPEC.md §check-queue-slug-liveness — the queue is looked for at the
     // configured path first and under the scan root second, so a case dir and a repo root
@@ -212,9 +213,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("QUEUE-SLUG-LIVENESS: clean (not applicable: no queue file and no surface configured — nothing to resolve)");
             return Ok(0);
         }
-        return Err(format!("queue file not found: {}", queue_knob));
+        return Err(Fault::refused(format!("queue file not found: {}", queue_knob)));
     }
-    let qtext = read(&qpath)?;
+    let qtext = read(&qpath).map_err(Fault::input)?;
     let live = queue::live_slugs(&qtext, &sec);
     let qfile = qpath.display().to_string();
     let cell: std::cell::OnceCell<Result<Vec<String>, String>> = std::cell::OnceCell::new();
@@ -222,7 +223,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let mut dead: Vec<String> = Vec::new();
     for f in &prose {
-        let text = read(f)?;
+        let text = read(f).map_err(Fault::input)?;
         let dir = f.parent().map(|d| d.display().to_string()).unwrap_or_default();
         for (i, line) in text.lines().enumerate() {
             for tok in queue_claims(line, &dir, &qfile) {
@@ -235,11 +236,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let mut stale: Vec<String> = Vec::new();
     if !cites.is_empty() {
-        let ret = retired()?;
+        let ret = retired().map_err(Fault::tool)?;
         if !ret.is_empty() {
             let stems = queue::tracked_stems(&qfile);
             for f in &cites {
-                let text = read(f)?;
+                let text = read(f).map_err(Fault::input)?;
                 let lines: Vec<&str> = text.lines().collect();
                 for (i, line) in lines.iter().enumerate() {
                     for tok in single_backtick_slugs(line) {
@@ -255,7 +256,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let status = status_findings(&qtext, &sec, &retired, &qpath)?;
+    let status = status_findings(&qtext, &sec, &retired, &qpath).map_err(Fault::tool)?;
 
     if !dead.is_empty() {
         println!("check-queue-slug-liveness: link into the queue claims membership but names no live task:");

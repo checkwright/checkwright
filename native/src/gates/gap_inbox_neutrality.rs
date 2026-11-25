@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-gap-inbox-neutrality — the capture surface records
 // observations: every bullet is '- <YYYY-MM-DD> — <prose>', and no bullet's prose opens with
 // the retired 'recurrence of `<slug>`:' verdict
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -91,7 +92,7 @@ pub fn run(args: &[String]) -> i32 {
         Some(p) => {
             if !Path::new(p.as_str()).is_file() {
                 eprintln!("check-gap-inbox-neutrality: inbox file not found: {}", p);
-                return 2;
+                return exit::REFUSED;
             }
             p.clone()
         }
@@ -100,7 +101,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-gap-inbox-neutrality: {}", e);
-                    return 2;
+                    return exit::REFUSED;
                 }
             };
             // spec: lifecycle-kit/SPEC.md §check-gap-inbox-neutrality — an absent inbox is
@@ -122,7 +123,7 @@ pub fn run(args: &[String]) -> i32 {
                 "check-gap-inbox-neutrality: inbox file not readable: {}",
                 inbox
             );
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -165,7 +166,7 @@ pub fn run(args: &[String]) -> i32 {
             inbox
         );
         let Some(door) = super::door_or_report("check-gap-inbox-neutrality", "--emit file-gap") else {
-            return 2;
+            return exit::REFUSED;
         };
         for f in &findings {
             println!("  {}", f);

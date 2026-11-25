@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-action-run-path — every repo-relative `.sh` path in invocation
 // position in a shell `run:` body of an Actions-shaped YAML file resolves under the scan root
+use crate::exit;
 use crate::actions_run::{actions_files, dialect_of, extract, print_refusal, ActionsFiles, Item, Runner};
 use crate::gates::docs_cmd;
 use crate::walk;
@@ -139,7 +140,7 @@ pub fn run(args: &[String]) -> i32 {
     let scanroot = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(scanroot).is_dir() {
         eprintln!("{}: scan root not found: {}", NAME, scanroot);
-        return 2;
+        return exit::REFUSED;
     }
 
     let found = match actions_files(Path::new(scanroot)) {
@@ -149,7 +150,7 @@ pub fn run(args: &[String]) -> i32 {
                 "{}: {} — the check could not run; treating as failure (not clean)",
                 NAME, e
             );
-            return 2;
+            return exit::INPUT;
         }
     };
 

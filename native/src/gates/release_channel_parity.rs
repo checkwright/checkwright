@@ -1,5 +1,6 @@
 // spec: installer/SPEC.md §Versioning — the declared release channel agrees with the publish
 // workflow's prerelease posture (A) and with the project's own version line (B)
+use crate::exit::{self, Fault};
 use super::install_docs;
 use crate::fresh;
 use crate::{proc, programs};
@@ -10,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-release-channel-parity: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -62,21 +63,21 @@ fn semver_major(v: &str) -> Option<u64> {
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let page_paths = install_docs::paths(args, 0)?;
     let publish_yml = match args.get(1).filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => crate::walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW")?
+        None => crate::walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW").map_err(Fault::refused)?
             .into_iter()
             .next()
-            .ok_or("GATE_SDK_NATIVE_PUBLISH_WORKFLOW names no workflow")?,
+            .ok_or_else(|| Fault::refused("GATE_SDK_NATIVE_PUBLISH_WORKFLOW names no workflow"))?,
     };
     let publish_yml = publish_yml.as_str();
     let version_arg = args.get(2).map(String::as_str).unwrap_or("");
 
     let pages = install_docs::read(&page_paths, "not found")?;
     if !Path::new(publish_yml).is_file() {
-        return Err(format!("not found: {}", publish_yml));
+        return Err(Fault::refused(format!("not found: {}", publish_yml)));
     }
 
     // spec: installer/SPEC.md §Versioning — one declaration line across the install pages, each
@@ -98,10 +99,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .collect();
 
     if decls.is_empty() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "{} carries no 'Release channel:' declaration line — the channel cannot be established (installer/SPEC.md §Versioning owns the declaration)",
             install_docs::names(&pages)
-        ));
+        )));
     }
     if decls.len() > 1 {
         eprintln!(
@@ -110,7 +111,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             decls.len()
         );
         eprintln!("{}", decls.iter().map(|(_, l)| l.as_str()).collect::<Vec<&str>>().join("\n"));
-        return Ok(2);
+        return Ok(exit::INPUT);
     }
     let (install_md, install_text) = (pages[decls[0].0].path.as_str(), pages[decls[0].0].text.as_str());
 
@@ -125,13 +126,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         } else {
             channel
         };
-        return Err(format!(
+        return Err(Fault::input(format!(
             "{} declares an unrecognized channel value ({}); the two admissible values are 'preview' and 'stable' (installer/SPEC.md §Versioning)",
             install_md, shown
-        ));
+        )));
     }
 
-    let publish_text = fresh::read_captured(publish_yml)?;
+    let publish_text = fresh::read_captured(publish_yml).map_err(Fault::input)?;
     let create_step: Vec<String> = fresh::file_lines(&publish_text)
         .iter()
         .enumerate()
@@ -139,10 +140,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .map(|(n, l)| format!("{}:{}", n + 1, l))
         .collect();
     if create_step.is_empty() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "{} has no recognizable Release-creating step ('gh release create'); the prerelease posture cannot be established",
             publish_yml
-        ));
+        )));
     }
     let has_prerelease = create_step.iter().any(|l| l.contains("--prerelease"));
 
@@ -173,10 +174,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         b_state = "dormant".to_string();
     } else {
         let major = semver_major(&version).ok_or_else(|| {
-            format!(
+            Fault::input(format!(
                 "the version line ('{}') does not parse as semver, so the channel cannot be compared against it",
                 version
-            )
+            ))
         })?;
         let bare = version.strip_prefix('v').unwrap_or(&version);
         if major == 0 {

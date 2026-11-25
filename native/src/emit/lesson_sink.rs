@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §The lesson-sink arm — the outbound channel's router, an `Arm::Run`
 // rather than an `Arm::Emit` member because the sink's exit status *is* this arm's
 // spec: gate-sdk/SPEC.md §The non-gate arm — the member the flag-keyed table exists for
+use crate::exit::Fault;
 use crate::proc::{self, Stderr};
 use crate::programs;
 use crate::walk;
@@ -17,21 +18,21 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("checkwright-gates: --lesson-sink: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn route(args: &[String]) -> Result<i32, String> {
+fn route(args: &[String]) -> Result<i32, Fault> {
     let mut tag = String::new();
     for a in args {
         if a.starts_with('-') {
-            return Err(format!("unknown option: {}", a));
+            return Err(Fault::usage(format!("unknown option: {}", a)));
         }
         tag = a.clone();
     }
     if tag.is_empty() {
-        return Err("needs a <tag>".to_string());
+        return Err(Fault::usage("needs a <tag>"));
     }
 
     // spec: queue-kit/SPEC.md §The lesson-sink arm — stdin is buffered rather than streamed, so
@@ -39,9 +40,9 @@ fn route(args: &[String]) -> Result<i32, String> {
     let mut body: Vec<u8> = Vec::new();
     std::io::stdin()
         .read_to_end(&mut body)
-        .map_err(|e| format!("cannot read the lesson body on stdin: {}", e))?;
+        .map_err(|e| Fault::input(format!("cannot read the lesson body on stdin: {}", e)))?;
 
-    let sinks = walk::knob_map("QUEUE_KIT_LESSON_SINKS")?;
+    let sinks = walk::knob_map("QUEUE_KIT_LESSON_SINKS").map_err(Fault::refused)?;
     if let Some((_, command)) = sinks.iter().find(|(k, _)| *k == tag) {
         return spawn_sink(command, &body);
     }
@@ -51,11 +52,13 @@ fn route(args: &[String]) -> Result<i32, String> {
 // spec: queue-kit/SPEC.md §The lesson-sink arm — spawn-and-report: `Streamed::code()` already
 // wraps the signal-aware exit-code spelling, and `run_streamed` captures stdout rather than
 // inheriting it, so the arm re-emits what the child wrote
-fn spawn_sink(command: &str, body: &[u8]) -> Result<i32, String> {
-    let done = proc::run_streamed(&programs::BASH, &["-c", command], body, Stderr::Inherit)?;
+fn spawn_sink(command: &str, body: &[u8]) -> Result<i32, Fault> {
+    let done = proc::run_streamed(&programs::BASH, &["-c", command], body, Stderr::Inherit).map_err(Fault::tool)?;
     // spec: gate-sdk/SPEC.md §The non-gate arm — a departed reader is no refusal: the sink ran
     match std::io::stdout().write_all(done.stdout()) {
-        Err(e) if !crate::departed_reader(&e) => Err(format!("cannot re-emit the sink's output: {}", e)),
+        Err(e) if !crate::departed_reader(&e) => {
+            Err(Fault::tool(format!("cannot re-emit the sink's output: {}", e)))
+        }
         _ => Ok(done.code()),
     }
 }
@@ -63,29 +66,30 @@ fn spawn_sink(command: &str, body: &[u8]) -> Result<i32, String> {
 // spec: queue-kit/SPEC.md §The lesson-sink arm — the unconfigured tag falls **open**, appending
 // to `<workflow-dir>/<tag>-harvest.md`, which is what keeps a fresh clone closing cleanly and
 // preserves the staging file's documented reclaim path.
-fn fallback(tag: &str, body: &[u8]) -> Result<i32, String> {
-    let dir = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?;
+fn fallback(tag: &str, body: &[u8]) -> Result<i32, Fault> {
+    let dir = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?;
     let path = format!("{}/{}-harvest.md", dir, tag);
     let mut f = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
         .open(walk::capture_path(&path))
-        .map_err(|e| format!("cannot open the harvest file {}: {}", path, e))?;
+        .map_err(|e| Fault::tool(format!("cannot open the harvest file {}: {}", path, e)))?;
     f.write_all(body)
-        .map_err(|e| format!("cannot append to the harvest file {}: {}", path, e))?;
+        .map_err(|e| Fault::tool(format!("cannot append to the harvest file {}: {}", path, e)))?;
     Ok(0)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::exit;
 
     // spec: queue-kit/SPEC.md §The lesson-sink arm — the argv is one `<tag>` and nothing else, so
     // a missing tag and an option are both refusals rather than a silent no-op
     #[test]
     fn the_argv_is_one_tag_and_a_missing_one_refuses() {
-        assert_eq!(run(&[]), 2);
-        assert_eq!(run(&["--nope".to_string()]), 2);
+        assert_eq!(run(&[]), exit::USAGE);
+        assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }
 
     // spec: queue-kit/SPEC.md §The lesson-sink arm — the fallback appends under the resolved workflow

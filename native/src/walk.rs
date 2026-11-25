@@ -388,8 +388,8 @@ pub fn spelled_here(root: &str) -> Result<String, String> {
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — `--emit kit-roots`: one root per line, relative to the
 // working directory, for the shell callers that still need the set
-pub fn emit_kit_roots(_args: &[String]) -> Result<String, String> {
-    Ok(kit_roots()?.into_iter().map(|r| format!("{}\n", r)).collect())
+pub fn emit_kit_roots(_args: &[String]) -> Result<String, crate::exit::Fault> {
+    Ok(kit_roots().map_err(crate::exit::Fault::refused)?.into_iter().map(|r| format!("{}\n", r)).collect())
 }
 
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the read of one scalar knob
@@ -509,6 +509,16 @@ pub fn escaped_os(s: &std::ffi::OsStr) -> String {
 // crosses for the same reason `cwd()` does.
 pub fn toplevel() -> Result<String, String> {
     toplevel_opt()?.ok_or_else(|| "not a git repository".to_string())
+}
+
+// spec: gate-sdk/SPEC.md §Output contract — the same answer typed by the cut: a run outside a
+// repository is the caller's refusal, and a git that could not answer is a tool error
+pub fn toplevel_fault() -> Result<String, crate::exit::Fault> {
+    match toplevel_opt() {
+        Ok(Some(top)) => Ok(top),
+        Ok(None) => Err(crate::exit::Fault::refused("not a git repository")),
+        Err(e) => Err(crate::exit::Fault::tool(e)),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the same producer asked from another directory.

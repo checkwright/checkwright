@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the contract is an action with
 // an exit status, and a table member because it reads nine knobs a hardcoded flag would hide
 // from the knob-file derivation
+use crate::exit::Fault;
 use crate::marker;
 use crate::{proc, programs};
 use crate::stages;
@@ -36,7 +37,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(()) => 0,
         Err(e) => {
             eprintln!("install-lifecycle: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -44,27 +45,27 @@ pub fn run(args: &[String]) -> i32 {
 // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the `[agent-file]` positional is the
 // file the rule writes into rather than a selector for where configuration comes from, so it
 // arrives as argv and overrides the knob's default (gate-sdk/SPEC.md §The non-gate arm)
-fn agent_file(args: &[String]) -> Result<String, String> {
+fn agent_file(args: &[String]) -> Result<String, Fault> {
     match args.first().filter(|a| !a.is_empty()) {
-        Some(a) if a.starts_with('-') => Err(format!("unknown option: {}", a)),
+        Some(a) if a.starts_with('-') => Err(Fault::usage(format!("unknown option: {}", a))),
         Some(a) => Ok(a.clone()),
-        None => walk::knob_scalar("LIFECYCLE_KIT_AGENT_FILE"),
+        None => walk::knob_scalar("LIFECYCLE_KIT_AGENT_FILE").map_err(Fault::refused),
     }
 }
 
-fn install(args: &[String]) -> Result<(), String> {
+fn install(args: &[String]) -> Result<(), Fault> {
     let agent = agent_file(args)?;
     // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the installer edits an always-loaded
     // file, it does not mint one, so an absent agent file is a refusal and not a create
     if !Path::new(&agent).is_file() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "agent file not found: {} — nothing to install into",
             agent
-        ));
+        )));
     }
 
-    let block = stages::registration_block()?;
-    let action = marker::install_block(&agent, BEGIN, END, &format!("{}\n", block))?;
+    let block = stages::registration_block().map_err(Fault::refused)?;
+    let action = marker::install_block(&agent, BEGIN, END, &format!("{}\n", block)).map_err(Fault::input)?;
     println!(
         "install-lifecycle: {} the lifecycle registration block in {}",
         action, agent
@@ -74,9 +75,10 @@ fn install(args: &[String]) -> Result<(), String> {
     // minted when absent: it is not an always-loaded file the consumer authored. The opposite
     // disposition to the agent file above, one call apart, and neither is the other's default.
     if !Path::new(ATTRS).is_file() {
-        std::fs::write(ATTRS, "").map_err(|e| format!("cannot create {}: {}", ATTRS, e))?;
+        std::fs::write(ATTRS, "").map_err(|e| Fault::tool(format!("cannot create {}: {}", ATTRS, e)))?;
     }
-    let aaction = marker::install_block(ATTRS, ABEGIN, AEND, &stages::merge_attrs_block()?)?;
+    let attrs_block = stages::merge_attrs_block().map_err(Fault::refused)?;
+    let aaction = marker::install_block(ATTRS, ABEGIN, AEND, &attrs_block).map_err(Fault::input)?;
     println!(
         "install-lifecycle: {} the iteration-scoped merge attributes in {}",
         aaction, ATTRS
@@ -114,9 +116,10 @@ fn register_driver() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::exit;
 
     // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the agent file is never minted, so
-    // an absent one is exit 2 rather than a create; a flag in the positional slot is a refusal
+    // an absent one is exit 3 rather than a create; a flag in the positional slot is a refusal
     #[test]
     fn an_absent_agent_file_refuses_and_never_mints() {
         let p = std::env::temp_dir()
@@ -124,8 +127,8 @@ mod tests {
             .display()
             .to_string();
         let _ = std::fs::remove_file(&p);
-        assert_eq!(run(std::slice::from_ref(&p)), 2);
+        assert_eq!(run(std::slice::from_ref(&p)), exit::REFUSED);
         assert!(!Path::new(&p).exists(), "the refusal minted the agent file");
-        assert_eq!(run(&["--nope".to_string()]), 2);
+        assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }
 }

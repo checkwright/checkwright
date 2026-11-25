@@ -2,6 +2,7 @@
 // install-observation channel: an aggregate-only table set, a pure function of the record and
 // byte-stable over an unchanged one, so a consumer's byte-comparing freshness gate can hold it.
 use super::file_install::{BEHAVIOURS, DAYS, DISPOSITIONS, NO_GREEN, RETAINED, VERDICTS};
+use crate::exit::Fault;
 use std::collections::{BTreeMap, BTreeSet};
 
 pub const KNOBS: &[&str] = &["DRIFT_KIT_INSTALL_RECORD", "DRIFT_KIT_GATES_FILE"];
@@ -19,7 +20,11 @@ const EMPTY_CELL: &str = "·";
 // repo root exactly as the capture arm resolves it in the main checkout, so writer and reader cannot
 // diverge there; a reader keeps its own root (gate-sdk/SPEC.md §The workflow directory).
 pub fn record_path() -> Result<(String, String), String> {
-    super::file_survey::anchored("DRIFT_KIT_INSTALL_RECORD")
+    record_path_fault().map_err(|f| f.message)
+}
+
+fn record_path_fault() -> Result<(String, String), Fault> {
+    super::file_survey::anchored_fault("DRIFT_KIT_INSTALL_RECORD")
 }
 
 // spec: drift-kit/SPEC.md §The install-evidence projection — one parsed observation; a line the
@@ -298,9 +303,9 @@ fn first_useful_red(events: &[Event<'_>]) -> String {
     )
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let human = args.iter().any(|a| a == "--human");
-    let (record, _) = record_path()?;
+    let (record, _) = record_path_fault()?;
     // spec: drift-kit/SPEC.md §The install-evidence projection — an absent record and a record of
     // zero observations are one reading, the counted zero, so the table set renders either way.
     let body = std::fs::read(&record)

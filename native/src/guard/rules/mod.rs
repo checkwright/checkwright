@@ -854,7 +854,7 @@ fn loop_tokens(s: &str) -> Option<Vec<(i32, bool, String, usize)>> {
     let (mut i, mut open) = (0usize, None);
     while i < b.len() {
         let glyph = match b[i] {
-            b'|' | b'&' if b.get(i + 1) == Some(&b[i]) => 2,
+            b'|' | b'&' if b.get(i + 1) == Some(&b[i]) => 2, // status-literal-exempt: the glyph width of a doubled operator
             b';' | b'|' | b'&' | b'(' | b')' | b'{' | b'}' => 1,
             b'>' | b'<' => {
                 let run = b[i..].iter().take_while(|c| matches!(c, b'>' | b'<')).count();

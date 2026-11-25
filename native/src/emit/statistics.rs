@@ -6,6 +6,7 @@ use super::kpi::{self, deferred_age, overhead};
 use super::queue_flow::{self, Window};
 use super::stage_economics::{self, LogRow};
 use super::trajectory::{self, days_from_civil, Closed};
+use crate::exit::Fault;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fmt::Write as _;
 
@@ -32,14 +33,14 @@ pub const KNOBS: &[&str] = &[
 pub const USAGE: &str = "usage: --emit statistics [<n>]   (<n> a positive integer, the trailing \
                          closed iterations charted; default every closed iteration)";
 
-fn count_arg(args: &[String]) -> Result<Option<usize>, String> {
+fn count_arg(args: &[String]) -> Result<Option<usize>, Fault> {
     match args {
         [] => Ok(None),
         [n] => match n.parse::<usize>() {
             Ok(v) if v > 0 && n.bytes().all(|b| b.is_ascii_digit()) => Ok(Some(v)),
-            _ => Err(USAGE.to_string()),
+            _ => Err(Fault::usage(USAGE)),
         },
-        _ => Err(USAGE.to_string()),
+        _ => Err(Fault::usage(USAGE)),
     }
 }
 
@@ -140,7 +141,7 @@ struct Spend {
 // a fan-out row by its suffix first, so `supervision+fanout` is fan-out spend
 fn band(stage: &str, supervision: &str, suffix: &str) -> usize {
     if !suffix.is_empty() && stage.ends_with(suffix) {
-        2
+        2 // status-literal-exempt: the fan-out band's index
     } else if stage == supervision {
         1
     } else {
@@ -303,11 +304,11 @@ fn read_lines<T>(path: &str, parse: fn(&str) -> Option<T>) -> Option<Vec<T>> {
         .map(|b| String::from_utf8_lossy(&b).lines().filter_map(parse).collect())
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let n = count_arg(args)?;
-    let knob = crate::walk::knob_scalar;
+    let knob = |name: &str| crate::walk::knob_scalar(name).map_err(Fault::refused);
     let file = knob("DRIFT_KIT_STATISTICS_FILE")?;
-    let h = trajectory::harvest()?;
+    let h = trajectory::harvest().map_err(Fault::refused)?;
     let closed_names: Vec<String> = h.closed.iter().map(|c| c.name.clone()).collect();
     let no_closed = if !h.state_present {
         Some(format!("no committed state file at {}", h.state_file))
@@ -326,8 +327,8 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     // spec: drift-kit/SPEC.md §The statistics view — the two close-commit reads share one batched
     // blob reader, so a long history buys one `git cat-file` process
     let mut blobs = always_loaded::blobs();
-    let always = if kpi::always_loaded::present(&crate::walk::kit_roots_abs()?) {
-        let surfaces = crate::walk::knob_array("CONTEXT_KIT_SURFACES")?;
+    let always = if kpi::always_loaded::present(&crate::walk::kit_roots_abs().map_err(Fault::refused)?) {
+        let surfaces = crate::walk::knob_array("CONTEXT_KIT_SURFACES").map_err(Fault::refused)?;
         Ok(closed
             .iter()
             .map(|c| match blobs.as_mut() {
@@ -339,7 +340,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         Err("context-kit absent".to_string())
     };
     let queue = knob("DRIFT_KIT_QUEUE_FILE")?;
-    let top = crate::walk::toplevel().or_else(|_| crate::walk::cwd())?;
+    let top = crate::walk::toplevel().or_else(|_| crate::walk::cwd()).map_err(Fault::tool)?;
     let queue = crate::walk::rel_under(&top, &queue).unwrap_or(&queue).to_string();
     let section = knob("DRIFT_KIT_DEFERRED_SECTION")?;
     let deferred = closed
@@ -368,7 +369,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     if let Some(dir) = std::path::Path::new(&at).parent() {
         let _ = std::fs::create_dir_all(dir);
     }
-    std::fs::write(&at, &r.document).map_err(|e| format!("cannot write {}: {}", file, e))?;
+    std::fs::write(&at, &r.document).map_err(|e| Fault::tool(format!("cannot write {}: {}", file, e)))?;
     Ok(format!(
         "statistics: wrote {} — {} closed iteration(s)\n{}",
         file,

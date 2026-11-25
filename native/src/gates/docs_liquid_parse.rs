@@ -1,5 +1,6 @@
 // spec: site-kit/SPEC.md §check-docs-liquid-parse — every tracked docs file the Pages build runs Liquid over parses under the parser SITE_KIT_LIQUID_PARSER names
 use super::docs_render_fidelity::{jekyll_internal, nul_records, spawn_filter};
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use crate::proc;
@@ -25,40 +26,40 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}", msg);
-            2
+            msg.status()
         }
     }
 }
 
-fn inner(_args: &[String]) -> Result<i32, String> {
-    let docs_knob = walk::knob_scalar("SITE_KIT_DOCS_DIR").map_err(|e| format!("{}: {}", NAME, e))?;
+fn inner(_args: &[String]) -> Result<i32, Fault> {
+    let docs_knob = walk::knob_scalar("SITE_KIT_DOCS_DIR").map_err(|e| Fault::refused(format!("{}: {}", NAME, e)))?;
     let docs = fresh::strip_trailing_slash(&docs_knob).to_string();
 
-    if walk::toplevel_opt().map_err(|e| format!("{}: {}", NAME, e))?.is_none() {
-        return Err(format!("{}: not a git repository — cannot enumerate tracked docs files", NAME));
+    if walk::toplevel_opt().map_err(|e| Fault::tool(format!("{}: {}", NAME, e)))?.is_none() {
+        return Err(Fault::refused(format!("{}: not a git repository — cannot enumerate tracked docs files", NAME)));
     }
     if !fresh::is_dir(&docs) {
-        return Err(format!("{}: docs dir not found: {}", NAME, docs));
+        return Err(Fault::refused(format!("{}: docs dir not found: {}", NAME, docs)));
     }
 
-    let parser = walk::knob_array("SITE_KIT_LIQUID_PARSER").map_err(|e| format!("{}: {}", NAME, e))?;
+    let parser = walk::knob_array("SITE_KIT_LIQUID_PARSER").map_err(|e| Fault::refused(format!("{}: {}", NAME, e)))?;
     let probed = spawn_filter("SITE_KIT_LIQUID_PARSER", &parser, PROBE, proc::Stderr::Discard)
         .map(|(_, out)| nul_records(&out));
     if let Some(why) = probe_refusal(&probed) {
-        return Err(format!(
+        return Err(Fault::tool(format!(
             "{}: Liquid parser '{}' failed its probe ({})\n  help: SITE_KIT_LIQUID_PARSER must read NUL-terminated documents from stdin and write one\n        NUL-terminated verdict per input, in order: empty when the document parses, else\n        the parse error — the default needs ruby with the liquid gem",
             NAME,
             parser.join(" "),
             why
-        ));
+        )));
     }
 
-    let listing = tracked(&[&docs])?;
+    let listing = tracked(&[&docs]).map_err(Fault::tool)?;
 
-    let pathspecs = walk::knob_array("SITE_KIT_LIQUID_TEMPLATES").map_err(|e| format!("{}: {}", NAME, e))?;
-    let templates = selected(&pathspecs)?;
+    let pathspecs = walk::knob_array("SITE_KIT_LIQUID_TEMPLATES").map_err(|e| Fault::refused(format!("{}: {}", NAME, e)))?;
+    let templates = selected(&pathspecs).map_err(Fault::tool)?;
 
-    let prune = walk::prune_dirs().map_err(|e| format!("{}: {}", NAME, e))?;
+    let prune = walk::prune_dirs().map_err(|e| Fault::refused(format!("{}: {}", NAME, e)))?;
     let mut corpus: Vec<(String, Class)> = Vec::new();
     for p in listing.iter().map(String::as_str) {
         if walk::path_pruned(p, &prune) || !Path::new(p).is_file() {
@@ -74,7 +75,7 @@ fn inner(_args: &[String]) -> Result<i32, String> {
     for (p, _) in &corpus {
         let raw = std::fs::read(p)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .map_err(|e| format!("{}: cannot read {}: {}", NAME, p, e))?;
+            .map_err(|e| Fault::input(format!("{}: cannot read {}: {}", NAME, p, e)))?;
         stream.extend_from_slice(frame(&raw).as_bytes());
         stream.push(0);
     }
@@ -82,16 +83,16 @@ fn inner(_args: &[String]) -> Result<i32, String> {
     let verdicts = if corpus.is_empty() {
         Vec::new()
     } else {
-        let (_, out) = spawn_filter("SITE_KIT_LIQUID_PARSER", &parser, &stream, proc::Stderr::Inherit)?;
+        let (_, out) = spawn_filter("SITE_KIT_LIQUID_PARSER", &parser, &stream, proc::Stderr::Inherit).map_err(Fault::tool)?;
         nul_records(&out)
     };
     if verdicts.len() != corpus.len() {
-        return Err(format!(
+        return Err(Fault::tool(format!(
             "{}: Liquid parser returned {} verdict(s) for {} document(s)\n  help: SITE_KIT_LIQUID_PARSER must write exactly one NUL-terminated verdict per NUL-terminated\n        input document, in order; a short count is a parser that died mid-stream, truncated\n        its output, or framed it wrongly",
             NAME,
             verdicts.len(),
             corpus.len()
-        ));
+        )));
     }
 
     let findings: Vec<String> = corpus

@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — prior-stage invocation-stamp ordering +
 // drain-entry queue-empty + audit-trigger signal + inferred-claim residue + marker grammar
+use crate::exit;
 use crate::ere::Ere;
 use crate::stages;
 use crate::walk;
@@ -409,14 +410,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(k) => k,
         Err(e) => {
             eprintln!("check-stage-entry: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
     for path in [&k.queue, &k.state] {
         if !Path::new(path).is_file() {
             eprintln!("check-stage-entry: file not found: {}", path);
-            return 2;
+            return exit::REFUSED;
         }
     }
 
@@ -424,7 +425,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(e) => {
             eprintln!("check-stage-entry: cannot read {}: {}", k.queue, e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let Some(hdr) = stages::header(&qtext) else {
@@ -441,7 +442,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(e) => {
             eprintln!("check-stage-entry: cannot read {}: {}", k.state, e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let stage = stages::current_stage(&stext);
@@ -549,7 +550,7 @@ pub fn run(args: &[String]) -> i32 {
                 "check-stage-entry: {} — the check could not run; treating as failure (not clean)",
                 e
             );
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -565,7 +566,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-stage-entry: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
             Ok(Some(detail)) => {
                 if !stamp_present(&stext, &iter, &k.waiver) {
@@ -605,7 +606,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-stage-entry: cannot read {}: {} — the check could not run; treating as failure (not clean)",
                     af, e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         record(af, scan_markers(&text, &|_| true));

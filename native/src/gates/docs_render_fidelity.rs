@@ -1,6 +1,7 @@
 // spec: site-kit/SPEC.md §check-docs-render-fidelity — every tracked docs markdown page, rendered
 // through the Pages parser, leaks no code-span corruption symptom into text, promotes no
 // code-fenced heading, and renders no fewer tables than its source GFM table starts
+use crate::exit::Fault;
 use crate::fresh;
 use crate::{proc, programs};
 use crate::walk;
@@ -27,7 +28,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}", msg);
-            2
+            msg.status()
         }
     }
 }
@@ -81,28 +82,28 @@ fn strip_nuls(s: &str) -> String {
     s.chars().filter(|c| *c != '\0').collect()
 }
 
-fn inner(args: &[String]) -> Result<i32, String> {
-    let docs_knob = walk::knob_scalar("SITE_KIT_DOCS_DIR").map_err(|e| format!("{}: {}", NAME, e))?;
+fn inner(args: &[String]) -> Result<i32, Fault> {
+    let docs_knob = walk::knob_scalar("SITE_KIT_DOCS_DIR").map_err(|e| Fault::refused(format!("{}: {}", NAME, e)))?;
     let docs = fresh::strip_trailing_slash(fresh::positional(args, 0, &docs_knob)).to_string();
 
-    if walk::toplevel_opt().map_err(|e| format!("{}: {}", NAME, e))?.is_none() {
-        return Err(format!(
+    if walk::toplevel_opt().map_err(|e| Fault::tool(format!("{}: {}", NAME, e)))?.is_none() {
+        return Err(Fault::refused(format!(
             "{}: not a git repository — cannot enumerate tracked pages",
             NAME
-        ));
+        )));
     }
     if !fresh::is_dir(&docs) {
-        return Err(format!("{}: docs dir not found: {}", NAME, docs));
+        return Err(Fault::refused(format!("{}: docs dir not found: {}", NAME, docs)));
     }
 
-    let batch = walk::knob_array("SITE_KIT_RENDERER_BATCH").map_err(|e| format!("{}: {}", NAME, e))?;
-    let renderer = walk::knob_array("SITE_KIT_RENDERER").map_err(|e| format!("{}: {}", NAME, e))?;
+    let batch = walk::knob_array("SITE_KIT_RENDERER_BATCH").map_err(|e| Fault::refused(format!("{}: {}", NAME, e)))?;
+    let renderer = walk::knob_array("SITE_KIT_RENDERER").map_err(|e| Fault::refused(format!("{}: {}", NAME, e)))?;
 
     // spec: site-kit/SPEC.md §check-docs-render-fidelity — probe the oracle the gate will actually
     // run, and only that one: a set batch knob is the consumer's statement of which parser is
     // authoritative
     if !batch.is_empty() {
-        let (_, out) = spawn_filter("SITE_KIT_RENDERER_BATCH", &batch, b"# probe one\n\0# probe two\n\0", proc::Stderr::Discard)?;
+        let (_, out) = spawn_filter("SITE_KIT_RENDERER_BATCH", &batch, b"# probe one\n\0# probe two\n\0", proc::Stderr::Discard).map_err(Fault::tool)?;
         // spec: site-kit/SPEC.md §check-docs-render-fidelity — two documents in, exactly two
         // *non-empty* documents back. Emptiness is bash's `${d//[[:space:]]/}`, whose C-locale
         // class carries the vertical tab Rust's `is_ascii_whitespace` leaves out.
@@ -111,34 +112,34 @@ fn inner(args: &[String]) -> Result<i32, String> {
             .filter(|d| d.iter().any(|b| !posix_space(*b)))
             .count();
         if bprobe != 2 {
-            return Err(format!(
+            return Err(Fault::tool(format!(
                 "{}: batch renderer '{}' failed its probe\n  (2 documents in, {} non-empty document(s) back)\n  help: SITE_KIT_RENDERER_BATCH must read NUL-terminated documents from stdin and write\n        one NUL-terminated HTML document per input, in order; unset it to fall back to\n        the per-document SITE_KIT_RENDERER contract",
                 NAME,
                 batch.join(" "),
                 bprobe
-            ));
+            )));
         }
     } else {
-        let (pst, out) = spawn_filter("SITE_KIT_RENDERER", &renderer, b"# probe\n", proc::Stderr::Discard)?;
+        let (pst, out) = spawn_filter("SITE_KIT_RENDERER", &renderer, b"# probe\n", proc::Stderr::Discard).map_err(Fault::tool)?;
         let text = String::from_utf8_lossy(&out).into_owned();
         if pst != 0 || trim_trailing_newlines(&text).is_empty() {
-            return Err(format!(
+            return Err(Fault::tool(format!(
                 "{}: renderer '{}' could not run (exit {})\n  help: install the Pages parser — ruby plus the kramdown-parser-gfm gem — or point\n        SITE_KIT_RENDERER at a stdin->stdout GFM-to-HTML command",
                 NAME,
                 renderer.join(" "),
                 pst
-            ));
+            )));
         }
     }
 
     let listing = crate::listing::tracked(None, &[&docs]).map_err(|e| match e {
         crate::listing::Refusal::Failed(code) => {
-            format!("DOCS-RENDER-FIDELITY: {}", fresh::fail_closed("git-ls-files", code))
+            Fault::tool(format!("DOCS-RENDER-FIDELITY: {}", fresh::fail_closed("git-ls-files", code)))
         }
-        other => format!("{}: {}", NAME, other.text()),
+        other => Fault::tool(format!("{}: {}", NAME, other.text())),
     })?;
 
-    let prune = walk::prune_dirs().map_err(|e| format!("{}: {}", NAME, e))?;
+    let prune = walk::prune_dirs().map_err(|e| Fault::refused(format!("{}: {}", NAME, e)))?;
     let mut pages: Vec<String> = Vec::new();
     for p in listing.iter().map(String::as_str) {
         if !p.ends_with(".md") || jekyll_internal(p) || walk::path_pruned(p, &prune) {
@@ -161,7 +162,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     for p in &pages {
         let raw = std::fs::read(p)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .map_err(|e| format!("{}: cannot read {}: {}", NAME, p, e))?;
+            .map_err(|e| Fault::input(format!("{}: cannot read {}: {}", NAME, p, e)))?;
         bodies.push(strip_front_matter(&raw));
     }
 
@@ -172,7 +173,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
             stream.extend_from_slice(render_input(b).as_bytes());
             stream.push(0);
         }
-        let (_, out) = spawn_filter("SITE_KIT_RENDERER_BATCH", &batch, &stream, proc::Stderr::Inherit)?;
+        let (_, out) = spawn_filter("SITE_KIT_RENDERER_BATCH", &batch, &stream, proc::Stderr::Inherit).map_err(Fault::tool)?;
         for d in nul_records(&out) {
             let text = String::from_utf8_lossy(&d).into_owned();
             htmls.push(trim_trailing_newlines(&text).to_string());
@@ -181,21 +182,21 @@ fn inner(args: &[String]) -> Result<i32, String> {
         // the per-page exit status the shell form's process substitution discarded, so it catches
         // renderer death, truncation and framing error alike
         if htmls.len() != pages.len() {
-            return Err(format!(
+            return Err(Fault::tool(format!(
                 "{}: batch renderer returned {} document(s) for {} page(s)\n  help: SITE_KIT_RENDERER_BATCH must write exactly one NUL-terminated HTML document per\n        NUL-terminated input document, in order; a short count is a renderer that died\n        mid-stream, truncated its output, or framed it wrongly",
                 NAME,
                 htmls.len(),
                 pages.len()
-            ));
+            )));
         }
     } else {
         for b in &bodies {
-            let (rst, out) = spawn_filter("SITE_KIT_RENDERER", &renderer, render_input(b).as_bytes(), proc::Stderr::Inherit)?;
+            let (rst, out) = spawn_filter("SITE_KIT_RENDERER", &renderer, render_input(b).as_bytes(), proc::Stderr::Inherit).map_err(Fault::tool)?;
             if rst != 0 {
-                return Err(format!(
+                return Err(Fault::tool(format!(
                     "DOCS-RENDER-FIDELITY: {}",
                     fresh::fail_closed("renderer", Some(rst))
-                ));
+                )));
             }
             let text = String::from_utf8_lossy(&out).into_owned();
             htmls.push(trim_trailing_newlines(&text).to_string());

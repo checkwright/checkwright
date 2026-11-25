@@ -238,7 +238,7 @@ lacks "lane-off-count" "$tmp/out" "consumer case"
 printf 'GUARD_KIT_CONSUMER_CASES = lane.tsv\n' >"$tmp/lane-nocmd.knobs"
 eq "lane-nocmd-status" "$(lane "$tmp/lane-nocmd.knobs")" 2
 printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = %s\nGUARD_KIT_CONSUMER_CASES = no-such.tsv\n' "$tmp/lane-rule.sh" >"$tmp/lane-nofile.knobs"
-eq "lane-nofile-status" "$(lane "$tmp/lane-nofile.knobs")" 2
+eq "lane-nofile-status" "$(lane "$tmp/lane-nofile.knobs")" 3
 
 # --- the consumer lane's derivation: off where GUARD_KIT_CONSUMER_VARIANT_LIMITS is empty (above); a
 #     named table greens the re-spellings the consumer's command declines, reds one it does not
@@ -262,10 +262,10 @@ has "derive-stale-named" "$tmp/out" "limit row 'cd_compound sq-arg' admits a re-
 printf 'GUARD_KIT_CONSUMER_RULES_CMD[] = bash\nGUARD_KIT_CONSUMER_RULES_CMD[] = %s\nGUARD_KIT_CONSUMER_VARIANT_LIMITS = lane-limits.tsv\n' "$tmp/lane-rule.sh" >"$tmp/derive-nocases.knobs"
 eq "derive-nocases-status" "$(lane "$tmp/derive-nocases.knobs")" 2
 has "derive-nocases-named" "$tmp/out" "GUARD_KIT_CONSUMER_VARIANT_LIMITS"
-eq "derive-nofile-status" "$(lane "$(derive_knobs nofile no-such-limits.tsv)")" 2
+eq "derive-nofile-status" "$(lane "$(derive_knobs nofile no-such-limits.tsv)")" 3
 has "derive-nofile-named" "$tmp/out" "GUARD_KIT_CONSUMER_VARIANT_LIMITS"
 printf 'block\tcd_compound\tsq-lead\n' >"$tmp/cwd/lane-bad-limits.tsv"
-eq "derive-unreadable-status" "$(lane "$(derive_knobs unreadable lane-bad-limits.tsv)")" 2
+eq "derive-unreadable-status" "$(lane "$(derive_knobs unreadable lane-bad-limits.tsv)")" 3
 has "derive-unreadable-named" "$tmp/out" "GUARD_KIT_CONSUMER_VARIANT_LIMITS"
 
 # --- the variant lane reads the fifth positional: a limit row nothing needs is a mismatch, and a
@@ -278,14 +278,14 @@ limits() {  # $1=name $2..=rows — a limits table of those rows, its path echoe
 }
 eq "limits-stale-status" "$(lane "$tmp/lane-off.knobs" "$(limits stale 'fallthrough\tcd_compound\tsq-lead')")" 1
 has "limits-stale-named" "$tmp/out" "limit row 'cd_compound sq-lead' admits a re-spelling that no longer fails"
-eq "limits-floor-status" "$(lane "$tmp/lane-off.knobs" "$(limits floor 'block\tcd_compound\tsq-lead')")" 2
-eq "limits-transform-status" "$(lane "$tmp/lane-off.knobs" "$(limits transform 'allow\tcd_compound\tsq')")" 2
-eq "limits-twice-status" "$(lane "$tmp/lane-off.knobs" "$(limits twice 'allow\tcd_compound\tsq-lead' 'fallthrough\tcd_compound\tsq-lead')")" 2
-eq "limits-missing-status" "$(lane "$tmp/lane-off.knobs" "$tmp/no-such-limits.tsv")" 2
+eq "limits-floor-status" "$(lane "$tmp/lane-off.knobs" "$(limits floor 'block\tcd_compound\tsq-lead')")" 3
+eq "limits-transform-status" "$(lane "$tmp/lane-off.knobs" "$(limits transform 'allow\tcd_compound\tsq')")" 3
+eq "limits-twice-status" "$(lane "$tmp/lane-off.knobs" "$(limits twice 'allow\tcd_compound\tsq-lead' 'fallthrough\tcd_compound\tsq-lead')")" 3
+eq "limits-missing-status" "$(lane "$tmp/lane-off.knobs" "$tmp/no-such-limits.tsv")" 3
 
 if [[ "$fails" -gt 0 ]]; then
     echo "consumer-rules.test: $fails of $checks assertion(s) failed"
     exit 1
 fi
-echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim, view prints the named view through the tool's reader, nothing for a tool no reader serves, and words prints the word read's values a segment a line, nothing where the read answers nothing, and refuses an operand; a raw control byte is blocked by name before any rule; --run-guard-tests' consumer lane drives the consumer's rows against its command from the arm's working directory, reds a mismatch either way, is silent where no table is named, and refuses a table with no command or no file at exit 2, and derives its rows' re-spellings only under a named limits table, held from both sides and refused at exit 2 with no cases table or no readable table; its variant lane counts the four tables' derived rows, reds a limit row nothing needs and refuses a limits table it cannot read at exit 2)"
+echo "consumer-rules.test: ok ($checks assertions; the consumer command reads the payload bytes as received with the working directory and environment inherited, a block and a decision are relayed verbatim ahead of the generic ruleset, an empty result falls through to it, a fault — non-zero-non-2 exit, unparseable or non-object stdout, a command that cannot start — rides the ruleset's own answer and never silences it, an empty knob runs no stage; --guard-json field reads bytes verbatim, view prints the named view through the tool's reader, nothing for a tool no reader serves, and words prints the word read's values a segment a line, nothing where the read answers nothing, and refuses an operand; a raw control byte is blocked by name before any rule; --run-guard-tests' consumer lane drives the consumer's rows against its command from the arm's working directory, reds a mismatch either way, is silent where no table is named, and refuses a table with no command at exit 2 and one with no file at exit 3, and derives its rows' re-spellings only under a named limits table, held from both sides and refused with no cases table at exit 2 and with no readable table at exit 3; its variant lane counts the four tables' derived rows, reds a limit row nothing needs and refuses a limits table it cannot read at exit 3)"
 exit 0

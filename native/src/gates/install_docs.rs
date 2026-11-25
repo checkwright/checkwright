@@ -2,6 +2,7 @@
 // `GATE_LOCAL_INSTALL_DOCS` names, read from the tree or from the members a tag carries, each
 // block or line taken from the one member carrying it
 use super::pinned_release;
+use crate::exit::Fault;
 use crate::{fresh, walk};
 use std::path::Path;
 
@@ -14,28 +15,28 @@ pub(crate) struct Member {
 
 // spec: installer/SPEC.md §The hosted install pin — a positional page is one file and wins over
 // the knob
-pub(crate) fn paths(args: &[String], n: usize) -> Result<Vec<String>, String> {
+pub(crate) fn paths(args: &[String], n: usize) -> Result<Vec<String>, Fault> {
     if let Some(a) = args.get(n).filter(|a| !a.is_empty()) {
         return Ok(vec![a.clone()]);
     }
-    let set = walk::knob_array(KNOB)?;
+    let set = walk::knob_array(KNOB).map_err(Fault::refused)?;
     if set.is_empty() {
-        return Err(format!("{} names no install page", KNOB));
+        return Err(Fault::refused(format!("{} names no install page", KNOB)));
     }
     Ok(set)
 }
 
 // spec: installer/SPEC.md §The hosted install pin — a tree read takes every member's text, and a
 // member that is no file refuses
-pub(crate) fn read(paths: &[String], missing: &str) -> Result<Vec<Member>, String> {
+pub(crate) fn read(paths: &[String], missing: &str) -> Result<Vec<Member>, Fault> {
     let mut out = Vec::new();
     for p in paths {
         if !Path::new(p).is_file() {
-            return Err(format!("{}: {}", missing, p));
+            return Err(Fault::refused(format!("{}: {}", missing, p)));
         }
         out.push(Member {
             path: p.clone(),
-            text: fresh::read_captured(p)?,
+            text: fresh::read_captured(p).map_err(Fault::input)?,
         });
     }
     Ok(out)
@@ -43,7 +44,7 @@ pub(crate) fn read(paths: &[String], missing: &str) -> Result<Vec<Member>, Strin
 
 // spec: installer/SPEC.md §The hosted install pin — a tag read takes the members the tag carries,
 // and a tag carrying none refuses
-pub(crate) fn at_tag(tag: &str, paths: &[String]) -> Result<Vec<Member>, String> {
+pub(crate) fn at_tag(tag: &str, paths: &[String]) -> Result<Vec<Member>, Fault> {
     let mut out = Vec::new();
     for p in paths {
         let path = p.trim_start_matches("./");
@@ -55,7 +56,7 @@ pub(crate) fn at_tag(tag: &str, paths: &[String]) -> Result<Vec<Member>, String>
         }
     }
     if out.is_empty() {
-        return Err(format!("the tag {} exists and carries no {}", tag, paths.join(", ")));
+        return Err(Fault::refused(format!("the tag {} exists and carries no {}", tag, paths.join(", "))));
     }
     Ok(out)
 }
@@ -70,17 +71,17 @@ pub(crate) fn carrier<'a>(
     members: &'a [Member],
     what: &str,
     carries: impl Fn(&str) -> bool,
-) -> Result<Option<&'a Member>, String> {
+) -> Result<Option<&'a Member>, Fault> {
     let found: Vec<&Member> = members.iter().filter(|m| carries(&m.text)).collect();
     match found.as_slice() {
         [] => Ok(None),
         [one] => Ok(Some(one)),
-        many => Err(format!(
+        many => Err(Fault::input(format!(
             "{} install pages carry {} ({}); exactly one is admissible",
             many.len(),
             what,
             many.iter().map(|m| m.path.as_str()).collect::<Vec<&str>>().join(", ")
-        )),
+        ))),
     }
 }
 
@@ -113,6 +114,6 @@ mod tests {
         let args = vec!["x".to_string(), "one.md".to_string()];
         assert_eq!(paths(&args, 1), Ok(vec!["one.md".to_string()]));
         let e = read(&["no/such/install-docs.md".to_string()], "install page not found").err().unwrap();
-        assert_eq!(e, "install page not found: no/such/install-docs.md");
+        assert_eq!(e, Fault::refused("install page not found: no/such/install-docs.md"));
     }
 }

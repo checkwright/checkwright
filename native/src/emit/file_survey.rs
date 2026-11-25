@@ -2,6 +2,7 @@
 // survey, the grammar stamped by the producer rather than by its author.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
 // arm reads two consumer knobs, which a hardcoded flag would hide from the knob-file derivation.
+use crate::exit::Fault;
 use crate::gates::survey_record::{self, Corpus};
 use crate::programs;
 use crate::stages;
@@ -40,44 +41,48 @@ pub fn positionals<'a>(args: &'a [String], what: &str) -> Result<&'a [String], S
 // directory outside a repository.
 // comment-tier-exempt: the configured spelling rides back beside the resolved path because the
 // refusals print it, and an absolute path no knob carries is not what a reader can act on
-pub fn anchored(knob: &str) -> Result<(String, String), String> {
-    let configured = walk::knob_scalar(knob)?;
+pub fn anchored_fault(knob: &str) -> Result<(String, String), Fault> {
+    let configured = walk::knob_scalar(knob).map_err(Fault::refused)?;
     Ok((anchor(&configured)?, configured))
 }
 
 // spec: gate-sdk/SPEC.md §The workflow directory — a capture knob's path: the main checkout's from a
 // linked worktree, else anchored as a tracked record path is
 pub fn anchored_capture(knob: &str) -> Result<(String, String), String> {
-    let configured = walk::knob_scalar(knob)?;
+    anchored_capture_fault(knob).map_err(|f| f.message)
+}
+
+pub fn anchored_capture_fault(knob: &str) -> Result<(String, String), Fault> {
+    let configured = walk::knob_scalar(knob).map_err(Fault::refused)?;
     Ok((anchor(&walk::capture_path(&configured))?, configured))
 }
 
 // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the three tracked capture arms refuse in a
 // linked worktree rather than route: a line written there reaches the backlog only through a
 // commit that worktree makes, which an isolated child never does
-pub fn refuse_in_linked_worktree(knob: &str) -> Result<(), String> {
-    let record = walk::knob_scalar(knob)?;
+pub fn refuse_in_linked_worktree(knob: &str) -> Result<(), Fault> {
+    let record = walk::knob_scalar(knob).map_err(Fault::refused)?;
     linked_worktree_refusal(walk::main_checkout_root().as_deref(), &record)
 }
 
-fn linked_worktree_refusal(main: Option<&str>, record: &str) -> Result<(), String> {
+fn linked_worktree_refusal(main: Option<&str>, record: &str) -> Result<(), Fault> {
     match main {
         None => Ok(()),
-        Some(m) => Err(format!(
+        Some(m) => Err(Fault::refused(format!(
             "this checkout is a linked worktree of `{}`, so a `{}` line written here reaches the \
              backlog only through a commit this worktree makes and merges back. An isolated child \
              hands the finding back to its dispatcher, who files it from the main checkout. A \
              session that commits from this worktree appends the line by hand in the record's \
              grammar.",
             m, record
-        )),
+        ))),
     }
 }
 
-fn anchor(p: &str) -> Result<String, String> {
-    let root = match walk::toplevel_opt()? {
+fn anchor(p: &str) -> Result<String, Fault> {
+    let root = match walk::toplevel_opt().map_err(Fault::tool)? {
         Some(t) => t,
-        None => walk::cwd()?,
+        None => walk::cwd().map_err(Fault::tool)?,
     };
     Ok(walk::abs_against(&root, p))
 }
@@ -85,13 +90,14 @@ fn anchor(p: &str) -> Result<String, String> {
 // spec: lifecycle-kit/SPEC.md §The survey record — `rev` is machine-stamped because it is the field
 // the whole re-use protocol turns on and the one an author gets wrong; a tree with no HEAD cannot
 // ground a witness, so it is a refusal rather than a blank field.
-fn head_rev() -> Result<String, String> {
+fn head_rev() -> Result<String, Fault> {
     let refusal = || {
-        "no HEAD commit to stamp as the survey rev — the witness would have nothing to diff \
-         against; commit first."
-            .to_string()
+        Fault::refused(
+            "no HEAD commit to stamp as the survey rev — the witness would have nothing to diff \
+             against; commit first.",
+        )
     };
-    let out = crate::proc::run(&programs::GIT, &["rev-parse", "HEAD"]).map_err(|_| refusal())?;
+    let out = crate::proc::run(&programs::GIT, &["rev-parse", "HEAD"]).map_err(Fault::tool)?;
     let rev = match out.stdout() {
         Some(o) => String::from_utf8_lossy(o).trim().to_string(),
         None => return Err(refusal()),
@@ -104,8 +110,8 @@ fn head_rev() -> Result<String, String> {
 
 // spec: lifecycle-kit/SPEC.md §The survey record — the stage is derived from the cursor rather than
 // asked for, which is why the state-file knob is on this arm's roster and on no other's.
-fn stage() -> Result<String, String> {
-    let (state, _) = anchored("LIFECYCLE_KIT_STATE_FILE")?;
+fn stage() -> Result<String, Fault> {
+    let (state, _) = anchored_fault("LIFECYCLE_KIT_STATE_FILE")?;
     let s = std::fs::read(state)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
         .unwrap_or_default();
@@ -117,44 +123,44 @@ fn stage() -> Result<String, String> {
     })
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let fields = positionals(args, "field").map_err(|e| format!("{}\n{}", e, USAGE))?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let fields = positionals(args, "field").map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     if fields.len() != 5 || fields.iter().any(String::is_empty) {
-        return Err(USAGE.to_string());
+        return Err(Fault::usage(USAGE));
     }
     let (question, corpus, oracle, inferred, finding) = (
         &fields[0], &fields[1], &fields[2], &fields[3], &fields[4],
     );
-    let shape = survey_record::parse_corpus(corpus).map_err(|e| format!("{}\n{}", e, USAGE))?;
+    let shape = survey_record::parse_corpus(corpus).map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     refuse_in_linked_worktree("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?;
     let rev = head_rev()?;
     if let Corpus::Pathspecs(pathspecs) = &shape {
         let missed = survey_record::unmatched(None, &rev, pathspecs)
-            .map_err(|e| format!("{} — nothing was filed\n{}", e, USAGE))?;
+            .map_err(|e| Fault::tool(format!("{} — nothing was filed\n{}", e, USAGE)))?;
         if !missed.is_empty() {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "corpus pathspec(s) matching no path tracked at HEAD: {} — scoping prose belongs in the finding, and a survey over no tree corpus takes the corpus none\n{}",
                 missed.iter().map(|p| format!("'{}'", p)).collect::<Vec<_>>().join(" "),
                 USAGE
-            ));
+            )));
         }
     }
     let stage = stage()?;
     let today = super::kpi::today_iso();
-    let (record, spelled) = anchored("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?;
+    let (record, spelled) = anchored_fault("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?;
     let path = std::path::Path::new(&record);
     if let Some(dir) = path.parent() {
         let _ = std::fs::create_dir_all(dir);
     }
     if !path.is_file() {
         std::fs::write(path, CONTRACT_HEADER)
-            .map_err(|e| format!("cannot seed {}: {}", spelled, e))?;
+            .map_err(|e| Fault::tool(format!("cannot seed {}: {}", spelled, e)))?;
     }
     let block = format!(
         "\n## {} {} — {}\n- corpus: {}\n- oracle: {}\n- rev: {}\n- finding: {}\n- inferred: {}\n",
         today, stage, question, corpus, oracle, rev, finding, inferred
     );
-    append(path, &block).map_err(|e| format!("cannot append to {}: {}", spelled, e))?;
+    append(path, &block).map_err(|e| Fault::tool(format!("cannot append to {}: {}", spelled, e)))?;
 
     // spec: lifecycle-kit/SPEC.md §The survey record — the honest limit and the witness hint, the
     // two advisories written straight to stderr because the arm's returned string is the record's

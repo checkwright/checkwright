@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-rule-id-coverage — every rule id the code declares is cited by
 // exactly one spec file, and every rule id a spec cites is declared
+use crate::exit::Fault;
 use super::task_label_resolution::labels;
 use super::task_path_claim::valve_reason;
 use crate::ere::EreCapture;
@@ -21,7 +22,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-rule-id-coverage: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -57,14 +58,14 @@ struct Occurrence {
     valve: Valve,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let (declares, cites) = (walk::knob_map(DECLARES)?, walk::knob_map(CITES)?);
-    let (declare_globs, spec_globs) = (spec::knob_array_pub(DECLARE_GLOBS)?, spec::knob_array_pub(SPEC_GLOBS)?);
-    let homes = spec::knob_pub(HOMES)?;
+    let (declares, cites) = (walk::knob_map(DECLARES).map_err(Fault::refused)?, walk::knob_map(CITES).map_err(Fault::refused)?);
+    let (declare_globs, spec_globs) = (spec::knob_array_pub(DECLARE_GLOBS).map_err(Fault::refused)?, spec::knob_array_pub(SPEC_GLOBS).map_err(Fault::refused)?);
+    let homes = spec::knob_pub(HOMES).map_err(Fault::refused)?;
     let refusals = rule_id_refusals(&RuleIdConfig {
         declares: &declares,
         cites: &cites,
@@ -73,7 +74,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         homes: &homes,
     });
     if !refusals.is_empty() {
-        return Err(refusals.join("; "));
+        return Err(Fault::refused(refusals.join("; ")));
     }
     if declares.is_empty() {
         println!(
@@ -82,11 +83,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
         );
         return Ok(0);
     }
-    let families = families(&declares, &cites)?;
-    let declaring = files(root, &declare_globs)?;
-    let specs = files(root, &spec_globs)?;
-    let decls = occurrences(&declaring, &families, declare_side)?;
-    let cites = occurrences(&specs, &families, cite_side)?;
+    let families = families(&declares, &cites).map_err(Fault::refused)?;
+    let declaring = files(root, &declare_globs).map_err(Fault::input)?;
+    let specs = files(root, &spec_globs).map_err(Fault::input)?;
+    let decls = occurrences(&declaring, &families, declare_side).map_err(Fault::input)?;
+    let cites = occurrences(&specs, &families, cite_side).map_err(Fault::input)?;
     let report = judge(&families, &decls, &cites, homes == "one");
 
     if !report.findings.is_empty() {

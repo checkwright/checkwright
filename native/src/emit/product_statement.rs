@@ -1,5 +1,6 @@
 // spec: docs/generated-projections.md §Generated projections and their freshness gates — the product
 // statement: one source, its renderings per site kind, one function the gate calls in process
+use crate::exit::Fault;
 use crate::fresh;
 
 pub const SOURCE_KNOB: &str = "GATE_LOCAL_PRODUCT_STATEMENT_CONF";
@@ -279,22 +280,25 @@ fn rewrite(site: &str, text: &str, s: &Statement) -> Result<String, String> {
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the bare arm prints each site's expected text; `--write`
 // rewrites every site's slot in place, and only after every site has placed its slot
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let source = crate::walk::knob_scalar(SOURCE_KNOB)?;
-    let st = parse(&source, &crate::emit::read_text(&source)?)?;
-    let sites = crate::walk::knob_array(SITES_KNOB)?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let source = crate::walk::knob_scalar(SOURCE_KNOB).map_err(Fault::refused)?;
+    let st = parse(&source, &crate::emit::read_text(&source).map_err(Fault::input)?).map_err(Fault::input)?;
+    let sites = crate::walk::knob_array(SITES_KNOB).map_err(Fault::refused)?;
+    for site in &sites {
+        kind_of(site).map_err(Fault::refused)?;
+    }
     if args.iter().any(|a| a == "--write") {
         let mut staged: Vec<(&str, String, bool)> = Vec::new();
         for site in &sites {
-            let text = crate::emit::read_text(site)?;
-            let new = rewrite(site, &text, &st)?;
+            let text = crate::emit::read_text(site).map_err(Fault::input)?;
+            let new = rewrite(site, &text, &st).map_err(Fault::input)?;
             let changed = new != text;
             staged.push((site, new, changed));
         }
         let mut out = String::new();
         for (site, new, changed) in staged {
             if changed {
-                std::fs::write(site, new).map_err(|e| format!("cannot write {}: {}", site, e))?;
+                std::fs::write(site, new).map_err(|e| Fault::tool(format!("cannot write {}: {}", site, e)))?;
                 out.push_str(&format!("product-statement: rewrote {}\n", site));
             }
         }
@@ -305,7 +309,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     }
     let mut out = String::new();
     for site in &sites {
-        for text in expected(site, &st)? {
+        for text in expected(site, &st).map_err(Fault::refused)? {
             out.push_str(&format!("{}: {}\n", site, text));
         }
     }

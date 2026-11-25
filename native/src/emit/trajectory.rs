@@ -486,9 +486,9 @@ fn render_stages(seen: &[String], stages: &[String], abbr: &[String]) -> String 
 // spec: drift-kit/SPEC.md §The published-evidence extractor — the *bare* arm prints the committed
 // projection and `--human` prepends the advisory header, inverting the shell tool's default: an
 // arm returns the document, else the comparator compares against a banner.
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, crate::exit::Fault> {
     let human = args.iter().any(|a| a == "--human");
-    let h = harvest()?;
+    let h = harvest().map_err(crate::exit::Fault::refused)?;
     let abbr = abbreviations(&h.roster);
     let legend = abbr.join(" ");
 

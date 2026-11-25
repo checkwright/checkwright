@@ -59,7 +59,7 @@ out="$( cd "$SANDBOX/repo" && run DEMO_HARNESS_DIR quoted )"; rc=$?
 expect quoted-name 1 "quoted/$quoted:1:" "$rc" "$out"
 
 out="$( cd "$SANDBOX/bare" && GIT_CEILING_DIRECTORIES="$SANDBOX" run DEMO_HARNESS_DIR . )"; rc=$?
-expect non-repository 2 'git-ls-files' "$rc" "$out"
+expect non-repository 3 'git-ls-files' "$rc" "$out"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-harness-literal.test.sh: $fails case(s) failed"

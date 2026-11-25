@@ -53,7 +53,7 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 <!-- measured: gate-tally=7 -->
 The registry holds 7 gates today.
 EOF
-check_case "unknown-key-fails-closed" 2 "key 'gate-tally' is absent from the emitter's roster" cfg.knobs
+check_case "unknown-key-fails-closed" 3 "key 'gate-tally' is absent from the emitter's roster" cfg.knobs
 
 # The authoring contract arm C prices: a bound claim carrying more than one
 # distinct cardinal is ambiguous, and the gate refuses to guess which one the
@@ -64,7 +64,7 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 <!-- measured: gate-total=7 -->
 The registry holds 7 gates across 3 kits today.
 EOF
-check_case "ambiguous-claim-fails-closed" 2 "2 distinct cardinals" cfg.knobs
+check_case "ambiguous-claim-fails-closed" 3 "2 distinct cardinals" cfg.knobs
 
 # A marker that does not parse is an authoring error, never a site to skip: a
 # skipped malformed marker is an unchecked claim that looks checked.
@@ -74,7 +74,7 @@ cat >"$SANDBOX/SPEC.md" <<'EOF'
 <!-- measured: gate-total -->
 The registry holds 7 gates today.
 EOF
-check_case "malformed-marker-fails-closed" 2 "marker does not parse" cfg.knobs
+check_case "malformed-marker-fails-closed" 3 "marker does not parse" cfg.knobs
 
 # Inactive by default: with no oracle command the gate has nothing to check a
 # marker against, and reports clean rather than reddening every marker in a

@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — whenever a registered member resolving to a
 // .gate descriptor makes the binary load-bearing, the binary was built from the source now in
 // the tree
+use crate::exit;
 use crate::fresh;
 use crate::proc;
 use crate::registry;
@@ -16,7 +17,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-gate-binary-fresh: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -26,14 +27,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-gate-binary-fresh: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let crate_dir = match walk::knob_scalar("GATE_SDK_NATIVE_CRATE") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-gate-binary-fresh: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     // spec: gate-sdk/SPEC.md §Layout and configuration — a `{root}/checks` resolve dir is opened,
@@ -48,7 +49,7 @@ pub fn run(args: &[String]) -> i32 {
         ),
         Err(e) => {
             eprintln!("check-gate-binary-fresh: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     }
 
@@ -78,7 +79,7 @@ pub fn run(args: &[String]) -> i32 {
     if !Path::new(&list).is_file() {
         eprintln!("check-gate-binary-fresh: no gate registry at {} — the live member set is what decides whether the binary is load-bearing, so the check could not run; treating as failure (not clean)", list);
         eprintln!("  help: pass the gates dir carrying gates.list as the first argument, or set GATE_SDK_GATES_DIR.");
-        return 2;
+        return exit::REFUSED;
     }
     let listing = std::fs::read(&list)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
@@ -95,7 +96,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(_) => {}
             Err(e) => {
                 eprintln!("check-gate-binary-fresh: {} — the check could not run; treating as failure (not clean)", e);
-                return 2;
+                return exit::INPUT;
             }
         }
     }
@@ -121,14 +122,14 @@ pub fn run(args: &[String]) -> i32 {
     if !proc::is_executable(Path::new(&bin)) {
         eprintln!("check-gate-binary-fresh: {} is absent or not executable, but {} registered member(s) dispatch to it — the check could not run; treating as failure (not clean)", bin, dispatching.len());
         eprintln!("  help: build it — {}", REBUILD);
-        return 2;
+        return exit::TOOL;
     }
 
     let stamped = match proc::run(&crate::programs::CHECKWRIGHT_GATES.at(bin.as_str()), &["--source-stamp"]) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("check-gate-binary-fresh: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     };
     let Some(out) = stamped.stdout() else {
@@ -136,13 +137,13 @@ pub fn run(args: &[String]) -> i32 {
             "check-gate-binary-fresh: {}",
             fresh::fail_closed(&format!("{} --source-stamp", bin), stamped.code())
         );
-        return 2;
+        return exit::TOOL;
     };
     let baked = String::from_utf8_lossy(out).lines().next().unwrap_or("").to_string();
     if baked.is_empty() {
         eprintln!("check-gate-binary-fresh: {} --source-stamp reported no stamp — the check could not run; treating as failure (not clean)", bin);
         eprintln!("  help: rebuild it — {}", REBUILD);
-        return 2;
+        return exit::TOOL;
     }
 
     let (tree, source_desc) = if !stamp_file.is_empty() {
@@ -151,13 +152,13 @@ pub fn run(args: &[String]) -> i32 {
                 "check-gate-binary-fresh: tree-stamp file not readable: {}",
                 stamp_file
             );
-            return 2;
+            return exit::INPUT;
         }
         let text = match fresh::read_captured(&stamp_file) {
             Ok(t) => t,
             Err(e) => {
                 eprintln!("check-gate-binary-fresh: {}", e);
-                return 2;
+                return exit::INPUT;
             }
         };
         (
@@ -170,7 +171,7 @@ pub fn run(args: &[String]) -> i32 {
             None => {
                 eprintln!("check-gate-binary-fresh: git could not hash the tracked source under {} — the check could not run; treating as failure (not clean)", crate_dir);
                 eprintln!("  help: the stamp is git's content identity for the crate's tracked source set, so the crate root must be a tracked directory inside a git worktree.");
-                return 2;
+                return exit::TOOL;
             }
         }
     };
@@ -179,7 +180,7 @@ pub fn run(args: &[String]) -> i32 {
             "check-gate-binary-fresh: no tree-side stamp from {}",
             source_desc
         );
-        return 2;
+        return exit::TOOL;
     }
 
     if baked != tree {

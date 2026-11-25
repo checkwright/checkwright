@@ -1,6 +1,7 @@
 // spec: docs/generated-projections.md §Generated projections and their freshness gates — the
 // install-evidence arm's byte-fresh projection is docs/install-evidence.md, and the gate is inert
 // on a counted zero where the gitignored record does not resolve to a file.
+use crate::exit::Fault;
 use crate::fresh;
 use std::path::Path;
 
@@ -9,16 +10,16 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-install-evidence-fresh: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let emit_src = args.get(1).map(String::as_str).unwrap_or("");
 
     if emit_src.is_empty() {
-        let (record, spelled) = crate::emit::install_evidence::record_path()?;
+        let (record, spelled) = crate::emit::install_evidence::record_path().map_err(Fault::refused)?;
         if record.is_empty() || !Path::new(&record).is_file() {
             println!(
                 "INSTALL-EVIDENCE-FRESH: clean (not applicable: 0 install-observation records — {} names no file, so there is nothing to re-emit from)",
@@ -28,22 +29,22 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
 
-    let projection = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_EVIDENCE_PAGE")?;
+    let projection = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_EVIDENCE_PAGE").map_err(Fault::refused)?;
     let projection = projection.as_str();
     if !Path::new(projection).is_file() {
-        return Err(format!("projection not found: {}", projection));
+        return Err(Fault::refused(format!("projection not found: {}", projection)));
     }
 
     let emitted = if !emit_src.is_empty() {
         if !Path::new(emit_src).is_file() {
-            return Err(format!("emit source not found: {}", emit_src));
+            return Err(Fault::refused(format!("emit source not found: {}", emit_src)));
         }
-        fresh::read_captured(emit_src)?
+        fresh::read_captured(emit_src).map_err(Fault::input)?
     } else {
         crate::emit::install_evidence::emit(&[])?
     };
 
-    let projection_raw = fresh::read_captured(projection)?;
+    let projection_raw = fresh::read_captured(projection).map_err(Fault::input)?;
     if emitted.trim_end_matches('\n') != projection_raw.trim_end_matches('\n') {
         println!(
             "check-install-evidence-fresh: {} is stale vs the install-evidence projection:",
@@ -53,7 +54,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         fresh::print_capped_diff(&left, &projection_raw);
         println!(
             "  help: regenerate — {} > docs/install-evidence.md",
-            super::door_command("--emit install-evidence")?
+            super::door_command("--emit install-evidence").map_err(Fault::refused)?
         );
         return Ok(1);
     }

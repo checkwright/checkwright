@@ -1,5 +1,6 @@
 // spec: context-kit/SPEC.md §check-settings-pins — every pin in the pins file holds against the
 // tracked harness settings file, compared as parsed JSON values rather than as rendered strings
+use crate::exit;
 use crate::gates::template_registry_parity::list_members;
 use crate::json::{values_equal, Path};
 use crate::walk;
@@ -30,13 +31,13 @@ pub fn run(args: &[String]) -> i32 {
                 fixture = args.get(i + 1).cloned();
                 if fixture.is_none() {
                     eprintln!("check-settings-pins: --fixture needs a directory");
-                    return 2;
+                    return exit::USAGE;
                 }
                 i += 2;
             }
             a => {
                 eprintln!("check-settings-pins: unexpected argument: {}", a);
-                return 2;
+                return exit::USAGE;
             }
         }
     }
@@ -45,7 +46,7 @@ pub fn run(args: &[String]) -> i32 {
         Some(d) => {
             if !std::path::Path::new(d).is_dir() {
                 eprintln!("check-settings-pins: fixture dir not found: {}", d);
-                return 2;
+                return exit::REFUSED;
             }
             (format!("{}/settings.json", d), format!("{}/settings-pins.conf", d))
         }
@@ -54,14 +55,14 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-settings-pins: {}", e);
-                    return 2;
+                    return exit::REFUSED;
                 }
             };
             let pf = match walk::knob_scalar("CONTEXT_KIT_SETTINGS_PINS") {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-settings-pins: {}", e);
-                    return 2;
+                    return exit::REFUSED;
                 }
             };
             (sf, pf)
@@ -81,7 +82,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-settings-pins: pins file not readable: {}", pins_file);
-            return 2;
+            return if std::path::Path::new(&pins_file).exists() { exit::INPUT } else { exit::REFUSED };
         }
     };
     let settings_text = match std::fs::read_to_string(&settings_file) {
@@ -91,7 +92,7 @@ pub fn run(args: &[String]) -> i32 {
                 "check-settings-pins: settings file not readable: {}",
                 settings_file
             );
-            return 2;
+            return if std::path::Path::new(&settings_file).exists() { exit::INPUT } else { exit::REFUSED };
         }
     };
     let doc: Value = match serde_json::from_str(&settings_text) {
@@ -101,7 +102,7 @@ pub fn run(args: &[String]) -> i32 {
                 "check-settings-pins: {} is not valid JSON",
                 settings_file
             );
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -172,7 +173,7 @@ pub fn run(args: &[String]) -> i32 {
         for m in &malformed {
             eprintln!("  {}", m);
         }
-        return 2;
+        return exit::REFUSED;
     }
     if !absent.is_empty() {
         eprintln!(
@@ -186,7 +187,7 @@ pub fn run(args: &[String]) -> i32 {
             "  help: add the key to {}, or drop the pin from {} if the key was retired",
             settings_file, pins_file
         );
-        return 2;
+        return exit::REFUSED;
     }
     if !mismatches.is_empty() {
         println!(

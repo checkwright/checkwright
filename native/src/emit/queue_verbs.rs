@@ -90,7 +90,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("checkwright-gates: --queue: {}", e);
-            2
+            crate::exit::NOTHING_WRITTEN
         }
     }
 }

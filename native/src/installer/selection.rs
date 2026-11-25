@@ -1,6 +1,7 @@
 // spec: installer/SPEC.md §Selecting kits and gates — the adopter's adjustments to a profile's kit
 // set and registry, read from argv or the manifest as data, so no kit or gate name enters the crate
 use super::{payload_recipe, profile, recipe, refuse, Refusal, GATES_DIR};
+use crate::exit;
 use std::collections::BTreeSet;
 use std::path::Path;
 
@@ -113,14 +114,14 @@ pub fn check(pkg_root: &Path, root: &Path, kits: &[String], s: &Selection) -> Re
         return Err(refuse(
             format!("--with-kit and --without-kit both name {}", n),
             "name each kit once: added or removed.",
-            2,
+            exit::USAGE,
         ));
     }
     if let Some(n) = both(&s.with_gates, &s.without_gates) {
         return Err(refuse(
             format!("--with-gate and --without-gate both name {}", n),
             "name each gate once: added or dropped.",
-            2,
+            exit::USAGE,
         ));
     }
     let payload = profile::payload_kits(pkg_root);
@@ -128,7 +129,7 @@ pub fn check(pkg_root: &Path, root: &Path, kits: &[String], s: &Selection) -> Re
         return Err(refuse(
             format!("unknown kit: {}", k),
             format!("kits in this payload: {} ", payload.join(" ")),
-            2,
+            exit::REFUSED,
         ));
     }
     let floor = floor_kits(pkg_root);
@@ -139,7 +140,7 @@ pub fn check(pkg_root: &Path, root: &Path, kits: &[String], s: &Selection) -> Re
                 "it is the runner, the git hooks and the registry every other kit's gates resolve through; kits a selection may remove: {} ",
                 payload.iter().filter(|k| !floor.contains(k)).cloned().collect::<Vec<_>>().join(" ")
             ),
-            2,
+            exit::REFUSED,
         ));
     }
     let dirs = resolve_dirs(pkg_root, root, kits);
@@ -156,14 +157,14 @@ pub fn check(pkg_root: &Path, root: &Path, kits: &[String], s: &Selection) -> Re
                 return Err(refuse(
                     format!("--with-gate {} resolves to no gate on this tree", g),
                     carried(),
-                    2,
+                    exit::REFUSED,
                 ))
             }
             Some(p) if recipe::install_disposition(Path::new(&p)) == "never" => {
                 return Err(refuse(
                     format!("--with-gate {} declares '# install: never'", g),
                     "its kit declares that it cannot hold on a vendored tree, so no install registers it.",
-                    2,
+                    exit::REFUSED,
                 ))
             }
             Some(_) => {}
@@ -173,7 +174,7 @@ pub fn check(pkg_root: &Path, root: &Path, kits: &[String], s: &Selection) -> Re
         return Err(refuse(
             format!("--without-gate {} names no gate a selected kit ships or {}/ carries", g, GATES_DIR),
             carried(),
-            2,
+            exit::REFUSED,
         ));
     }
     Ok(())

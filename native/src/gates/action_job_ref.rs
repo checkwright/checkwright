@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-action-job-ref — a backticked span matching a consumer-declared
 // job pattern names a job key some walked workflow defines
 use crate::actions::{self, Ev};
+use crate::exit;
 use crate::ere::Ere;
 use crate::walk;
 use std::collections::BTreeSet;
@@ -94,13 +95,13 @@ pub fn run(args: &[String]) -> i32 {
     let root = Path::new(scanroot);
     if !root.is_dir() {
         eprintln!("check-action-job-ref: scan root not found: {}", scanroot);
-        return 2;
+        return exit::REFUSED;
     }
     let raw = match walk::knob_array(KNOB) {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-action-job-ref: {} — the check could not run; treating as failure (not clean)", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if raw.is_empty() {
@@ -116,7 +117,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-action-job-ref: {} element '{}' does not compile ({}) — the check could not run; treating as failure (not clean)",
                     KNOB, p, e
                 );
-                return 2;
+                return exit::REFUSED;
             }
         }
     }
@@ -124,7 +125,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(f) => f,
         Err(e) => {
             eprintln!("check-action-job-ref: {} — the check could not run; treating as failure (not clean)", e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let mut files = Vec::new();
@@ -137,7 +138,7 @@ pub fn run(args: &[String]) -> i32 {
                     p.display(),
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         }
     }

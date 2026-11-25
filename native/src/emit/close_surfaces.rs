@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §The close-surface roster — the derivation: every close-surface:
 // declaration across the resolved declaration surfaces, unioned with the workflow directory's
 // capture tier so an undeclared capture surface is reported rather than missing
+use crate::exit::Fault;
 use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
@@ -9,23 +10,23 @@ use std::path::Path;
 // spec: lifecycle-kit/SPEC.md §The close-surface roster — the effective base, computed and never
 // entered: `set_current_dir` is process-global, so the arm anchors every path it globs, ignores
 // and prints against this instead of `cd`-ing into it.
-pub fn base(args: &[String]) -> Result<String, String> {
+pub fn base(args: &[String]) -> Result<String, Fault> {
     match args.first().filter(|a| !a.is_empty()) {
         Some(a) => {
             let root = if a.len() > 1 { a.trim_end_matches('/') } else { a.as_str() };
-            if crate::walk::toplevel_in_opt(root)?.is_none() {
+            if crate::walk::toplevel_in_opt(root).map_err(Fault::tool)?.is_none() {
                 return Err(not_a_repo());
             }
             Ok(root.to_string())
         }
         None => {
-            crate::walk::toplevel_opt()?.ok_or_else(not_a_repo)
+            crate::walk::toplevel_opt().map_err(Fault::tool)?.ok_or_else(not_a_repo)
         }
     }
 }
 
-fn not_a_repo() -> String {
-    "not a git repository — the capture tier is underivable".to_string()
+fn not_a_repo() -> Fault {
+    Fault::refused("not a git repository — the capture tier is underivable")
 }
 
 fn joined(base: &str, rel: &str) -> String {
@@ -248,41 +249,41 @@ fn declared_rows(base: &str, surfaces: &[String]) -> Result<(Vec<String>, Vec<St
     Ok((rows, declared))
 }
 
-pub fn derive(args: &[String]) -> Result<Roster, String> {
+pub fn derive_fault(args: &[String]) -> Result<Roster, Fault> {
     let base = base(args)?;
 
-    let roster_basename = walk::knob_scalar("LIFECYCLE_KIT_ROSTER_BASENAME")?;
+    let roster_basename = walk::knob_scalar("LIFECYCLE_KIT_ROSTER_BASENAME").map_err(Fault::refused)?;
     // spec: gate-sdk/SPEC.md §Layout and configuration — the root is joined onto a path statted
     // under the base and then carried as the surface's own path, so it takes `kit_roots`
-    let mut surfaces = kit_surfaces(&base, &walk::kit_roots()?, &roster_basename);
-    let globs = walk::knob_array("LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS")?;
-    for p in walk::glob_corpus(Path::new(&base), &globs)? {
+    let mut surfaces = kit_surfaces(&base, &walk::kit_roots().map_err(Fault::refused)?, &roster_basename);
+    let globs = walk::knob_array("LIFECYCLE_KIT_CLOSE_SURFACE_GLOBS").map_err(Fault::refused)?;
+    for p in walk::glob_corpus(Path::new(&base), &globs).map_err(Fault::input)? {
         add_surface(&mut surfaces, relativize(&base, &p));
     }
 
-    let (mut rows, declared) = declared_rows(&base, &surfaces)?;
+    let (mut rows, declared) = declared_rows(&base, &surfaces).map_err(Fault::input)?;
 
     // spec: lifecycle-kit/SPEC.md §The close-surface roster — source 2, the closure that makes the
     // roster fail loudly: every gitignored member of the workflow directory is capture-tier by
     // definition, so one added with no declaration appears as `(undeclared)` rather than not at all
-    let workflow_dir = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?;
+    let workflow_dir = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?;
     let wf_path = joined(&base, &workflow_dir);
     if Path::new(&wf_path).is_dir() {
-        for (name, _) in walk::list_dir(Path::new(&wf_path))? {
+        for (name, _) in walk::list_dir(Path::new(&wf_path)).map_err(Fault::input)? {
             let rel = format!("{}/{}", workflow_dir, name);
             if !Path::new(&joined(&base, &rel)).is_file() || drain_of_declared(&rel, &declared) {
                 continue;
             }
-            let ci = proc::run(&programs::GIT, &["-C", &base, "check-ignore", "-q", "--", &rel])?;
+            let ci = proc::run(&programs::GIT, &["-C", &base, "check-ignore", "-q", "--", &rel]).map_err(Fault::tool)?;
             match ci.code() {
                 Some(0) => {}
                 Some(1) => continue,
                 other => {
-                    return Err(format!(
+                    return Err(Fault::tool(format!(
                         "git check-ignore exited {} on {}",
                         other.unwrap_or(-1),
                         rel
-                    ))
+                    )))
                 }
             }
             if !declared.contains(&rel) {
@@ -295,7 +296,7 @@ pub fn derive(args: &[String]) -> Result<Roster, String> {
         .iter()
         .map(|r| row_file(r.split('\t').next().unwrap_or("")))
         .collect();
-    let values = tracking(&base, &files)?;
+    let values = tracking(&base, &files).map_err(Fault::tool)?;
     let mut rows: Vec<String> = rows
         .iter()
         .zip(values)
@@ -311,13 +312,13 @@ pub const USAGE: &str = "usage: --emit close-surfaces [scan-root]";
 
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the shape refusal sits here and not in
 // `derive`, which the gate also calls with its own argv.
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let args = super::file_survey::positionals(args, "scan-root")
-        .map_err(|e| format!("{}\n{}", e, USAGE))?;
+        .map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     if let Some(surplus) = args.get(1) {
-        return Err(format!("unexpected argument: {} — it takes one scan-root\n{}", surplus, USAGE));
+        return Err(Fault::usage(format!("unexpected argument: {} — it takes one scan-root\n{}", surplus, USAGE)));
     }
-    let r = derive(args)?;
+    let r = derive_fault(args)?;
     if r.rows.is_empty() {
         return Ok(String::new());
     }

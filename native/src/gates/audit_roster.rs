@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-audit-roster — every audit-roster block carries the grammar
 // §The audit roster states, under the line cap, with unique classes and a stage-checked last
+use crate::exit;
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -182,9 +183,9 @@ fn stamped(state: &str, iteration: &str, stage: &str) -> bool {
     })
 }
 
-fn fail(msg: String) -> i32 {
+fn fail(msg: String, status: i32) -> i32 {
     eprintln!("check-audit-roster: {}", msg);
-    2
+    status
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -192,7 +193,7 @@ pub fn run(args: &[String]) -> i32 {
     let roster = match &hermetic {
         Some(p) => {
             if !Path::new(p).is_file() {
-                return fail(format!("roster file not found: {}", p));
+                return fail(format!("roster file not found: {}", p), exit::REFUSED);
             }
             p.clone()
         }
@@ -202,7 +203,7 @@ pub fn run(args: &[String]) -> i32 {
                 return 0;
             }
             Ok(v) => v,
-            Err(e) => return fail(e),
+            Err(e) => return fail(e, exit::REFUSED),
         },
     };
     let cap = match walk::knob_scalar("LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP") {
@@ -213,10 +214,10 @@ pub fn run(args: &[String]) -> i32 {
                 return fail(format!(
                     "LIFECYCLE_KIT_AUDIT_ROSTER_LINE_CAP is neither a positive integer nor off: {}",
                     v
-                ))
+                ), exit::REFUSED)
             }
         },
-        Err(e) => return fail(e),
+        Err(e) => return fail(e, exit::REFUSED),
     };
     let held = if cap.is_some() {
         "grammar, cap and class uniqueness hold"
@@ -225,7 +226,7 @@ pub fn run(args: &[String]) -> i32 {
     };
     let stage_roster = match stages::stages() {
         Ok(s) => s,
-        Err(e) => return fail(e),
+        Err(e) => return fail(e, exit::REFUSED),
     };
     let text = match read(&roster) {
         Ok(Read::Text(t)) => t,
@@ -233,7 +234,7 @@ pub fn run(args: &[String]) -> i32 {
             println!("AUDIT-ROSTER: clean (not applicable: no roster at {} — inert)", roster);
             return 0;
         }
-        Err(e) => return fail(format!("roster file not readable: {}", e)),
+        Err(e) => return fail(format!("roster file not readable: {}", e), exit::INPUT),
     };
 
     let (mut findings, stamps, blocks) = check(&text, cap, &stage_roster);
@@ -242,22 +243,22 @@ pub fn run(args: &[String]) -> i32 {
     if hermetic.is_none() && !stamps.is_empty() {
         let queue_path = match walk::knob_scalar("LIFECYCLE_KIT_QUEUE_FILE") {
             Ok(v) => v,
-            Err(e) => return fail(e),
+            Err(e) => return fail(e, exit::REFUSED),
         };
         let current = match read(&queue_path) {
             Ok(Read::Text(q)) => stages::header(&q).map(stages::header_iter),
             Ok(Read::Absent) => None,
-            Err(e) => return fail(format!("queue file not readable: {}", e)),
+            Err(e) => return fail(format!("queue file not readable: {}", e), exit::INPUT),
         };
         if let Some(current) = current.filter(|c| !c.is_empty()) {
             let state_path = match walk::knob_scalar("LIFECYCLE_KIT_STATE_FILE") {
                 Ok(v) => v,
-                Err(e) => return fail(e),
+                Err(e) => return fail(e, exit::REFUSED),
             };
             let state = match read(&state_path) {
                 Ok(Read::Text(s)) => s,
                 Ok(Read::Absent) => String::new(),
-                Err(e) => return fail(format!("state file not readable: {}", e)),
+                Err(e) => return fail(format!("state file not readable: {}", e), exit::INPUT),
             };
             // assertion D: a current-iteration last names a stage the state file stamped
             for s in stamps.iter().filter(|s| s.iteration == current) {

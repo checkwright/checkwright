@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-exec-bit — every tracked *.sh matching an exec-glob carries git
 // index mode 100755 and every tracked *.gate descriptor carries 100644, or a by-path-invoked kit
 // script degrades silently to a skipped check / failed plugin in a fresh clone
+use crate::exit;
 use crate::fresh;
 use crate::walk;
 
@@ -16,14 +17,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-exec-bit: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let prune = match walk::knob_words("GATE_SDK_EXEC_PRUNE") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-exec-bit: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -35,7 +36,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(b) => fresh::file_lines(&String::from_utf8_lossy(&b)).into_iter().map(String::from).collect(),
             Err(_) => {
                 eprintln!("check-exec-bit: ls-files dump not readable: {}", dump);
-                return 2;
+                return exit::INPUT;
             }
         },
         None => {
@@ -43,18 +44,18 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(Some(_)) => {}
                 Ok(None) => {
                     eprintln!("check-exec-bit: not a git repository — cannot read index modes");
-                    return 2;
+                    return exit::REFUSED;
                 }
                 Err(e) => {
                     eprintln!("check-exec-bit: {}", e);
-                    return 2;
+                    return exit::TOOL;
                 }
             }
             match crate::listing::names(None, &["ls-files", "-s", "-z"]) {
                 Ok(records) => records,
                 Err(e) => {
                     eprintln!("check-exec-bit: {}", e.text());
-                    return 2;
+                    return exit::TOOL;
                 }
             }
         }

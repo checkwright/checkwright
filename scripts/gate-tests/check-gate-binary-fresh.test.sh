@@ -79,11 +79,11 @@ expect present-none-dispatching 0 '2 .gate descriptor(s)' "$rc" "$out"
 expect present-none-dispatching-count 0 '0 dispatched to by a live member' "$rc" "$out"
 
 # --- the near miss: a registered member resolves to a descriptor, no binary ---
-# Exit 2, never 0: this is the state the corrected predicate must still fail
+# Exit 3, never 0: this is the state the corrected predicate must still fail
 # closed on, and the one way a too-loose predicate passes its own good/ case.
 printf 'check-shell\ncheck-ported\n' > "$SANDBOX/scripts/gates.list"
 out="$(run ./nonexistent-bin)"; rc=$?
-expect registered-no-binary 2 'registered member(s) dispatch to it' "$rc" "$out"
+expect registered-no-binary 3 'registered member(s) dispatch to it' "$rc" "$out"
 
 # --- absent registry: cannot verify, so exit 2 rather than a clean report ---
 rm -f "$SANDBOX/scripts/gates.list"

@@ -3,7 +3,8 @@
 // construction so exit is always 0 and a missing input is a notice rather than a failure.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member on the forced-family test
 // (it reads seven consumer knobs), and `Arm::Emit` because exit is always 0, so no `1` is
-// load-bearing and the `{0, 2}` collapse costs nothing.
+// load-bearing and the `{0, 2, 3}` collapse costs nothing.
+use crate::exit::Fault;
 use crate::hook::binding::{META_SUFFIX, PARENT_AGENT_ID, SUBAGENTS_DIR, TRANSCRIPT_SUFFIX};
 use std::collections::HashMap;
 
@@ -438,17 +439,17 @@ fn logged_under(line: &str, marker: &str) -> bool {
     matches!(line.split_once(' '), Some((_, rest)) if rest.starts_with(marker))
 }
 
-fn knob(name: &str) -> Result<String, String> {
-    crate::walk::knob_scalar(name)
+fn knob(name: &str) -> Result<String, Fault> {
+    crate::walk::knob_scalar(name).map_err(Fault::refused)
 }
 
 // spec: drift-kit/SPEC.md §The overhead meter — the shared sessions inputs, drift-kit's own knob
 // resolved and handed in
-pub fn inputs() -> Result<crate::sessions::Inputs, String> {
+pub fn inputs() -> Result<crate::sessions::Inputs, Fault> {
     let var = |n: &str| std::env::var(n).unwrap_or_default();
     let pwd = var("PWD");
     let here = if pwd.is_empty() {
-        crate::walk::cwd()?
+        crate::walk::cwd().map_err(Fault::tool)?
     } else {
         pwd
     };
@@ -463,7 +464,7 @@ pub fn inputs() -> Result<crate::sessions::Inputs, String> {
     })
 }
 
-fn run(writes: bool) -> Result<Run, String> {
+fn run(writes: bool) -> Result<Run, Fault> {
     Ok(Run {
         today: super::kpi::today_iso(),
         log: if writes {
@@ -485,7 +486,7 @@ fn run(writes: bool) -> Result<Run, String> {
     })
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
     let state_file = knob("DRIFT_KIT_STATE_FILE")?;
     let price_table = knob("DRIFT_KIT_PRICE_TABLE")?;
     let mut r = run(true)?;
@@ -503,14 +504,14 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
 
 // spec: drift-kit/SPEC.md §The manual-operation meter — the meter's own attribution, run with no
 // price table, no log read and no log write, its report discarded
-pub fn attribution() -> Result<Vec<Attributed>, String> {
+pub fn attribution() -> Result<Vec<Attributed>, Fault> {
     let state_file = knob("DRIFT_KIT_STATE_FILE")?;
     let mut r = run(false)?;
     measure(&mut r, &state_file, "")?;
     Ok(r.billed)
 }
 
-fn measure(r: &mut Run, state_file: &str, price_table: &str) -> Result<String, String> {
+fn measure(r: &mut Run, state_file: &str, price_table: &str) -> Result<String, Fault> {
     let mut head = String::new();
     if !std::path::Path::new(&state_file).is_file() {
         head.push_str(&format!(
@@ -776,7 +777,7 @@ fn measure(r: &mut Run, state_file: &str, price_table: &str) -> Result<String, S
         if !body.is_empty() {
             body.push('\n');
         }
-        std::fs::write(&at, body).map_err(|e| format!("cannot write {}: {}", log, e))?;
+        std::fs::write(&at, body).map_err(|e| Fault::tool(format!("cannot write {}: {}", log, e)))?;
     }
     head.push_str(&r.out);
     Ok(head)

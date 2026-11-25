@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — a deferred entry is a costed filing:
 // bounded above so it is not an inlined amendment, bounded below so it is not a flag-and-skip,
 // bounded in what it may displace; an icebox entry is its heading and one sentence
+use crate::exit;
 use crate::queue::{self, Unit};
 
 const COST_MARK: &str = "**Cost while deferred";
@@ -120,14 +121,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(s) => s,
         Err(e) => {
             eprintln!("check-queue-entry-budget: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let cap = match cap() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-queue-entry-budget: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let max = match queue::knob_scalar("QUEUE_KIT_ENTRY_CREDIT_MAX")
@@ -136,7 +137,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-queue-entry-budget: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let file = match args.first() {
@@ -145,7 +146,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-queue-entry-budget: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -153,7 +154,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-queue-entry-budget: file not found: {}", file);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -267,7 +268,7 @@ pub fn run(args: &[String]) -> i32 {
             }
         }
         let Some(door) = super::door_or_report("check-queue-entry-budget", "--emit entry-history") else {
-            return 2;
+            return exit::REFUSED;
         };
         println!("  help: add the cost field, or evict the entry to the icebox as its heading and one sentence.");
         println!("        Over the cap: compress by ANSWERING grounds, never by dropping them —");

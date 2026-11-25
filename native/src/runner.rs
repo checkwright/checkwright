@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the registry walk, the two selectors,
 // the timings, the omission accounting, the output contract and the worker pool. `bin/run-gates.sh`
 // is the front-end that locates the binary and execs this arm.
+use crate::exit;
 use crate::gates;
 use crate::proc;
 use crate::registry;
@@ -46,6 +47,11 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --import-gate-run [<file> | -]          verify a Statement and record its suites
        --run -h | --help                      this text, on stdout, exit 0
 
+  --run   exits 0 pass, every member green; 1 fail, a member red; 3 error, a
+          member that could not judge the tree with none red. Fail outranks
+          error. A request the runner refuses (an argument, a knob, an
+          unknown gate) is 2. Every form below states its own statuses; an
+          arm's "unavailable" is the front end's absent binary, exit 3.
   --only  runs the named members in registry order whatever order they were
           typed; duplicates collapse. A name unknown to the registry is a
           refusal, except that a *sole* name is also looked up in the check
@@ -76,14 +82,14 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           Takes no argument, and names one on stderr and ignores it.
   --usage-poll  runs one poll cycle against the usage source and rewrites the
           snapshot. Its caller is a refresh command or a session rather than a
-          gate on a tool call, so it refuses with exit 2 when unavailable.
+          gate on a tool call, so it exits 3 when unavailable.
           Takes no argument, and refuses one with exit 2.
   --usage-verdict  emits one budget verdict line on stdout from the usage
           snapshot: exit 0 OK / RESET-OK, 1 PAUSE, 2 STALE or unreadable
           (budget-unknown, which never blocks delegation). Two optional
           positionals override the snapshot and credentials paths for test
           injection; a path beginning with a dash is passed after `--`.
-          Unavailable is exit 2, the same code an unreadable snapshot takes.
+          Unavailable is exit 3, which a caller reads as STALE too.
   --model-verdict  emits one line naming the model the session runs on, read
           off its transcript, and with --expect <class> judges it against the
           tier binding: exit 0 READ or OK, 1 BELOW or UNBOUND (off its
@@ -92,7 +98,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           the session runs at, and an OK names one that is not the class's
           bound effort. The operand names the transcript by path or
           eight-character session id; bare, it takes the delegation-aware
-          pick. Unavailable is exit 2.
+          pick. Unavailable is exit 3.
   --foreign-run  runs one read-only audit or mechanical sweep on the adapter
           DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of
           committed HEAD, and emits one verdict line: exit 0 OK, 1 REFUSED
@@ -111,26 +117,26 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           spawn, and a paused window spawns nothing: FAILED (budget: ...).
           With --budget it prints that budget verdict alone and spawns no
           adapter: exit 0 OK / RESET-OK, 1 PAUSE, 2 STALE or OFF
-          (budget-unknown, which never blocks a run). Unavailable is exit 2.
+          (budget-unknown, which never blocks a run). Unavailable is exit 3.
   --foreign-resume  runs the next turn of an open session in its kept clone,
           the prompt file on stdin: exit 0 OK, 1 REFUSED (the session ends),
           2 FAILED (the session stays open). With --close it removes the clone
           and keeps every report: exit 0 CLOSED, 2 no open session.
-          Unavailable is exit 2.
+          Unavailable is exit 3.
   --lesson-sink  reads a lesson body on stdin and runs the sink configured for
           <tag>, or appends to <workflow-dir>/<tag>-harvest.md when none is.
           The sink's exit status is this arm's, so a failing sink is visible to
-          the close step that ran it; unavailable is exit 2 for the same reason.
+          the close step that ran it; unavailable is exit 3 for the same reason.
   --queue  moves or stamps one entry of the queue file, then runs every gate
           coupling to that file as its post-check. The verb roster prints on
           stderr at exit 2 on misuse. Exit 0 written and green, 1 written and a
-          gate red (its findings are the worklist before commit), 2 nothing
-          written; unavailable is 2.
+          post-check not green (its findings are the worklist before commit),
+          2 nothing written; unavailable is 3.
   --upgrade-smoke  vendors every kit at GATE_SDK_UPGRADE_FROM into a scratch
           consumer, swaps them wholesale to GATE_SDK_UPGRADE_TO and asserts the
           sync is deterministic and the phase-B red set is declared. Takes no
           argument. Exit 0 clean with one UPGRADE-SMOKE line on stdout, 1 an
-          upgrade finding, 2 a broken tag or environment; unavailable is 2.
+          upgrade finding, 2 a broken tag or environment; unavailable is 3.
   --run-config-variant  runs the battery twice over a scratch copy of the
           tree carrying its history, as committed and with the files in <dir>
           copied over their namesakes in the gates directory, and prints one
@@ -138,21 +144,22 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           added, removed. `--keep` retains the scratch and prints its path.
           Exit 0 no gate newly red, 1 a gate the variant reds, 2 no
           comparison made (a refused <dir>, a scratch it could not build, a
-          battery that could not run); unavailable is 2.
+          battery that could not run); unavailable is 3.
   --run-consumer-smoke  takes [--keep] [kit-root...]: vendors the named kit
           roots (default: every kit; gate-sdk always first) into a scratch
           consumer, runs each smoke/install.sh, asserts the battery green under
           zero config, accounts for every shipped but unregistered gate, and
           fires each smoke/violation.sh. `--keep` retains the scratch and
           prints its path. Exit 0 with one
-          CONSUMER-SMOKE clean line, 1 an assertion failed, 2 usage or
-          environment; unavailable is 2.
+          CONSUMER-SMOKE clean line, 1 an assertion failed, 2 usage, 3 an
+          environment it could not stand up; unavailable is 3.
   --install-lifecycle  writes the lifecycle registration block into the
           always-loaded agent file, the iteration-scoped merge attributes into
           .gitattributes, and the keep-ours merge driver into this clone's git
           config. The optional positional is the agent file to write into,
           overriding LIFECYCLE_KIT_AGENT_FILE. Idempotent; exit 2 when the agent
-          file is absent or a marker pair is malformed, and unavailable is 2.
+          file is absent, 3 when a marker pair is malformed or a write fails,
+          and unavailable is 3.
   --install-hooks  places the pre-commit and commit-msg hooks, each the gate
           binary under the hook's name, in gate-hooks under this clone's git
           directory and points core.hooksPath there, sets blame.ignoreRevsFile
@@ -160,8 +167,8 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           learns of a wrong-identity mapping before its first commit. The gate
           is resolved through the registry, so a consumer shadow still wins; a
           consumer without it is skipped. Exit 0 placed and verified, 1 the
-          identity gate's own finding, 2 each refusal gate-sdk/SPEC.md
-          §install-hooks lists; unavailable is 2. With --refresh it only
+          identity gate's own finding, 2 or 3 each refusal gate-sdk/SPEC.md
+          §install-hooks lists; unavailable is 3. With --refresh it only
           re-places the served hooks and a forwarding hook for each live hook
           in the recorded directory, of a clone already opted in, printing
           'install-hooks: refreshed <hooks-dir>'; in a clone not opted in, or
@@ -174,41 +181,43 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           `--open-lead-journal` opens the lead journal under a heading keyed on
           the stage cursor and writes the session-role marker, stamping
           nothing. Exit 0 a stamp or
-          a reported no-op, 1 a refusal, 2 a usage or configuration error;
-          unavailable is 2, because the caller is a stage session's first step
+          a reported no-op, 1 a refusal, 2 a usage or configuration error, 3 a
+          file it could not read or write; unavailable is 3, because the caller is a stage session's first step
           whose failure must be visible and a silent 0 would let a session
           believe it had stamped.
   --wait-probe  stands known-duration producers up and measures candidate wait
           forms against them, one trial line per run. The subcommand is an
           operand: produce, waiter, arm-local, record, report, sweep — the
           roster prints on stderr at exit 2 on misuse. Exit 0 on a completed
-          subcommand, 1 for `report` with no trials recorded, 2 on misuse;
-          unavailable is 2. Hand-invoked, wired into no tier, and `sweep`
+          subcommand, 1 for `report` with no trials recorded, 2 on misuse, 3 a
+          read, write or spawn that failed; unavailable is 3. Hand-invoked, wired into no tier, and `sweep`
           sleeps for its declared durations.
   --run-validate  claims the producer-liveness lock, then runs each configured
           suite foreground, parses it, diffs the baseline slice per-scenario and
           folds one evidence line per suite into the tracked manifest after the
           whole roster has run. Takes no argument: the whole input is the
           EVIDENCE_KIT_* configuration. Exit 0 every suite clean, 1 a
-          suite recorded new-failures, 2 the run could not start (no suites, no
-          run key, an absent manifest or one whose header is neither major, a
-          held or unclaimable lock, a missing suite command, a failing
-          pre-hook, a pre-hook that moved HEAD while a Statement is configured;
-          a parser producing no result is 1); unavailable is 2, because a
+          suite recorded new-failures, 2 a refused run (an argument, no
+          suites, no run key, an absent manifest, a held lock, a missing suite
+          command, a pre-hook that moved HEAD while a Statement is configured),
+          3 a run that could not start or finish its writes (a manifest whose
+          header is neither major, a lock it could not read, a failing
+          pre-hook or spawn; a parser producing no result is 1); unavailable
+          is 3, because a
           caller that read a silent 0 would believe a run it never got had
           passed. With EVIDENCE_KIT_STATEMENT_FILE set it also writes one
           in-toto Statement of the run there, and with
           EVIDENCE_KIT_STATEMENT_WRITE_CMD set it hands the Statement to that
           argv on stdin, the subject commit appended, after every other write;
-          a store that fails is 2.
+          a store that fails is 3.
   --diff-baseline  parses each captured log named on argv and diffs it against
           the baseline's suite slice per-scenario, printing `new-failure` and
           `recovery` findings. Each argument group is `<suite> <logfile>
           [<status>]`, repeated; an `exit-code` suite must carry its status or
           the tool refuses rather than assuming success. A positional beginning
           with a dash is a refusal, and `--` ends option processing. Exit 0
-          clean, 1 new failures against the baseline, 2 misuse or an unreadable
-          log; unavailable is 2, its one functional caller being a CI leg that
+          clean, 1 new failures against the baseline, 2 misuse or an absent
+          log, 3 an unreadable log; unavailable is 3, its one functional caller being a CI leg that
           reads nothing but the status.
   --verify-gate-run  reads one gate-run Statement, bare or in a DSSE
           envelope, from <file>, from stdin for `-`, or from the stdout of the
@@ -216,15 +225,17 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           against HEAD's ancestry, and each suite's binding, command and tree,
           then each EVIDENCE_KIT_VERIFY_REQUIRE word: `head` the subject is
           HEAD, `verdict` every suite clean. The DSSE signature is never checked. Exit 0 every check held, 1 a
-          contradiction (one line per finding), 2 a Statement that could not
-          be read or judged; unavailable is 2. Writes nothing. --json prints
-          one versioned JSON object in place of the verdict line on exit 0
-          or 1, and nothing on exit 2.
+          contradiction (one line per finding), 2 a refused request, 3 a
+          Statement that could not be read or judged; unavailable is 3.
+          Writes nothing. --json prints one versioned JSON object in place of
+          the verdict line on exit 0 or 1, and the error document on exit 2
+          or 3.
   --import-gate-run  takes the same input and checks, then records each suite
           as an origin=imported manifest line under this tree's run key,
           under the producer-liveness lock. Refused unless
           EVIDENCE_KIT_IMPORTED_RUNS is accept. Exit 0 recorded, 1 a
-          contradiction with nothing recorded, 2 a refusal; unavailable is 2.
+          contradiction with nothing recorded, 2 a refusal, 3 an input or
+          tool error; unavailable is 3.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -236,7 +247,7 @@ GATE_SDK_VERBOSE (any non-empty value) restores the per-gate banner roll the
 quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
 (default: the machine's parallelism; 1 restores a serial run);
 GATE_SDK_SARIF_FILE names a file the run also writes its verdict to as a SARIF
-2.1.0 log, the exit status unchanged unless that file cannot be written (exit 2);
+2.1.0 log, the exit status unchanged unless that file cannot be written (exit 3);
 GATE_SDK_SARIF_RESULTS selects its results: all (default) or failures.
 Per-gate timings of an unfiltered run land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
 
@@ -265,6 +276,9 @@ pub(crate) struct Outcome {
     tail: String,
     pub(crate) output: Vec<u8>,
     pub(crate) failed: bool,
+    // spec: gate-sdk/SPEC.md §run-gates — a member that failed without judging the tree: a status
+    // other than 0 and 1, resolved nowhere, or never started
+    pub(crate) errored: bool,
     ms: u128,
 }
 
@@ -450,7 +464,7 @@ pub(crate) fn select(
             continue;
         }
         let trigger = registry::effective_trigger(&f);
-        // spec: gate-sdk/SPEC.md §Fail-closed contract — an unresolvable couples token is exit 2,
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — an unresolvable couples token is a refusal at exit 2,
         // never a narrower selection: a silently lost trigger is a gate the selector stops running.
         let trigger = registry::expand_couples(&trigger, kit_roots_here)
             .map_err(|e| format!("cannot expand {}'s trigger: {}", name, e))?;
@@ -512,7 +526,7 @@ fn select_for(
 ) -> Result<Vec<Selected>, i32> {
     let s = select(members, resolve_dirs, kit_roots_here, paths, None).map_err(|e| {
         eprintln!("{}: --for {}", TOOL, e);
-        2
+        exit::REFUSED
     })?;
     for (p, c) in paths.iter().zip(&s.covered) {
         if !c {
@@ -535,7 +549,7 @@ fn select_only(
     if only.len() == 1 && !members.iter().any(|m| m == &only[0]) {
         if registry::resolve(&only[0], resolve_dirs).is_none() {
             eprintln!("{}: --only: '{}' is not registered in {}", TOOL, only[0], list);
-            return Err(2);
+            return Err(exit::REFUSED);
         }
         return Ok(vec![Selected {
             name: only[0].clone(),
@@ -545,7 +559,7 @@ fn select_only(
     for n in only {
         if !members.iter().any(|m| m == n) {
             eprintln!("{}: --only: '{}' is not registered in {}", TOOL, n, list);
-            return Err(2);
+            return Err(exit::REFUSED);
         }
     }
     let picked: Vec<&String> = members
@@ -565,7 +579,7 @@ fn select_only(
         eprintln!(
             "  help: name exactly one gate before the '--'; broadcasting one argument vector across a selection is refused, not narrowed"
         );
-        return Err(2);
+        return Err(exit::USAGE);
     }
     let args = forwarded.unwrap_or(&[]);
     Ok(picked
@@ -593,6 +607,9 @@ pub(crate) struct Dispatch<'a> {
 // spec: gate-sdk/SPEC.md §run-gates — the invariant line's reserved prefix, held here because the
 // producer, §Consumer smoke's demo excerpt and the overhead meter's gate row may not spell it twice
 pub const SPEC_LINE_PREFIX: &str = "    spec: ";
+
+// spec: gate-sdk/SPEC.md §run-gates — the tail of a member the battery could not start
+pub(crate) const DISPATCH_TAIL: &str = "dispatch harness error, exit 3";
 
 // spec: gate-sdk/SPEC.md §run-gates — the failing member's own declared invariant, read off the
 // descriptor that resolved it and only on a red; a descriptor carrying no `# spec:` line
@@ -674,6 +691,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
         tail: format!("  FAIL: {} ({}){}", sel.name, tail, invariant(d, &sel.name)),
         output: body.into_bytes(),
         failed: true,
+        errored: true,
         ms,
     };
     let src = match registry::resolve(&sel.name, d.resolve_dirs) {
@@ -693,7 +711,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
     };
     let inv = match registry::invocation(&sel.name, &src, d.self_exe) {
         Ok(i) => i,
-        Err(e) => return fail("dispatch harness error, exit 2", e, started.elapsed().as_millis()),
+        Err(e) => return fail(DISPATCH_TAIL, e, started.elapsed().as_millis()),
     };
     let (program, mut args) = (inv.program, inv.args);
     args.extend(sel.args.iter().cloned());
@@ -707,7 +725,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
     let tmpdir = d.scratch.join(format!("t{}", idx));
     if let Err(e) = std::fs::create_dir_all(&tmpdir) {
         return fail(
-            "dispatch harness error, exit 2",
+            DISPATCH_TAIL,
             format!(
                 "cannot create the per-gate scratch {}: {} — the check could not run; treating as \
                  failure (not clean)",
@@ -719,11 +737,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
     }
     let capture = d.scratch.join(format!("c{}", idx));
     match proc::dispatch(&program, &args, &tmpdir, d.scratch, &capture, &env) {
-        Err(e) => fail(
-            "dispatch harness error, exit 2",
-            e,
-            started.elapsed().as_millis(),
-        ),
+        Err(e) => fail(DISPATCH_TAIL, e, started.elapsed().as_millis()),
         Ok(done) => {
             let ms = started.elapsed().as_millis();
             if done.code == 0 {
@@ -731,6 +745,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
                     tail: format!("  PASS: {}", sel.name),
                     output: done.output,
                     failed: false,
+                    errored: false,
                     ms,
                 }
             } else {
@@ -743,6 +758,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
                     ),
                     output: done.output,
                     failed: true,
+                    errored: done.code != 1,
                     ms,
                 }
             }
@@ -839,7 +855,7 @@ pub fn run(args: &[String]) -> i32 {
             if e.usage {
                 eprintln!("{}", USAGE);
             }
-            return 2;
+            return exit::USAGE;
         }
     };
     // spec: gate-sdk/SPEC.md §The bin/-tool contract — a help request is the usage text on stdout at
@@ -854,7 +870,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let gates_dir = parsed.gates_dir.clone().unwrap_or_else(|| configured_dir.clone());
@@ -868,13 +884,13 @@ pub fn run(args: &[String]) -> i32 {
             if explicit {
                 steer(&gates_dir, &configured_dir);
             }
-            return 2;
+            return exit::REFUSED;
         }
     };
     let members = registry::members(&list_text);
     if members.is_empty() {
         eprintln!("{}: {} names no gates", TOOL, list);
-        return 2;
+        return exit::REFUSED;
     }
 
     // spec: gate-sdk/SPEC.md §Layout and configuration — the kit roots absolutized, so the
@@ -883,7 +899,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let resolve_dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
@@ -898,7 +914,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(s) => s,
             Err(e) => {
                 eprintln!("{}: {}", TOOL, e);
-                return 2;
+                return exit::REFUSED;
             }
         }
     };
@@ -915,7 +931,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("{}: {}", TOOL, e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         let s = match select_for(&members, &resolve_dirs, &kit_roots_here, &parsed.paths) {
@@ -928,7 +944,7 @@ pub fn run(args: &[String]) -> i32 {
                 let set = set_members(&[], &resolve_dirs);
                 if let Err(e) = write_log(&sarif_path, &list, sarif::Scope::For, selection, &[], &[], set) {
                     eprintln!("{}: {}", TOOL, e);
-                    return 2;
+                    return exit::TOOL;
                 }
             }
             return 0;
@@ -948,14 +964,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let scratch = match run_scratch(&tmp_dir) {
         Ok(s) => s,
         Err(e) => {
             eprintln!("{}: {} — treating as failure (not clean)", TOOL, e);
-            return 2;
+            return exit::TOOL;
         }
     };
 
@@ -966,7 +982,7 @@ pub fn run(args: &[String]) -> i32 {
                 "{}: cannot resolve this binary's own path: {} — treating as failure (not clean)",
                 TOOL, e
             );
-            return 2;
+            return exit::TOOL;
         }
     };
 
@@ -974,7 +990,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", TOOL, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let scratch_path = scratch.to_path_buf();
@@ -1032,7 +1048,7 @@ pub fn run(args: &[String]) -> i32 {
             selected.len(),
             failed.join(" ")
         );
-        1
+        verdict_status(&outcomes)
     };
     // spec: gate-sdk/SPEC.md §run-gates — the SARIF log is written once after the verdict lines,
     // and only an unwritable path changes the exit status
@@ -1066,10 +1082,23 @@ pub fn run(args: &[String]) -> i32 {
         let set = set_members(&selected, &resolve_dirs);
         if let Err(e) = write_log(&sarif_path, &list, scope, selection, &members, &omissions, set) {
             eprintln!("{}: {}", TOOL, e);
-            return 2;
+            return exit::TOOL;
         }
     }
     code
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the run's verdict: `fail` where any member exited 1, else
+// `error` where any other member failed without judging, else `pass`; a violation found outranks
+// an error beside it
+pub(crate) fn verdict_status(outcomes: &[Outcome]) -> i32 {
+    if outcomes.iter().any(|o| o.failed && !o.errored) {
+        1
+    } else if outcomes.iter().any(|o| o.errored) {
+        exit::TOOL
+    } else {
+        0
+    }
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the selection as `gateSet` reads it, each member's resolved
@@ -1180,12 +1209,14 @@ fn dispatch_all(d: &Dispatch, selected: &[Selected]) -> Vec<Outcome> {
                 .expect("a battery result slot is poisoned")
                 .unwrap_or_else(|| Outcome {
                     tail: format!(
-                        "  FAIL: {} (dispatch harness error, exit 2){}",
+                        "  FAIL: {} ({}){}",
                         selected[i].name,
+                        DISPATCH_TAIL,
                         invariant(d, &selected[i].name)
                     ),
                     output: b"the worker pool returned no result for this member".to_vec(),
                     failed: true,
+                    errored: true,
                     ms: 0,
                 })
         })
@@ -1327,5 +1358,23 @@ mod tests {
         assert!(!pathspec_matches("docsx/a.md", &["docs"]));
         assert!(!staged_matches("docs/a/b.md", &["docs"]));
         assert!(staged_matches("docs/a/b.md", &["docs/*"]));
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — pass, fail and error exit 0, 1 and 3, and a violation one
+    // member found outranks another member's error
+    #[test]
+    fn the_verdict_is_three_way_and_fail_outranks_error() {
+        let o = |failed: bool, errored: bool| Outcome {
+            tail: String::new(),
+            output: Vec::new(),
+            failed,
+            errored,
+            ms: 0,
+        };
+        assert_eq!(verdict_status(&[o(false, false), o(false, false)]), 0);
+        assert_eq!(verdict_status(&[o(false, false), o(true, false)]), 1);
+        assert_eq!(verdict_status(&[o(false, false), o(true, true)]), exit::TOOL);
+        assert_eq!(verdict_status(&[o(true, true), o(true, false)]), 1);
+        assert_eq!(verdict_status(&[]), 0);
     }
 }

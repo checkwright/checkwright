@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-consumer-value-literal — every literal a gate's crate modules carry
 // that names a tracked consumer path or heading is a knob or a declared site
+use crate::exit::Fault;
 use crate::gates::door_binding::rust_region;
 use crate::registry::{self, GATE_MODULES};
 use crate::walk;
@@ -22,7 +23,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {} — the check could not run; treating as failure (not clean)", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -113,7 +114,7 @@ fn literals(src: &str) -> Vec<Literal> {
         let prefix = if !boundary {
             0
         } else if b[i..].starts_with(b"br") {
-            2
+            2 // status-literal-exempt: the byte length of the br raw-string prefix
         } else if c == b'r' || c == b'b' {
             1
         } else {
@@ -257,20 +258,20 @@ fn arm(lit: &str, tracked: &BTreeSet<String>, dirs: &BTreeSet<String>, roots: &[
     None
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     if let Some(a) = args.first() {
-        return Err(format!("unexpected argument: {}", a));
+        return Err(Fault::usage(format!("unexpected argument: {}", a)));
     }
-    let src = walk::knob_scalar("GATE_SDK_NATIVE_SRC")?;
+    let src = walk::knob_scalar("GATE_SDK_NATIVE_SRC").map_err(Fault::refused)?;
     let src = src.trim_end_matches('/').to_string();
     if src.is_empty() || !Path::new(&src).is_dir() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "GATE_SDK_NATIVE_SRC names no crate source directory ('{}') — a gate that reads no crate cannot say the crate is clean",
             src
-        ));
+        )));
     }
-    let kit_roots = walk::kit_roots()?;
-    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    let kit_roots = walk::kit_roots().map_err(Fault::refused)?;
+    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
     let dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
 
     // spec: gate-sdk/SPEC.md §check-consumer-value-literal — the members: every registry row whose
@@ -283,18 +284,18 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         members += 1;
-        for f in registry::module_files(member, &dirs)? {
+        for f in registry::module_files(member, &dirs).map_err(Fault::refused)? {
             if !walk::at_or_under(&knob_dir, &f) {
                 corpus.insert(f);
             }
         }
     }
     if members == 0 {
-        return Err("no member resolves under the gates dir or any kit root".to_string());
+        return Err(Fault::refused("no member resolves under the gates dir or any kit root"));
     }
 
     let tracked: BTreeSet<String> = crate::listing::tracked(None, &[])
-        .map_err(|e| e.text_or(|_| "git ls-files failed".to_string()))?
+        .map_err(|e| Fault::tool(e.text_or(|_| "git ls-files failed".to_string())))?
         .into_iter()
         .collect();
     let mut tracked_dirs: BTreeSet<String> = BTreeSet::new();
@@ -305,19 +306,19 @@ fn rule(args: &[String]) -> Result<i32, String> {
             at += p + 1;
         }
     }
-    let prune = walk::prune_dirs()?;
+    let prune = walk::prune_dirs().map_err(Fault::refused)?;
     let md: Vec<String> = tracked
         .iter()
         .filter(|t| t.ends_with(".md") && !under_any(&kit_roots, t) && !walk::path_pruned(t, &prune))
         .cloned()
         .collect();
-    let headings = index_headings(&md)?;
+    let headings = index_headings(&md).map_err(Fault::input)?;
 
     let mut findings: Vec<String> = Vec::new();
     let mut malformed: Vec<String> = Vec::new();
     let (mut read_lits, mut valved) = (0usize, 0usize);
     for f in &corpus {
-        let text = read(f)?;
+        let text = read(f).map_err(Fault::input)?;
         let region = rust_region(&text);
         let lines: Vec<&str> = region.lines().collect();
         for (n, line) in lines.iter().enumerate() {

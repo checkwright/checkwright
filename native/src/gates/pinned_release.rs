@@ -2,6 +2,7 @@
 // once for every gate holding a front-door claim to them, so no two can disagree about either
 use super::install_pin::{is_triple, pin_of};
 use super::release_bump::disposition_file;
+use crate::exit::Fault;
 use crate::{fresh, proc, programs, queue, stages};
 use std::path::Path;
 
@@ -37,45 +38,45 @@ fn disposition(path: &str, text: &str, iteration: &str) -> Result<Disposition, S
     ))
 }
 
-fn git_ok(args: &[&str]) -> Result<Option<String>, String> {
-    let c = proc::run(&programs::GIT, args)?;
+fn git_ok(args: &[&str]) -> Result<Option<String>, Fault> {
+    let c = proc::run(&programs::GIT, args).map_err(Fault::tool)?;
     if c.code() != Some(0) {
         return Ok(None);
     }
     Ok(c.stdout().map(|o| String::from_utf8_lossy(o).into_owned()))
 }
 
-pub(crate) fn read(path: &str) -> Result<String, String> {
+pub(crate) fn read(path: &str) -> Result<String, Fault> {
     std::fs::read(path)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| format!("cannot read {}: {}", path, e))
+        .map_err(|e| Fault::input(format!("cannot read {}: {}", path, e)))
 }
 
 // spec: installer/SPEC.md §The front door's verbs — the tag the hosted pin names, or none where it
 // does not resolve here, as in a shallow checkout
-pub(crate) fn pinned_tag() -> Result<Option<String>, String> {
-    let install_sh = crate::walk::knob_scalar("GATE_LOCAL_INSTALL_SH")?;
-    let pin = pin_of(&install_sh, &fresh::read_captured(&install_sh)?, "pin")?;
+pub(crate) fn pinned_tag() -> Result<Option<String>, Fault> {
+    let install_sh = crate::walk::knob_scalar("GATE_LOCAL_INSTALL_SH").map_err(Fault::refused)?;
+    let pin = pin_of(&install_sh, &fresh::read_captured(&install_sh).map_err(Fault::input)?, "pin").map_err(Fault::input)?;
     let tag = format!("v{}", pin);
     Ok(git_ok(&["rev-parse", "--verify", "--quiet", &format!("refs/tags/{}", tag)])?.map(|_| tag))
 }
 
 // spec: installer/SPEC.md §The front door's verbs — a resolved tag that carries no such file is a
 // refusal, never a dormant arm
-pub(crate) fn show_at(tag: &str, path: &str) -> Result<String, String> {
+pub(crate) fn show_at(tag: &str, path: &str) -> Result<String, Fault> {
     git_ok(&["show", &format!("{}:{}", tag, path)])?
-        .ok_or_else(|| format!("the tag {} exists and carries no {}", tag, path))
+        .ok_or_else(|| Fault::refused(format!("the tag {} exists and carries no {}", tag, path)))
 }
 
 // spec: plugin/SPEC.md §check-plugin-parity — whether a resolved tag carries a path, where the
 // absence is the answer rather than a refusal
-pub(crate) fn carries(tag: &str, path: &str) -> Result<bool, String> {
+pub(crate) fn carries(tag: &str, path: &str) -> Result<bool, Fault> {
     Ok(git_ok(&["cat-file", "-e", &format!("{}:{}", tag, path)])?.is_some())
 }
 
 // spec: installer/SPEC.md §The front door's verbs — the live disposition file and queue file
-pub(crate) fn live_paths() -> Result<(String, String), String> {
-    Ok((disposition_file()?, queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?))
+pub(crate) fn live_paths() -> Result<(String, String), Fault> {
+    Ok((disposition_file().map_err(Fault::refused)?, queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?))
 }
 
 // spec: installer/SPEC.md §The front door's verbs — the iteration the queue header names, and its
@@ -83,13 +84,13 @@ pub(crate) fn live_paths() -> Result<(String, String), String> {
 pub(crate) fn iteration_disposition(
     disposition_path: &str,
     queue_path: &str,
-) -> Result<(String, Disposition), String> {
+) -> Result<(String, Disposition), Fault> {
     let queue_text = read(queue_path)?;
     let iteration = stages::header(&queue_text)
         .map(stages::header_iter)
-        .ok_or_else(|| format!("{} carries no '## Iteration:' header", queue_path))?;
+        .ok_or_else(|| Fault::input(format!("{} carries no '## Iteration:' header", queue_path)))?;
     let disp = if Path::new(disposition_path).is_file() {
-        disposition(disposition_path, &read(disposition_path)?, &iteration)?
+        disposition(disposition_path, &read(disposition_path)?, &iteration).map_err(Fault::input)?
     } else {
         Disposition::Absent
     };

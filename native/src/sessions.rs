@@ -204,7 +204,7 @@ pub fn newest(i: &Inputs) -> Option<String> {
     newest.map(|(p, _)| p)
 }
 
-// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order and its exit-2 refusals,
+// spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the derivation order and its exit-3 errors,
 // returning the *winning path* rather than the normalized key, so a caller needing the transcript
 // does not re-glob for the id it was handed. `key` is the identity on the two early returns.
 pub fn resolve(i: &Inputs) -> Result<String, String> {

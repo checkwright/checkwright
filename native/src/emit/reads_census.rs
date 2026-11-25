@@ -10,7 +10,7 @@ pub const KNOBS: &[&str] = &[];
 // spec: gate-sdk/SPEC.md §check-reads-couples — no count line, for the same reason `--reads` has
 // none: the population is derivable from the lines and a transcribed total is a second source for
 // it. A caller wanting the member count counts lines; the root total sums column 2.
-pub fn emit(_args: &[String]) -> Result<String, String> {
+pub fn emit(_args: &[String]) -> Result<String, crate::exit::Fault> {
     let mut out = String::new();
     for (name, _, roots, _, _, _) in crate::gates::REGISTRY {
         let grounds: Vec<&str> = roots

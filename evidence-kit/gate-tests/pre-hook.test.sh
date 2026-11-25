@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the pre-hook runs once per suite, before it, with the suite as operand, and a failing hook aborts at exit 2 with no evidence appended.
+# spec: evidence-kit/SPEC.md §bin/run-validate.sh — the pre-hook runs once per suite, before it, with the suite as operand, and a failing hook aborts at exit 3 with no evidence appended.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -45,11 +45,11 @@ if ! grep -q '^hook-test alpha .* verdict=clean ' "$tmp/a/.workflow/validate-evi
     echo "  FAIL: a suite ran before its hook, or no evidence was folded: $(cat "$tmp/a/.workflow/validate-evidence.txt")"; fails=$((fails + 1))
 fi
 
-# B — a failing hook aborts at the guards' code before its suite runs, and no line reaches the manifest.
+# B — a failing hook aborts at the tool-error code before its suite runs, and no line reaches the manifest.
 mk_tree "$tmp/b" "false"
 out="$(_rv "$tmp/b")"; rc=$?
-if [[ "$rc" -ne 2 ]] || [[ "$out" != *"pre-hook failed for suite 'alpha'"* ]]; then
-    echo "  FAIL: a failing hook must refuse at exit 2 naming its suite (rc=$rc): $out"; fails=$((fails + 1))
+if [[ "$rc" -ne 3 ]] || [[ "$out" != *"pre-hook failed for suite 'alpha'"* ]]; then
+    echo "  FAIL: a failing hook must abort at exit 3 naming its suite (rc=$rc): $out"; fails=$((fails + 1))
 fi
 if [[ -e "$tmp/b/.tmp/suite.log" ]]; then
     echo "  FAIL: a suite ran after its hook failed"; fails=$((fails + 1))
@@ -78,5 +78,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "pre-hook.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "pre-hook.test: ok (per-suite hook in roster order with its operand ahead of the suite, failing hook exit 2 with no suite run and no evidence, a HEAD-moving hook under a Statement exit 2 with nothing written)"
+echo "pre-hook.test: ok (per-suite hook in roster order with its operand ahead of the suite, failing hook exit 3 with no suite run and no evidence, a HEAD-moving hook under a Statement exit 2 with nothing written)"
 exit 0

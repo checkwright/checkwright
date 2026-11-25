@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §The queue-migrate arm — `--emit queue-migrate [--write] <file>`: the
 // retired bullet grammar rewritten into the heading grammar, refused whole when the rewrite would
 // lose a slug, a tag or a done line
+use crate::exit::Fault;
 use crate::queue::{self, Sections};
 
 pub const KNOBS: &[&str] = &[
@@ -15,23 +16,23 @@ pub const USAGE: &str = "usage: --emit queue-migrate [--write] <file>";
 // spec: queue-kit/SPEC.md §The queue-migrate arm — the three body declarations that become tags
 const DECLARATIONS: [&str; 3] = ["recurrence:", "roadmap-summary:", "not-icebox-eligible:"];
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let write = args.first().is_some_and(|a| a == "--write");
     let files: Vec<&String> = args.iter().skip(usize::from(write)).collect();
     if files.len() != 1 || files[0].starts_with("--") {
-        return Err(USAGE.to_string());
+        return Err(Fault::usage(USAGE));
     }
     let f = files[0];
-    let sec = Sections::with_done()?;
-    let text = std::fs::read_to_string(f).map_err(|e| format!("queue-migrate: cannot read {}: {}", f, e))?;
-    let out = convert(&text, &sec).map_err(|e| format!("queue-migrate: {}: {}", f, e))?;
+    let sec = Sections::with_done().map_err(Fault::refused)?;
+    let text = std::fs::read_to_string(f).map_err(|e| Fault::input(format!("queue-migrate: cannot read {}: {}", f, e)))?;
+    let out = convert(&text, &sec).map_err(|e| Fault::input(format!("queue-migrate: {}: {}", f, e)))?;
     if !write {
         return Ok(out);
     }
     if out != text {
-        std::fs::write(f, &out).map_err(|e| format!("queue-migrate: cannot write {}: {}", f, e))?;
+        std::fs::write(f, &out).map_err(|e| Fault::tool(format!("queue-migrate: cannot write {}: {}", f, e)))?;
         if std::fs::read_to_string(f).ok().as_deref() != Some(out.as_str()) {
-            return Err(format!("queue-migrate: {}: the written text does not read back", f));
+            return Err(Fault::tool(format!("queue-migrate: {}: the written text does not read back", f)));
         }
     }
     Ok(String::new())
@@ -90,7 +91,7 @@ struct Block {
 
 fn bullet_depth(line: &str) -> usize {
     if line.starts_with(['-']) {
-        3
+        3 // status-literal-exempt: a bullet's indent width
     } else {
         4
     }

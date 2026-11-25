@@ -2,6 +2,7 @@
 // per gap, the grammar stamped by the producer rather than by its filer.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
 // arm reads six consumer knobs, which a hardcoded flag would hide from the knob-file derivation.
+use crate::exit::Fault;
 use crate::stages;
 
 pub const KNOBS: &[&str] = &[
@@ -100,49 +101,49 @@ pub fn disposed_matches<'a>(record_text: &'a str, prose: &str) -> Vec<(&'a str, 
 // spec: lifecycle-kit/SPEC.md §The stage-machine adapters — the closing-stage predicate, composed here from the
 // cursor and the last configured stage; the hoisting's by-construction guarantee holds inside each
 // substrate and not across them until `--enter-stage` ports.
-fn cursor() -> Result<(String, bool), String> {
-    let (state, _) = super::file_survey::anchored("LIFECYCLE_KIT_STATE_FILE")?;
+fn cursor() -> Result<(String, bool), Fault> {
+    let (state, _) = super::file_survey::anchored_fault("LIFECYCLE_KIT_STATE_FILE")?;
     let text = std::fs::read(state)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
         .unwrap_or_default();
     let stage = stages::current_stage(&text);
-    let last = stages::stages()?.last().cloned().unwrap_or_default();
+    let last = stages::stages().map_err(Fault::refused)?.last().cloned().unwrap_or_default();
     let closing = !last.is_empty() && stage == last;
     Ok((stage, closing))
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let fields =
-        super::file_survey::positionals(args, "prose").map_err(|e| format!("{}\n{}", e, USAGE))?;
+        super::file_survey::positionals(args, "prose").map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     if fields.len() != 1 || fields[0].is_empty() {
-        return Err(USAGE.to_string());
+        return Err(Fault::usage(USAGE));
     }
     let prose = &fields[0];
     super::file_survey::refuse_in_linked_worktree("LIFECYCLE_KIT_GAP_INBOX_FILE")?;
 
-    let (inbox, spelled) = super::file_survey::anchored("LIFECYCLE_KIT_GAP_INBOX_FILE")?;
+    let (inbox, spelled) = super::file_survey::anchored_fault("LIFECYCLE_KIT_GAP_INBOX_FILE")?;
     let path = std::path::Path::new(&inbox);
     if let Some(dir) = path.parent() {
         let _ = std::fs::create_dir_all(dir);
     }
     if !path.is_file() {
         std::fs::write(path, CONTRACT_HEADER)
-            .map_err(|e| format!("cannot seed {}: {}", spelled, e))?;
+            .map_err(|e| Fault::tool(format!("cannot seed {}: {}", spelled, e)))?;
     }
 
-    let (queue, _) = super::file_survey::anchored("LIFECYCLE_KIT_QUEUE_FILE")?;
+    let (queue, _) = super::file_survey::anchored_fault("LIFECYCLE_KIT_QUEUE_FILE")?;
     let slug = std::fs::read(queue)
         .ok()
         .and_then(|b| live_slug(&String::from_utf8_lossy(&b), prose));
 
     let (stage, closing) = cursor()?;
-    let first = crate::walk::knob_scalar("LIFECYCLE_KIT_FIRST_STAGE")?;
+    let first = crate::walk::knob_scalar("LIFECYCLE_KIT_FIRST_STAGE").map_err(Fault::refused)?;
 
     let line = bullet(&super::kpi::today_iso(), prose);
     super::file_survey::append(path, &format!("{}\n", line))
-        .map_err(|e| format!("cannot append to {}: {}", spelled, e))?;
+        .map_err(|e| Fault::tool(format!("cannot append to {}: {}", spelled, e)))?;
 
-    let (disposed, _) = super::file_survey::anchored("LIFECYCLE_KIT_DISPOSED_FILE")?;
+    let (disposed, _) = super::file_survey::anchored_fault("LIFECYCLE_KIT_DISPOSED_FILE")?;
     let record_text = std::fs::read(disposed)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
         .unwrap_or_default();

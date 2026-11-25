@@ -2,6 +2,8 @@
 // log to one scenario per registered gate
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster of the *happens to read nothing*
 // kind: the log path arrives on argv and the arm resolves no kit knob
+use crate::exit::Fault;
+
 pub const KNOBS: &[&str] = &[];
 pub const USAGE: &str = "usage: --emit parse-gates-log <log>";
 
@@ -59,15 +61,15 @@ pub(crate) fn sections(log: &str) -> Vec<Section> {
 }
 
 // spec: evidence-kit/SPEC.md §The evidence adapters — the log is the arm's only positional
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let log = args.first().map(String::as_str).unwrap_or("");
     if log.is_empty() {
-        return Err(format!("needs a <log>\n{}", USAGE));
+        return Err(Fault::usage(format!("needs a <log>\n{}", USAGE)));
     }
     if !std::path::Path::new(log).is_file() {
-        return Err(format!("log not found: {}", log));
+        return Err(Fault::input(format!("log not found: {}", log)));
     }
-    let text = super::read_text(log)?;
+    let text = super::read_text(log).map_err(Fault::input)?;
     let mut out = String::new();
     for line in text.lines() {
         if let Some(row) = tail(line) {
@@ -92,7 +94,7 @@ mod tests {
             Some("check-bar fail")
         );
         assert_eq!(
-            tail("  FAIL: check-baz (dispatch harness error, exit 2)").as_deref(),
+            tail("  FAIL: check-baz (dispatch harness error, exit 3)").as_deref(),
             Some("check-baz fail")
         );
         assert_eq!(
@@ -134,7 +136,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
-    // spec: evidence-kit/SPEC.md §Layout and configuration — a log that does not resolve is exit 2
+    // spec: evidence-kit/SPEC.md §Layout and configuration — a log that does not resolve is exit 3
     #[test]
     fn a_missing_log_fails_closed() {
         assert!(emit(&[]).is_err(), "no operand at all was accepted");

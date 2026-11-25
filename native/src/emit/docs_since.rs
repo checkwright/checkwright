@@ -1,5 +1,6 @@
 // spec: site-kit/SPEC.md §check-docs-since — the governed pages' `since:` key, the untagged note it
 // is held against, and the rewrite the release note's commit runs; one reader the gate calls in process
+use crate::exit::Fault;
 use crate::gates::release_bump::untagged_notes;
 use crate::spec;
 use crate::walk;
@@ -55,11 +56,16 @@ pub fn read(text: &str) -> Result<Since, String> {
 // spec: site-kit/SPEC.md §check-docs-since — the governed set: the files SITE_KIT_SINCE_PAGES's
 // globs match from the work-tree top, pruned as every corpus glob is
 pub fn pages() -> Result<Vec<String>, String> {
-    let globs = spec::knob_array_pub(PAGES_KNOB)?;
+    pages_fault().map_err(|f| f.message)
+}
+
+fn pages_fault() -> Result<Vec<String>, Fault> {
+    let globs = spec::knob_array_pub(PAGES_KNOB).map_err(Fault::refused)?;
     if globs.is_empty() {
         return Ok(Vec::new());
     }
-    let mut out: Vec<String> = walk::glob_corpus(Path::new("."), &globs)?
+    let mut out: Vec<String> = walk::glob_corpus(Path::new("."), &globs)
+        .map_err(Fault::input)?
         .into_iter()
         .filter(|p| p.is_file())
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
@@ -78,26 +84,30 @@ pub enum Note {
 // spec: site-kit/SPEC.md §check-docs-since — the note the rule reads: off while the notes knob is
 // empty, and two untagged notes are a state the release choreography does not admit
 pub fn note() -> Result<Note, String> {
-    let dirs = walk::knob_words(NOTES_KNOB)?;
+    note_fault().map_err(|f| f.message)
+}
+
+fn note_fault() -> Result<Note, Fault> {
+    let dirs = walk::knob_words(NOTES_KNOB).map_err(Fault::refused)?;
     let Some(dir) = dirs.first() else {
         return Ok(Note::Off);
     };
     let dir = dir.trim_end_matches('/').to_string();
     if !Path::new(&dir).is_dir() {
-        return Err(format!("release notes dir not found: {}", dir));
+        return Err(Fault::input(format!("release notes dir not found: {}", dir)));
     }
-    let mut untagged = untagged_notes(Path::new(&dir))?;
+    let mut untagged = untagged_notes(Path::new(&dir)).map_err(Fault::input)?;
     match untagged.len() {
         0 => Ok(Note::None(dir)),
         1 => {
             let (v, path) = untagged.remove(0);
             Ok(Note::Untagged(v, path))
         }
-        _ => Err(format!(
+        _ => Err(Fault::refused(format!(
             "{} carries more than one untagged release note, a state the release choreography does not admit: {} — tag the released one or remove the stray note",
             dir,
             untagged.iter().map(|(v, p)| format!("{} ({})", p, v)).collect::<Vec<_>>().join(", ")
-        )),
+        ))),
     }
 }
 
@@ -118,36 +128,36 @@ pub fn rewrite(text: &str, line: usize, version: &str) -> String {
 
 // spec: site-kit/SPEC.md §check-docs-since — the bare arm prints each page it would rewrite;
 // `--write` rewrites them; with no untagged note there is no version to write, so it refuses
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let write = args.iter().any(|a| a == "--write");
-    let pages = pages()?;
+    let pages = pages_fault()?;
     if pages.is_empty() {
         return Ok(format!("docs-since: {} matches no page — no page is governed\n", PAGES_KNOB));
     }
-    apply(&pages, note()?, write)
+    apply(&pages, note_fault()?, write)
 }
 
-fn apply(pages: &[String], note: Note, write: bool) -> Result<String, String> {
+fn apply(pages: &[String], note: Note, write: bool) -> Result<String, Fault> {
     let version = match note {
         Note::Off => return Ok(format!("docs-since: {} is empty — the rewrite is off\n", NOTES_KNOB)),
         Note::None(dir) => {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "no untagged release note under {}, so there is no version to write — author the release note first",
                 dir
-            ))
+            )))
         }
         Note::Untagged(v, _) => v,
     };
     let mut open = Vec::new();
     for page in pages {
-        let text = std::fs::read_to_string(page).map_err(|e| format!("cannot read {}: {}", page, e))?;
-        match read(&text).map_err(|e| format!("{}: {}", page, e))? {
+        let text = std::fs::read_to_string(page).map_err(|e| Fault::input(format!("cannot read {}: {}", page, e)))?;
+        match read(&text).map_err(|e| Fault::input(format!("{}: {}", page, e)))? {
             Since::Unreleased(line) => open.push((page, text, line)),
             Since::Duplicate(first, second) => {
-                return Err(format!(
+                return Err(Fault::input(format!(
                     "{}:{}: a second since: key beside line {}, so no one line says the page's release — keep one",
                     page, second, first
-                ))
+                )))
             }
             _ => {}
         }
@@ -155,7 +165,7 @@ fn apply(pages: &[String], note: Note, write: bool) -> Result<String, String> {
     let mut out = String::new();
     for (page, text, line) in open {
         if write {
-            std::fs::write(page, rewrite(&text, line, &version)).map_err(|e| format!("cannot write {}: {}", page, e))?;
+            std::fs::write(page, rewrite(&text, line, &version)).map_err(|e| Fault::tool(format!("cannot write {}: {}", page, e)))?;
             out.push_str(&format!("docs-since: {}:{}: since: {} → {}\n", page, line, UNRELEASED, version));
         } else {
             out.push_str(&format!("{}:{}: since: {} → {}\n", page, line, UNRELEASED, version));

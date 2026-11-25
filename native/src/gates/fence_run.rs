@@ -2,6 +2,7 @@
 // narrowed static pass, then runs in a scratch copy of the tracked tree and exits as declared
 use crate::bashscan::{self, Kind, Token};
 use crate::emit::csmoke;
+use crate::exit::Fault;
 use crate::gates::fence_command_head::{self as fch, Ctx, Head};
 use crate::{proc, programs, spec, walk};
 use std::path::{Path, PathBuf};
@@ -37,7 +38,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -154,7 +155,7 @@ struct Runnable {
     heads: usize,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let depth = nesting_depth();
     if (depth > 0 && args.is_empty()) || depth >= DEPTH_BACKSTOP {
         println!(
@@ -163,22 +164,24 @@ fn rule(args: &[String]) -> Result<i32, String> {
         );
         return Ok(0);
     }
-    let top = walk::toplevel_opt()?
-        .ok_or_else(|| "not a git repository — cannot resolve tracked paths".to_string())?;
+    let top = walk::toplevel_opt()
+        .map_err(Fault::tool)?
+        .ok_or_else(|| Fault::refused("not a git repository — cannot resolve tracked paths"))?;
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        corpus_at(".", &walk::kit_roots()?)?
+        corpus_at(".", &walk::kit_roots().map_err(Fault::refused)?).map_err(Fault::refused)?
     };
     let ctx = Ctx {
-        tracked: fch::tracked_files(&top)?,
-        cwd: walk::cwd()?,
+        tracked: fch::tracked_files(&top).map_err(Fault::tool)?,
+        cwd: walk::cwd().map_err(Fault::tool)?,
         top,
-        programs: spec::knob_array_pub("CANON_KIT_FENCE_RUN_PROGRAMS")?
+        programs: spec::knob_array_pub("CANON_KIT_FENCE_RUN_PROGRAMS")
+            .map_err(Fault::refused)?
             .into_iter()
             .collect(),
     };
-    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
+    let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(Fault::refused)?;
 
     let mut bad: Vec<String> = Vec::new();
     let mut runnable: Vec<Runnable> = Vec::new();
@@ -187,7 +190,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if !Path::new(f).is_file() {
             continue;
         }
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         let (marked, findings) = scan(&text);
         for (ln, why) in findings {
             bad.push(format!("{}:{}: {}", f, ln, why));
@@ -195,7 +198,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let docdir = fch::dirname(f);
         for fence in marked {
             nmarked += 1;
-            let (reds, heads) = judge(&ctx, &docdir, &fence.body, &bin)?;
+            let (reds, heads) = judge(&ctx, &docdir, &fence.body, &bin).map_err(Fault::input)?;
             if reds.is_empty() {
                 runnable.push(Runnable {
                     doc: f.clone(),
@@ -220,7 +223,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             .position(|r| r.doc != doc)
             .map_or(runnable.len(), |n| i + n);
         ndocs += 1;
-        for (r, outcome) in runnable[i..end].iter().zip(execute(&runnable[i..end], &bin)?) {
+        for (r, outcome) in runnable[i..end].iter().zip(execute(&runnable[i..end], &bin).map_err(Fault::tool)?) {
             nexec += r.heads;
             if let Some(finding) = outcome {
                 bad.push(finding);

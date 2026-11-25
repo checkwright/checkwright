@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-install-disposition — every shipped gate declares one install
 // disposition, every zero-config gate is registrable in its kit's smoke, and the installer keeps
 // no second copy of the roster
+use crate::exit;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -157,29 +158,29 @@ pub fn run(args: &[String]) -> i32 {
             Ok(Some(t)) => t,
             Ok(None) => {
                 eprintln!("check-install-disposition: not a git repository and no root argument");
-                return 2;
+                return exit::REFUSED;
             }
             Err(e) => {
                 eprintln!("check-install-disposition: {}", e);
-                return 2;
+                return exit::TOOL;
             }
         },
     };
     if !Path::new(&root).is_dir() {
         eprintln!("check-install-disposition: root not found: {}", root);
-        return 2;
+        return exit::REFUSED;
     }
 
     let kit_roots = match walk::kit_roots_abs() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-install-disposition: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if kit_roots.is_empty() {
         eprintln!("check-install-disposition: no kit roots enumerated");
-        return 2;
+        return exit::REFUSED;
     }
 
     let mut findings: Vec<String> = Vec::new();
@@ -200,7 +201,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(h) => h,
             Err(e) => {
                 eprintln!("check-install-disposition: {}", e);
-                return 2;
+                return exit::INPUT;
             }
         };
         for f in &hits {
@@ -215,7 +216,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-install-disposition: unreadable gate header: {}/checks/{}",
                     kit, fname
                 );
-                return 2;
+                return exit::INPUT;
             };
             let text = String::from_utf8_lossy(&bytes).into_owned();
 
@@ -270,7 +271,7 @@ pub fn run(args: &[String]) -> i32 {
     }
     if declared == 0 && findings.is_empty() {
         eprintln!("check-install-disposition: kit roots enumerated but no gate found under any checks/");
-        return 2;
+        return exit::INPUT;
     }
 
     // spec: gate-sdk/SPEC.md §check-install-disposition — assertion C, whose holder moved in-crate
@@ -280,7 +281,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(s) => s.trim_end_matches('/').to_string(),
         Err(e) => {
             eprintln!("check-install-disposition: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let shown = format!("{}/{}", src, RECIPE_IN_SRC);
@@ -295,9 +296,9 @@ pub fn run(args: &[String]) -> i32 {
         let Ok(bytes) = std::fs::read(&recipe) else {
             eprintln!(
                 "check-install-disposition: {}",
-                fresh::fail_closed("awk", Some(2))
+                fresh::fail_closed("awk", Some(2)) // status-literal-exempt: the exit code the awk-read message cites, not a status
             );
-            return 2;
+            return exit::INPUT;
         };
         let text = String::from_utf8_lossy(&bytes).into_owned();
         for n in recipe_hits(&text) {

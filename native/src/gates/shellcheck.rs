@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-shellcheck — ShellCheck lint of the gate family at -S warning
 // (the self-lint contract), as the wrapper a program-is-the-rule member ports to: the program
-// stays a declared dependency this spawns and refuses at exit 2 without
+// stays a declared dependency this spawns and refuses at exit 3 without
+use crate::exit;
 use crate::{proc, programs};
 use crate::walk;
 
@@ -17,7 +18,7 @@ fn refuse_absent_program() -> i32 {
     eprintln!("{}: {} not found on PATH — the gate cannot run.", NAME, programs::SHELLCHECK);
     eprintln!("  A gate that cannot run is not clean (fail-closed).");
     eprintln!("  help: install ShellCheck (e.g. 'apt install shellcheck' / 'brew install shellcheck').");
-    2
+    exit::TOOL
 }
 
 // spec: gate-sdk/SPEC.md §check-shellcheck — the derived corpus both lint gates read: the
@@ -60,7 +61,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(d) => d,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -82,7 +83,7 @@ pub fn run(args: &[String]) -> i32 {
             NAME,
             dirs.join(" ")
         );
-        return 2;
+        return exit::REFUSED;
     }
 
     let mut argv: Vec<&str> = vec!["-S", "warning"];
@@ -91,7 +92,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(c) => c,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::TOOL;
         }
     };
 

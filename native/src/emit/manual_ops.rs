@@ -2,6 +2,7 @@
 // repeated by hand, ranked, over the transcripts the stage-economics meter attributes to it.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member because it reads consumer knobs,
 // and `Arm::Emit` because exit is always 0 bar a usage error, so no `1` is load-bearing.
+use crate::exit::Fault;
 use crate::hook::binding::{COMMAND, TOOL_BASH, TOOL_POWERSHELL, TOOL_USE_BLOCK, WORKING_DIR};
 use std::collections::{BTreeSet, HashMap, HashSet};
 
@@ -179,19 +180,19 @@ fn last_stamped(state_file: &str) -> Option<String> {
         .map(str::to_string)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let given = super::file_survey::positionals(args, "iteration")
-        .map_err(|e| format!("{}\n{}", e, USAGE))?;
+        .map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     if given.len() > 1 {
-        return Err(USAGE.to_string());
+        return Err(Fault::usage(USAGE));
     }
-    let state_file = crate::walk::knob_scalar("DRIFT_KIT_STATE_FILE")?;
-    let log = crate::walk::knob_scalar("DRIFT_KIT_MANUAL_OPS_LOG")?;
-    let ignore = crate::walk::knob_array("DRIFT_KIT_MANUAL_OPS_IGNORE")?;
-    let top_raw = crate::walk::knob_scalar("DRIFT_KIT_MANUAL_OPS_TOP")?;
-    let top: usize = top_raw
-        .parse()
-        .map_err(|_| format!("DRIFT_KIT_MANUAL_OPS_TOP '{}' is not a positive integer", top_raw))?;
+    let state_file = crate::walk::knob_scalar("DRIFT_KIT_STATE_FILE").map_err(Fault::refused)?;
+    let log = crate::walk::knob_scalar("DRIFT_KIT_MANUAL_OPS_LOG").map_err(Fault::refused)?;
+    let ignore = crate::walk::knob_array("DRIFT_KIT_MANUAL_OPS_IGNORE").map_err(Fault::refused)?;
+    let top_raw = crate::walk::knob_scalar("DRIFT_KIT_MANUAL_OPS_TOP").map_err(Fault::refused)?;
+    let top: usize = top_raw.parse().map_err(|_| {
+        Fault::refused(format!("DRIFT_KIT_MANUAL_OPS_TOP '{}' is not a positive integer", top_raw))
+    })?;
 
     let Some(iteration) = given.first().cloned().or_else(|| last_stamped(&state_file)) else {
         return Ok(format!(
@@ -269,7 +270,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     }
     let mut text = body.join("\n");
     text.push('\n');
-    std::fs::write(&at, text).map_err(|e| format!("cannot write {}: {}", log, e))?;
+    std::fs::write(&at, text).map_err(|e| Fault::tool(format!("cannot write {}: {}", log, e)))?;
     out.push_str(&format!("  logged: {} ({} key(s))\n", log, printed.len()));
     Ok(out)
 }

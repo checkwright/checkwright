@@ -1,8 +1,9 @@
 // spec: context-kit/SPEC.md §Testing — the expected-output runner for the advisory index-first
-// tools and the always-loaded meter, an `Arm::Run` member: the three-valued exit is the
+// tools and the always-loaded meter, an `Arm::Run` member: the four-valued exit is the
 // contract and `Arm::Emit` collapses it.
 // spec: context-kit/SPEC.md §Testing — the checks reach their arms through the `--emit` front-end
 // rather than through the binary, which is the property the port must not lose.
+use crate::exit::{self, Fault};
 use crate::{proc, programs};
 use crate::walk;
 use std::path::{Path, PathBuf};
@@ -35,19 +36,19 @@ pub fn run(args: &[String]) -> i32 {
             update = true;
         } else {
             eprintln!("{}: unknown option: {}; {}", NAME, a, USAGE);
-            return 2;
+            return exit::USAGE;
         }
     }
     match execute(update) {
         Ok(code) => code,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
 
-fn execute(update: bool) -> Result<i32, String> {
+fn execute(update: bool) -> Result<i32, Fault> {
     let kit = kit_root("context-kit")?;
     let sdk = kit_root("gate-sdk")?;
     let host = parent_of(&sdk)?;
@@ -55,7 +56,7 @@ fn execute(update: bool) -> Result<i32, String> {
     let corpus = format!("{}/index-tests/corpus", kit);
     let expected = format!("{}/index-tests/expected", kit);
     std::fs::create_dir_all(&expected)
-        .map_err(|e| format!("cannot create {}: {}", expected, e))?;
+        .map_err(|e| Fault::tool(format!("cannot create {}: {}", expected, e)))?;
 
     let scratch = make_scratch()?;
     let shadow_cfg = write_shadow(&scratch)?;
@@ -116,7 +117,7 @@ fn execute(update: bool) -> Result<i32, String> {
     }
     if r.harness > 0 {
         println!("{}: {} harness error(s)", VERDICT, r.harness);
-        return Ok(2);
+        return Ok(exit::TOOL);
     }
     if r.fail > 0 {
         println!(
@@ -154,7 +155,7 @@ impl Runner {
         golden: &str,
         emit_args: &[&str],
         env: &[(String, String)],
-    ) -> Result<(), String> {
+    ) -> Result<(), Fault> {
         let front_end = self.front_end.clone();
         self.spawn_check(name, golden, &front_end, emit_args, env)
     }
@@ -166,10 +167,10 @@ impl Runner {
         script: &str,
         rest: &[&str],
         env: &[(String, String)],
-    ) -> Result<(), String> {
+    ) -> Result<(), Fault> {
         let mut argv: Vec<&str> = vec![script];
         argv.extend_from_slice(rest);
-        let done = proc::run_with_env_in(&programs::BASH, &argv, env, Some(&self.host))?;
+        let done = proc::run_with_env_in(&programs::BASH, &argv, env, Some(&self.host)).map_err(Fault::tool)?;
         // spec: context-kit/SPEC.md §Testing — the shell form read the tool's own status out of
         // `PIPESTATUS[0]` and called any non-zero a *harness* error rather than a finding; the
         // fail-closed accessor withholds stdout on exactly that status, so the branch is the same.
@@ -187,7 +188,7 @@ impl Runner {
         let shown = format!("index-tests/expected/{}", golden);
         if self.update {
             std::fs::write(&path, payload.as_bytes())
-                .map_err(|e| format!("cannot write {}: {}", path, e))?;
+                .map_err(|e| Fault::tool(format!("cannot write {}: {}", path, e)))?;
             println!("  UPDATED: {} -> {}", name, shown);
             return Ok(());
         }
@@ -196,7 +197,8 @@ impl Runner {
             self.harness += 1;
             return Ok(());
         }
-        let golden_text = std::fs::read(&path).map_err(|e| format!("cannot read {}: {}", path, e))?;
+        let golden_text =
+            std::fs::read(&path).map_err(|e| Fault::input(format!("cannot read {}: {}", path, e)))?;
         if golden_text == payload.as_bytes() {
             self.pass += 1;
             return Ok(());
@@ -218,14 +220,15 @@ impl Runner {
     // spec: context-kit/SPEC.md §The always-loaded meter — a mode outside the closed set is
     // refused. No golden holds this: the assertion is the exit status and the *stream* the usage
     // went to.
-    fn refusal_case(&mut self, cfg: &str) -> Result<(), String> {
+    fn refusal_case(&mut self, cfg: &str) -> Result<(), Fault> {
         let env = [("CONTEXT_KIT_KNOB_FILE".to_string(), cfg.to_string())];
         let done = proc::run_with_env_in(
             &programs::BASH,
             &[&self.front_end, "--emit", "always-loaded", "--growht"],
             &env,
             Some(&self.host),
-        )?;
+        )
+        .map_err(Fault::tool)?;
         // spec: gate-sdk/SPEC.md §Fail-closed contract — the failed child's whole account of
         // itself, which is what makes one spawn answer what the shell form needed two for: the
         // report renders an empty stdout as `stdout: <empty>`, so `usage:` and `--growht` appearing
@@ -233,7 +236,7 @@ impl Runner {
         let report = done.failure_report().unwrap_or_default();
         let rc = done.reported_code();
         let empty_stdout = report.contains("stdout: <empty>");
-        if rc == 2 && empty_stdout && report.contains("usage:") && report.contains("--growht") {
+        if rc == exit::USAGE && empty_stdout && report.contains("usage:") && report.contains("--growht") {
             self.pass += 1;
             return Ok(());
         }
@@ -282,38 +285,40 @@ fn norm_line(line: &str) -> String {
 
 // spec: context-kit/SPEC.md §Testing — the arm reaches both kits through the transported roots
 // rather than a path relative to itself.
-fn kit_root(name: &str) -> Result<String, String> {
-    walk::kit_roots_abs()?
+fn kit_root(name: &str) -> Result<String, Fault> {
+    walk::kit_roots_abs()
+        .map_err(Fault::refused)?
         .into_iter()
         .find(|r| r.rsplit('/').next() == Some(name))
         .ok_or_else(|| {
-            format!(
+            Fault::refused(format!(
                 "the kit roots name no {} root, so neither the fixture corpus nor the \
                  front-end the checks reach their arms through can be found",
                 name
-            )
+            ))
         })
 }
 
-fn parent_of(root: &str) -> Result<String, String> {
+fn parent_of(root: &str) -> Result<String, Fault> {
     let trimmed = root.trim_end_matches('/');
     match trimmed.rsplit_once('/') {
         Some((host, _)) if !host.is_empty() => Ok(host.to_string()),
-        _ => Err(format!("{} has no host checkout above it", root)),
+        _ => Err(Fault::refused(format!("{} has no host checkout above it", root))),
     }
 }
 
-fn make_scratch() -> Result<Scratch, String> {
-    let root = crate::runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR")?)?;
+fn make_scratch() -> Result<Scratch, Fault> {
+    let root = crate::runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?)
+        .map_err(Fault::tool)?;
     std::fs::create_dir_all(root.join("pub-lang"))
-        .map_err(|e| format!("cannot create the scratch dir {}: {}", root.display(), e))?;
+        .map_err(|e| Fault::tool(format!("cannot create the scratch dir {}: {}", root.display(), e)))?;
     Ok(Scratch { root })
 }
 
 // spec: context-kit/SPEC.md §Testing — the consumer extractor the shadow case points
 // `CONTEXT_KIT_PUB_LANG_DIR` at: its `rust.sh` emits a marker row, so the built-in grammar's
 // absence is visible in the golden rather than inferred.
-fn write_shadow(scratch: &Scratch) -> Result<String, String> {
+fn write_shadow(scratch: &Scratch) -> Result<String, Fault> {
     let dir = scratch.root.join("pub-lang");
     write(
         &dir.join("rust.sh"),
@@ -335,7 +340,7 @@ fn write_shadow(scratch: &Scratch) -> Result<String, String> {
 // spec: context-kit/SPEC.md §The always-loaded meter — the meter's four inputs pinned at the
 // fixture corpus (the state file pinned absent-but-nonempty-path), so the golden holds a
 // measurement of the corpus rather than of this repo's live iteration state.
-fn write_meter_config(scratch: &Scratch, corpus: &str) -> Result<String, String> {
+fn write_meter_config(scratch: &Scratch, corpus: &str) -> Result<String, Fault> {
     let cfg = scratch.root.join("meter.knobs");
     let absent_state = scratch.root.join("no-iteration-state.txt");
     write(
@@ -353,8 +358,8 @@ fn write_meter_config(scratch: &Scratch, corpus: &str) -> Result<String, String>
     Ok(cfg.display().to_string())
 }
 
-fn write(path: &Path, body: &str) -> Result<(), String> {
-    std::fs::write(path, body).map_err(|e| format!("cannot write {}: {}", path.display(), e))
+fn write(path: &Path, body: &str) -> Result<(), Fault> {
+    std::fs::write(path, body).map_err(|e| Fault::tool(format!("cannot write {}: {}", path.display(), e)))
 }
 
 #[cfg(test)]
@@ -366,7 +371,7 @@ mod tests {
     // left it.
     #[test]
     fn the_member_takes_only_update() {
-        assert_eq!(run(&["--nope".to_string()]), 2);
+        assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }
 
     // spec: context-kit/SPEC.md §Testing — `norm()`'s rewrite is a sub-behaviour no golden holds,

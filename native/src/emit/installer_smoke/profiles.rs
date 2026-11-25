@@ -1123,7 +1123,7 @@ pub(super) fn demo(state: &mut Run) -> Step {
         proof.len()
     ));
     let m = state.verb(&c, &["demo", "extra"])?;
-    if m.code() != Some(2) {
+    if m.code() != Some(crate::exit::USAGE) {
         return Err(failed(&m, format!(
             "demo arm: checkwright demo extra exited {}, not the usage refusal's 2",
             m.reported_code()
@@ -1203,7 +1203,7 @@ pub(super) fn prove(state: &mut Run) -> Step {
     say(&format!("placed binary --prove: exit 0, {}", line));
 
     let m = state.verb(&c, &["prove", "extra"])?;
-    if m.code() != Some(2) {
+    if m.code() != Some(crate::exit::USAGE) {
         return Err(failed(&m, format!(
             "prove arm: checkwright prove extra exited {}, not the usage refusal's 2",
             m.reported_code()

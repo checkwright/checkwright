@@ -198,7 +198,7 @@ check_case "non-note-post-ignored" "$j" 0 "RELEASE-DECLARATION-PARITY: clean"
 k="$tmp/noheader"
 write_note "$k" "99.1.0" 'None.'
 printf '## Tightened gates\n\n- `check-alpha`\n' >"$k/release-declarations.md"
-check_case "surface-missing-header" "$k" 2 "missing its required header line"
+check_case "surface-missing-header" "$k" 3 "missing its required header line"
 
 l="$tmp/nosection"
 mkdir -p "$l/posts"
@@ -218,21 +218,21 @@ None.
 None.
 EOF
 write_surface "$l" ''
-check_case "note-missing-section" "$l" 2 "has no 'Knob changes' section"
+check_case "note-missing-section" "$l" 3 "has no 'Knob changes' section"
 
 m="$tmp/unparseable"
 write_note "$m" "99.1.0" '- **check-alpha** — bolded, which is not the canonical spelling.'
 write_surface "$m" '## Tightened gates
 
 - `check-alpha`'
-check_case "note-section-unparseable" "$m" 2 "does not parse"
+check_case "note-section-unparseable" "$m" 3 "does not parse"
 
 n="$tmp/surfaceunparseable"
 write_note "$n" "99.1.0" 'None.'
 write_surface "$n" '## Behavior changes
 
 - kit/bin/tool.sh — no bolded lead, so no token.'
-check_case "surface-section-unparseable" "$n" 2 "carries unreadable bullet(s)"
+check_case "surface-section-unparseable" "$n" 3 "carries unreadable bullet(s)"
 
 # --- arm P against real tags: the previous release's page through git ---------
 # $1=dir — a repository whose v99.0.0 page joins alpha at v1 and holds gamma
@@ -281,7 +281,7 @@ t="$tmp/platforms-rc"
 mkplatforms "$t"
 git -C "$t" tag -a v99.1.0-rc1 -m rc
 write_note "$t" "99.1.0" 'None.'
-check_case "platforms-prerelease-tag-refused" "$t" 2 "is outside the grammar this gate orders" git
+check_case "platforms-prerelease-tag-refused" "$t" 3 "is outside the grammar this gate orders" git
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-release-declaration-parity.test: $fails assertion(s) failed"

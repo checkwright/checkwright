@@ -4,6 +4,7 @@
 use super::install_docs::{self, Member};
 use super::release_assets::{declaration, DEFAULT_DOC};
 use super::release_channel_parity::newest_tag;
+use crate::exit::Fault;
 use crate::{fresh, proc, programs};
 use std::path::Path;
 
@@ -12,7 +13,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-install-pin: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -195,12 +196,12 @@ fn measured_version(stem: &str, path: &str, text: &str) -> Result<String, String
 
 // spec: installer/SPEC.md §The hosted install pin — invariant D counts each block across the install
 // pages: the one member carrying a marker line is read, and no carrier reads as the absent block
-fn measured<'a>(stem: &str, pages: &'a [Member]) -> Result<(&'a str, String), String> {
+fn measured<'a>(stem: &str, pages: &'a [Member]) -> Result<(&'a str, String), Fault> {
     let (open, close) = markers(stem);
     let carries = |t: &str| fresh::file_lines(t).iter().any(|l| l.trim() == open || l.trim() == close);
     match install_docs::carrier(pages, &format!("a {} block", stem), carries)? {
-        Some(m) => Ok((m.path.as_str(), measured_version(stem, &m.path, &m.text)?)),
-        None => Err(measured_version(stem, &install_docs::names(pages), "").unwrap_err()),
+        Some(m) => Ok((m.path.as_str(), measured_version(stem, &m.path, &m.text).map_err(Fault::input)?)),
+        None => Err(Fault::input(measured_version(stem, &install_docs::names(pages), "").unwrap_err())),
     }
 }
 
@@ -251,13 +252,13 @@ fn invariant_c(surfaces: &[Vec<(&str, &str)>], templates: &[&str], pinned: &str)
 // spec: installer/SPEC.md §The hosted install pin — the pinned declaration: from the positional
 // file when one is given, else the declaring doc at `v<pin>`; `None` is C's dormancy, a tag that
 // does not resolve
-fn pinned_declaration(doc_arg: Option<&str>, pin: &str) -> Result<Option<(String, Vec<String>)>, String> {
+fn pinned_declaration(doc_arg: Option<&str>, pin: &str) -> Result<Option<(String, Vec<String>)>, Fault> {
     let (source, text) = match doc_arg {
         Some(p) => {
             if !Path::new(p).is_file() {
-                return Err(format!("not found: {}", p));
+                return Err(Fault::refused(format!("not found: {}", p)));
             }
-            (p.to_string(), fresh::read_captured(p)?)
+            (p.to_string(), fresh::read_captured(p).map_err(Fault::input)?)
         }
         None => {
             let tag = format!("v{}", pin);
@@ -269,11 +270,11 @@ fn pinned_declaration(doc_arg: Option<&str>, pin: &str) -> Result<Option<(String
                 return Ok(None);
             }
             let spec = format!("{}:{}", tag, DEFAULT_DOC);
-            let shown = proc::run(&programs::GIT, &["show", &spec])?;
+            let shown = proc::run(&programs::GIT, &["show", &spec]).map_err(Fault::tool)?;
             let text = shown
                 .stdout()
                 .map(|o| String::from_utf8_lossy(o).into_owned())
-                .ok_or_else(|| format!("the pinned tag {} carries no declaring doc {}", tag, DEFAULT_DOC))?;
+                .ok_or_else(|| Fault::refused(format!("the pinned tag {} carries no declaring doc {}", tag, DEFAULT_DOC)))?;
             (spec, text)
         }
     };
@@ -283,17 +284,17 @@ fn pinned_declaration(doc_arg: Option<&str>, pin: &str) -> Result<Option<(String
         .collect();
     match decls.as_slice() {
         [one] => Ok(Some((source, one.clone()))),
-        _ => Err(format!(
+        _ => Err(Fault::input(format!(
             "{} carries {} release-assets lines; exactly one is admissible (gate-sdk/SPEC.md §check-release-assets)",
             source,
             decls.len()
-        )),
+        ))),
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let install_sh = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_SH")?;
-    let install_ps1 = fresh::positional_or_knob(args, 1, "GATE_LOCAL_INSTALL_PS1")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let install_sh = fresh::positional_or_knob(args, 0, "GATE_LOCAL_INSTALL_SH").map_err(Fault::refused)?;
+    let install_ps1 = fresh::positional_or_knob(args, 1, "GATE_LOCAL_INSTALL_PS1").map_err(Fault::refused)?;
     let page_paths = install_docs::paths(args, 2)?;
     let (install_sh, install_ps1) = (install_sh.as_str(), install_ps1.as_str());
     let pinned_doc = args.get(3).map(String::as_str).filter(|a| !a.is_empty());
@@ -301,16 +302,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     for p in [install_sh, install_ps1] {
         if !Path::new(p).is_file() {
-            return Err(format!("not found: {}", p));
+            return Err(Fault::refused(format!("not found: {}", p)));
         }
     }
     let pages = install_docs::read(&page_paths, "not found")?;
-    let sh_text = fresh::read_captured(install_sh)?;
-    let ps_text = fresh::read_captured(install_ps1)?;
-    let sh_pin = pin_of(install_sh, &sh_text, "pin")?;
-    let ps_pin = pin_of(install_ps1, &ps_text, "$pin")?;
-    let sh_floor = floor_of(install_sh, &sh_text, "attest_from")?;
-    let ps_floor = floor_of(install_ps1, &ps_text, "$attestFrom")?;
+    let sh_text = fresh::read_captured(install_sh).map_err(Fault::input)?;
+    let ps_text = fresh::read_captured(install_ps1).map_err(Fault::input)?;
+    let sh_pin = pin_of(install_sh, &sh_text, "pin").map_err(Fault::input)?;
+    let ps_pin = pin_of(install_ps1, &ps_text, "$pin").map_err(Fault::input)?;
+    let sh_floor = floor_of(install_sh, &sh_text, "attest_from").map_err(Fault::input)?;
+    let ps_floor = floor_of(install_ps1, &ps_text, "$attestFrom").map_err(Fault::input)?;
     let mut d_blocks: Vec<(&str, &str, String)> = Vec::new();
     for stem in MEASURED {
         let (page, version) = measured(stem, &pages)?;
@@ -343,10 +344,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     } else {
         let bare = version.strip_prefix('v').unwrap_or(&version).to_string();
         if !is_triple(&bare) {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "the newest tag ('{}') does not parse as <major>.<minor>.<patch>, so the pin cannot be compared against it",
                 version
-            ));
+            )));
         }
         for (path, pin) in [(install_sh, &sh_pin), (install_ps1, &ps_pin)] {
             if *pin != bare {
@@ -449,7 +450,7 @@ mod tests {
         assert_eq!(pin_of("s", "pin_dir=x\npin='1.2.3'\n", "pin"), Ok("1.2.3".to_string()));
     }
 
-    // spec: installer/SPEC.md §The hosted install pin — the exit-2 set: a missing, duplicated or
+    // spec: installer/SPEC.md §The hosted install pin — the exit-3 set: a missing, duplicated or
     // malformed pin line
     #[test]
     fn a_missing_duplicated_or_malformed_pin_fails_closed() {
@@ -475,7 +476,7 @@ mod tests {
         assert!(floor_of("p", "$attestFrom = 'v1.2.4'\n", "$attestFrom").is_err());
     }
 
-    // spec: installer/SPEC.md §The hosted install pin — invariant D's exit-2 set, for each
+    // spec: installer/SPEC.md §The hosted install pin — invariant D's exit-3 set, for each
     // release-measured block: a missing or duplicated block, and a block with no `measured at`
     // token, two, or no triple after it
     #[test]

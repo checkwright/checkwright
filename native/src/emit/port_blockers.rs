@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §port-blockers — the derived roster for the port's remaining work, at each
 // invocation. Three exclusive arms over two corpora: the registry arms answer criteria 7 and 6 and
 // speak for the battery alone, while `--tree` answers the completion predicate over the tree.
+use crate::exit::Fault;
 use crate::programs;
 use crate::bashscan::{self, Kind};
 use crate::registry;
@@ -75,13 +76,13 @@ struct Args {
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — `-h`/`--help` is no per-arm help flag: it is an
 // unrecognized argument like any other, and the refusal carries the usage.
-fn parse(args: &[String]) -> Result<Args, String> {
+fn parse(args: &[String]) -> Result<Args, Fault> {
     let mut mode: Option<Mode> = None;
     let mut gates_dir: Option<String> = None;
     let mut i = 0usize;
     while i < args.len() {
         let mut set = |m: Mode| match mode {
-            Some(_) => Err(USAGE.to_string()),
+            Some(_) => Err(Fault::usage(USAGE)),
             None => {
                 mode = Some(m);
                 Ok(())
@@ -93,11 +94,11 @@ fn parse(args: &[String]) -> Result<Args, String> {
             "--gates-dir" => {
                 match args.get(i + 1) {
                     Some(d) if gates_dir.is_none() => gates_dir = Some(d.clone()),
-                    _ => return Err(USAGE.to_string()),
+                    _ => return Err(Fault::usage(USAGE)),
                 }
                 i += 1;
             }
-            other => return Err(format!("unrecognized argument: {}\n{}", other, USAGE)),
+            other => return Err(Fault::usage(format!("unrecognized argument: {}\n{}", other, USAGE))),
         }
         i += 1;
     }
@@ -105,12 +106,12 @@ fn parse(args: &[String]) -> Result<Args, String> {
     // spec: gate-sdk/SPEC.md §The non-gate arm — a documented flag that silently changes nothing is
     // worse than no flag, so the arm whose corpus is the tree refuses a registry it never reads.
     if mode == Mode::Tree && gates_dir.is_some() {
-        return Err(USAGE.to_string());
+        return Err(Fault::usage(USAGE));
     }
     Ok(Args { mode, gates_dir })
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let parsed = parse(args)?;
     match parsed.mode {
         Mode::Tree => tree(),
@@ -121,16 +122,17 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 // spec: gate-sdk/SPEC.md §port-blockers — the tree arm dispatches ahead of the registry resolution
 // the other two share, so a tree carrying no gates.list still answers for its own shell: requiring
 // a registry to count files the registry does not contain is the corpus confusion it exists to end.
-fn tree() -> Result<String, String> {
+fn tree() -> Result<String, Fault> {
     // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the shared corpus rule degrades to an
     // empty corpus where git cannot answer, deliberately and on a monotonicity ground for its other
     // reader; this arm absorbs the divergence by probing first rather than printing `0 owed`.
-    if walk::toplevel_opt()?.is_none() {
-        return Err(
-            "--tree: not a git repository — this arm's corpus is the tracked shell tree".to_string(),
-        );
+    if walk::toplevel_opt().map_err(Fault::tool)?.is_none() {
+        return Err(Fault::refused(
+            "--tree: not a git repository — this arm's corpus is the tracked shell tree",
+        ));
     }
-    let files = walk::tracked_shell_tree()?;
+    walk::prune_dirs().map_err(Fault::refused)?;
+    let files = walk::tracked_shell_tree().map_err(Fault::input)?;
     let (mut scanned, mut noport, mut held, mut owed) = (0usize, 0usize, 0usize, 0usize);
     let mut out = String::new();
     for f in &files {
@@ -532,15 +534,15 @@ fn glob_set(text: &str) -> String {
     globs.into_iter().collect::<Vec<_>>().join(",")
 }
 
-fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, String> {
-    let reg = resolve_registry(gates_dir)?;
+fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, Fault> {
+    let reg = resolve_registry(gates_dir).map_err(Fault::refused)?;
     let list = registry::list_path(&reg.gates_dir);
     if !Path::new(&list).is_file() {
-        return Err(format!("registry not found: {}", list));
+        return Err(Fault::refused(format!("registry not found: {}", list)));
     }
     let listing = std::fs::read(&list)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| format!("cannot read {}: {}", list, e))?;
+        .map_err(|e| Fault::refused(format!("cannot read {}: {}", list, e)))?;
 
     let mut scanned = 0usize;
     let mut undecidable = 0usize;
@@ -552,7 +554,7 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, String>
     for member in registry::members(&listing) {
         scanned += 1;
         let decl = registry::resolve(&member, &reg.check_dirs).ok_or_else(|| {
-            format!("{} is registered but resolves to no declaration path", member)
+            Fault::refused(format!("{} is registered but resolves to no declaration path", member))
         })?;
         let text = std::fs::read(Path::new(&decl))
             .map(|b| String::from_utf8_lossy(&b).into_owned())
@@ -561,7 +563,7 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, String>
         // spec: gate-sdk/SPEC.md §port-blockers — a ported member leaves the partition entirely
         // rather than printing `?`: the grouping orders the *remaining* corpus, so there is no open
         // question to report. `--group` does not consume the requirement lookup: it has no row to fill.
-        let substrate = registry::substrate(&decl)?;
+        let substrate = registry::substrate(&decl).map_err(Fault::refused)?;
         if substrate != registry::Substrate::Shell {
             if mode == Mode::Group {
                 ported += 1;
@@ -617,8 +619,8 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, String>
             };
             let fields = registry::manifest_fields(registry::manifest_line(&text).unwrap_or(""));
             let tier = registry::field(&fields, "tier");
-            let couples =
-                registry::expand_couples(&registry::field(&fields, "couples"), &reg.kit_roots_here)?;
+            let couples = registry::expand_couples(&registry::field(&fields, "couples"), &reg.kit_roots_here)
+                .map_err(Fault::refused)?;
             let key = format!(
                 "libs={} globs={}",
                 dash_if_empty(&lib_key),

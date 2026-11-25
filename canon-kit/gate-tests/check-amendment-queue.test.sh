@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # spec: canon-kit/SPEC.md §check-amendment-queue — the absent-queue clean and the wrong-kind refusal,
-# arms the pair cannot spell: its good/ holds a queue, and exit 2 has no pair spelling
+# arms the pair cannot spell: its good/ holds a queue, and exit 3 has no pair spelling
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -29,11 +29,11 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=queue path
 check_case "absent-queue-is-not-applicable" 0 "clean (not applicable: no queue file at" "$SANDBOX/TASK-QUEUE.md"
 
 mkdir -p "$SANDBOX/dirqueue"
-check_case "non-file-queue-fails-closed" 2 "not a file" "$SANDBOX/dirqueue"
+check_case "non-file-queue-fails-closed" 3 "not a file" "$SANDBOX/dirqueue"
 
 ln -s "$SANDBOX/gone.md" "$SANDBOX/danglingqueue" 2>/dev/null
 if [[ -L "$SANDBOX/danglingqueue" ]]; then
-    check_case "dangling-link-queue-fails-closed" 2 "not a file" "$SANDBOX/danglingqueue"
+    check_case "dangling-link-queue-fails-closed" 3 "not a file" "$SANDBOX/danglingqueue"
 fi
 
 if [[ "$fails" -gt 0 ]]; then

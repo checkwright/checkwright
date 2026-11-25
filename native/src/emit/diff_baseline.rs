@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because 1 is this tool's verdict and the
 // emitting family can never carry it; its one functional caller reads nothing but the status.
 use crate::evidence;
+use crate::exit::{self, Fault};
 use crate::walk;
 use std::path::Path;
 
@@ -31,7 +32,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("diff-baseline: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -39,8 +40,8 @@ pub fn run(args: &[String]) -> i32 {
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the shape half, an *addition* this port makes
 // rather than a behaviour it preserves; the scan itself is borrowed from the class's first
 // free-text member rather than re-spelled, so the escape has one implementation.
-fn positionals(args: &[String]) -> Result<&[String], String> {
-    super::file_survey::positionals(args, "positional").map_err(|e| format!("{}\n{}", e, USAGE))
+fn positionals(args: &[String]) -> Result<&[String], Fault> {
+    super::file_survey::positionals(args, "positional").map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))
 }
 
 struct Cfg {
@@ -51,20 +52,20 @@ struct Cfg {
     parser_family: Vec<(String, String)>,
 }
 
-fn dispatch(args: &[String]) -> Result<i32, String> {
+fn dispatch(args: &[String]) -> Result<i32, Fault> {
     let rest = positionals(args)?;
     if rest.len() < 2 {
-        return Err(format!("too few arguments\n{}", USAGE));
+        return Err(Fault::usage(format!("too few arguments\n{}", USAGE)));
     }
     let cfg = Cfg {
-        baseline: walk::knob_scalar("EVIDENCE_KIT_BASELINE_FILE")?,
-        skip: walk::knob_scalar("EVIDENCE_KIT_SKIP_FILE")?,
-        tmpdir: walk::knob_scalar("EVIDENCE_KIT_TMP_DIR")?,
-        parser: walk::knob_scalar("EVIDENCE_KIT_PARSER")?,
-        parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_")?,
+        baseline: walk::knob_scalar("EVIDENCE_KIT_BASELINE_FILE").map_err(Fault::refused)?,
+        skip: walk::knob_scalar("EVIDENCE_KIT_SKIP_FILE").map_err(Fault::refused)?,
+        tmpdir: walk::knob_scalar("EVIDENCE_KIT_TMP_DIR").map_err(Fault::refused)?,
+        parser: walk::knob_scalar("EVIDENCE_KIT_PARSER").map_err(Fault::refused)?,
+        parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_").map_err(Fault::refused)?,
     };
     std::fs::create_dir_all(&cfg.tmpdir)
-        .map_err(|e| format!("cannot create {}: {}", cfg.tmpdir, e))?;
+        .map_err(|e| Fault::tool(format!("cannot create {}: {}", cfg.tmpdir, e)))?;
 
     let baseline_text = read_or_empty(&cfg.baseline);
     let skip_text = if !cfg.skip.is_empty() && Path::new(&cfg.skip).is_file() {
@@ -78,7 +79,7 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
     let mut i = 0usize;
     while i < rest.len() {
         if rest.len() - i < 2 {
-            return Err(format!("too few arguments\n{}", USAGE));
+            return Err(Fault::usage(format!("too few arguments\n{}", USAGE)));
         }
         let suite = &rest[i];
         let log = &rest[i + 1];
@@ -94,7 +95,7 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
             }
         }
         if !Path::new(log).is_file() {
-            return Err(format!("log not found: {}", log));
+            return Err(Fault::refused(format!("log not found: {}", log)));
         }
         let parser = evidence::parser_for(&cfg.parser_family, suite, &cfg.parser);
         let status = match status {
@@ -104,7 +105,8 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
                 // success: an exit-code suite parsed against an assumed 0 reports pass for every
                 // log it is ever handed, clearing a red it structurally cannot see.
                 if parser == "exit-code" {
-                    let door = crate::gates::door_command(&format!("--diff-baseline {} {} <status>", suite, log))?;
+                    let door = crate::gates::door_command(&format!("--diff-baseline {} {} <status>", suite, log))
+                        .map_err(Fault::refused)?;
                     eprintln!(
                         "diff-baseline: suite '{}' is parsed by exit code and no status was given.",
                         suite
@@ -112,13 +114,13 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
                     eprintln!("  help: pass the suite's own exit status as a third argument —");
                     eprintln!("        {}", door);
                     eprintln!("        Without it this tool cannot observe a failure in that suite at all.");
-                    return Ok(2);
+                    return Ok(exit::USAGE);
                 }
                 0
             }
         };
 
-        let lines = evidence::parse(suite, Path::new(log), status, &parser)?;
+        let lines = evidence::parse(suite, Path::new(log), status, &parser).map_err(Fault::tool)?;
         let parsed = format!("{}/diff-{}.parsed", cfg.tmpdir, suite);
         write_lines(&parsed, &lines)?;
         let observed = if lines.is_empty() {
@@ -159,13 +161,13 @@ fn read_or_empty(path: &str) -> String {
         .unwrap_or_default()
 }
 
-fn write_lines(path: &str, lines: &[String]) -> Result<(), String> {
+fn write_lines(path: &str, lines: &[String]) -> Result<(), Fault> {
     let mut out = String::new();
     for l in lines {
         out.push_str(l);
         out.push('\n');
     }
-    std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))
+    std::fs::write(path, out).map_err(|e| Fault::tool(format!("cannot write {}: {}", path, e)))
 }
 
 #[cfg(test)]

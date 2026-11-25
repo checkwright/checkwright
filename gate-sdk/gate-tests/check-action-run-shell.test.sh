@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Behavioral test of check-action-run-shell — the fidelity limit's refused class,
 # which the one good/bad pair cannot hold: the pair models exit 0 and exit 1, and
-# every refusal here is exit 2 by the fail-closed contract.
+# every refusal here is exit 3 by the fail-closed contract, a construct the extractor cannot read.
 # Each case asserts the exit status AND the construct named in the message, so the
 # boundary is proved by the oracle rather than described in prose.
 #
@@ -38,19 +38,19 @@ check_case() {
 # conformance requirement inside the gate's own subject.
 check_case folded '      - run: >
           echo folded
-          across lines' 2 "a folded block scalar (run: >)"
+          across lines' 3 "a folded block scalar (run: >)"
 
 check_case folded_chomped '      - run: >-
           echo folded
-          across lines' 2 "a folded block scalar (run: >-)"
+          across lines' 3 "a folded block scalar (run: >-)"
 
 # B — an explicit block-scalar indentation indicator can contradict the indent the
 # extractor derives from the first body line.
 check_case indicator '      - run: |2
-            echo indicated' 2 "an explicit block-scalar indentation indicator (run: |2)"
+            echo indicated' 3 "an explicit block-scalar indentation indicator (run: |2)"
 
 # C — a YAML alias as the run: value. No anchor resolution is attempted.
-check_case alias '      - run: *setup' 2 "a YAML alias as the run: value (run: *setup)"
+check_case alias '      - run: *setup' 3 "a YAML alias as the run: value (run: *setup)"
 
 # C2 — the anchor half of the same rule. This fell through every refusal arm and
 # landed on the plain-scalar counter, so an anchored body was reported skipped and
@@ -58,11 +58,11 @@ check_case alias '      - run: *setup' 2 "a YAML alias as the run: value (run: *
 # shell. The body below is ShellCheck-dirty, so a regression here reads as clean.
 check_case anchor '      - run: &setup |
           echo "$undefined_var"
-          unused=1' 2 "a YAML anchor on the run: value (run: &setup |)"
+          unused=1' 3 "a YAML anchor on the run: value (run: &setup |)"
 
 # C3 — an anchor on a plain scalar refuses too: the anchor is what we cannot
 # resolve, independent of the scalar style it decorates.
-check_case anchor_plain '      - run: &setup echo hi' 2 "a YAML anchor on the run: value (run: &setup echo hi)"
+check_case anchor_plain '      - run: &setup echo hi' 3 "a YAML anchor on the run: value (run: &setup echo hi)"
 
 # C4 — a quoted value merely beginning with & is an ordinary string, not an anchor.
 check_case anchor_quoted '      - run: "echo && echo"' 0 "0 run: block(s) linted"
@@ -71,7 +71,7 @@ check_case anchor_quoted '      - run: "echo && echo"' 0 "0 run: block(s) linted
 # the fragment, so the line is refused rather than linted wrong.
 check_case unbalanced '      - run: |
           echo "${{ github.ref_name"
-          echo tail' 2 "an unbalanced GitHub expression"
+          echo tail' 3 "an unbalanced GitHub expression"
 
 # E — the chomping indicators are ordinary spellings, handled rather than refused.
 # An author reaches for |- by habit, so silently skipping these would be the worst
@@ -115,7 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo body' 2 "$defaults_refusal"
+          echo body' 3 "$defaults_refusal"
 
 wf_case defaults_job 'name: job-level defaults
 
@@ -127,7 +127,7 @@ jobs:
         shell: pwsh
     steps:
       - run: |
-          echo body' 2 "$defaults_refusal"
+          echo body' 3 "$defaults_refusal"
 
 # E3 — the refusal is the `run:` key, not the `defaults:` key. A defaults block
 # setting anything else changes no step's dialect, so it is extracted normally —
@@ -192,5 +192,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-action-run-shell.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-action-run-shell.test: ok (folded scalars, an explicit indentation indicator, a YAML alias, a YAML anchor on either scalar style, an unbalanced GitHub expression and a defaults: subtree carrying run: at either level each refuse at exit 2 naming the construct; |- and |+ extract normally; a quoted value merely starting with & is not an anchor; a defaults: block with no run: key extracts normally; an absent shell: key under a Windows or an unreadable runs-on is a finding at exit 1 and naming the key clears it; a refusable construct outside the Actions-shape subject is skipped and counted rather than refused)"
+echo "check-action-run-shell.test: ok (folded scalars, an explicit indentation indicator, a YAML alias, a YAML anchor on either scalar style, an unbalanced GitHub expression and a defaults: subtree carrying run: at either level each refuse at exit 3 naming the construct; |- and |+ extract normally; a quoted value merely starting with & is not an anchor; a defaults: block with no run: key extracts normally; an absent shell: key under a Windows or an unreadable runs-on is a finding at exit 1 and naming the key clears it; a refusable construct outside the Actions-shape subject is skipped and counted rather than refused)"
 exit 0

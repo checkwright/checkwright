@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-core-files — every path in the core-files manifest exists in the
 // worktree and is tracked, a `kit:` line deriving one path per kit root
+use crate::exit;
 use crate::fresh;
 use crate::{proc, programs};
 use crate::registry;
@@ -31,7 +32,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-core-files: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let manifest = fresh::positional(args, 0, &default).to_string();
@@ -47,7 +48,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(_) => {
             eprintln!("check-core-files: manifest not readable: {}", manifest);
-            return 2;
+            return exit::INPUT;
         }
     };
     let lines: Vec<String> = registry::members(&text);
@@ -64,7 +65,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-core-files: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         }
     } else {
@@ -81,7 +82,7 @@ pub fn run(args: &[String]) -> i32 {
             eprintln!("  help: this manifest requires every expanded path to exist and be tracked,");
             eprintln!("        which a wildcard cannot express — name an exact per-kit basename");
             eprintln!("        (e.g. kit:SPEC.md), or hand-list the paths.");
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -89,11 +90,11 @@ pub fn run(args: &[String]) -> i32 {
         Ok(Some(_)) => {}
         Ok(None) => {
             eprintln!("check-core-files: not a git repository — cannot verify tracked status");
-            return 2;
+            return exit::REFUSED;
         }
         Err(e) => {
             eprintln!("check-core-files: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     }
 

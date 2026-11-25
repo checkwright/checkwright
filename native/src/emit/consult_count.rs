@@ -1,6 +1,8 @@
 // spec: lifecycle-kit/SPEC.md §The consult inbox — the count arm: one line naming how many items
 // the inbox owes the consult skill and the oldest one's date, and nothing for an empty inbox.
 
+use crate::exit::Fault;
+
 pub const KNOBS: &[&str] = &["LIFECYCLE_KIT_CONSULT_INBOX_FILE"];
 
 // spec: lifecycle-kit/SPEC.md §The consult inbox — a bullet is a line opening `- `, and the oldest
@@ -19,8 +21,8 @@ pub fn line(inbox: &str) -> Option<String> {
     ))
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    let (inbox, _) = super::file_survey::anchored("LIFECYCLE_KIT_CONSULT_INBOX_FILE")?;
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
+    let (inbox, _) = super::file_survey::anchored_fault("LIFECYCLE_KIT_CONSULT_INBOX_FILE")?;
     let text = match std::fs::read(&inbox) {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(_) => return Ok(String::new()),

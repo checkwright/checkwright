@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-knob-default-coupling — every literal kit-knob default in kit
 // source agrees across its sites and with the default the owning SPEC states
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::collections::BTreeMap;
@@ -10,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-knob-default-coupling: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -370,23 +371,23 @@ fn window() -> Result<Option<usize>, String> {
     }
 }
 
-fn rule(_args: &[String]) -> Result<i32, String> {
-    let pairs = prefix_pairs()?;
+fn rule(_args: &[String]) -> Result<i32, Fault> {
+    let pairs = prefix_pairs().map_err(Fault::refused)?;
     if pairs.is_empty() {
-        return Err("no kit roots enumerated".to_string());
+        return Err(Fault::refused("no kit roots enumerated"));
     }
-    let window = window()?;
+    let window = window().map_err(Fault::refused)?;
 
     let mut sources: Vec<String> = Vec::new();
     // spec: gate-sdk/SPEC.md §Layout and configuration — the root is walked off disk, so it takes
     // the working-directory spelling; on the kit-parent one this loop fail-closes under a nested
     // root rather than reading an empty corpus, which is the only loud member of the cohort
-    for kr in walk::kit_roots()? {
+    for kr in walk::kit_roots().map_err(Fault::refused)? {
         let kr = kr.trim_end_matches('/');
         if kr.is_empty() {
             continue;
         }
-        for p in walk::find_files(Path::new(kr), &["sh"])? {
+        for p in walk::find_files(Path::new(kr), &["sh"]).map_err(Fault::input)? {
             let rel = spec::strip_dot_slash(&p.display().to_string());
             if rel.contains("/templates/") {
                 continue;
@@ -403,12 +404,12 @@ fn rule(_args: &[String]) -> Result<i32, String> {
 
     let mut records: Vec<Record> = Vec::new();
     for f in &sources {
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         records.extend(extract(&pairs, f, &text));
     }
     // spec: canon-kit/SPEC.md §check-knob-default-coupling — idiom 3, the static knob roster: a
     // scalar default rendered there is coupled exactly as a guarded assignment is
-    for (idx, line) in crate::knobs::roster()?.lines().enumerate() {
+    for (idx, line) in crate::knobs::roster().map_err(Fault::refused)?.lines().enumerate() {
         let mut f = line.splitn(3, '\t');
         let (Some(knob), Some("scalar"), Some(val)) = (f.next(), f.next(), f.next()) else {
             continue;
@@ -469,7 +470,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
             .push((knob.clone(), val.clone(), spec_val.clone()));
     }
 
-    let spec_name = spec::spec_name()?;
+    let spec_name = spec::spec_name().map_err(Fault::refused)?;
     for (kit, subset) in &kit_subset {
         let spec_path = format!("{}/{}", kit, spec_name);
         // spec: canon-kit/SPEC.md §check-knob-default-coupling — an ABSENT owning SPEC is a skip on
@@ -479,7 +480,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
             unowned += subset.len();
             continue;
         }
-        let text = spec::read_text(Path::new(&spec_path))?;
+        let text = spec::read_text(Path::new(&spec_path)).map_err(Fault::input)?;
         let blob: Vec<char> = text
             .lines()
             .collect::<Vec<&str>>()

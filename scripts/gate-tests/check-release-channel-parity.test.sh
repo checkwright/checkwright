@@ -99,24 +99,24 @@ write_case "$tmp/tagged" 'Release channel: **stable**' no
 git -C "$tmp/tagged" tag -a v0.4.0 -m v0.4.0
 check_case "newest-tag-read-red" "$tmp/tagged" "" 1 "invariant B: version line v0.4.0 is 0.x"
 
-# --- fail-closed refusals: exit 2, never a pass ------------------------------
+# --- fail-closed refusals: exit 3, never a pass ------------------------------
 write_case "$tmp/nodecl" 'This section declares no channel at all.' yes
-check_case "no-declaration" "$tmp/nodecl" 0.5.0 2 "carries no 'Release channel:' declaration line"
+check_case "no-declaration" "$tmp/nodecl" 0.5.0 3 "carries no 'Release channel:' declaration line"
 
 write_case "$tmp/dupdecl" 'Release channel: **preview**
 
 Release channel: **stable**' yes
-check_case "duplicate-declaration" "$tmp/dupdecl" 0.5.0 2 "declaration lines; exactly one is admissible"
+check_case "duplicate-declaration" "$tmp/dupdecl" 0.5.0 3 "declaration lines; exactly one is admissible"
 
 write_case "$tmp/badval" 'Release channel: **beta**' yes
-check_case "unrecognized-channel" "$tmp/badval" 0.5.0 2 "unrecognized channel value"
+check_case "unrecognized-channel" "$tmp/badval" 0.5.0 3 "unrecognized channel value"
 
 write_case "$tmp/nostep" 'Release channel: **preview**' yes
 printf 'jobs:\n  release:\n    steps:\n      - run: echo nothing\n' >"$tmp/nostep/publish.yml"
-check_case "no-release-step" "$tmp/nostep" 0.5.0 2 "no recognizable Release-creating step"
+check_case "no-release-step" "$tmp/nostep" 0.5.0 3 "no recognizable Release-creating step"
 
 write_case "$tmp/badver" 'Release channel: **preview**' yes
-check_case "unparseable-version" "$tmp/badver" not-a-version 2 "does not parse as semver"
+check_case "unparseable-version" "$tmp/badver" not-a-version 3 "does not parse as semver"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-release-channel-parity.test: $fails assertion(s) failed"

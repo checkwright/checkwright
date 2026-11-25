@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §The queue-history arm — one entry's section transitions, oldest first, a
 // report with no verdict and no exit-1 path
+use crate::exit::Fault;
 use crate::queue;
 
 pub const USAGE: &str = "\
@@ -18,23 +19,31 @@ pub const KNOBS: &[&str] = &[
     "QUEUE_KIT_DONE_SECTION",
 ];
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let mut slug = String::new();
     let mut file = String::new();
     for a in args {
         match a.as_str() {
-            other if other.starts_with('-') => return Err(format!("unknown option: {}\n{}", other, USAGE)),
+            other if other.starts_with('-') => return Err(Fault::usage(format!("unknown option: {}\n{}", other, USAGE))),
             other if slug.is_empty() => slug = other.to_string(),
             other if file.is_empty() => file = other.to_string(),
-            other => return Err(format!("unexpected argument: {}\n{}", other, USAGE)),
+            other => return Err(Fault::usage(format!("unexpected argument: {}\n{}", other, USAGE))),
         }
     }
     if slug.is_empty() {
-        return Err(format!("queue-history needs a <slug>\n{}", USAGE));
+        return Err(Fault::usage(format!("queue-history needs a <slug>\n{}", USAGE)));
     }
-    let sec = queue::Sections::with_done()?;
-    let file = if file.is_empty() { queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")? } else { file };
-    Ok(render(&slug, &queue::transitions(&file, &slug, &sec)?))
+    let sec = queue::Sections::with_done().map_err(Fault::refused)?;
+    let file = if file.is_empty() { queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)? } else { file };
+    Ok(render(&slug, &queue::transitions(&file, &slug, &sec).map_err(transitions_fault)?))
+}
+
+fn transitions_fault(e: String) -> Fault {
+    if e.starts_with("not a live or retired slug") {
+        Fault::refused(e)
+    } else {
+        Fault::tool(e)
+    }
 }
 
 fn render(slug: &str, rows: &[queue::Transition]) -> String {

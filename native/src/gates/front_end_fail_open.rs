@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-front-end-fail-open — each front-end stub's fail-open declaration
 // line names exactly the crate's FAIL_OPEN_ARMS
 use crate::emit::FAIL_OPEN_ARMS;
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::collections::BTreeSet;
@@ -34,12 +35,12 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let sdk_default = walk::sdk_root();
     let sdk = fresh::strip_trailing_slash(fresh::positional(args, 0, &sdk_default)).to_string();
     let declared: BTreeSet<&str> = FAIL_OPEN_ARMS.iter().copied().collect();
@@ -52,8 +53,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
             absent.push(path);
             continue;
         }
-        let text = fresh::read_captured(&path)?;
-        let names = declaration(&text, stub, &path)?;
+        let text = fresh::read_captured(&path).map_err(Fault::input)?;
+        let names = declaration(&text, stub, &path).map_err(Fault::input)?;
         let named: BTreeSet<&str> = names.iter().map(String::as_str).collect();
         for arm in named.difference(&declared) {
             findings.push(format!(

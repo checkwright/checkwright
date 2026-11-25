@@ -2,6 +2,7 @@
 // its own: what the install configures, enforces and leaves inactive, the battery, the claim, and
 // the verdict as the exit status and the last line of stdout.
 use super::{demo, doctor, lock, workflow, GATES_DIR, QUEUE_FILE, STATE_FILE};
+use crate::exit;
 use crate::gates::task_path_claim::LISTS_KNOB;
 use crate::walkthrough::{self as show, Scratch};
 use crate::{proc, programs};
@@ -60,7 +61,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         eprintln!("checkwright prove: unknown argument: {}", a);
         eprintln!("  {}", USAGE[0]);
-        return 2;
+        return exit::USAGE;
     }
     let mut scratch = Scratch { dir: None };
     let outcome = prove(&mut scratch);
@@ -82,7 +83,7 @@ pub fn run(args: &[String]) -> i32 {
             if !help.is_empty() {
                 eprintln!("  help: {}", help);
             }
-            2
+            exit::FAIL_ENV
         }
     }
 }
@@ -552,7 +553,7 @@ mod tests {
     #[test]
     fn help_answers_and_an_operand_is_refused() {
         assert_eq!(super::run(&["--help".to_string()]), 0);
-        assert_eq!(super::run(&["extra".to_string()]), 2);
+        assert_eq!(super::run(&["extra".to_string()]), crate::exit::USAGE);
     }
 
     // spec: installer/SPEC.md §prove — the clone is by path and never `--local`

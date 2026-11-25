@@ -1,6 +1,7 @@
 // spec: guard-kit/SPEC.md §compare-settings-allow — the redundancy and breadth questions over one
 // match core, `guard::allow_match` with its arguments swapped, and the dead-path question over
 // context-kit's extraction predicate; an advisory, so every report path is 0.
+use crate::exit::Fault;
 use crate::gates::settings_paths;
 use crate::guard;
 use crate::walk;
@@ -294,10 +295,10 @@ fn parse(args: &[String]) -> Result<bool, String> {
     Ok(count_only)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let count_only = parse(args)?;
-    let committed_path = walk::knob_scalar("GUARD_KIT_SETTINGS")?;
-    let local_path = walk::knob_scalar("GUARD_KIT_SETTINGS_LOCAL")?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let count_only = parse(args).map_err(Fault::usage)?;
+    let committed_path = walk::knob_scalar("GUARD_KIT_SETTINGS").map_err(Fault::refused)?;
+    let local_path = walk::knob_scalar("GUARD_KIT_SETTINGS_LOCAL").map_err(Fault::refused)?;
     let local = match read_allow(&local_path) {
         AllowRead::Entries(e) => e,
         AllowRead::Absent | AllowRead::Unparseable => {
@@ -311,15 +312,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         // no parser can read is a refusal with the path named, never zero entries: every local
         // entry would otherwise report as adding coverage it may already have.
         AllowRead::Unparseable => {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "cannot parse {} as JSON — the committed allowlist could not be read, and reading \
                  it as empty would report every local entry as adding coverage",
                 committed_path
-            ))
+            )))
         }
     };
-    let probes = walk::knob_array("GUARD_KIT_BREADTH_PROBES")?;
-    let declarations = walk::knob_map("GUARD_KIT_BREADTH_DECLARED")?;
+    let probes = walk::knob_array("GUARD_KIT_BREADTH_PROBES").map_err(Fault::refused)?;
+    let declarations = walk::knob_map("GUARD_KIT_BREADTH_DECLARED").map_err(Fault::refused)?;
     let mut r = partition(&local, &committed, &probes, &declarations);
     // spec: guard-kit/SPEC.md §compare-settings-allow — a relative token resolves against the
     // working directory, which the front-end sets to the repository root

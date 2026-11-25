@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-md-refs — every internal markdown link in the governed doc
 // set resolves (relative path to a tracked file/dir, #anchor to a heading slug)
+use crate::exit::Fault;
 use crate::{proc, programs};
 use crate::spec;
 use crate::walk;
@@ -11,21 +12,21 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-md-refs: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    if crate::walk::toplevel_opt()?.is_none() {
-        return Err("not a git repository — cannot verify tracked targets".to_string());
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    if crate::walk::toplevel_opt().map_err(Fault::tool)?.is_none() {
+        return Err(Fault::refused("not a git repository — cannot verify tracked targets"));
     }
 
-    let exclude = spec::knob_array_pub("CANON_KIT_MDREF_EXCLUDE")?;
+    let exclude = spec::knob_array_pub("CANON_KIT_MDREF_EXCLUDE").map_err(Fault::refused)?;
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        spec::manifest_files(".")?
+        spec::manifest_files(".").map_err(Fault::refused)?
             .into_iter()
             .map(|p| p.display().to_string())
             .filter(|f| !excluded(&exclude, &spec::strip_dot_slash(f)))
@@ -34,12 +35,12 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: canon-kit/SPEC.md §check-md-refs — the self-repo blob-link prefix, derived from
     // origin through the shared identity rule; an empty prefix skips the self-repo pass
-    let self_repo_prefix = self_repo_prefix(&spec::knob_pub("CANON_KIT_DOCS_BLOB_REF")?)?;
+    let self_repo_prefix = self_repo_prefix(&spec::knob_pub("CANON_KIT_DOCS_BLOB_REF").map_err(Fault::refused)?).map_err(Fault::tool)?;
 
     // spec: canon-kit/SPEC.md §check-md-refs — the tracked-file membership set, filled once
     // rather than by a per-link exec
     let tracked: HashSet<String> = crate::listing::tracked(None, &[])
-        .map_err(|e| e.text_or(|_| "git ls-files failed — the tracked set is unknown".to_string()))?
+        .map_err(|e| Fault::tool(e.text_or(|_| "git ls-files failed — the tracked set is unknown".to_string())))?
         .into_iter()
         .collect();
 
@@ -53,7 +54,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         let base = dirname(f);
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         for tgt in link_targets(&text) {
             if !self_repo_prefix.is_empty() && tgt.starts_with(&self_repo_prefix) {
                 let rest = &tgt[self_repo_prefix.len()..];
@@ -65,14 +66,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
                         "{}: self-repo reference link '{}' names no path",
                         f, tgt
                     ));
-                } else if !target_resolves(&tracked, &path)? {
+                } else if !target_resolves(&tracked, &path).map_err(Fault::tool)? {
                     bad.push(format!(
                         "{}: self-repo reference link '{}' → {} is not a git-tracked file",
                         f, tgt, path
                     ));
                 } else if !anchor.is_empty()
                     && Path::new(&path).is_file()
-                    && !anchor_ok(&mut anchors, &path, &anchor)?
+                    && !anchor_ok(&mut anchors, &path, &anchor).map_err(Fault::input)?
                 {
                     bad.push(format!(
                         "{}: [..]({}) — no heading in {} slugs to '{}'",
@@ -87,7 +88,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             links += 1;
             let (path, anchor) = split_anchor(&tgt);
             if path.is_empty() {
-                if !anchor.is_empty() && !anchor_ok(&mut anchors, f, &anchor)? {
+                if !anchor.is_empty() && !anchor_ok(&mut anchors, f, &anchor).map_err(Fault::input)? {
                     bad.push(format!(
                         "{}: [..](#{}) — no heading in this file slugs to '{}'",
                         f, anchor, anchor
@@ -96,14 +97,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 continue;
             }
             let p = spec::relative_to_cwd(&format!("{}/{}", base, path));
-            if !target_resolves(&tracked, &p)? {
+            if !target_resolves(&tracked, &p).map_err(Fault::tool)? {
                 bad.push(format!(
                     "{}: link target '{}' → {} is not a tracked file or directory",
                     f, tgt, p
                 ));
                 continue;
             }
-            if !anchor.is_empty() && Path::new(&p).is_file() && !anchor_ok(&mut anchors, &p, &anchor)?
+            if !anchor.is_empty() && Path::new(&p).is_file() && !anchor_ok(&mut anchors, &p, &anchor).map_err(Fault::input)?
             {
                 bad.push(format!(
                     "{}: [..]({}) — no heading in {} slugs to '{}'",

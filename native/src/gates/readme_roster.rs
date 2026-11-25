@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-readme-roster — every kit README's gate-roster marker block
 // holds name-set parity with the kit's shipped checks/ basenames, both directions
-use crate::gates::smoke_entry_guard::{kit_name, scan_root};
+use crate::exit;
+use crate::gates::smoke_entry_guard::{kit_name, scan_root_or_status};
 use crate::walk;
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -61,25 +62,25 @@ fn roster_names(text: &str) -> BTreeSet<String> {
 }
 
 pub fn run(args: &[String]) -> i32 {
-    let root = match scan_root(args, "check-readme-roster") {
-        Some(r) => r,
-        None => return 2,
+    let root = match scan_root_or_status(args, "check-readme-roster") {
+        Ok(r) => r,
+        Err(rc) => return rc,
     };
     if !Path::new(&root).is_dir() {
         eprintln!("check-readme-roster: root not found: {}", root);
-        return 2;
+        return exit::REFUSED;
     }
 
     let kit_roots = match walk::kit_roots() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-readme-roster: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if kit_roots.is_empty() {
         eprintln!("check-readme-roster: no kit roots enumerated");
-        return 2;
+        return exit::REFUSED;
     }
 
     // spec: gate-sdk/SPEC.md §check-reads-couples — every kit's `checks/` listing goes through one
@@ -105,7 +106,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-readme-roster: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         }
     }
@@ -120,7 +121,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-readme-roster: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         }
     }
@@ -168,14 +169,14 @@ pub fn run(args: &[String]) -> i32 {
             Ok(b) => Some(String::from_utf8_lossy(&b).into_owned()),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
             // spec: gate-sdk/SPEC.md §check-readme-roster — an unreadable README marker scan is
-            // exit 2, never a false clean and never the marker-block finding, which asserts the
+            // exit 3, never a false clean and never the marker-block finding, which asserts the
             // block is absent rather than that the scan could not run
             Err(e) => {
                 eprintln!(
                     "check-readme-roster: README not readable: {} ({}) — the check could not run; treating as failure (not clean)",
                     readme, e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         let Some(text) = text.filter(|t| t.contains(BEGIN)) else {

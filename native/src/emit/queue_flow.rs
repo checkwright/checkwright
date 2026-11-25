@@ -2,6 +2,7 @@
 // design-pending pool, `kpi-queue-net-delta`'s definitions read over consecutive iteration-start
 // commits. Advisory, so every unmeasurable input is an `n/a (<reason>)` line and exit 0.
 use super::kpi::queue_net_delta::{flow, pool};
+use crate::exit::Fault;
 use crate::history::{Blobs, Git};
 use crate::stages;
 
@@ -17,14 +18,14 @@ const DEFAULT_WINDOWS: usize = 5;
 pub const USAGE: &str =
     "usage: --emit queue-flow [<n>]   (<n> a positive integer, the trailing windows; default 5)";
 
-fn windows_arg(args: &[String]) -> Result<usize, String> {
+fn windows_arg(args: &[String]) -> Result<usize, Fault> {
     match args {
         [] => Ok(DEFAULT_WINDOWS),
         [n] => match n.parse::<usize>() {
             Ok(v) if v > 0 && n.bytes().all(|b| b.is_ascii_digit()) => Ok(v),
-            _ => Err(USAGE.to_string()),
+            _ => Err(Fault::usage(USAGE)),
         },
-        _ => Err(USAGE.to_string()),
+        _ => Err(Fault::usage(USAGE)),
     }
 }
 
@@ -63,7 +64,7 @@ pub struct Window {
     pub drained: i64,
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let n = windows_arg(args)?;
     let rows = match windows(Some(n))? {
         Ok(rows) => rows,
@@ -81,14 +82,14 @@ pub fn emit(args: &[String]) -> Result<String, String> {
 
 // spec: drift-kit/SPEC.md §The queue-flow arm — the trailing `limit` windows oldest first, every
 // window where `limit` is none; the inner error is the degrade's `n/a` reason
-pub fn windows(limit: Option<usize>) -> Result<Result<Vec<Window>, String>, String> {
-    let knob = crate::walk::knob_scalar;
+pub fn windows(limit: Option<usize>) -> Result<Result<Vec<Window>, String>, Fault> {
+    let knob = |name: &str| crate::walk::knob_scalar(name).map_err(Fault::refused);
     let (state_file, queue_file) = (knob("DRIFT_KIT_STATE_FILE")?, knob("DRIFT_KIT_QUEUE_FILE")?);
     let (deferred, icebox) = (
         knob("DRIFT_KIT_DEFERRED_SECTION")?,
         knob("DRIFT_KIT_ICEBOX_SECTION")?,
     );
-    let top = crate::walk::toplevel().or_else(|_| crate::walk::cwd())?;
+    let top = crate::walk::toplevel().or_else(|_| crate::walk::cwd()).map_err(Fault::tool)?;
     let git = Git { top: top.clone() };
     let (state_path, queue_path) = (repo_path(&top, &state_file), repo_path(&top, &queue_file));
     let na = |reason: String| Ok(Err(reason));
@@ -106,7 +107,7 @@ pub fn windows(limit: Option<usize>) -> Result<Result<Vec<Window>, String>, Stri
     // history buys only the blobs of the windows it prints.
     let mut found: Vec<(String, String)> = Vec::new();
     for rev in revs.lines() {
-        let text = match blobs.at(rev, &state_path)? {
+        let text = match blobs.at(rev, &state_path).map_err(Fault::tool)? {
             Some(t) => t,
             None => continue,
         };
@@ -132,7 +133,7 @@ pub fn windows(limit: Option<usize>) -> Result<Result<Vec<Window>, String>, Stri
             if !stages::commit_resolves(head) {
                 return na(format!("head {} does not resolve in this clone", head));
             }
-            match blobs.at(head, &queue_path)? {
+            match blobs.at(head, &queue_path).map_err(Fault::tool)? {
                 Some(t) => pools.push(pool(&t, &deferred, &icebox)),
                 None => return na(format!("queue absent at {}", head)),
             }

@@ -3,7 +3,8 @@
 // pointer that dies at the next boundary.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and not a hardcoded flag, because the
 // arm reads the record knob, which a hardcoded flag would hide from the knob-file derivation.
-use super::file_survey::{anchored, positionals};
+use super::file_survey::{anchored_fault, positionals};
+use crate::exit::Fault;
 
 pub const KNOBS: &[&str] = &["LIFECYCLE_KIT_SURVEY_RECORD_FILE"];
 
@@ -28,17 +29,17 @@ fn headings<'a>(text: &'a str, needle: &str) -> Vec<&'a str> {
         .collect()
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let rest = positionals(args, "substring").map_err(|e| format!("{}\n{}", e, USAGE))?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let rest = positionals(args, "substring").map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     let needle = match rest.first() {
         Some(n) if rest.len() == 1 && !n.is_empty() => n,
-        _ => return Err(USAGE.to_string()),
+        _ => return Err(Fault::usage(USAGE)),
     };
-    let (record, spelled) = anchored("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?;
+    let (record, spelled) = anchored_fault("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?;
     if !std::path::Path::new(&record).is_file() {
-        return Err(format!("no survey record at {} — nothing to cite.", spelled));
+        return Err(Fault::input(format!("no survey record at {} — nothing to cite.", spelled)));
     }
-    let text = super::read_text(&record)?;
+    let text = super::read_text(&record).map_err(Fault::input)?;
     let matched = headings(&text, needle);
 
     // spec: lifecycle-kit/SPEC.md §The survey record — both refusals keep printing what the author
@@ -51,18 +52,18 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         } else {
             all.join("\n")
         };
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "no block heading in {} contains: {}\n  the record carries these headings —\n{}",
             spelled, needle, listed
-        ));
+        )));
     }
     if matched.len() > 1 {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "{} block headings contain \"{}\" — narrow the substring:\n  {}",
             matched.len(),
             needle,
             matched.join("\n  ")
-        ));
+        )));
     }
 
     let head = matched[0];

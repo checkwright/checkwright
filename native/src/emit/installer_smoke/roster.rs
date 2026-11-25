@@ -175,7 +175,7 @@ pub(super) fn declare(part: Option<u8>) {
     print!("{}", declaration(part));
 }
 
-// spec: installer/SPEC.md §The consumer smoke — every precondition refuses at exit 2 before the
+// spec: installer/SPEC.md §The consumer smoke — every precondition refuses at exit 3 before the
 // first arm: the scratch base and a set hand-off are directories, each program resolves, and the
 // tree under test is clean outside the workflow directory
 pub(super) fn preflight(state: &mut Run) -> Step {

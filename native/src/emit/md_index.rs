@@ -2,6 +2,7 @@
 // hierarchy with line numbers, each heading's first sentence, and a per-file line count. The walk's
 // one exclusion source is CONTEXT_KIT_PRUNE_DIRS and the arm declares nothing else.
 use super::{corpus, read_text, relative, targets};
+use crate::exit::Fault;
 use crate::section;
 use crate::walk;
 
@@ -125,11 +126,12 @@ fn index_one(text: &str) -> String {
 // spec: context-kit/SPEC.md §Index-first reading — the per-file block: the path and its `wc -l`
 // count, the heading rows, then a blank line — after the last block too, which the shell form's
 // unconditional trailing `echo ""` is what makes true.
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let paths = targets(args, USAGE)?;
-    let root = walk::toplevel_opt()?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let paths = targets(args, USAGE).map_err(|e| if e.ends_with(USAGE) { Fault::usage(e) } else { Fault::tool(e) })?;
+    let root = walk::toplevel_opt().map_err(Fault::tool)?;
+    walk::knob_array("CONTEXT_KIT_PRUNE_DIRS").map_err(Fault::refused)?;
     let mut out = String::new();
-    for file in corpus(&paths, &["*.md"])? {
+    for file in corpus(&paths, &["*.md"]).map_err(Fault::input)? {
         // spec: context-kit/SPEC.md §Index-first reading — a file the walk reached but the reader
         // cannot open contributes nothing, the shell form's `awk … 2>/dev/null || true`: the index
         // is advisory, so an unreadable entry is a gap in it rather than a refusal of the run

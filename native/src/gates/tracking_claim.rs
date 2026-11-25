@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-tracking-claim — every fixed-vocabulary tracking claim on a
 // governed manifest surface agrees with git
+use crate::exit::Fault;
 use crate::{proc, programs};
 use crate::spec;
 use std::path::Path;
@@ -11,7 +12,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-tracking-claim: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -23,19 +24,20 @@ struct Claim {
     pred: String,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    if crate::walk::toplevel_in_opt(root)?.is_none() {
-        return Err(format!(
+    if crate::walk::toplevel_in_opt(root).map_err(Fault::tool)?.is_none() {
+        return Err(Fault::refused(format!(
             "{} is not a git repository — a tracking claim is unverifiable",
             root
-        ));
+        )));
     }
 
-    let manifest_files: Vec<String> = spec::manifest_files(root)?
+    let manifest_files: Vec<String> = spec::manifest_files(root)
+        .map_err(Fault::input)?
         .into_iter()
         .map(|p| p.display().to_string())
         .collect();
@@ -44,16 +46,16 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    let claims = extract(&manifest_files)?;
+    let claims = extract(&manifest_files).map_err(Fault::input)?;
     let mut errors: Vec<String> = Vec::new();
     for c in &claims {
         let rel = spec::strip_dot_slash(crate::walk::rel_under(root, &c.file).unwrap_or(&c.file));
 
-        let ls = proc::run(&programs::GIT, &["-C", root, "ls-files", "-z", "--", &c.path])?;
+        let ls = proc::run(&programs::GIT, &["-C", root, "ls-files", "-z", "--", &c.path]).map_err(Fault::tool)?;
         let tracked = match ls.stdout() {
             Some(o) => !o.is_empty(),
             None => {
-                return Err(format!("git ls-files failed for '{}'", c.path));
+                return Err(Fault::tool(format!("git ls-files failed for '{}'", c.path)));
             }
         };
         let ntracked = usize::from(tracked);
@@ -63,7 +65,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let ci = proc::run(
             &programs::GIT,
             &["-C", root, "check-ignore", "-q", "--no-index", "--", &c.path],
-        )?;
+        )
+        .map_err(Fault::tool)?;
         let nignored = usize::from(ci.code() == Some(0));
 
         if ntracked == 0 && nignored == 0 && !Path::new(&format!("{}/{}", root, c.path)).exists() {

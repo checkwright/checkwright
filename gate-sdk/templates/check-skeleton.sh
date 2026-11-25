@@ -8,8 +8,9 @@ SDK="${GATE_SDK_ROOT:-"${BASH_SOURCE[0]%/*}/../gate-sdk"}"
 # shellcheck source=../lib/gate.sh
 source "$SDK/lib/gate.sh"
 
+[[ $# -le 1 ]] || { echo "check-skeleton: takes at most one file" >&2; exit 2; }  # exit 2: the request refused as given — the caller fixes it
 FILE="${1:-README.md}"
-[[ -f "$FILE" ]] || { echo "check-skeleton: not found: $FILE" >&2; exit 2; }  # exit 2: harness/usage error
+[[ -f "$FILE" ]] || { echo "check-skeleton: not found: $FILE" >&2; exit 3; }  # exit 3: a tool or input error — something the tool reads could not be read
 
 out="$(grep -Hn -- 'never-matching-placeholder' "$FILE")"; st=$?
 [[ "$st" -le 1 ]] || fail_closed "$st" check-skeleton grep   # grep exit 1 is no match, a verdict

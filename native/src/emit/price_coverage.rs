@@ -1,10 +1,11 @@
 // spec: drift-kit/SPEC.md §The price-coverage arm — which running model ids the price table cannot
 // price, and, where the consumer opts in, whether the pricing page's section moved since it was
-// transcribed. Advisory: exit 0 on every reading, 2 on an operand or a configuration refusal.
+// transcribed. Advisory: exit 0 on every reading, 2 on an operand or a configuration refusal, 3 on a tool error.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` although its exit grammar is the
 // `--emit-` collapse: its page half spawns a consumer's fetch, and that family is fence-safe.
 use super::kpi::price_table_age::header_value;
 use super::stage_economics::{usage_by_model, Prices, Tokens};
+use crate::exit::{self, Fault};
 use crate::proc;
 use crate::programs::{self, Program};
 use crate::walk;
@@ -24,7 +25,7 @@ pub fn run(args: &[String]) -> i32 {
             "checkwright-gates: --price-coverage: takes no argument (got: {}) — usage: --price-coverage   (it takes no argument)",
             a
         );
-        return 2;
+        return exit::USAGE;
     }
     match report() {
         Ok(out) => {
@@ -33,16 +34,17 @@ pub fn run(args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("checkwright-gates: --price-coverage: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn report() -> Result<String, String> {
-    let table_path = walk::knob_scalar("DRIFT_KIT_PRICE_TABLE")?;
-    let days: u64 = walk::knob_scalar("DRIFT_KIT_PRICE_COVERAGE_DAYS")?
+fn report() -> Result<String, Fault> {
+    let table_path = walk::knob_scalar("DRIFT_KIT_PRICE_TABLE").map_err(Fault::refused)?;
+    let days: u64 = walk::knob_scalar("DRIFT_KIT_PRICE_COVERAGE_DAYS")
+        .map_err(Fault::refused)?
         .parse()
-        .map_err(|_| "DRIFT_KIT_PRICE_COVERAGE_DAYS is not a non-negative integer".to_string())?;
+        .map_err(|_| Fault::refused("DRIFT_KIT_PRICE_COVERAGE_DAYS is not a non-negative integer"))?;
     let table = std::fs::read(&table_path)
         .ok()
         .map(|b| String::from_utf8_lossy(&b).into_owned());
@@ -53,10 +55,10 @@ fn report() -> Result<String, String> {
         session_id: String::new(),
         harness_id: String::new(),
         child: String::new(),
-        sessions_dir: walk::knob_scalar("DRIFT_KIT_SESSIONS_DIR")?,
+        sessions_dir: walk::knob_scalar("DRIFT_KIT_SESSIONS_DIR").map_err(Fault::refused)?,
         config_home: var(crate::hook::binding::CONFIG_DIR_VAR),
         home: var(crate::sessions::HOME_VAR),
-        here: if pwd.is_empty() { walk::cwd()? } else { pwd },
+        here: if pwd.is_empty() { walk::cwd().map_err(Fault::tool)? } else { pwd },
     };
     let dir = crate::sessions::sessions_dir(&inputs);
     let today = super::kpi::today_iso();
@@ -146,20 +148,21 @@ fn used_ids(transcripts: &[String]) -> Vec<String> {
 
 // spec: drift-kit/SPEC.md §The price-coverage arm — the page half's one verdict, `off` where the
 // command knob is empty; the arm reads the stored hash and never writes it
-fn page(table: &str) -> Result<String, String> {
-    let cmd = walk::knob_array("DRIFT_KIT_PRICE_PAGE_CMD")?;
+fn page(table: &str) -> Result<String, Fault> {
+    let cmd = walk::knob_array("DRIFT_KIT_PRICE_PAGE_CMD").map_err(Fault::refused)?;
     if cmd.is_empty() {
         return Ok("off".to_string());
     }
-    let heading = walk::knob_scalar("DRIFT_KIT_PRICE_PAGE_SECTION")?;
+    let heading = walk::knob_scalar("DRIFT_KIT_PRICE_PAGE_SECTION").map_err(Fault::refused)?;
     if heading.is_empty() {
         return Ok("n/a (no section heading configured)".to_string());
     }
-    let secs: u64 = walk::knob_scalar("DRIFT_KIT_PRICE_PAGE_TIMEOUT")?
+    let secs: u64 = walk::knob_scalar("DRIFT_KIT_PRICE_PAGE_TIMEOUT")
+        .map_err(Fault::refused)?
         .parse()
         .ok()
         .filter(|s| *s > 0)
-        .ok_or_else(|| "DRIFT_KIT_PRICE_PAGE_TIMEOUT is not a positive integer".to_string())?;
+        .ok_or_else(|| Fault::refused("DRIFT_KIT_PRICE_PAGE_TIMEOUT is not a positive integer"))?;
     let program = Program::consumer("DRIFT_KIT_PRICE_PAGE_CMD", cmd[0].as_str());
     let rest: Vec<&str> = cmd[1..].iter().map(String::as_str).collect();
     let body = match proc::run_bounded_capture(&program, &rest, secs, &[], None) {
@@ -211,12 +214,12 @@ fn section(page: &str, heading: &str) -> Option<String> {
     Some(out)
 }
 
-fn hash_object(bytes: &[u8]) -> Result<String, String> {
-    let done = proc::run_with_stdin(&programs::GIT, &["hash-object", "--stdin"], bytes)?;
+fn hash_object(bytes: &[u8]) -> Result<String, Fault> {
+    let done = proc::run_with_stdin(&programs::GIT, &["hash-object", "--stdin"], bytes).map_err(Fault::tool)?;
     done.stdout()
         .map(|o| String::from_utf8_lossy(o).trim().to_string())
         .filter(|h| !h.is_empty())
-        .ok_or_else(|| "git hash-object --stdin failed".to_string())
+        .ok_or_else(|| Fault::tool("git hash-object --stdin failed"))
 }
 
 #[cfg(test)]

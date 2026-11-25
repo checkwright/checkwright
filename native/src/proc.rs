@@ -1382,7 +1382,7 @@ fn exit_code(status: &std::process::ExitStatus) -> i32 {
             return 128 + sig;
         }
     }
-    2
+    crate::exit::TOOL
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a runner's child: its private dir as `TMPDIR` and `TMP`, and

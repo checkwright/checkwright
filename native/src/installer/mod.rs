@@ -17,6 +17,7 @@ pub mod update;
 pub mod user;
 pub mod workflow;
 
+use crate::exit;
 use crate::programs;
 use crate::{proc, walk};
 use std::path::{Path, PathBuf};
@@ -187,7 +188,7 @@ pub fn help_only(args: &[String], usage: &[&str]) -> Option<Result<i32, Refusal>
             }
             Some(Ok(0))
         }
-        Some(other) => Some(Err(refuse(format!("unknown argument: {}", other), "", 2))),
+        Some(other) => Some(Err(refuse(format!("unknown argument: {}", other), "", exit::USAGE))),
     }
 }
 
@@ -238,7 +239,7 @@ pub fn package(verb_action: &str) -> Result<Package, Refusal> {
                 "{} out of the package's own payload/, assembled at pack time — run it from an installed package, not from a source checkout.",
                 verb_action
             ),
-            2,
+            exit::REFUSED,
         )
     })
 }
@@ -255,11 +256,11 @@ pub fn repo_root() -> Result<Option<PathBuf>, String> {
 pub fn required_root(absent_help: &str) -> Result<PathBuf, Refusal> {
     match repo_root() {
         Ok(Some(root)) => Ok(root),
-        Ok(None) => Err(refuse("not inside a git work tree", absent_help, 2)),
+        Ok(None) => Err(refuse("not inside a git work tree", absent_help, exit::REFUSED)),
         Err(cause) => Err(refuse(
             cause,
             "git cannot answer for this repository, so the verb has no root to act on. Repair git's access to it (the command the cause names prints git's reason), then run the verb again.",
-            2,
+            exit::TOOL,
         )),
     }
 }
@@ -703,7 +704,7 @@ mod tests {
                 }
             }
             for (flag, _) in FLAGS.iter().filter(|(_, vs)| !vs.contains(&verb)) {
-                assert_eq!(refused_at(verb, &[flag.to_string()]), Some(2), "{} did not refuse {}", verb, flag);
+                assert_eq!(refused_at(verb, &[flag.to_string()]), Some(exit::USAGE), "{} did not refuse {}", verb, flag);
             }
         }
     }

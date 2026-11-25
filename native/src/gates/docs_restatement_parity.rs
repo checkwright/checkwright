@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-docs-restatement-parity — every arm and kit-knob token a
 // declared restating page carries in its code still occurs in the `README.md` beside it
 use super::docs_cmd::{inline_code_spans, kit_knob_prefixes, kit_knob_runs};
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::collections::BTreeSet;
@@ -11,7 +12,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-docs-restatement-parity: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -19,16 +20,16 @@ pub fn run(args: &[String]) -> i32 {
 // consumer-value-exempt: the README beside a restating page, the pairing the rule itself states
 const SOURCE: &str = "README.md";
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let globs = spec::knob_array_pub("CANON_KIT_RESTATEMENT_PAGES")?;
+    let globs = spec::knob_array_pub("CANON_KIT_RESTATEMENT_PAGES").map_err(Fault::refused)?;
     let mut pages: Vec<String> = if globs.is_empty() {
         Vec::new()
     } else {
-        walk::glob_corpus(Path::new(root), &globs)?
+        walk::glob_corpus(Path::new(root), &globs).map_err(Fault::input)?
             .into_iter()
             .filter(|p| p.is_file())
             .map(|p| spec::strip_dot_slash(&p.display().to_string()))
@@ -37,14 +38,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
     pages.sort();
     pages.dedup();
 
-    let pairs = pair(&pages)?;
-    let prefixes = kit_knob_prefixes()?;
+    let pairs = pair(&pages).map_err(Fault::refused)?;
+    let prefixes = kit_knob_prefixes().map_err(Fault::refused)?;
     let mut bad: Vec<String> = Vec::new();
     let mut ntok = 0usize;
     for (page, source) in &pairs {
-        let src = spec::read_text(Path::new(source))?;
+        let src = spec::read_text(Path::new(source)).map_err(Fault::input)?;
         let held = source_tokens(&src, &prefixes);
-        let text = spec::read_text(Path::new(page))?;
+        let text = spec::read_text(Path::new(page)).map_err(Fault::input)?;
         for (ln, tok) in page_tokens(&text, &prefixes) {
             ntok += 1;
             if !held.contains(&tok) {

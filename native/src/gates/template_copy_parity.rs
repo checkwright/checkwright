@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-template-copy-parity — a kit template and its vendored consumer
 // copy agree on their declared contract surface, with copy-side additions declared
 use crate::ere::Ere;
+use crate::exit::Fault;
 use crate::walk;
 use std::path::Path;
 
@@ -9,7 +10,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-template-copy-parity: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -215,28 +216,29 @@ fn divergence_reasons(text: &str) -> String {
     out
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = match args.first().filter(|a| !a.is_empty()) {
         Some(r) => r.clone(),
         None => {
             // spec: gate-sdk/SPEC.md §check-template-copy-parity — the root defaults to the git
             // toplevel, a derivation no injected fixture case can reach, so a sibling harness
             // drives it against the live tree instead
-            match walk::toplevel_opt()? {
+            match walk::toplevel_opt().map_err(Fault::tool)? {
                 Some(r) => r,
-                None => return Err("not a git repository and no root given".to_string()),
+                None => return Err(Fault::refused("not a git repository and no root given")),
             }
         }
     };
     if !Path::new(&root).is_dir() {
-        return Err(format!("root not a directory: {}", root));
+        return Err(Fault::refused(format!("root not a directory: {}", root)));
     }
-    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
-    let g = Grammar::new()?;
+    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
+    let g = Grammar::new().map_err(Fault::tool)?;
 
     // spec: gate-sdk/SPEC.md §check-template-copy-parity — one `templates/*.sh` per kit root
     // resolved under the scan root; a kit root equal to the scan root is never paired
-    let kit_roots: Vec<String> = walk::kit_roots_under(&walk::abs_against(&walk::cwd()?, &root))?
+    let kit_roots: Vec<String> = walk::kit_roots_under(&walk::abs_against(&walk::cwd().map_err(Fault::tool)?, &root))
+        .map_err(Fault::refused)?
         .into_iter()
         .map(|r| r.trim_end_matches('/').to_string())
         .filter(|r| !r.is_empty() && r != "." && Path::new(&root).join(r).is_dir())

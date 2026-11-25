@@ -2,6 +2,7 @@
 // index: `llms.txt` and `llms-full.txt` projected from the nav model, one rendering the gate calls in
 // process
 use crate::emit::product_statement as ps;
+use crate::exit::Fault;
 use crate::fresh;
 use crate::nav::{self, Model};
 
@@ -361,10 +362,10 @@ pub fn paths(root: &str) -> (String, String) {
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the bare arm prints `llms.txt`; `--write` writes both
 // files, and neither until both render
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let root = crate::walk::knob_scalar(ROOT_KNOB)?;
-    let source = crate::walk::knob_scalar(ps::SOURCE_KNOB)?;
-    let r = render(&root, &source)?;
+pub fn emit(args: &[String]) -> Result<String, crate::exit::Fault> {
+    let root = crate::walk::knob_scalar(ROOT_KNOB).map_err(Fault::refused)?;
+    let source = crate::walk::knob_scalar(ps::SOURCE_KNOB).map_err(Fault::refused)?;
+    let r = render(&root, &source).map_err(Fault::input)?;
     if !args.iter().any(|a| a == "--write") {
         return Ok(r.index);
     }
@@ -372,7 +373,7 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     let mut out = String::new();
     for (path, text) in [(&index, &r.index), (&full, &r.full)] {
         if std::fs::read_to_string(path).ok().as_deref() != Some(text.as_str()) {
-            std::fs::write(path, text).map_err(|e| format!("cannot write {}: {}", path, e))?;
+            std::fs::write(path, text).map_err(|e| Fault::tool(format!("cannot write {}: {}", path, e)))?;
             out.push_str(&format!("llms: wrote {}\n", path));
         }
     }

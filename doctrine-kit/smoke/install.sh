@@ -7,7 +7,7 @@ set -euo pipefail
 SDK="$SMOKE_KIT_ROOT/../gate-sdk"   # the vendored gate-sdk beside this kit
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the smoke resolves a kit gate through gate_command, the way
 # a consumer's own battery does: this is the one context where a ported member's `.sh` is genuinely
-# absent, and an absent binary is exit 2 — never a skip, never a pass, never an invented fallback.
+# absent, and an absent binary is exit 3 — never a skip, never a pass, never an invented fallback.
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 
@@ -158,8 +158,8 @@ smoke_refusal() {   # $1=label  $2=stderr substring; the scratch doctrine on std
     cat > .doctrine-refusal/DOCTRINE.md
     err="$(install_doctrine \
         .doctrine-refusal/AGENT.md .doctrine-refusal/DOCTRINE.md 2>&1 >/dev/null)" || rc=$?
-    if [[ "$rc" -ne 2 ]]; then
-        echo "doctrine smoke: $1 — the installer exited $rc, want 2; a digest it cannot derive must fail closed, not ship short" >&2
+    if [[ "$rc" -ne 3 ]]; then
+        echo "doctrine smoke: $1 — the installer exited $rc, want 3; a digest it cannot derive must fail closed, not ship short" >&2
         exit 1
     fi
     case "$err" in

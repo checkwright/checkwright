@@ -26,13 +26,12 @@ done
 
 # spec: gate-sdk/SPEC.md §enforcement-map — adopted-but-broken refuses: a knob
 # explicitly set to a missing path exits 2 before the first stdout byte, the
-# stderr line naming the knob; the settings knob also refuses a set file jq
-# cannot parse.
+# stderr line naming the knob; a set settings file it cannot parse exits 3.
 errfile="$scratch/stderr"
-assert_strict() {  # $1=case $2=knob-name $3=knob-value
-    local out rc
+assert_strict() {  # $1=case $2=knob-name $3=knob-value [$4=want status, default 2]
+    local out rc want="${4:-2}"
     out="$(env "$2=$3" bash "${EMIT[@]}" 2>"$errfile")"; rc=$?
-    [[ "$rc" -eq 2 ]]  || { echo "FAIL [$1]: expected exit 2, got $rc"; fails=$((fails + 1)); }
+    [[ "$rc" -eq "$want" ]]  || { echo "FAIL [$1]: expected exit $want, got $rc"; fails=$((fails + 1)); }
     [[ -z "$out" ]]    || { echo "FAIL [$1]: expected empty stdout"; fails=$((fails + 1)); }
     grep -qF -- "$2" "$errfile" || { echo "FAIL [$1]: stderr does not name $2"; fails=$((fails + 1)); }
 }
@@ -41,7 +40,7 @@ assert_strict strict-settings CONTEXT_KIT_SETTINGS_FILE  /nonexistent/settings.j
 assert_strict strict-evidence EVIDENCE_KIT_KNOB_FILE     /nonexistent/evidence-config.knobs
 assert_strict strict-scandir  GATE_SDK_ENFORCE_SCAN_DIR  /nonexistent/scandir
 printf '{ not json\n' > "$scratch/bad-settings.json"
-assert_strict strict-settings-unparseable CONTEXT_KIT_SETTINGS_FILE "$scratch/bad-settings.json"
+assert_strict strict-settings-unparseable CONTEXT_KIT_SETTINGS_FILE "$scratch/bad-settings.json" 3
 
 # spec: gate-sdk/SPEC.md §enforcement-map — not-adopted degrades: an unset knob
 # whose default path is absent drops exactly its own section. A scratch

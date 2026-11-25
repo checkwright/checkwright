@@ -2,6 +2,7 @@
 // named recipe's seam lines and the gates it drops, read as data, so no gate or toolkit name enters
 // the crate.
 use super::{profile, recipe, refuse, Refusal};
+use crate::exit;
 use std::collections::BTreeSet;
 use std::path::Path;
 
@@ -86,7 +87,7 @@ pub fn resolve(pkg_root: &Path, names: &[String]) -> Result<Vec<Recipe>, Refusal
                 return Err(refuse(
                     format!("unknown payload recipe: {}", name),
                     format!("payload recipes in this package: {} ", available(pkg_root).join(" ")),
-                    2,
+                    exit::REFUSED,
                 ))
             }
         }
@@ -137,7 +138,7 @@ pub fn check_seams(pkg_root: &Path, profile_name: &str, kits: &[String], recipes
             recipe, file, profile_name
         ),
         format!("choose a profile that seeds every file the recipes write: {} ", fit.join(" ")),
-        2,
+        exit::REFUSED,
     ))
 }
 
@@ -188,7 +189,7 @@ pub fn check_composed(file: &str, text: &str, recipes: &[Recipe]) -> Result<(), 
                 why
             ),
             "apply the recipes one at a time, or drop the one whose line collides.",
-            2,
+            exit::REFUSED,
         )
     })
 }

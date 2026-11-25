@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-hook-knobs-fresh — one knob table per hook page, the member's own
 // knob slice in slice order; one function the gate calls in process
 use crate::emit::support_table as st;
+use crate::exit::Fault;
 use crate::hook;
 use crate::knobs::{self, Value};
 use crate::walk;
@@ -72,18 +73,18 @@ pub fn is_member(stem: &str) -> bool {
 
 // spec: gate-sdk/SPEC.md §check-hook-knobs-fresh — the bare arm prints each page's block; `--write`
 // rewrites the blocks and touches nothing else
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let dirs = walk::knob_words(PAGES_KNOB)?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let dirs = walk::knob_words(PAGES_KNOB).map_err(Fault::refused)?;
     if dirs.is_empty() {
         return Ok(format!("hook-knobs: {} is empty — no hook page is governed\n", PAGES_KNOB));
     }
     let write = args.iter().any(|a| a == "--write");
     let mut out = String::new();
-    for (page, member) in pages(&dirs)? {
+    for (page, member) in pages(&dirs).map_err(Fault::input)? {
         if !is_member(&member) {
-            return Err(format!("{}: names no hook member — `--hook` with no member lists them", page));
+            return Err(Fault::refused(format!("{}: names no hook member — `--hook` with no member lists them", page)));
         }
-        let table = render(&member)?;
+        let table = render(&member).map_err(Fault::tool)?;
         if write {
             out.push_str(&st::write_marked("hook-knobs", &page, BEGIN, END, &table)?);
         } else {

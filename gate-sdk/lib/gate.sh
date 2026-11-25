@@ -2,13 +2,13 @@
 # spec: gate-sdk/SPEC.md §lib/gate.sh — sourced library: values + adapters, never gate structure
 # no-port: gate-sdk/SPEC.md §lib/gate.sh, its port disposition — two grounds. Its API is shell functions sourced into bash callers (CI steps, the installer smoke, the author template, the front-ends and the test harness), and a binary arm cannot be sourced into bash; and its pre-binary accessors answer before any binary exists, the bootstrap cause bin/build-native.sh declares on. Structural, not a sizing judgment.
 
-# spec: gate-sdk/SPEC.md §Fail-closed contract — non-zero capture status means the check could not run; exit 2, never a false clean
+# spec: gate-sdk/SPEC.md §Fail-closed contract — non-zero capture status means the check could not run; exit 3, a tool error, never a false clean
 fail_closed() {
     if [[ "$1" -ne 0 ]]; then
         printf '%s: %s exited %s — the check could not run; treating as ' \
             "$2" "$3" "$1" >&2
         printf 'failure (not clean)\n' >&2
-        exit 2
+        exit 3
     fi
 }
 
@@ -215,8 +215,11 @@ gate_prune_load() {
     [[ -n "${_gate_prune_loaded:-}" ]] && return 0
     local out n el
     out="$(gate_knob_values GATE_SDK_PRUNE_DIRS GATE_SDK_PRUNE_EXTRA_DIRS)" || {
+        n=$?
         echo "gate-sdk: the prune set could not be read from the gate binary; treating as failure (not clean)" >&2
-        exit 2
+        # spec: gate-sdk/SPEC.md §Output contract — the binary's refusal of a malformed knob stays 2; every other failure to answer is a tool error
+        [[ "$n" -eq 2 ]] && exit 2
+        exit 3
     }
     _gate_prune=()
     GATE_GREP_EXCLUDES=()
@@ -268,7 +271,7 @@ gate_resolve() {
     return 1
 }
 
-# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, one element per line; a `.gate` declaration's is the binary's `--emit gate-argv` answer. An absent or non-executable binary, or the arm's refusal, is a harness error — exit 2, never a skip and never a pass (§Fail-closed contract).
+# spec: gate-sdk/SPEC.md §lib/gate.sh — resolve a gate name to its *invocation argv*, one element per line; a `.gate` declaration's is the binary's `--emit gate-argv` answer. An absent or non-executable binary is a tool error at exit 3, and the arm's own refusal or error exits at its status — never a skip and never a pass (§Fail-closed contract).
 gate_command() {
     local g="$1" d bin
     shift
@@ -283,9 +286,9 @@ gate_command() {
                 printf 'gate_command: %s dispatches to the native binary, but %s is ' "$g" "$bin" >&2
                 printf 'absent or not executable — the gate could not run; treating as ' >&2
                 printf 'failure (not clean). Build it: bash gate-sdk/bin/build-native.sh\n' >&2
-                exit 2
+                exit 3
             fi
-            "$bin" --emit gate-argv "$d/$g.gate" || exit 2
+            "$bin" --emit gate-argv "$d/$g.gate" || exit
             return 0
         fi
     done
@@ -358,13 +361,13 @@ gate_kit_roots() {
 gate_check_dirs() {
     gate_sdk_gates_dir
     local k roots
-    roots="$(gate_kit_roots)" || return 2
+    roots="$(gate_kit_roots)" || return
     while IFS= read -r k; do
         [[ -n "$k" ]] && printf '%s/checks\n' "$k"
     done <<<"$roots"
 }
 
-# spec: gate-sdk/SPEC.md §check-commit-msg — resolve the banned-pattern file set shared by check-commit-msg and check-tree-terms: explicit positional args win; otherwise GATE_SDK_MSG_PATTERN_FILES (tracked, must exist — fail-closed) plus GATE_SDK_MSG_PATTERN_FILES_LOCAL (gitignored, skipped when absent). Both are whitespace lists split with no expansion. Emits one existing readable file path per line; returns 2 when a required tracked file is missing.
+# spec: gate-sdk/SPEC.md §check-commit-msg — resolve the banned-pattern file set shared by check-commit-msg and check-tree-terms: explicit positional args win; otherwise GATE_SDK_MSG_PATTERN_FILES (tracked, must exist — fail-closed) plus GATE_SDK_MSG_PATTERN_FILES_LOCAL (gitignored, skipped when absent). Both are whitespace lists split with no expansion. Emits one existing readable file path per line; returns 2 when a required tracked file is missing and 3 when one is unreadable.
 gate_msg_pattern_files() {
     if [[ $# -gt 0 ]]; then
         printf '%s\n' "$@"
@@ -376,7 +379,7 @@ gate_msg_pattern_files() {
     read -ra local_files <<<"$(_gate_prebinary_knob GATE_SDK_MSG_PATTERN_FILES_LOCAL "$dir/msg-patterns.local.list")"
     for f in ${required[@]+"${required[@]}"}; do
         [[ -f "$f" ]] || { echo "gate_msg_pattern_files: required tracked pattern file missing: $f" >&2; return 2; }
-        [[ -r "$f" ]] || { echo "gate_msg_pattern_files: pattern file not readable: $f" >&2; return 2; }
+        [[ -r "$f" ]] || { echo "gate_msg_pattern_files: pattern file not readable: $f" >&2; return 3; }
         printf '%s\n' "$f"
     done
     for f in ${local_files[@]+"${local_files[@]}"}; do

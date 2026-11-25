@@ -10,7 +10,7 @@ SDK="$(cd "$SMOKE_KIT_ROOT/../gate-sdk" && pwd)"   # the vendored gate-sdk besid
 # repository toplevel before resolving anything
 # spec: gate-sdk/SPEC.md §lib/gate.sh — the smoke resolves a kit gate through gate_command, the way
 # a consumer's own battery does: this is the one context where a ported member's `.sh` is genuinely
-# absent, and an absent binary is exit 2 — never a skip, never a pass, never an invented fallback.
+# absent, and an absent binary is exit 3 — never a skip, never a pass, never an invented fallback.
 # shellcheck source=../../gate-sdk/lib/gate.sh
 source "$SDK/lib/gate.sh"
 

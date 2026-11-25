@@ -2,6 +2,7 @@
 // CI step can gate on the verdict without parsing a report. The roster is the crate's own
 // (context-kit/SPEC.md §bin/env-probe), because at init time nothing is vendored in the tree yet.
 use super::{lock, GATES_DIR};
+use crate::exit;
 use crate::toolfloor::{self, Owing, Selection, Verdict as Floor};
 use crate::{proc, programs, sha256};
 use std::fmt::Write as _;
@@ -396,7 +397,7 @@ pub fn diagnose(selection: Option<&Selection>, caller: Caller) -> Report {
             return Report {
                 out,
                 err,
-                code: 2,
+                code: exit::INPUT,
             };
         };
         let version = manifest.field("version");
@@ -655,7 +656,7 @@ mod tests {
 
     // spec: installer/SPEC.md §doctor — the content form renders disarmed when a named file is
     // present and none carries a live line, stays silent when the local file alone carries one,
-    // and stays silent when the required file is absent, which is the battery's exit 2
+    // and stays silent when the required file is absent, which is the battery's non-zero exit
     #[test]
     fn a_content_declared_member_is_disarmed_only_by_present_files_with_no_live_line() {
         let d = std::env::temp_dir().join(format!("checkwright-doctor-content.{}", std::process::id()));
@@ -714,6 +715,6 @@ mod tests {
     #[test]
     fn help_answers_and_an_unknown_argument_refuses() {
         assert_eq!(run(&["--help".to_string()]), 0);
-        assert_eq!(run(&["--nope".to_string()]), 2);
+        assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }
 }

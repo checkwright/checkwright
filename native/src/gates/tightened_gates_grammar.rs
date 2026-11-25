@@ -3,6 +3,7 @@
 // non-`none` section yielding no tokens is the silently-empty declaration the smoke cannot see
 use crate::declaration;
 use crate::declaration::{SectionVerdict, TokenRule};
+use crate::exit::Fault;
 use crate::gates::release_bump::read_text;
 use crate::release_sections;
 use crate::walk;
@@ -27,18 +28,18 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-tightened-gates-grammar: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR").map_err(Fault::refused)?;
     let posts = posts.as_str();
     if !Path::new(posts).is_dir() {
-        return Err(format!("posts dir not found: {}", posts));
+        return Err(Fault::refused(format!("posts dir not found: {}", posts)));
     }
-    let roster = release_sections::roster()?;
+    let roster = release_sections::roster().map_err(Fault::refused)?;
     let Some(gates) = release_sections::find(&roster, release_sections::Role::Gates) else {
         println!("TIGHTENED-GATES-GRAMMAR: clean (not applicable: the release-section roster carries no gates role, so no section is read)");
         return Ok(0);
@@ -48,9 +49,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let mut errors: Vec<String> = Vec::new();
     let (mut notes, mut tokens, mut none) = (0usize, 0usize, 0usize);
-    for f in walk::glob_files(Path::new(posts), &["*.md".to_string()])? {
+    for f in walk::glob_files(Path::new(posts), &["*.md".to_string()]).map_err(Fault::input)? {
         let path = f.display().to_string();
-        let text = read_text(&path)?;
+        let text = read_text(&path).map_err(Fault::input)?;
         if !is_note(&text) {
             continue;
         }
@@ -84,11 +85,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // a declaration still accumulating, never a finding
     let surface = match args.get(1).filter(|a| !a.is_empty()) {
         Some(s) => s.clone(),
-        None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?),
+        None => format!(
+            "{}/release-declarations.md",
+            walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?
+        ),
     };
     let surface_read = Path::new(&surface).is_file();
     if surface_read {
-        let text = read_text(&surface)?;
+        let text = read_text(&surface).map_err(Fault::input)?;
         if let SectionVerdict::Unparsed(b) = declaration::section_tokens(&text, &names, TokenRule::GateName) {
             for line in b.iter().filter(|l| l.trim_start().starts_with(['-', '*'])) {
                 errors.push(format!(
@@ -100,7 +104,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         }
     } else if args.get(1).is_some_and(|a| !a.is_empty()) {
-        return Err(format!("declaration surface not found: {}", surface));
+        return Err(Fault::refused(format!("declaration surface not found: {}", surface)));
     }
 
     if !errors.is_empty() {

@@ -1,6 +1,7 @@
 // spec: delegation-kit/SPEC.md §One template, a resident pointer — every `the template's
 // **<name>** rule` citation in SPEC §The delegation model resolves to a template bullet's
 // bold lead-in (forward direction only)
+use crate::exit;
 use std::collections::HashSet;
 use std::path::Path;
 
@@ -137,7 +138,7 @@ pub fn run(args: &[String]) -> i32 {
     for f in [&spec_file, &template_file] {
         if !Path::new(f).is_file() {
             eprintln!("check-rule-citation: not found: {}", f);
-            return 2;
+            return exit::REFUSED;
         }
     }
 
@@ -145,14 +146,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(e) => {
             eprintln!("check-rule-citation: cannot read {}: {}", spec_file, e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let template_text = match std::fs::read_to_string(&template_file) {
         Ok(t) => t,
         Err(e) => {
             eprintln!("check-rule-citation: cannot read {}: {}", template_file, e);
-            return 2;
+            return exit::INPUT;
         }
     };
 

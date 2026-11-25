@@ -2,6 +2,7 @@
 // scratch repository of its own: install, a clean battery, a caught done claim, the claim
 // withdrawn. Exit status is the verdict: 0 every act held, 1 an act did not, 2 no harness.
 use super::{GATES_DIR, Package, QUEUE_FILE, STATE_FILE};
+use crate::exit;
 use crate::walkthrough::{self as show, banner, ends_with_newline, say, Scratch};
 use crate::{proc, programs};
 use std::path::{Path, PathBuf};
@@ -81,7 +82,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         eprintln!("checkwright demo: unknown argument: {}", a);
         eprintln!("  {}", USAGE[0]);
-        return 2;
+        return exit::USAGE;
     }
     let pkg = match super::package("demo installs") {
         Ok(p) => p,
@@ -106,7 +107,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         Outcome::Refuse(why) => {
             eprintln!("\n{}: FAIL(env) — {}", VERDICT, why);
-            2
+            exit::FAIL_ENV
         }
     }
 }
@@ -325,14 +326,14 @@ mod tests {
     #[test]
     fn help_answers_and_an_operand_is_refused() {
         assert_eq!(super::run(&["--help".to_string()]), 0);
-        assert_eq!(super::run(&["extra".to_string()]), 2);
+        assert_eq!(super::run(&["extra".to_string()]), crate::exit::USAGE);
     }
 
     // spec: installer/SPEC.md §demo — run from a source checkout there is no payload, so the verb
     // refuses at exit 2 rather than reaching for the contributor's kit roots
     #[test]
     fn a_source_checkout_gets_the_no_payload_refusal() {
-        assert_eq!(super::run(&[]), 2);
+        assert_eq!(super::run(&[]), crate::exit::REFUSED);
     }
 
     // spec: installer/SPEC.md §demo — act 3 names the iteration, heads Done with the task, appends

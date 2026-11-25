@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-pendency-contradiction — no governed manifest file binds one code
 // span both to a pending construction and to a landed one
+use crate::exit::Fault;
 use super::citation_link::prose_only;
 use super::spec_pointer::paragraphs;
 use crate::spec;
@@ -22,29 +23,29 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-pendency-contradiction: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let pending = phrases(&spec::vocabulary(PENDING, PENDING_EXTRA)?);
-    let landed = phrases(&spec::vocabulary(LANDED, LANDED_EXTRA)?);
+    let pending = phrases(&spec::vocabulary(PENDING, PENDING_EXTRA).map_err(Fault::refused)?);
+    let landed = phrases(&spec::vocabulary(LANDED, LANDED_EXTRA).map_err(Fault::refused)?);
     for (set, knob) in [(&pending, PENDING), (&landed, LANDED)] {
         if set.is_empty() {
             println!("PENDENCY-CONTRADICTION: clean (not applicable: {} and its extra are empty)", knob);
             return Ok(0);
         }
     }
-    let files = spec::manifest_files_sorted_stripped(root)?;
+    let files = spec::manifest_files_sorted_stripped(root).map_err(Fault::refused)?;
     let mut out: Vec<String> = Vec::new();
     let (mut n_pending, mut n_landed) = (0usize, 0usize);
     for f in &files {
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         let scan = scan(&text, &pending, &landed);
         n_pending += scan.pending;
         n_landed += scan.landed;

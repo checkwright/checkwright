@@ -1,6 +1,7 @@
 // spec: delegation-kit/SPEC.md §check-brief-authority — a brief grants no authority the consumer
 // forbids and carries every section it requires
 use crate::ere::Ere;
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -46,14 +47,14 @@ fn parse_rules(file: &str, text: &str) -> Result<Vec<Rule>, String> {
     Ok(rules)
 }
 
-fn load_rules() -> Result<Vec<Rule>, String> {
+fn load_rules() -> Result<Vec<Rule>, Fault> {
     let mut rules: Vec<Rule> = Vec::new();
-    for f in walk::knob_words("DELEGATION_KIT_BRIEF_RULES")? {
+    for f in walk::knob_words("DELEGATION_KIT_BRIEF_RULES").map_err(Fault::refused)? {
         if !Path::new(&f).is_file() {
-            return Err(format!("rule file not found: {} (DELEGATION_KIT_BRIEF_RULES)", f));
+            return Err(Fault::refused(format!("rule file not found: {} (DELEGATION_KIT_BRIEF_RULES)", f)));
         }
-        let bytes = std::fs::read(&f).map_err(|e| format!("cannot read rule file {}: {}", f, e))?;
-        rules.extend(parse_rules(&f, &String::from_utf8_lossy(&bytes))?);
+        let bytes = std::fs::read(&f).map_err(|e| Fault::input(format!("cannot read rule file {}: {}", f, e)))?;
+        rules.extend(parse_rules(&f, &String::from_utf8_lossy(&bytes)).map_err(Fault::refused)?);
     }
     Ok(rules)
 }
@@ -84,12 +85,12 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-brief-authority: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     // spec: delegation-kit/SPEC.md §check-brief-authority — no brief is a tracked surface, so the
     // battery's no-operand run reads nothing
     if args.is_empty() {
@@ -100,9 +101,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut briefs: Vec<(String, String)> = Vec::new();
     for b in args {
         if !Path::new(b).is_file() {
-            return Err(format!("brief not found: {}", b));
+            return Err(Fault::refused(format!("brief not found: {}", b)));
         }
-        let bytes = std::fs::read(b).map_err(|e| format!("cannot read brief {}: {}", b, e))?;
+        let bytes = std::fs::read(b).map_err(|e| Fault::input(format!("cannot read brief {}: {}", b, e)))?;
         briefs.push((b.clone(), String::from_utf8_lossy(&bytes).into_owned()));
     }
 

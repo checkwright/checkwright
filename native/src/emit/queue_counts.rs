@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §The queue-counts arm — the size of each set, one `<key><TAB><count>`
 // line in configured order. One output grammar: `--by` changes the partition key and nothing else,
 // and the argv tail otherwise stays the optional queue file the rule itself consumes.
+use crate::exit::Fault;
 use crate::queue::{self, Sections};
 
 pub const USAGE: &str = "usage: --emit queue-counts [--by <tag>] [queue-file]";
@@ -18,7 +19,7 @@ struct Args {
 // spec: queue-kit/SPEC.md §The queue-counts arm — the optional `[queue-file]`, an argument the
 // rule consumes and falls back to a knob for, so it ports unchanged (gate-sdk/SPEC.md §The
 // non-gate arm's distinguishing test). The last positional wins, as the shell loop's did.
-fn parse(args: &[String]) -> Result<Args, String> {
+fn parse(args: &[String]) -> Result<Args, Fault> {
     let mut a = Args {
         file: String::new(),
         by: None,
@@ -29,13 +30,13 @@ fn parse(args: &[String]) -> Result<Args, String> {
             "--by" => {
                 let v = args.get(i + 1).cloned().unwrap_or_default();
                 if v.is_empty() || v.starts_with('-') {
-                    return Err(format!("--by needs a <tag>\n{}", USAGE));
+                    return Err(Fault::usage(format!("--by needs a <tag>\n{}", USAGE)));
                 }
                 a.by = Some(v);
                 i += 2;
             }
             other if other.starts_with('-') => {
-                return Err(format!("unknown option: {}\n{}", other, USAGE))
+                return Err(Fault::usage(format!("unknown option: {}\n{}", other, USAGE)))
             }
             other => {
                 a.file = other.to_string();
@@ -46,16 +47,16 @@ fn parse(args: &[String]) -> Result<Args, String> {
     Ok(a)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let a = parse(args)?;
     let file = if a.file.is_empty() {
-        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?
+        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?
     } else {
         a.file.clone()
     };
-    let text =
-        std::fs::read_to_string(&file).map_err(|e| format!("file not found: {}: {}", file, e))?;
-    let sec = Sections::active_and_deferred()?;
+    let text = std::fs::read_to_string(&file)
+        .map_err(|e| Fault::input(format!("file not found: {}: {}", file, e)))?;
+    let sec = Sections::active_and_deferred().map_err(Fault::refused)?;
     Ok(match &a.by {
         Some(tag) => render_by(&text, &sec, tag),
         None => render(&text, &sec),

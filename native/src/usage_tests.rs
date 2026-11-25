@@ -695,7 +695,8 @@ fn the_kits_trend_fixture_reports_its_segments() {
     }
 
     // spec: delegation-kit/SPEC.md §Trend reporter — the two fail-closed arms, preserved as the
-    // arm's own `Err` into `Arm::Emit`'s exit 2 rather than as the shell idiom that read a status
+    // arm's own `Err` into `Arm::Emit`'s exit, 2 for the unset knob and 3 for the unreadable history,
+    // rather than as the shell idiom that read a status
     let unset = usage_trend::emit(&[]).expect_err("[unset knob]: want a refusal");
     assert!(
         unset.contains("no history to report"),

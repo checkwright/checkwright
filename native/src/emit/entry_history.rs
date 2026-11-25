@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §check-queue-entry-budget — the entry-history arm: the commits at which
 // one entry's counted extent fell, reported and never judged, with no exit-1 path at all
+use crate::exit::Fault;
 use crate::gates::queue_entry_budget;
 use crate::queue;
 
@@ -20,37 +21,37 @@ struct Row {
     subject: String,
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let mut slug = String::new();
     let mut file = String::new();
     for a in args {
         match a.as_str() {
             other if other.starts_with('-') => {
-                return Err(format!("unknown option: {}\n{}", other, USAGE))
+                return Err(Fault::usage(format!("unknown option: {}\n{}", other, USAGE)))
             }
             other if slug.is_empty() => slug = other.to_string(),
             other => file = other.to_string(),
         }
     }
     if slug.is_empty() {
-        return Err(format!("entry-history needs a <slug>\n{}", USAGE));
+        return Err(Fault::usage(format!("entry-history needs a <slug>\n{}", USAGE)));
     }
-    let sec_cfg = queue::Sections::active_and_deferred()?;
-    let unit = queue_entry_budget::display_unit(queue_entry_budget::cap()?);
+    let sec_cfg = queue::Sections::active_and_deferred().map_err(Fault::refused)?;
+    let unit = queue_entry_budget::display_unit(queue_entry_budget::cap().map_err(Fault::refused)?);
     let file = if file.is_empty() {
-        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?
+        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?
     } else {
         file
     };
-    let top = crate::walk::toplevel()?;
+    let top = crate::walk::toplevel_fault()?;
 
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — the addressable domain is the live slugs
     // plus the retired ones, and that membership is the bound the back-search would otherwise lack:
     // it is settled from one history pass before a blob is read.
     let text = std::fs::read_to_string(&file).unwrap_or_default();
     let live = queue::live_slugs(&text, &sec_cfg);
-    if !live.contains(&slug) && !queue::retired_set(&file, &live)?.contains(&slug) {
-        return Err(format!("not a live or retired slug: {}", slug));
+    if !live.contains(&slug) && !queue::retired_set(&file, &live).map_err(Fault::tool)?.contains(&slug) {
+        return Err(Fault::refused(format!("not a live or retired slug: {}", slug)));
     }
 
     let mut rows: Vec<Row> = Vec::new();
@@ -91,18 +92,19 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             subject: rev.subject.clone(),
         });
         true
-    })?;
+    })
+    .map_err(Fault::tool)?;
     if !had_history {
-        return Err(format!("no committed history for {}", file));
+        return Err(Fault::refused(format!("no committed history for {}", file)));
     }
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — the retired set admits a slug on
     // entry shape alone, so a heading or bullet that never stood in a task section is addressable and
     // has no counted history; that is the one case the membership bound does not shorten
     if walked == 0 {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "no commit touching {} carries a counted entry for {}",
             file, slug
-        ));
+        )));
     }
 
     // spec: queue-kit/SPEC.md §check-queue-entry-budget — the departure is a header fact and never

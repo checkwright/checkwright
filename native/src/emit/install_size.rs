@@ -2,6 +2,7 @@
 // packer packs; one function the gate calls in process
 use crate::emit::pack_installer;
 use crate::emit::support_table as st;
+use crate::exit::Fault;
 use crate::installer::profile;
 use crate::proc::{self, Stderr};
 use crate::programs;
@@ -171,22 +172,26 @@ fn table(profiles: &[(String, Vec<String>)], kits: &[(String, Tally)]) -> String
 
 // spec: installer/SPEC.md §The install size — the block between the markers' blank lines
 pub fn render() -> Result<String, String> {
-    walk::toplevel_opt()?.ok_or_else(|| "not a git repository".to_string())?;
-    let withhold: Vec<String> = walk::knob_scalar(WITHHOLD_KNOB)?.split_whitespace().map(String::from).collect();
-    let installer = walk::knob_scalar(INSTALLER_KNOB)?;
+    render_fault().map_err(|f| f.message)
+}
+
+fn render_fault() -> Result<String, Fault> {
+    walk::toplevel_fault()?;
+    let withhold: Vec<String> = walk::knob_scalar(WITHHOLD_KNOB).map_err(Fault::refused)?.split_whitespace().map(String::from).collect();
+    let installer = walk::knob_scalar(INSTALLER_KNOB).map_err(Fault::refused)?;
     let roster = format!("{}/profiles.list", installer.trim_end_matches('/'));
-    let text = crate::emit::read_text(&roster)?;
-    let roots: Vec<String> = walk::kit_roots()?
+    let text = crate::emit::read_text(&roster).map_err(Fault::input)?;
+    let roots: Vec<String> = walk::kit_roots().map_err(Fault::refused)?
         .iter()
         .map(|k| k.trim_end_matches('/').to_string())
         .filter(|k| !k.is_empty() && std::path::Path::new(k).is_dir())
         .collect();
     if roots.is_empty() {
-        return Err("no kit roots enumerated — there is no payload to size".to_string());
+        return Err(Fault::refused("no kit roots enumerated — there is no payload to size"));
     }
     let mut kits: Vec<(String, Tally)> = Vec::new();
     for root in &roots {
-        kits.push((leaf(root), tally(root, &entries(None, root, &withhold)?)));
+        kits.push((leaf(root), tally(root, &entries(None, root, &withhold).map_err(Fault::tool)?)));
     }
     let payload: Vec<String> = kits.iter().map(|(n, _)| n.clone()).collect();
     let profiles: Vec<(String, Vec<String>)> = profile::names_in(&text)
@@ -205,10 +210,10 @@ pub fn block(page: &str, text: &str) -> Result<st::Block, String> {
 
 // spec: installer/SPEC.md §The install size — the bare arm prints the block; `--write` rewrites it
 // in place and touches nothing else
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let table = render()?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let table = render_fault()?;
     if args.iter().any(|a| a == "--write") {
-        let page = walk::knob_scalar(PAGE_KNOB)?;
+        let page = walk::knob_scalar(PAGE_KNOB).map_err(Fault::refused)?;
         return st::write_marked("install-size", &page, BEGIN, END, &table);
     }
     Ok(format!("{}\n", table.trim_matches('\n')))

@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-gate-fail-closed — every awk/jq capture in the gate family
 // handles subprocess exit status, so a crashed parser cannot false-green as "clean"
+use crate::exit;
 use crate::fresh;
 use crate::walk;
 
@@ -167,14 +168,14 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-gate-fail-closed: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         let roots = match walk::kit_roots_abs() {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-gate-fail-closed: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         let mut d = vec![gates_dir];
@@ -208,7 +209,7 @@ pub fn run(args: &[String]) -> i32 {
             eprintln!("  A tree carrying no gate declaration of either spelling has not finished a");
             eprintln!("  port — it resolved no gates directory. A gate that cannot run is not clean.");
             eprintln!("  help: check GATE_SDK_GATES_DIR and the kit roots it derives the rest from.");
-            return 2;
+            return exit::REFUSED;
         }
         println!(
             "GATE-FAIL-CLOSED: clean (not applicable: 0 shell gate(s) to scan, {} .gate-dispatched member(s) — the defect has no representation left in this corpus)",
@@ -224,9 +225,9 @@ pub fn run(args: &[String]) -> i32 {
             Err(_) => {
                 eprintln!(
                     "check-gate-fail-closed: {}",
-                    fresh::fail_closed("awk", Some(2))
+                    fresh::fail_closed("awk", Some(exit::INPUT))
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         scan_file(g, &text, &mut findings);

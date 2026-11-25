@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-surface-duplication — a non-glossary surface may not carry a
 // glossary term's bold-lead-in definition. The two awk programs the shell form drove become two
 // in-process scans; every program it spawned was on the floor, so the compiled form spawns none.
+use crate::exit::{self, Fault};
 use crate::spec;
 
 const NAME: &str = "check-surface-duplication";
@@ -275,33 +276,33 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
 
-fn check(args: &[String]) -> Result<i32, String> {
+fn check(args: &[String]) -> Result<i32, Fault> {
     let root = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
         None => ".".to_string(),
     };
     if !std::path::Path::new(&root).is_dir() {
         eprintln!("{}: not a directory: {}", NAME, root);
-        return Ok(2);
+        return Ok(exit::REFUSED);
     }
-    let glossary_name = spec::knob_pub("CANON_KIT_GLOSSARY_FILE")?;
+    let glossary_name = spec::knob_pub("CANON_KIT_GLOSSARY_FILE").map_err(Fault::refused)?;
     let gloss = format!("{}/{}", root, glossary_name);
     if !std::path::Path::new(&gloss).is_file() {
         eprintln!(
             "{}: no {} at {} (register the gate only where the glossary topology exists)",
             NAME, glossary_name, gloss
         );
-        return Ok(2);
+        return Ok(exit::REFUSED);
     }
 
-    let spec_name = spec::spec_name()?;
+    let spec_name = spec::spec_name().map_err(Fault::refused)?;
     let mut surfaces: Vec<Surface> = Vec::new();
-    for s in spec::knob_array_pub("CANON_KIT_DUP_SURFACES")? {
+    for s in spec::knob_array_pub("CANON_KIT_DUP_SURFACES").map_err(Fault::refused)? {
         let path = format!("{}/{}", root, s);
         if !std::path::Path::new(&path).is_file() {
             continue;
@@ -318,7 +319,7 @@ fn check(args: &[String]) -> Result<i32, String> {
     // directory owning a canonical spec — is never flagged: the component's definition lives in
     // its own spec, so there is nothing to restate
     let mut components: Vec<String> = Vec::new();
-    for f in spec::canonical_specs_sorted(&root)? {
+    for f in spec::canonical_specs_sorted(&root).map_err(Fault::input)? {
         let comp = match dirname(&f) {
             Some(d) if basename(&d) != "." => basename(&d).to_string(),
             _ => basename(&abs_root(&root)).to_string(),
@@ -338,7 +339,7 @@ fn check(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    let section = spec::knob_pub("CANON_KIT_GLOSSARY_TERM_SECTION")?;
+    let section = spec::knob_pub("CANON_KIT_GLOSSARY_TERM_SECTION").map_err(Fault::refused)?;
     let terms = glossary_terms(&read(&gloss)?, &section);
     let tcount = terms.len();
 
@@ -382,12 +383,12 @@ fn check(args: &[String]) -> Result<i32, String> {
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the shell form drove every surface through awk
 // and refused on a non-zero exit; the compiled form has no child, so the same refusal is owed on
 // the read that replaced it
-fn read(path: &str) -> Result<String, String> {
+fn read(path: &str) -> Result<String, Fault> {
     std::fs::read_to_string(path).map_err(|e| {
-        format!(
+        Fault::input(format!(
             "cannot read {}: {} — the check could not run; treating as failure (not clean)",
             path, e
-        )
+        ))
     })
 }
 

@@ -1,7 +1,9 @@
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the deterministic stamp half of a stage
 // transition, mechanized (judgment stays in the skill) spec: gate-sdk/SPEC.md §The non-gate arm —
-// an `Arm::Run` because the exit contract is three-state and every code is load-bearing: 0 a
+// an `Arm::Run` because the exit contract is four-state and every code is load-bearing: 0 a
+// stamp or a no-op, 1 a refusal, 2 a usage or configuration refusal, 3 a tool error.
 use crate::ere::EreCapture;
+use crate::exit::{self, Fault};
 use crate::proc;
 use crate::programs::{self, Program};
 use crate::registry;
@@ -40,10 +42,10 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the ledger's fail-closed refusal names
         // every malformed line itself, so an empty message is the already-reported one
-        Err(e) if e.is_empty() => 2,
+        Err(e) if e.is_empty() => e.status(),
         Err(e) => {
             eprintln!("enter-stage: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -174,8 +176,8 @@ fn read(path: &str) -> String {
         .unwrap_or_default()
 }
 
-fn dispatch(args: &[String]) -> Result<i32, String> {
-    let c = cfg()?;
+fn dispatch(args: &[String]) -> Result<i32, Fault> {
+    let c = cfg().map_err(Fault::refused)?;
     let first = args.first().map(String::as_str).unwrap_or("");
 
     // spec: gate-sdk/SPEC.md §The bin/-tool contract — the help half; this tool's positionals are
@@ -216,17 +218,17 @@ fn marker_file(c: &Cfg) -> String {
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — one line naming `stage` leaves the marker, and
 // an emptied marker is deleted; `Ok(false)` when no line names it
-fn discharge_marker(c: &Cfg, stage: &str) -> Result<bool, String> {
+fn discharge_marker(c: &Cfg, stage: &str) -> Result<bool, Fault> {
     let path = marker_file(c);
     if !Path::new(&path).is_file() {
         return Ok(false);
     }
-    let text = std::fs::read_to_string(&path).map_err(|e| format!("cannot read {}: {}", path, e))?;
+    let text = std::fs::read_to_string(&path).map_err(|e| Fault::input(format!("cannot read {}: {}", path, e)))?;
     let Some((kept, _)) = stages::marker_without(&text, stage, &c.waiver_token) else {
         return Ok(false);
     };
     if kept.is_empty() {
-        std::fs::remove_file(&path).map_err(|e| format!("cannot remove {}: {}", path, e))?;
+        std::fs::remove_file(&path).map_err(|e| Fault::tool(format!("cannot remove {}: {}", path, e)))?;
     } else {
         write_file(&path, &format!("{}\n", kept.join("\n")))?;
     }
@@ -242,29 +244,29 @@ fn marker_waiver(c: &Cfg, stage: &str) -> Option<String> {
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — `--waive <reason…>`: the reason is the rest of
 // the argv joined with single spaces; `Err` carries the refusal, exit 2 and nothing written
-fn waive_reason(c: &Cfg, stage: &str, words: &[String]) -> Result<String, String> {
+fn waive_reason(c: &Cfg, stage: &str, words: &[String]) -> Result<String, Fault> {
     if c.waiver_token.is_empty() {
-        return Err("--waive has no waiver token to write — LIFECYCLE_KIT_WAIVER_TOKEN is empty, as it is on a roster with no audit stage".into());
+        return Err(Fault::refused("--waive has no waiver token to write — LIFECYCLE_KIT_WAIVER_TOKEN is empty, as it is on a roster with no audit stage"));
     }
     if stage != c.audit_entry_stage {
-        return Err(format!(
+        return Err(Fault::usage(format!(
             "--waive declares an audit waiver, which only the entry of '{}' (LIFECYCLE_KIT_AUDIT_ENTRY_STAGE) reads — not '{}'",
             c.audit_entry_stage, stage
-        ));
+        )));
     }
     let reason = words.join(" ");
     if reason.contains(['\n', '\r']) {
-        return Err("--waive <reason> spans a line break — the marker holds one declaration per line".into());
+        return Err(Fault::usage("--waive <reason> spans a line break — the marker holds one declaration per line"));
     }
     if reason.trim().is_empty() {
-        return Err("--waive takes a reason — the ruling the waiver records".into());
+        return Err(Fault::usage("--waive takes a reason — the ruling the waiver records"));
     }
     Ok(reason.split_whitespace().collect::<Vec<_>>().join(" "))
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --dispatch and --dispatch-withdraw: the lead's
 // declaration and its withdrawal, writing scratch only and never lifecycle state
-fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
+fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, Fault> {
     let form = rest[0].as_str();
     if sim {
         eprintln!(
@@ -273,13 +275,13 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
             form
         );
         eprintln!("{}", usage(&c.stages));
-        return Ok(2);
+        return Ok(exit::USAGE);
     }
     let waiving = form == DISPATCH && rest.get(2).map(String::as_str) == Some(WAIVE);
     if (rest.len() != 2 && !waiving) || rest.get(1).map_or(true, |s| s.is_empty()) {
         eprintln!("enter-stage: {} takes exactly one <stage> — nothing written.", form);
         eprintln!("{}", usage(&c.stages));
-        return Ok(2);
+        return Ok(exit::USAGE);
     }
     let stage = &rest[1];
     if !stages::stage_known(&c.stages, stage) {
@@ -289,7 +291,7 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
             c.stages.join(" ")
         );
         eprintln!("{}", usage(&c.stages));
-        return Ok(2);
+        return Ok(exit::REFUSED);
     }
     let path = marker_file(c);
     if form == DISPATCH_WITHDRAW {
@@ -313,7 +315,7 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
             Err(e) => {
                 eprintln!("enter-stage: {} — nothing written.", e);
                 eprintln!("{}", usage(&c.stages));
-                return Ok(2);
+                return Ok(e.status());
             }
         }
     } else {
@@ -328,7 +330,7 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
         return Ok(code);
     }
     walk::make_scratch(&c.tmpdir)
-        .map_err(|e| format!("cannot create the scratch dir {}: {}", c.tmpdir, e))?;
+        .map_err(|e| Fault::tool(format!("cannot create the scratch dir {}: {}", c.tmpdir, e)))?;
     let line = match &waiver {
         Some(r) => format!("{} {} {}", stage, c.waiver_token, r),
         None => stage.to_string(),
@@ -353,15 +355,15 @@ fn dispatch_form(c: &Cfg, sim: bool, rest: &[String]) -> Result<i32, String> {
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --open-lead-journal: the lead journal's opener,
 // not stage motion — no stamp, no pre-flight, no queue write, nothing tracked
-fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
+fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, Fault> {
     if let Some(msg) = surplus_refusal(rest) {
         eprintln!("{}", msg);
         eprintln!("{}", usage(&c.stages));
-        return Ok(2);
+        return Ok(exit::USAGE);
     }
     if !Path::new(&c.state).is_file() {
         eprintln!("enter-stage: state file not found: {}", c.state);
-        return Ok(2);
+        return Ok(exit::INPUT);
     }
     let key = cursor_key(&read(&c.state));
     let heading = format!("{}{}", LEAD_OPEN_MARK, key);
@@ -410,7 +412,7 @@ fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String>
     }
 
     walk::make_scratch(&c.tmpdir)
-        .map_err(|e| format!("cannot create the scratch dir {}: {}", c.tmpdir, e))?;
+        .map_err(|e| Fault::tool(format!("cannot create the scratch dir {}: {}", c.tmpdir, e)))?;
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — append, never overwrite: the file is
     // rewritten only when a disposed segment is dropped, and then every other segment is kept
     if dropped.is_empty() {
@@ -457,8 +459,8 @@ fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String>
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the opener writes the session-role marker: the
 // id derived in process as the stamp derives it, a held line left alone, an underived id a skip at
-// exit 0, an unwritable marker exit 2
-fn role_marker(c: &Cfg, say: &Say) -> Result<(), String> {
+// exit 0, an unwritable marker exit 3
+fn role_marker(c: &Cfg, say: &Say) -> Result<(), Fault> {
     let path = &c.role_file;
     let id = match crate::emit::session_id::emit(&[]) {
         Ok(id) => id.trim().to_string(),
@@ -502,7 +504,7 @@ fn role_marker(c: &Cfg, say: &Say) -> Result<(), String> {
     }
     if let Some(dir) = Path::new(path).parent().filter(|d| !d.as_os_str().is_empty()) {
         std::fs::create_dir_all(dir).map_err(|e| {
-            format!("cannot create the session-role marker's dir {}: {}", dir.display(), e)
+            Fault::tool(format!("cannot create the session-role marker's dir {}: {}", dir.display(), e))
         })?;
     }
     write_file(path, &format!("{}\n", line))?;
@@ -513,16 +515,16 @@ fn role_marker(c: &Cfg, say: &Say) -> Result<(), String> {
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --rename: the two-surface iteration rename in
 // one motion, no stamp appended and no stage token written, so the cursor is untouched and this
 // is not stage motion
-fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
+fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, Fault> {
     if rest.len() != 1 {
         eprintln!("enter-stage: --rename takes exactly one <name> — nothing written.");
         eprintln!("{}", usage(&c.stages));
-        return Ok(2);
+        return Ok(exit::USAGE);
     }
     let name = &rest[0];
     if name.is_empty() {
         eprintln!("enter-stage: --rename <name> is empty — nothing written.");
-        return Ok(2);
+        return Ok(exit::USAGE);
     }
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the placeholder refusal precedes the slug
     // grammar that would already reject it, so a session trying to un-name an iteration is told
@@ -533,7 +535,7 @@ fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
              iteration-boundary reset writes it; nothing written.",
             UNNAMED
         );
-        return Ok(2);
+        return Ok(exit::USAGE);
     }
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the slug grammar is a refusal because
     // column 1 is whitespace-delimited: a two-word name silently shifts every field of every stamp
@@ -542,15 +544,15 @@ fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
             "enter-stage: --rename '{}' is not a queue slug ([a-z0-9][a-z0-9-]*) — nothing written.",
             name
         );
-        return Ok(2);
+        return Ok(exit::USAGE);
     }
     if !Path::new(&c.queue).is_file() {
         eprintln!("enter-stage: queue file not found: {}", c.queue);
-        return Ok(2);
+        return Ok(exit::INPUT);
     }
     if !Path::new(&c.state).is_file() {
         eprintln!("enter-stage: state file not found: {}", c.state);
-        return Ok(2);
+        return Ok(exit::INPUT);
     }
 
     let queue_text = read(&c.queue);
@@ -562,7 +564,7 @@ fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
                 "enter-stage: no '## Iteration:' header in {} — nothing written.",
                 c.queue
             );
-            return Ok(2);
+            return Ok(exit::INPUT);
         }
     };
     let cur = stages::header_iter(&hdr);
@@ -599,7 +601,7 @@ fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
              head) of {} — refusing, nothing written.",
             c.state
         );
-        return Ok(2);
+        return Ok(exit::INPUT);
     }
 
     let scratch = Scratch::new(&c.tmpdir, "rename.", say.sim)?;
@@ -610,14 +612,14 @@ fn rename(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, String> {
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the rename pre-flight names the gate and
     // never a substrate: the resolver yields the shell member's argv or the binary's, and a gate
-    // it cannot dispatch is exit 2 — never a rename that proceeds unchecked
+    // it cannot dispatch is exit 3 — never a rename that proceeds unchecked
     match preflight_gate("check-stage-evidence", &tq, &ts)? {
         GateRun::Undispatchable => {
             eprintln!(
                 "enter-stage: check-stage-evidence could not be dispatched (see above) — the \
                  rename could not be pre-flighted; nothing written."
             );
-            return Ok(2);
+            return Ok(exit::TOOL);
         }
         GateRun::Refused(out) => {
             if say.sim {
@@ -804,19 +806,19 @@ fn surplus_refusal(rest: &[String]) -> Option<String> {
     })
 }
 
-fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<i32, String> {
+fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<i32, Fault> {
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — refuse before parsing anything, so the
     // fail-closed rule reaches the argument the tool cannot act on rather than dropping it
     if let Some(msg) = surplus_refusal(rest) {
         eprintln!("{}", msg);
         eprintln!("{}", usage(&c.stages));
-        return Ok(2);
+        return Ok(exit::USAGE);
     }
     let stage = match rest.first() {
         Some(s) if !s.is_empty() => s.clone(),
         _ => {
             eprintln!("{}", usage(&c.stages));
-            return Ok(2);
+            return Ok(exit::USAGE);
         }
     };
     if !stages::stage_known(&c.stages, &stage) {
@@ -826,15 +828,15 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
             c.stages.join(" ")
         );
         eprintln!("{}", usage(&c.stages));
-        return Ok(2);
+        return Ok(exit::REFUSED);
     }
     if !Path::new(&c.queue).is_file() {
         eprintln!("enter-stage: queue file not found: {}", c.queue);
-        return Ok(2);
+        return Ok(exit::INPUT);
     }
     if !Path::new(&c.state).is_file() {
         eprintln!("enter-stage: state file not found: {}", c.state);
-        return Ok(2);
+        return Ok(exit::INPUT);
     }
 
     let queue_text = read(&c.queue);
@@ -856,7 +858,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
     // after the port this arm sits behind the front-end that cds to the git toplevel, so the cwd
     // source 3 slugs is the project directory the harness keys transcripts on.
     let id = crate::emit::session_id::emit(&[])
-        .map_err(|e| format!("could not read the session id ({}) — nothing written.", e))?
+        .map_err(|e| Fault::input(format!("could not read the session id ({}) — nothing written.", e)))?
         .trim()
         .to_string();
     let today = date_today()?;
@@ -946,14 +948,14 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
 
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the built-in pre-flight names the gate and
     // never a substrate, the rename pre-flight's own resolution: a gate it cannot dispatch is
-    // exit 2, never an entry that proceeds unchecked.
+    // exit 3, never an entry that proceeds unchecked.
     match preflight_gate("check-stage-entry", pre_queue, &tmpstate)? {
         GateRun::Undispatchable => {
             eprintln!(
                 "enter-stage: check-stage-entry could not be dispatched (see above) — the entry \
                  could not be pre-flighted; nothing written."
             );
-            return Ok(2);
+            return Ok(exit::TOOL);
         }
         GateRun::Refused(out) => {
             if say.sim {
@@ -1052,7 +1054,7 @@ fn stamp(c: &Cfg, say: &Say, rest: &[String], declared: Option<&str>) -> Result<
         let pred_stage = stages::current_stage(&state_text);
         if !pred_stage.is_empty() {
             let pred_journal = journal_path(&c.journal_pattern, &pred_stage);
-            let pred_file = repo_anchored(&pred_journal)?;
+            let pred_file = repo_anchored(&pred_journal).map_err(Fault::tool)?;
             // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — three-way, because the opener made
             // unwritten a state distinct from absent: absent means this tool never ran for that
             // stage, unwritten means it ran and the session did not
@@ -1743,7 +1745,7 @@ impl Valve {
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the ledger is read only where the question
     // "is it armed?" is actually asked, which is a LIFECYCLE_KIT_ENTRY_PREFLIGHT refusal. Parsing
     // it on every entry would let a malformed ledger wedge entries that never needed a valve.
-    fn query(&mut self, c: &Cfg, iter: &str, stage: &str) -> Result<(), String> {
+    fn query(&mut self, c: &Cfg, iter: &str, stage: &str) -> Result<(), Fault> {
         if self.queried {
             return Ok(());
         }
@@ -1789,7 +1791,7 @@ impl Valve {
             for b in &bad {
                 eprintln!("{}", b);
             }
-            return Err(String::new());
+            return Err(Fault::input(String::new()));
         }
         // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the match: the FIRST armed line whose
         // iteration and stage both equal the entering entry's; the prior-used count is every used
@@ -1853,8 +1855,9 @@ enum GateRun {
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — both arms name a gate and never a substrate.
 // spec: gate-sdk/SPEC.md §run-gates — the member runs as a **child process** and never as an in-
 // process call: `native/src/runner.rs` records the ground as the declared-knob discipline, fault
-fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, String> {
-    let dirs: Vec<String> = walk::kit_roots_abs()?
+fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Fault> {
+    let dirs: Vec<String> = walk::kit_roots_abs()
+        .map_err(Fault::refused)?
         .into_iter()
         .map(|r| format!("{}/checks", r))
         .collect();
@@ -1868,7 +1871,7 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
         return Ok(GateRun::Undispatchable);
     };
     let exe = crate::proc::self_image()
-        .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
+        .map_err(|e| Fault::tool(format!("cannot resolve this binary's own path: {}", e)))?
         .display()
         .to_string();
     let inv = match registry::invocation(name, &src, &exe) {
@@ -1888,7 +1891,7 @@ fn preflight_gate(name: &str, queue: &str, state: &str) -> Result<GateRun, Strin
         registry::Substrate::Compiled => Vec::new(),
         _ => vec![("GATE_SDK_NATIVE_BIN".to_string(), exe)],
     };
-    let merged = proc::run_merged_in(&program, &args, &env, None)?;
+    let merged = proc::run_merged_in(&program, &args, &env, None).map_err(Fault::tool)?;
     if merged.succeeded() {
         Ok(GateRun::Passed)
     } else {
@@ -1910,12 +1913,12 @@ fn run_preflight_command(
     argv: &[String],
     queue: &str,
     state: &str,
-) -> Result<PreflightOut, String> {
+) -> Result<PreflightOut, Fault> {
     let mut args: Vec<&str> = argv[1..].iter().map(String::as_str).collect();
     args.push(queue);
     args.push(state);
     let program = Program::consumer("LIFECYCLE_KIT_ENTRY_PREFLIGHT", argv[0].as_str());
-    let merged = proc::run_merged_in(&program, &args, &[], None)?;
+    let merged = proc::run_merged_in(&program, &args, &[], None).map_err(Fault::tool)?;
     Ok(PreflightOut {
         ok: merged.succeeded(),
         text: String::from_utf8_lossy(merged.output()).into_owned(),
@@ -1935,8 +1938,8 @@ struct Row {
     head: String,
 }
 
-fn inside_git() -> Result<bool, String> {
-    Ok(crate::walk::toplevel_opt()?.is_some())
+fn inside_git() -> Result<bool, Fault> {
+    Ok(crate::walk::toplevel_opt().map_err(Fault::tool)?.is_some())
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the linked-worktree scan: one porcelain parse
@@ -2188,7 +2191,7 @@ pub fn journal_open(
         "{}{} — {} {} {} {}\n",
         JOURNAL_MARK, stage, iter, id, date, head
     ));
-    append_raw(p, &body)
+    append_raw(p, &body).map_err(|e| e.message)
 }
 
 fn is_bullet(l: &str) -> bool {
@@ -2245,10 +2248,10 @@ fn lines_with_ends(text: &str) -> Vec<&str> {
     out
 }
 
-fn date_today() -> Result<String, String> {
+fn date_today() -> Result<String, Fault> {
     let today = crate::emit::kpi::today_iso();
     if today.is_empty() {
-        return Err("could not read today's date — nothing written.".to_string());
+        return Err(Fault::tool("could not read today's date — nothing written."));
     }
     Ok(today)
 }
@@ -2284,9 +2287,9 @@ struct Scratch {
 impl Scratch {
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — `--simulate` writes nothing, so it leaves
     // no self-ignore behind: its temporaries are gone before it exits
-    fn new(dir: &str, tag: &str, sim: bool) -> Result<Scratch, String> {
+    fn new(dir: &str, tag: &str, sim: bool) -> Result<Scratch, Fault> {
         let made = if sim { std::fs::create_dir_all(dir) } else { walk::make_scratch(dir) };
-        made.map_err(|e| format!("cannot create the scratch dir {}: {}", dir, e))?;
+        made.map_err(|e| Fault::tool(format!("cannot create the scratch dir {}: {}", dir, e)))?;
         Ok(Scratch {
             dir: dir.to_string(),
             tag: tag.to_string(),
@@ -2313,7 +2316,7 @@ impl Drop for Scratch {
 
 // comment-tier-exempt: a cross-filesystem fallback local to this helper — GATE_SDK_TMP_DIR may
 // name another mount, where rename fails and the reset must still land
-fn move_file(src: &str, dst: &str) -> Result<(), String> {
+fn move_file(src: &str, dst: &str) -> Result<(), Fault> {
     if std::fs::rename(src, dst).is_ok() {
         return Ok(());
     }
@@ -2322,22 +2325,22 @@ fn move_file(src: &str, dst: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn write_file(path: &str, body: &str) -> Result<(), String> {
-    std::fs::write(path, body).map_err(|e| format!("cannot write {}: {}", path, e))
+fn write_file(path: &str, body: &str) -> Result<(), Fault> {
+    std::fs::write(path, body).map_err(|e| Fault::tool(format!("cannot write {}: {}", path, e)))
 }
 
-fn append_raw(path: &str, body: &str) -> Result<(), String> {
+fn append_raw(path: &str, body: &str) -> Result<(), Fault> {
     use std::io::Write;
     let mut f = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
         .open(path)
-        .map_err(|e| format!("cannot open {}: {}", path, e))?;
+        .map_err(|e| Fault::tool(format!("cannot open {}: {}", path, e)))?;
     f.write_all(body.as_bytes())
-        .map_err(|e| format!("cannot append to {}: {}", path, e))
+        .map_err(|e| Fault::tool(format!("cannot append to {}: {}", path, e)))
 }
 
-fn append_line(path: &str, line: &str) -> Result<(), String> {
+fn append_line(path: &str, line: &str) -> Result<(), Fault> {
     append_raw(path, &format!("{}\n", line))
 }
 

@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-knob-citation — no kit knob stated with its value in
 // manifest prose outside the owning kit's SPEC
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -9,7 +10,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-knob-citation: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -212,25 +213,25 @@ fn blank_expansions(line: &str) -> String {
     String::from_utf8_lossy(&out).into_owned()
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let pairs = prefix_pairs()?;
-    let manifests = spec::manifest_files_sorted_stripped(root)?;
+    let pairs = prefix_pairs().map_err(Fault::refused)?;
+    let manifests = spec::manifest_files_sorted_stripped(root).map_err(Fault::refused)?;
     if manifests.is_empty() {
         println!("KNOB-CITATION: clean (not applicable: 0 manifest file(s) found)");
         return Ok(0);
     }
     let mut sink = Sink {
         pairs,
-        spec_name: spec::spec_name()?,
-        reach: reach()?,
-        span: span()?,
+        spec_name: spec::spec_name().map_err(Fault::refused)?,
+        reach: reach().map_err(Fault::refused)?,
+        span: span().map_err(Fault::refused)?,
         out: Vec::new(),
     };
-    spec::walk_prose(&manifests, "knob-citation-exempt:", &mut sink)?;
+    spec::walk_prose(&manifests, "knob-citation-exempt:", &mut sink).map_err(Fault::input)?;
 
     if !sink.out.is_empty() {
         println!("check-knob-citation: kit knob(s) stated with a value in manifest prose outside the owning SPEC — a knob's value has one home, and a restated copy drifts silently:");

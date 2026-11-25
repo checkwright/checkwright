@@ -1,17 +1,18 @@
 // spec: evidence-kit/SPEC.md §The baseline-claims arm — each baseline row as a `measured:` oracle
 // line, `baseline-<suite>--<scenario>`⇥`<status>`, in the file's order
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Emit`: the contract is a document and every
-// failure is exit 2; it declares evidence-kit's baseline knob alone, so a canon-kit command knob
+// failure is a typed fault; it declares evidence-kit's baseline knob alone, so a canon-kit command knob
 // naming it cannot recurse
 use crate::evidence;
+use crate::exit::Fault;
 use crate::walk;
 
 pub const KNOBS: &[&str] = &["EVIDENCE_KIT_BASELINE_FILE"];
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    let path = walk::knob_scalar("EVIDENCE_KIT_BASELINE_FILE")?;
-    let text = super::read_text(&path)?;
-    lines(&text)
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
+    let path = walk::knob_scalar("EVIDENCE_KIT_BASELINE_FILE").map_err(Fault::refused)?;
+    let text = super::read_text(&path).map_err(Fault::input)?;
+    lines(&text).map_err(Fault::input)
 }
 
 // spec: evidence-kit/SPEC.md §The baseline-claims arm — each part lowercased, every character

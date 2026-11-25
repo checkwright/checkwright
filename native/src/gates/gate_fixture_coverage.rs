@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-gate-fixture-coverage — every gates.list member has a fixture
 // pair or a no-fixture opt-out
+use crate::exit;
 use crate::fresh;
 use crate::registry;
 use crate::walk;
@@ -20,21 +21,21 @@ pub fn run(_args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-gate-fixture-coverage: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let kit_roots = match walk::kit_roots_abs() {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-gate-fixture-coverage: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let tests_dir = match walk::knob_scalar("GATE_SDK_TESTS_DIR") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-gate-fixture-coverage: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let tests_dirs = registry::fixture_dirs(&tests_dir, &kit_roots);
@@ -43,19 +44,19 @@ pub fn run(_args: &[String]) -> i32 {
     let list = format!("{}/gates.list", dir);
     if !Path::new(&list).is_file() {
         eprintln!("check-gate-fixture-coverage: no registry at {}", list);
-        return 2;
+        return exit::REFUSED;
     }
     let listing = match std::fs::read(&list) {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(_) => {
             eprintln!("check-gate-fixture-coverage: no members parsed from {}", list);
-            return 2;
+            return exit::INPUT;
         }
     };
     let members = registry::members(&listing);
     if members.is_empty() {
         eprintln!("check-gate-fixture-coverage: no members parsed from {}", list);
-        return 2;
+        return exit::INPUT;
     }
 
     let mut neither: Vec<String> = Vec::new();
@@ -76,7 +77,7 @@ pub fn run(_args: &[String]) -> i32 {
                 Ok(_) => {}
                 Err(e) => {
                     eprintln!("check-gate-fixture-coverage: {}", e);
-                    return 2;
+                    return exit::INPUT;
                 }
             }
         }

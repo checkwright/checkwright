@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-spec-dod-singleton — a canonical spec carries the
 // Definition-of-Done heading the configured number of times
+use crate::exit::Fault;
 use crate::spec;
 use std::path::Path;
 
@@ -8,30 +9,30 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-spec-dod-singleton: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let spec_name = spec::knob_pub("CANON_KIT_SPEC_NAME")?;
-    let specs = spec::canonical_specs_sorted(root)?;
+    let spec_name = spec::knob_pub("CANON_KIT_SPEC_NAME").map_err(Fault::refused)?;
+    let specs = spec::canonical_specs_sorted(root).map_err(Fault::input)?;
     if specs.is_empty() {
         println!("SPEC-DOD-SINGLETON: clean (not applicable: 0 {} found)", spec_name);
         return Ok(0);
     }
 
-    let heading = spec::knob_pub("CANON_KIT_DOD_HEADING")?;
+    let heading = spec::knob_pub("CANON_KIT_DOD_HEADING").map_err(Fault::refused)?;
     let want = heading.to_ascii_lowercase();
-    let mode = spec::knob_pub("CANON_KIT_DOD_MODE")?;
+    let mode = spec::knob_pub("CANON_KIT_DOD_MODE").map_err(Fault::refused)?;
 
     let mut errors: Vec<String> = Vec::new();
     for f in &specs {
-        let n = dod_headings(&spec::read_text(Path::new(f))?, &want);
+        let n = dod_headings(&spec::read_text(Path::new(f)).map_err(Fault::input)?, &want);
         // spec: canon-kit/SPEC.md §check-spec-dod-singleton — `at-most-one` exists because a
         // reference-spec corpus legitimately has none, so only the doubled case is a finding
         // there; an unrecognised mode is neither branch, exactly as the shell reads it

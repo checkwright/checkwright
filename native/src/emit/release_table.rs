@@ -2,6 +2,7 @@
 // function the gate calls in process
 use crate::declaration;
 use crate::emit::support_table as st;
+use crate::exit::Fault;
 use crate::gates::release_bump as rb;
 use crate::release_sections::{self as rs, Role, Section};
 use crate::walk;
@@ -107,10 +108,11 @@ pub fn block(page: &str, text: &str) -> Result<st::Block, String> {
 
 // spec: installer/SPEC.md §The releases table — the bare arm prints the block; `--write`
 // rewrites it in place and touches nothing else
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let posts = walk::knob_scalar(POSTS_KNOB)?;
-    let page = walk::knob_scalar(PAGE_KNOB)?;
-    let table = render(&posts, &page)?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let posts = walk::knob_scalar(POSTS_KNOB).map_err(Fault::refused)?;
+    let page = walk::knob_scalar(PAGE_KNOB).map_err(Fault::refused)?;
+    let roster = rs::roster().map_err(Fault::refused)?;
+    let table = table(&notes(&posts, &page).map_err(Fault::input)?, &roster);
     if args.iter().any(|a| a == "--write") {
         return st::write_marked("release-table", &page, BEGIN, END, &table);
     }

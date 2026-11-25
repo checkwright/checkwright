@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` though its exit grammar is the `--emit-`
 // collapse: it spawns a consumer's agent programs, which reach the network, and that family is
 // fence-safe by derivation.
+use crate::exit::Fault;
 use crate::proc;
 use crate::programs::Program;
 use crate::walk;
@@ -28,7 +29,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(()) => 0,
         Err(e) => {
             eprintln!("checkwright-gates: {}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -40,28 +41,30 @@ struct Call {
     text: String,
 }
 
-fn probe(args: &[String]) -> Result<(), String> {
-    let agents = walk::knob_map("DRIFT_KIT_SELECTION_AGENTS")?;
-    let prompts = walk::knob_map("DRIFT_KIT_SELECTION_PROMPTS")?;
-    let subject = walk::knob_array("DRIFT_KIT_SELECTION_SUBJECT")?;
-    let Some(calls) = plan(&agents, &prompts, &subject, args)? else {
+fn probe(args: &[String]) -> Result<(), Fault> {
+    let agents = walk::knob_map("DRIFT_KIT_SELECTION_AGENTS").map_err(Fault::refused)?;
+    let prompts = walk::knob_map("DRIFT_KIT_SELECTION_PROMPTS").map_err(Fault::refused)?;
+    let subject = walk::knob_array("DRIFT_KIT_SELECTION_SUBJECT").map_err(Fault::refused)?;
+    let Some(calls) = plan(&agents, &prompts, &subject, args).map_err(Fault::refused)? else {
         println!("selection-probe: off");
         return Ok(());
     };
-    let secs: u64 = walk::knob_scalar("DRIFT_KIT_SELECTION_TIMEOUT")?
+    let secs: u64 = walk::knob_scalar("DRIFT_KIT_SELECTION_TIMEOUT")
+        .map_err(Fault::refused)?
         .parse()
         .ok()
         .filter(|s| *s > 0)
-        .ok_or_else(|| "DRIFT_KIT_SELECTION_TIMEOUT is not a positive integer".to_string())?;
+        .ok_or_else(|| Fault::refused("DRIFT_KIT_SELECTION_TIMEOUT is not a positive integer"))?;
     let mut seq = 0usize;
     let first = cold_dir(&mut seq)?;
     if let Err(e) = cold(&first) {
         let _ = std::fs::remove_dir_all(&first);
         return Err(e);
     }
-    let (record, record_spelled) = super::file_survey::anchored_capture("DRIFT_KIT_SELECTION_RECORD")?;
+    let (record, record_spelled) =
+        super::file_survey::anchored_capture("DRIFT_KIT_SELECTION_RECORD").map_err(Fault::refused)?;
     let (answers, answers_spelled) =
-        super::file_survey::anchored_capture("DRIFT_KIT_SELECTION_ANSWERS_DIR")?;
+        super::file_survey::anchored_capture("DRIFT_KIT_SELECTION_ANSWERS_DIR").map_err(Fault::refused)?;
     let today = super::kpi::today_iso();
     let mut dir = Some(first);
     let mut named = 0usize;
@@ -78,10 +81,11 @@ fn probe(args: &[String]) -> Result<(), String> {
         let file = format!("{}-{}-{}.txt", today, c.agent, c.prompt);
         std::fs::create_dir_all(&answers)
             .and_then(|()| std::fs::write(walk::child(Path::new(&answers), &file), &answer))
-            .map_err(|e| format!("cannot write {}/{}: {}", answers_spelled, file, e))?;
+            .map_err(|e| Fault::tool(format!("cannot write {}/{}: {}", answers_spelled, file, e)))?;
         let line = format!("{} {} {} {}", today, c.agent, c.prompt, verdict);
         let is_key = |l: &str| same_call(l, &today, &c.agent, &c.prompt);
-        super::file_install::write_line(Path::new(&record), &record_spelled, &line, Some(&is_key))?;
+        super::file_install::write_line(Path::new(&record), &record_spelled, &line, Some(&is_key))
+            .map_err(Fault::tool)?;
         println!("{}", line);
     }
     println!("selection-probe: {} named of {} asked", named, calls.len());
@@ -136,25 +140,25 @@ fn key_shaped(k: &str) -> bool {
 
 // spec: drift-kit/SPEC.md §The agent-selection probe — a fresh empty directory under the host's
 // temporary directory, made exclusively so no earlier run's leftover is reused
-fn cold_dir(seq: &mut usize) -> Result<PathBuf, String> {
+fn cold_dir(seq: &mut usize) -> Result<PathBuf, Fault> {
     let d = proc::temp_base().join(format!("checkwright-selection-probe.{}.{}", std::process::id(), seq));
     *seq += 1;
-    std::fs::create_dir(&d).map_err(|e| format!("cannot create {}: {}", d.display(), e))?;
+    std::fs::create_dir(&d).map_err(|e| Fault::tool(format!("cannot create {}: {}", d.display(), e)))?;
     Ok(d)
 }
 
 // spec: drift-kit/SPEC.md §The agent-selection probe — the coldness test, through the crosser
 // (gate-sdk/SPEC.md §The crate's crosser): a work tree above the directory, or a repository git
 // refuses there, is a refusal, since an agent run there would read it
-fn cold(dir: &Path) -> Result<(), String> {
+fn cold(dir: &Path) -> Result<(), Fault> {
     let at = walk::cross_arg(&dir.display().to_string());
-    match walk::toplevel_in_opt(&at)? {
+    match walk::toplevel_in_opt(&at).map_err(Fault::tool)? {
         None => Ok(()),
-        Some(top) => Err(format!(
+        Some(top) => Err(Fault::refused(format!(
             "the temporary directory {} lies inside the work tree {}, where an agent would read a \
              repository — point the host's temporary directory outside every work tree",
             at, top
-        )),
+        ))),
     }
 }
 

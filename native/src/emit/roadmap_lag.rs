@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §The roadmap-lag arm — the entries outside the first horizon, or untagged,
 // under which a split slice landed: a report with no verdict and no exit-1 path
+use crate::exit::Fault;
 use crate::programs;
 use crate::queue::{self, Sections};
 use crate::walk;
@@ -111,22 +112,22 @@ fn locate(file: &str) -> Result<(String, String), String> {
     Ok((top, rel))
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let mut file = String::new();
     for a in args {
         match a.as_str() {
-            other if other.starts_with('-') => return Err(format!("unknown option: {}\n{}", other, USAGE)),
+            other if other.starts_with('-') => return Err(Fault::usage(format!("unknown option: {}\n{}", other, USAGE))),
             other if file.is_empty() => file = other.to_string(),
-            other => return Err(format!("unexpected argument: {}\n{}", other, USAGE)),
+            other => return Err(Fault::usage(format!("unexpected argument: {}\n{}", other, USAGE))),
         }
     }
-    let file = if file.is_empty() { queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")? } else { file };
-    let text = std::fs::read_to_string(&file).map_err(|_| format!("queue file not found: {}", file))?;
-    let horizons = queue::knob_array("QUEUE_KIT_HORIZONS")?;
+    let file = if file.is_empty() { queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)? } else { file };
+    let text = std::fs::read_to_string(&file).map_err(|_| Fault::input(format!("queue file not found: {}", file)))?;
+    let horizons = queue::knob_array("QUEUE_KIT_HORIZONS").map_err(Fault::refused)?;
     let Some(first) = horizons.first() else {
-        return Err("QUEUE_KIT_HORIZONS is empty — no roadmap vocabulary is configured".to_string());
+        return Err(Fault::refused("QUEUE_KIT_HORIZONS is empty — no roadmap vocabulary is configured"));
     };
-    let sec = Sections::with_done()?;
+    let sec = Sections::with_done().map_err(Fault::refused)?;
     let cands = candidates(&text, &sec, first);
     if cands.is_empty() {
         return Ok(String::new());
@@ -153,7 +154,8 @@ pub fn emit(args: &[String]) -> Result<String, String> {
             });
         }
         !wanted.is_empty()
-    })?;
+    })
+    .map_err(Fault::tool)?;
     Ok(rows(&cands, &last_live))
 }
 

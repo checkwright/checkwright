@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §Layout and configuration — every kit-name reference in a tracked file
 // resolves to a live kit root: a slash/line-anchored <name>-kit or gate-sdk path segment names a
 // gate_kit_roots dir, and a live-prefix kit knob resolves to a tracked kit knob
+use crate::exit::Fault;
 use crate::fresh;
 use crate::{proc, programs};
 use crate::walk;
@@ -15,7 +16,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}", e);
-            2
+            e.status()
         }
     }
 }
@@ -146,13 +147,12 @@ fn prefix_of(root: &str) -> String {
     format!("{}_", base.to_ascii_uppercase().replace('-', "_"))
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let scanroot = fresh::positional(args, 0, ".");
     let top = walk::toplevel_opt()
-        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?
+        .map_err(|e| Fault::tool(e).prefixed("check-kit-ref-liveness"))?
         .ok_or_else(|| {
-            "check-kit-ref-liveness: not a git repository — cannot enumerate tracked paths/knobs"
-                .to_string()
+            Fault::refused("check-kit-ref-liveness: not a git repository — cannot enumerate tracked paths/knobs")
         })?;
 
     let mut live: HashSet<String> = HashSet::new();
@@ -161,7 +161,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §Layout and configuration — `live` and `prefixes` name every kit root,
     // basename-derived and so dialect-free, because a kit vendored outside this repository is still
     // live and still owns its knob namespace
-    for root in walk::kit_roots().map_err(|e| format!("check-kit-ref-liveness: {}", e))? {
+    for root in walk::kit_roots().map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))? {
         if root.is_empty() {
             continue;
         }
@@ -173,13 +173,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // pathspec for `git -C <top>`, spelled against that toplevel and narrowed to what lies under it
     roots.extend(
         walk::kit_roots_under(&top)
-            .map_err(|e| format!("check-kit-ref-liveness: {}", e))?
+            .map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))?
             .into_iter()
             .map(|r| r.trim_end_matches('/').to_string())
             .filter(|r| !r.is_empty()),
     );
     if live.is_empty() {
-        return Err("check-kit-ref-liveness: gate_kit_roots enumerated no roots".to_string());
+        return Err(Fault::refused("check-kit-ref-liveness: gate_kit_roots enumerated no roots"));
     }
 
     // spec: canon-kit/SPEC.md §Layout and configuration — the defined-knob set, out of the
@@ -198,13 +198,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         String::new()
     } else {
         let completed =
-            proc::run(&programs::GIT, &argv).map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+            proc::run(&programs::GIT, &argv).map_err(|e| Fault::tool(e).prefixed("check-kit-ref-liveness"))?;
         let code = completed.code().unwrap_or(-1);
         if code > 1 {
-            return Err(format!(
+            return Err(Fault::tool(format!(
                 "check-kit-ref-liveness: git grep failed (exit {}) building the knob set",
                 code
-            ));
+            )));
         }
         completed
             .stdout()
@@ -225,24 +225,24 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // future knobs and paths, so it is valved out by basename, the queue
     // file's knob read rather than a literal name
     let queue_file = walk::knob_scalar("GATE_SDK_QUEUE_FILE")
-        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+        .map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))?;
     let queue_base = queue_file.rsplit('/').next().unwrap_or(&queue_file).to_string();
     // spec: canon-kit/SPEC.md §Layout and configuration — the gap inbox joins the queue in the
     // valve, by its knob's resolved repo-relative path rather than by basename
     let gap_inbox_file = walk::knob_scalar("LIFECYCLE_KIT_GAP_INBOX_FILE")
-        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+        .map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))?;
     // spec: canon-kit/SPEC.md §Layout and configuration — the consult inbox likewise, by its knob
     let consult_inbox_file = walk::knob_scalar("LIFECYCLE_KIT_CONSULT_INBOX_FILE")
-        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+        .map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))?;
     // spec: canon-kit/SPEC.md §Layout and configuration — the survey record is valved as frozen,
     // by its knob's resolved repo-relative path
     let survey_record_file = walk::knob_scalar("LIFECYCLE_KIT_SURVEY_RECORD_FILE")
-        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+        .map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))?;
     // spec: canon-kit/SPEC.md §Layout and configuration — the disposed-findings record is valved
     // as frozen, by its knob's resolved repo-relative path
     let disposed_file = walk::knob_scalar("LIFECYCLE_KIT_DISPOSED_FILE")
-        .map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
-    let prune = walk::prune_dirs().map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+        .map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))?;
+    let prune = walk::prune_dirs().map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))?;
     // spec: canon-kit/SPEC.md §Layout and configuration — the release record is valved as frozen:
     // the posts directory, the evidence projection and the release declarations, each by its knob
     let frozen = || -> Result<(String, String, String), String> {
@@ -253,13 +253,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         ))
     };
     let (posts_dir, evidence_page, declarations) =
-        frozen().map_err(|e| format!("check-kit-ref-liveness: {}", e))?;
+        frozen().map_err(|e| Fault::refused(e).prefixed("check-kit-ref-liveness"))?;
 
     let listing = crate::listing::tracked(None, &[scanroot]).map_err(|e| match e {
         crate::listing::Refusal::Failed(code) => {
-            format!("KIT-REF-LIVENESS: {}", fresh::fail_closed("git-ls-files", code))
+            Fault::tool(format!("KIT-REF-LIVENESS: {}", fresh::fail_closed("git-ls-files", code)))
         }
-        other => format!("check-kit-ref-liveness: {}", other.text()),
+        other => Fault::tool(format!("check-kit-ref-liveness: {}", other.text())),
     })?;
 
     let mut files: Vec<String> = Vec::new();
@@ -302,7 +302,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut bad: Vec<String> = Vec::new();
     for path in &files {
         let text = fresh::read_captured(path)
-            .map_err(|_| format!("KIT-REF-LIVENESS: {}", fresh::fail_closed("awk", Some(2))))?;
+            .map_err(|_| Fault::input(format!("KIT-REF-LIVENESS: {}", fresh::fail_closed("awk", Some(2)))))?; // status-literal-exempt: the exit code the awk-read message cites, not a status
         for (n, line) in fresh::file_lines(&text).iter().enumerate() {
             let fnr = n + 1;
             for hit in kit_tokens(line) {

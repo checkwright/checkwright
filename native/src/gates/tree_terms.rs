@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-tree-terms — no tracked file matches the banned-pattern set (the
 // tracked-files half of the leak guard; the pattern files and their templates are self-exempt)
 use crate::ere::Ere;
+use crate::exit::{self, Fault};
 use crate::fresh;
 use crate::gates::commit_msg::{live_patterns, resolve_files};
 use crate::knobs::gate_sdk::MSG_PATTERN_FILE;
@@ -16,22 +17,22 @@ fn binary(bytes: &[u8]) -> bool {
 pub fn run(args: &[String]) -> i32 {
     match inner(args) {
         Ok(code) => code,
-        Err(msg) => {
-            eprintln!("{}", msg);
-            2
+        Err(fault) => {
+            eprintln!("{}", fault);
+            fault.status()
         }
     }
 }
 
-fn inner(args: &[String]) -> Result<i32, String> {
+fn inner(args: &[String]) -> Result<i32, Fault> {
     let scanroot = fresh::positional(args, 0, ".").to_string();
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — the tracked set is the subject, so a non-repo
     // cwd is fail-closed before anything else: there is no listing to be clean about
-    if crate::walk::toplevel_opt().map_err(|e| format!("check-tree-terms: {}", e))?.is_none() {
-        return Err(
-            "check-tree-terms: not a git repository — cannot enumerate tracked files".into(),
-        );
+    if crate::walk::toplevel_opt().map_err(|e| Fault::tool(format!("check-tree-terms: {}", e)))?.is_none() {
+        return Err(Fault::refused(
+            "check-tree-terms: not a git repository — cannot enumerate tracked files",
+        ));
     }
 
     let files: Vec<String> = if args.len() > 1 {
@@ -40,17 +41,18 @@ fn inner(args: &[String]) -> Result<i32, String> {
         match resolve_files() {
             Ok(f) => f,
             Err(e) => {
-                eprintln!("{}", e);
-                return Err(format!(
-                    "TREE-TERMS: {}",
-                    fresh::fail_closed("pattern-files", Some(2))
-                ));
+                eprintln!("{}", e.message);
+                let status = e.status();
+                return Err(Fault {
+                    message: format!("TREE-TERMS: {}", fresh::fail_closed("pattern-files", Some(status))),
+                    ..e
+                });
             }
         }
     };
 
     let patterns = live_patterns(&files).ok_or_else(|| {
-        format!("TREE-TERMS: {}", fresh::fail_closed("grep-patterns", Some(2)))
+        Fault::input(format!("TREE-TERMS: {}", fresh::fail_closed("grep-patterns", Some(exit::INPUT))))
     })?;
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — an empty set leaves the tree unchecked and
@@ -69,7 +71,10 @@ fn inner(args: &[String]) -> Result<i32, String> {
             Ok(e) => compiled.push(e),
             Err(e) => {
                 eprintln!("check-tree-terms: {}: {}", p, e);
-                return Err(format!("TREE-TERMS: {}", fresh::fail_closed("grep", Some(2))));
+                return Err(Fault::refused(format!(
+                    "TREE-TERMS: {}",
+                    fresh::fail_closed("grep", Some(exit::REFUSED))
+                )));
             }
         }
     }
@@ -79,16 +84,16 @@ fn inner(args: &[String]) -> Result<i32, String> {
     let named: Vec<String> = if args.len() > 1 {
         args[1..].to_vec()
     } else {
-        let mut n = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES")?;
-        n.extend(walk::knob_words("GATE_SDK_MSG_PATTERN_FILES_LOCAL")?);
+        let mut n = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES").map_err(Fault::refused)?;
+        n.extend(walk::knob_words("GATE_SDK_MSG_PATTERN_FILES_LOCAL").map_err(Fault::refused)?);
         n
     };
     let exempt = walk::self_exempt_paths(&named, MSG_PATTERN_FILE)
-        .map_err(|e| format!("check-tree-terms: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-tree-terms: {}", e)))?;
 
-    let prune = walk::prune_dirs().map_err(|e| format!("check-tree-terms: {}", e))?;
+    let prune = walk::prune_dirs().map_err(|e| Fault::refused(format!("check-tree-terms: {}", e)))?;
     let listing = crate::listing::tracked(None, &[&scanroot])
-        .map_err(|e| format!("check-tree-terms: {}", e.text()))?;
+        .map_err(|e| Fault::tool(format!("check-tree-terms: {}", e.text())))?;
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — the cheap-filter-then-match split: the per-path
     // filter costs no process, and the pattern set is compiled once for the whole walk rather than

@@ -32,22 +32,24 @@ _run_gates_marked() {
     done
 }
 
-# spec: gate-sdk/SPEC.md §run-gates — the one piece of per-arm knowledge the stub keeps, the fail-open set on one declaration line check-front-end-fail-open holds to the crate's FAIL_OPEN_ARMS: the unavailable status is read on precisely the paths where no binary runs, so it cannot be asked of the binary that would report it
-ARM_UNAVAILABLE_STATUS=2
+# spec: gate-sdk/SPEC.md §run-gates — the one piece of per-arm knowledge the stub keeps, the fail-open set on one declaration line check-front-end-fail-open holds to the crate's FAIL_OPEN_ARMS: the refused and unavailable statuses are read on precisely the paths where no binary runs, so they cannot be asked of the binary that would report them
+ARM_REFUSED_STATUS=2
+ARM_UNAVAILABLE_STATUS=3
 FAIL_OPEN_ARMS='--hook --statusline'
 for arm in $FAIL_OPEN_ARMS; do
     if [[ "${1-}" == "$arm" ]]; then
+        ARM_REFUSED_STATUS=0
         ARM_UNAVAILABLE_STATUS=0
     fi
 done
 
 # spec: gate-sdk/SPEC.md §The harness-integration arm — a tree whose repository git refuses or skips runs no binary, so a fail-open arm declines there as on an absent binary
-_run_gates_refuse() {  # <line> <leading arm>
+_run_gates_refuse() {  # <line> <leading arm> <status>
     echo "$1" >&2
     if [[ "$2" == --hook ]]; then
         printf '%s\n' '{"systemMessage":"run-gates: git refuses or skips the repository this session stands in, so every hook guard in this tree is off and each guarded call is allowed. git status prints its reason, or git --git-dir=<that .git> status for a skipped one"}'
     fi
-    exit "$ARM_UNAVAILABLE_STATUS"
+    exit "$3"
 }
 
 # spec: gate-sdk/SPEC.md §run-gates — the refusal is the stub's own line alone. The one lookup splits as the crate splits it (§The crate's crosser), and a failed one hands `cd` a path that is never a directory rather than an empty one: bash before 5.3 takes `cd ""` as a silent success
@@ -57,16 +59,16 @@ if answer="$(git rev-parse --show-toplevel --show-prefix 2>/dev/null)" && [[ -n 
     prefix=''
     [[ "$answer" == *$'\n'* ]] && prefix="${answer#*$'\n'}"
     if gate_skipped_mark "$top" "$prefix" >/dev/null; then
-        _run_gates_refuse "run-gates: git skipped the repository a .git entry marks between here and the toplevel it answered, and answered the enclosing one; git --git-dir=<that .git> status prints its reason" "${1-}"
+        _run_gates_refuse "run-gates: git skipped the repository a .git entry marks between here and the toplevel it answered, and answered the enclosing one; git --git-dir=<that .git> status prints its reason" "${1-}" "$ARM_UNAVAILABLE_STATUS"
     fi
 else
     top=/dev/null
 fi
 cd "$top" 2>/dev/null || {
     if _run_gates_marked; then
-        _run_gates_refuse "run-gates: git refuses the repository marked here (GIT_DIR, or a .git entry here or above); git status prints its reason" "${1-}"
+        _run_gates_refuse "run-gates: git refuses the repository marked here (GIT_DIR, or a .git entry here or above); git status prints its reason" "${1-}" "$ARM_UNAVAILABLE_STATUS"
     fi
-    _run_gates_refuse "run-gates: not inside a git repository" "${1-}"
+    _run_gates_refuse "run-gates: not inside a git repository" "${1-}" "$ARM_REFUSED_STATUS"
 }
 
 # spec: gate-sdk/SPEC.md §Layout and configuration — the gate-sdk root locator, exported from this front-end's own location so every arm reaches the exact root
@@ -76,7 +78,7 @@ else
     export GATE_SDK_ROOT="$SDK"
 fi
 
-# spec: gate-sdk/SPEC.md §run-gates — the binary located and exec'd with the environment this process already carries. $ARM_UNAVAILABLE_STATUS is the status a *dispatch* failure exits — 2 for every arm whose verdict a battery or a session reads, 0 for a harness-integration arm gating a user action, which §The non-gate arm rules must decline rather than wedge the session
+# spec: gate-sdk/SPEC.md §run-gates — the binary located and exec'd with the environment this process already carries. $ARM_UNAVAILABLE_STATUS is the status a *dispatch* failure exits — 3, a tool error, for every arm whose verdict a battery or a session reads, 0 for a harness-integration arm gating a user action, which §The non-gate arm rules must decline rather than wedge the session
 exec_arm() {
     local bin why=''
     if [[ "$ARM_UNAVAILABLE_STATUS" -eq 0 ]]; then

@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-docs-page-repeat — no declared page states a relative link target,
 // or a sentence of the configured length, twice, nor restates the site chrome around it
 use super::md_refs::line_link_targets;
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::collections::HashMap;
@@ -16,29 +17,29 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-docs-page-repeat: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let min_words = parse_min(&spec::knob_pub(MIN_WORDS_KNOB)?)?;
-    let pages = expand(root, &spec::knob_array_pub(PAGES_KNOB)?)?;
+    let min_words = parse_min(&spec::knob_pub(MIN_WORDS_KNOB).map_err(Fault::refused)?).map_err(Fault::refused)?;
+    let pages = expand(root, &spec::knob_array_pub(PAGES_KNOB).map_err(Fault::refused)?).map_err(Fault::input)?;
     let mut chrome = Chrome::default();
-    for file in expand(root, &spec::knob_array_pub(CHROME_KNOB)?)? {
+    for file in expand(root, &spec::knob_array_pub(CHROME_KNOB).map_err(Fault::refused)?).map_err(Fault::input)? {
         let text = spec::read_text(Path::new(&file))
-            .map_err(|e| format!("cannot read chrome file {}: {}", file, e))?;
+            .map_err(|e| Fault::input(format!("cannot read chrome file {}: {}", file, e)))?;
         chrome.add(&file, &text, min_words);
     }
 
     let mut findings: Vec<Finding> = Vec::new();
     let (mut nlinks, mut nsentences) = (0usize, 0usize);
     for page in &pages {
-        let scan = scan(&read_page(page)?, min_words, &chrome);
+        let scan = scan(&read_page(page).map_err(Fault::input)?, min_words, &chrome);
         nlinks += scan.links;
         nsentences += scan.sentences;
         for f in scan.findings {
@@ -578,8 +579,8 @@ mod tests {
         );
     }
 
-    // spec: canon-kit/SPEC.md §check-docs-page-repeat — both exit-2 paths, which a `bad/` fixture
-    // held to exit 1 cannot express
+    // spec: canon-kit/SPEC.md §check-docs-page-repeat — the exit-3 unreadable page and the exit-2 bad
+    // threshold, which a `bad/` fixture held to exit 1 cannot express
     #[test]
     fn an_unreadable_page_and_a_bad_threshold_are_refusals() {
         assert!(read_page("no/such/page-repeat.md")

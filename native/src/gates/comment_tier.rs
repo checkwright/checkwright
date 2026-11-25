@@ -2,6 +2,7 @@
 // is a machine/reason directive, rides a directive's bounded window, is comment-tier-exempt,
 // or justifies a positional construct
 use super::rule_id_coverage::Declaring;
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::collections::BTreeSet;
@@ -51,7 +52,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-comment-tier: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -335,34 +336,35 @@ fn wrapflush(
     para.reset();
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let machine = spec::knob_array_pub("CANON_KIT_COMMENT_MACHINE")?;
-    let reason = spec::knob_array_pub("CANON_KIT_COMMENT_REASON")?;
+    let machine = spec::knob_array_pub("CANON_KIT_COMMENT_MACHINE").map_err(Fault::refused)?;
+    let reason = spec::knob_array_pub("CANON_KIT_COMMENT_REASON").map_err(Fault::refused)?;
     let mut extra = machine;
     extra.extend(reason);
     let shell_bless = Bless::new(SHELL_COLON, SHELL_WORD, &extra);
     let txt_bless = Bless::new(TXT_COLON, TXT_WORD, &extra);
-    let pos: Vec<String> = spec::knob_array_pub("CANON_KIT_COMMENT_POSITIONAL")?
+    let pos: Vec<String> = spec::knob_array_pub("CANON_KIT_COMMENT_POSITIONAL").map_err(Fault::refused)?
         .into_iter()
         .filter(|p| !p.is_empty())
         .collect();
-    let whitelist = spec::knob_array_pub("CANON_KIT_COMMENT_WHITELIST")?;
-    let cap: usize = spec::knob_pub("CANON_KIT_COMMENT_RUN_CAP")?
+    let whitelist = spec::knob_array_pub("CANON_KIT_COMMENT_WHITELIST").map_err(Fault::refused)?;
+    let cap: usize = spec::knob_pub("CANON_KIT_COMMENT_RUN_CAP")
+        .map_err(Fault::refused)?
         .parse()
-        .map_err(|_| "CANON_KIT_COMMENT_RUN_CAP is not a number".to_string())?;
-    let grammar = spec::CountGrammar::resolve()?;
-    let wf = spec::knob_pub("GATE_SDK_WORKFLOW_DIR")?;
-    let declaring = Declaring::resolve(root)?;
+        .map_err(|_| Fault::refused("CANON_KIT_COMMENT_RUN_CAP is not a number"))?;
+    let grammar = spec::CountGrammar::resolve().map_err(Fault::refused)?;
+    let wf = spec::knob_pub("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?;
+    let declaring = Declaring::resolve(root).map_err(Fault::refused)?;
     let no_pos: Vec<String> = Vec::new();
 
     // spec: canon-kit/SPEC.md §check-comment-tier — the governed surface via the shared
     // primitive; the with-templates variant adds the templates/ sources this gate governs
     // where check-spec-pointer exempts them
-    let surface = spec::comment_surface(root, true)?;
+    let surface = spec::comment_surface(root, true).map_err(Fault::input)?;
     let mut errors: Vec<String> = Vec::new();
     let mut scanned = 0usize;
     for f in &surface {
@@ -372,7 +374,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         let (style, bless, linepos, mdhead) = classify(&rel, &wf, &shell_bless, &txt_bless);
         scanned += 1;
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         let mut w = Walk {
             file: rel.clone(),
             style,

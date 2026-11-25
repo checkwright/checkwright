@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §check-queue-sections — the queue carries each required ## section
 // heading exactly once, the fail-closed floor under every section-scoped scanner
+use crate::exit;
 use crate::queue;
 
 // spec: queue-kit/SPEC.md §check-queue-sections — a required name ending in `:` is matched as
@@ -17,7 +18,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-queue-sections: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let file = match args.first() {
@@ -26,7 +27,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-queue-sections: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -34,7 +35,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-queue-sections: file not found: {}", file);
-            return 2;
+            return exit::REFUSED;
         }
     };
 

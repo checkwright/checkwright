@@ -1,11 +1,12 @@
 // spec: queue-kit/SPEC.md §check-task-conservation — every live slug present at HEAD is still
 // present (live or done) in the working tree; the absence class diff-review misses
+use crate::exit;
 use crate::{proc, programs};
 use crate::queue;
 use std::collections::HashSet;
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — the two failures stay apart: a git that
-// could not be spawned is `Err` and reaches the caller's exit 2, while `Ok(None)` is a git
+// could not be spawned is `Err` and reaches the caller's exit 3, while `Ok(None)` is a git
 // that ran and said no. Folding them is how "no repository" comes to mean "no git".
 fn git_capture(args: &[&str]) -> Result<Option<Vec<u8>>, String> {
     Ok(proc::run(&programs::GIT, args)?.stdout().map(<[u8]>::to_vec))
@@ -50,7 +51,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(s) => s,
         Err(e) => {
             eprintln!("check-task-conservation: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let max = match queue::knob_scalar("QUEUE_KIT_SLUG_MAX") {
@@ -59,12 +60,12 @@ pub fn run(args: &[String]) -> i32 {
             Ok(n) => Some(n),
             Err(_) => {
                 eprintln!("check-task-conservation: QUEUE_KIT_SLUG_MAX is not a positive integer or off: {}", v);
-                return 2;
+                return exit::REFUSED;
             }
         },
         Err(e) => {
             eprintln!("check-task-conservation: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let file = match args.first() {
@@ -73,7 +74,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-task-conservation: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -81,7 +82,7 @@ pub fn run(args: &[String]) -> i32 {
     match crate::walk::toplevel_opt() {
         Err(e) => {
             eprintln!("check-task-conservation: {}", e);
-            return 2;
+            return exit::TOOL;
         }
         Ok(None) => {
             println!("TASK-CONSERVATION: clean (not applicable: no git repository — no HEAD baseline to compare)");
@@ -93,7 +94,7 @@ pub fn run(args: &[String]) -> i32 {
     let head = match git_capture(&["show", &format!("HEAD:{}", file)]) {
         Err(e) => {
             eprintln!("check-task-conservation: {}", e);
-            return 2;
+            return exit::TOOL;
         }
         // spec: queue-kit/SPEC.md §check-task-conservation — a HEAD written in the retired bullet
         // grammar is read through the migration, so the converting commit is conserved against its
@@ -110,13 +111,13 @@ pub fn run(args: &[String]) -> i32 {
 
     if !std::path::Path::new(&file).is_file() {
         eprintln!("check-task-conservation: worktree file not found: {}", file);
-        return 2;
+        return exit::REFUSED;
     }
     let work = match std::fs::read_to_string(&file) {
         Ok(t) => t,
         Err(e) => {
             eprintln!("check-task-conservation: cannot read {}: {}", file, e);
-            return 2;
+            return exit::INPUT;
         }
     };
 

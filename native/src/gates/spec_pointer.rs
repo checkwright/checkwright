@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-spec-pointer — every spec:/contract: directive on a governed
 // source and every free-prose §<heading> citation on a governed manifest resolves
+use crate::exit::Fault;
 use crate::spec;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
@@ -9,28 +10,29 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-spec-pointer: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    if crate::walk::toplevel_in_opt(root)?.is_none() {
-        return Err(format!(
+    if crate::walk::toplevel_in_opt(root).map_err(Fault::tool)?.is_none() {
+        return Err(Fault::refused(format!(
             "{} is not a git repository — cannot verify tracked targets",
             root
-        ));
+        )));
     }
     // spec: canon-kit/SPEC.md §check-spec-pointer — the tracked-file membership set, filled once
     // from a single `git ls-files` pass rather than a per-pointer `--error-unmatch` exec
-    let raw = crate::listing::tracked(Some(root), &[]).map_err(|e| e.text_or(|_| "git ls-files failed".to_string()))?;
+    let raw = crate::listing::tracked(Some(root), &[])
+        .map_err(|e| Fault::tool(e.text_or(|_| "git ls-files failed".to_string())))?;
     let tracked: HashSet<&str> = raw.iter().map(String::as_str).collect();
 
-    let whitelist = spec::knob_array_pub("CANON_KIT_COMMENT_WHITELIST")?;
+    let whitelist = spec::knob_array_pub("CANON_KIT_COMMENT_WHITELIST").map_err(Fault::refused)?;
     let title_once = title_once()?;
     let mut headings: HeadingCache = HeadingCache::default();
     let mut errors: Vec<String> = Vec::new();
@@ -38,15 +40,15 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut pointers = 0usize;
     let mut markers = 0usize;
     let mut withheld = 0usize;
-    let spec_name = spec::spec_name()?;
+    let spec_name = spec::spec_name().map_err(Fault::refused)?;
 
-    for f in spec::comment_surface(root, false)? {
+    for f in spec::comment_surface(root, false).map_err(Fault::input)? {
         let rel = rel_of(root, &f);
         if spec::comment_whitelisted(&rel, &whitelist) {
             continue;
         }
         scanned += 1;
-        let text = spec::read_text(Path::new(&f))?;
+        let text = spec::read_text(Path::new(&f)).map_err(Fault::input)?;
         for (idx, line) in text.lines().enumerate() {
             let body = match directive_body(line) {
                 Some(b) => b,
@@ -93,7 +95,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 continue;
             }
             if !frag.is_empty()
-                && !headings.present(&format!("{}/{}", root, path), &frag, Mode::Exact)?
+                && !headings
+                    .present(&format!("{}/{}", root, path), &frag, Mode::Exact)
+                    .map_err(Fault::input)?
             {
                 errors.push(format!(
                     "{}:{}: §heading not found in {}: §{}",
@@ -106,14 +110,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: canon-kit/SPEC.md §check-spec-pointer — the prose-citation pass in prefix mode over
     // the manifest set; an untracked adjacent path is out of scope, an untracked link target
     // drops to the unqualified form
-    let manifest_files = spec::manifest_files(root)?;
+    let manifest_files = spec::manifest_files(root).map_err(Fault::input)?;
     let mut prose_cites = 0usize;
     let mut unqualified = 0usize;
     let manifests = manifest_files.len();
     let mut union: Vec<Heading> = Vec::new();
     for m in &manifest_files {
         let mf = m.display().to_string();
-        let hs = headings.headings(&mf)?;
+        let hs = headings.headings(&mf).map_err(Fault::input)?;
         union.extend(hs.iter().cloned());
         if !title_once {
             continue;
@@ -135,7 +139,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             }
         }
     }
-    for cite in prose_citations(root, &manifest_files, &tracked)? {
+    for cite in prose_citations(root, &manifest_files, &tracked).map_err(Fault::input)? {
         let prel = rel_of(root, &cite.file);
         let shown: String = cite.frag.chars().take(50).collect();
         match &cite.path {
@@ -144,7 +148,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 if cite.frag.is_empty() {
                     continue;
                 }
-                if !headings.present(&format!("{}/{}", root, path), &cite.frag, Mode::Prefix)? {
+                if !headings
+                    .present(&format!("{}/{}", root, path), &cite.frag, Mode::Prefix)
+                    .map_err(Fault::input)?
+                {
                     errors.push(format!(
                         "{}:{}: §heading not found in {}: §{}",
                         prel, cite.line, path, shown
@@ -190,14 +197,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
 // spec: canon-kit/SPEC.md §Layout and configuration — `CANON_KIT_SPEC_POINTER_TITLE_ONCE` is `off`
 // or `on`, and any other value refuses rather than resolving to either
-fn title_once() -> Result<bool, String> {
-    match spec::knob_pub("CANON_KIT_SPEC_POINTER_TITLE_ONCE")?.as_str() {
+fn title_once() -> Result<bool, Fault> {
+    match spec::knob_pub("CANON_KIT_SPEC_POINTER_TITLE_ONCE").map_err(Fault::refused)?.as_str() {
         "off" => Ok(false),
         "on" => Ok(true),
-        v => Err(format!(
+        v => Err(Fault::refused(format!(
             "CANON_KIT_SPEC_POINTER_TITLE_ONCE must be off|on (got '{}')",
             v
-        )),
+        ))),
     }
 }
 

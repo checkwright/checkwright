@@ -30,6 +30,7 @@ mod doctrine;
 mod emit;
 mod ere;
 mod evidence;
+mod exit;
 mod fresh;
 mod graph_vocab;
 mod gates;
@@ -97,7 +98,7 @@ pub(crate) fn departed_reader(e: &std::io::Error) -> bool {
     e.kind() == std::io::ErrorKind::BrokenPipe
 }
 
-// spec: gate-sdk/SPEC.md §Fail-closed contract — an unknown subcommand is a harness error,
+// spec: gate-sdk/SPEC.md §Fail-closed contract — an unknown subcommand is a refusal at exit 2,
 // never a pass; `--reads` refuses through the same help so a descriptor naming a subcommand
 // the binary does not carry cannot read as "reads nothing".
 fn no_such_gate(name: &str) -> ! {
@@ -107,7 +108,7 @@ fn no_such_gate(name: &str) -> ! {
     );
     let carried: Vec<&str> = gates::names_with_owners().iter().map(|(n, _)| *n).collect();
     eprintln!("  help: this binary carries: {}", carried.join(", "));
-    exit(2);
+    exit(exit::REFUSED);
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the emit path's own miss. The binary holds two
@@ -120,7 +121,7 @@ fn no_such_arm(arm: &str) -> ! {
     );
     eprintln!("  help: this binary carries: {}", emit::emit_names().join(", "));
     eprintln!("  help: gate-sdk/SPEC.md §The non-gate arm owns the arm contract");
-    exit(2);
+    exit(exit::USAGE);
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the arms that live in `main` rather than in either lookup
@@ -227,7 +228,7 @@ fn main() {
         Ok(a) => a,
         Err(refusal) => {
             eprintln!("{}", refusal);
-            exit(2);
+            exit(exit::USAGE);
         }
     };
     let mut started = all.clone().into_iter();
@@ -248,7 +249,7 @@ fn main() {
             eprintln!("  adopter verbs: {}", installer::VERBS.iter().map(|(f, _)| f.trim_start_matches('-')).collect::<Vec<_>>().join(", "));
             eprintln!("  usage: checkwright-gates --list | --reads <gate-name> | --needs <gate-name> | --source-stamp | --guard-json <mode> <arg>... | --install <op> [--<key> <value>]... | --run [--gates-dir <dir>] [--only <name>... | --for <path>...] | --hook <member> [--observe] [--binding <name>] [--knobs <absolute file>] | --emit-<arm> | <gate-name> [args...]");
             eprintln!("  arms: {}", emit::arms().join(", "));
-            exit(2);
+            exit(exit::USAGE);
         }
     };
 
@@ -307,7 +308,7 @@ fn main() {
             None => {
                 eprintln!("checkwright-gates: --reads needs a gate name — the read set could not be reported; treating as failure (not clean)");
                 eprintln!("  usage: checkwright-gates --reads <gate-name>");
-                exit(2);
+                exit(exit::USAGE);
             }
         };
         match gates::roots(name) {
@@ -346,7 +347,7 @@ fn main() {
             None => {
                 eprintln!("checkwright-gates: --needs needs a gate name — the requirement set could not be reported; treating as failure (not clean)");
                 eprintln!("  usage: checkwright-gates --needs <gate-name>");
-                exit(2);
+                exit(exit::USAGE);
             }
         };
         match gates::needs(name) {
@@ -375,8 +376,11 @@ fn main() {
                     exit(0);
                 }
                 Err(e) => {
+                    if let Some(line) = &e.stdout {
+                        println!("{}", line);
+                    }
                     eprintln!("checkwright-gates: {}", e);
-                    exit(2);
+                    exit(e.status());
                 }
             },
             emit::Arm::Run(f) => exit(f(&argv[1..])),

@@ -3,6 +3,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and `Arm::Run`, both forced rather
 // than chosen: the runner reads `GATE_SDK_TMP_DIR`, and it passes the child's exit code through
 // verbatim while its stdout must reach the terminal as the child produces it.
+use crate::exit;
 use crate::programs::{self, Program};
 use crate::substrate::{is_powershell_body, HOST_FLAGS};
 
@@ -57,9 +58,9 @@ pub fn snapshot_name(target_file: &str, token: &str) -> String {
     }
 }
 
-fn refuse(message: &str) -> i32 {
+fn refuse(status: i32, message: &str) -> i32 {
     eprintln!("{}: {}", NAME, message);
-    2
+    status
 }
 
 // spec: guard-kit/SPEC.md §scratch-run — created exclusively and never opened over an existing
@@ -138,25 +139,25 @@ fn interpreter_for(target: &str, text: &str, host: &str) -> Result<Program, Stri
 // exited 2 after its body was printed.
 pub fn run(args: &[String]) -> i32 {
     let Some(target) = args.first() else {
-        return refuse(USAGE);
+        return refuse(exit::USAGE, USAGE);
     };
     let scratch = match crate::walk::knob_scalar("GATE_SDK_TMP_DIR") {
         Ok(s) => s,
-        Err(e) => return refuse(&e),
+        Err(e) => return refuse(exit::REFUSED, &e),
     };
     let host = match crate::walk::knob_scalar(HOST_KNOB) {
         Ok(s) => s,
-        Err(e) => return refuse(&e),
+        Err(e) => return refuse(exit::REFUSED, &e),
     };
     let Some(scratch_abs) = crate::walk::canonicalize(&scratch) else {
-        return refuse(&format!(
-            "no scratch dir at {} (GATE_SDK_TMP_DIR)",
-            scratch
-        ));
+        return refuse(
+            exit::REFUSED,
+            &format!("no scratch dir at {} (GATE_SDK_TMP_DIR)", scratch),
+        );
     };
     let path = std::path::Path::new(target);
     if !path.is_file() {
-        return refuse(&format!("no such script: {}", target));
+        return refuse(exit::INPUT, &format!("no such script: {}", target));
     }
     // spec: guard-kit/SPEC.md §scratch-run — the leaf is rejoined after the crossing rather than
     // canonicalized with it, which is the shell's `cd "$(dirname)" && pwd -P` exactly: a symlinked
@@ -166,21 +167,21 @@ pub fn run(args: &[String]) -> i32 {
         _ => std::path::PathBuf::from("."),
     };
     let Some(parent_abs) = crate::walk::canonicalize(&parent) else {
-        return refuse(&format!("no such script: {}", target));
+        return refuse(exit::INPUT, &format!("no such script: {}", target));
     };
     if !is_inside(&scratch_abs, &parent_abs) {
-        return refuse(&format!(
-            "refusing {} — outside the scratch dir {}",
-            target, scratch_abs
-        ));
+        return refuse(
+            exit::REFUSED,
+            &format!("refusing {} — outside the scratch dir {}", target, scratch_abs),
+        );
     }
     let body = match std::fs::read(path) {
         Ok(b) => b,
-        Err(e) => return refuse(&format!("cannot read {}: {}", target, e)),
+        Err(e) => return refuse(exit::INPUT, &format!("cannot read {}: {}", target, e)),
     };
     let program = match interpreter_for(target, &String::from_utf8_lossy(&body), &host) {
         Ok(p) => p,
-        Err(m) => return refuse(&m),
+        Err(m) => return refuse(exit::REFUSED, &m),
     };
     let file = path.file_name().map(|f| f.to_string_lossy().into_owned()).unwrap_or_default();
     // spec: guard-kit/SPEC.md §scratch-run — the snapshot is written before the echo, so a
@@ -188,7 +189,7 @@ pub fn run(args: &[String]) -> i32 {
     let _ = crate::walk::make_scratch(&scratch_abs);
     let snapshot = match write_snapshot(&parent, &file, &body) {
         Ok(p) => p,
-        Err(e) => return refuse(&e),
+        Err(e) => return refuse(exit::TOOL, &e),
     };
     let snap = snapshot.display().to_string();
     // spec: guard-kit/SPEC.md §scratch-run — the echo is the compensating control, so it is flushed
@@ -208,7 +209,7 @@ pub fn run(args: &[String]) -> i32 {
     argv.extend(args[1..].iter().map(String::as_str));
     let code = match crate::proc::run_to(&program, &argv, &crate::proc::Sink::Inherit) {
         Ok(code) => code,
-        Err(e) => refuse(&e),
+        Err(e) => refuse(exit::TOOL, &e),
     };
     // spec: guard-kit/SPEC.md §scratch-run — the child's code is the contract, so a failed removal
     // is reported and changes nothing.

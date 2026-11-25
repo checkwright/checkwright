@@ -62,7 +62,7 @@ check_case "absent-count-excludes-unverified" 0 "2 expectation(s) match" \
 # present and unreadable whatever uid runs the battery, where a chmod-000 file
 # is readable by root and would make this case pass vacuously in a container.
 mkdir -p "$SANDBOX/hosts-is-a-dir"
-check_case "unreadable-fail-closed" 2 "not readable" "$SANDBOX/hosts-is-a-dir" "$MANIFEST"
+check_case "unreadable-fail-closed" 3 "not readable" "$SANDBOX/hosts-is-a-dir" "$MANIFEST"
 
 # Posture 3 — present, no block for the configured host: a violation. The
 # manifest says the account should be one thing and this machine is not logged
@@ -80,7 +80,7 @@ cat >"$SANDBOX/no-user-key.yml" <<'EOF'
 host.example:
     git_protocol: ssh
 EOF
-check_case "unrecognized-shape-fail-closed" 2 "no active-account key" \
+check_case "unrecognized-shape-fail-closed" 3 "no active-account key" \
     "$SANDBOX/no-user-key.yml" "$MANIFEST"
 
 # The collision the parse is ruled over: `users` is the map of accounts available

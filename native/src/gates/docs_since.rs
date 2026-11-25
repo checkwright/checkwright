@@ -1,6 +1,7 @@
 // spec: site-kit/SPEC.md §check-docs-since — every governed page carries a well-formed `since:`,
 // and none says `unreleased` while a release note is untagged
 use crate::emit::docs_since::{self, Note, Since};
+use crate::exit::Fault;
 
 const NAME: &str = "check-docs-since";
 
@@ -9,7 +10,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -36,8 +37,8 @@ fn findings(pages: &[(String, String)], note: &Note) -> Result<Vec<Finding>, Str
     Ok(out)
 }
 
-fn rule(_args: &[String]) -> Result<i32, String> {
-    let pages = docs_since::pages()?;
+fn rule(_args: &[String]) -> Result<i32, Fault> {
+    let pages = docs_since::pages().map_err(Fault::refused)?;
     if pages.is_empty() {
         println!("DOCS-SINCE: clean (not applicable: {} matches no page — no page is governed, 0 checked)", docs_since::PAGES_KNOB);
         return Ok(0);
@@ -46,11 +47,11 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     for page in &pages {
         let text = std::fs::read(page)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .map_err(|e| format!("cannot read {}: {}", page, e))?;
+            .map_err(|e| Fault::input(format!("cannot read {}: {}", page, e)))?;
         texts.push((page.clone(), text));
     }
-    let note = docs_since::note()?;
-    let found = findings(&texts, &note)?;
+    let note = docs_since::note().map_err(Fault::refused)?;
+    let found = findings(&texts, &note).map_err(Fault::input)?;
     if found.is_empty() {
         let rule = match &note {
             Note::Off => format!("the note rule is off while {} is empty", docs_since::NOTES_KNOB),
@@ -86,7 +87,7 @@ fn rule(_args: &[String]) -> Result<i32, String> {
         println!("  help: give the page since: unreleased, or since: vX.Y.Z naming the first release that carries what it says");
     }
     if found.iter().any(|f| matches!(f, Finding::Unreleased(..))) {
-        println!("  help: rewrite in the note-authoring commit — {}", super::door_command("--emit docs-since --write")?);
+        println!("  help: rewrite in the note-authoring commit — {}", super::door_command("--emit docs-since --write").map_err(Fault::refused)?);
     }
     Ok(1)
 }

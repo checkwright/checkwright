@@ -4,7 +4,7 @@
 # The pair sets no renderer knob, so the kit's batch default fills and the pair
 # already runs the batch path — what it leaves untested is everything that needs
 # a second configuration: the kit's two defaults agreeing, the per-document
-# fallback, and the two exit-2 refusals. The fill condition itself is a unit test
+# fallback, and the two exit-3 refusals. The fill condition itself is a unit test
 # on the crate's site-kit knob table (site-kit/SPEC.md §Knob defaults).
 #
 # Five assertions:
@@ -14,8 +14,8 @@
 #   2/3. verdicts  — the batch path and the per-document fallback return the SAME
 #                    verdict on the same pages, so the speedup changed no finding.
 #   4. count       — a batch renderer that passes the probe but returns the wrong
-#                    document count exits 2 (fail-closed), never 1.
-#   5. probe       — an unresolvable batch command exits 2 rather than silently
+#                    document count exits 3 (fail-closed), never 1.
+#   5. probe       — an unresolvable batch command exits 3 rather than silently
 #                    falling back to a different parser.
 # The gate enumerates tracked pages via git ls-files, so the fixture is a
 # throwaway git repo.
@@ -118,7 +118,7 @@ for mode in batch per-document; do
         || { echo "  FAIL: $mode path: faithful page expected exit 0, got $rc: $out"; fails=$((fails + 1)); }
 done
 
-# --- 4. count mismatch is fail-closed (exit 2), not a finding -----------------
+# --- 4. count mismatch is fail-closed (exit 3), not a finding -----------------
 # The stub emits exactly two documents whatever it is fed, so it PASSES the
 # two-document probe and only the corpus count catches it — which is the point:
 # a stub the probe already rejected would never reach the count assertion.
@@ -128,8 +128,8 @@ printf '%s\n' 'SITE_KIT_RENDERER_BATCH[] = bash' 'SITE_KIT_RENDERER_BATCH[] = -c
 git -C "$tmp" add docs/p1.md docs/p2.md docs/p3.md
 out="$( cd "$tmp" && gate_env SITE_KIT_KNOB_FILE="$tmp/miscount.knobs" \
     && gate_run check-docs-render-fidelity "$CHECKS" docs 2>&1 )"; rc=$?
-[[ "$rc" -eq 2 ]] \
-    || { echo "  FAIL: batch count mismatch expected exit 2 (fail-closed), got $rc: $out"; fails=$((fails + 1)); }
+[[ "$rc" -eq 3 ]] \
+    || { echo "  FAIL: batch count mismatch expected exit 3 (fail-closed), got $rc: $out"; fails=$((fails + 1)); }
 grep -qF -- "document(s) for" <<<"$out" \
     || { echo "  FAIL: count-mismatch refusal does not name the counts: $out"; fails=$((fails + 1)); }
 
@@ -138,8 +138,8 @@ printf '%s\n' 'SITE_KIT_RENDERER_BATCH[] = site-kit-no-such-batch-renderer' > "$
 
 out="$( cd "$tmp" && gate_env SITE_KIT_KNOB_FILE="$tmp/unresolvable.knobs" \
     && gate_run check-docs-render-fidelity "$CHECKS" docs 2>&1 )"; rc=$?
-[[ "$rc" -eq 2 ]] \
-    || { echo "  FAIL: unresolvable batch renderer expected exit 2, got $rc: $out"; fails=$((fails + 1)); }
+[[ "$rc" -eq 3 ]] \
+    || { echo "  FAIL: unresolvable batch renderer expected exit 3, got $rc: $out"; fails=$((fails + 1)); }
 grep -qF -- "failed its probe" <<<"$out" \
     || { echo "  FAIL: batch probe refusal does not name the probe: $out"; fails=$((fails + 1)); }
 grep -qF -- "DOCS-RENDER-FIDELITY: clean" <<<"$out" \
@@ -149,5 +149,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-docs-render-fidelity-batch.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-docs-render-fidelity-batch.test: ok (defaults agree byte-for-byte; both paths agree on verdicts; count mismatch and probe failure both exit 2)"
+echo "check-docs-render-fidelity-batch.test: ok (defaults agree byte-for-byte; both paths agree on verdicts; count mismatch and probe failure both exit 3)"
 exit 0

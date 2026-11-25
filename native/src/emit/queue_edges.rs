@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §The queue-edges arm — the inbound-citation aggregator. It reads the
 // queue and its own history, writes stdout only, and mutates nothing. The `--inbound` mode rides
 // the arm's own argv tail, the mechanism §The queue-index arm already uses for its three modes.
+use crate::exit::Fault;
 use crate::queue::{self, Sections};
 
 pub const USAGE: &str = "usage: --emit queue-edges [--inbound <slug>] [queue-file]";
@@ -10,7 +11,7 @@ struct Args {
     file: String,
 }
 
-fn parse(args: &[String]) -> Result<Args, String> {
+fn parse(args: &[String]) -> Result<Args, Fault> {
     let mut a = Args {
         target: String::new(),
         file: String::new(),
@@ -23,7 +24,7 @@ fn parse(args: &[String]) -> Result<Args, String> {
                 i += 2;
             }
             other if other.starts_with('-') => {
-                return Err(format!("unknown option: {}\n{}", other, USAGE));
+                return Err(Fault::usage(format!("unknown option: {}\n{}", other, USAGE)));
             }
             other => {
                 a.file = other.to_string();
@@ -34,23 +35,23 @@ fn parse(args: &[String]) -> Result<Args, String> {
     Ok(a)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let a = parse(args)?;
     let file = if a.file.is_empty() {
-        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?
+        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?
     } else {
         a.file.clone()
     };
-    let text =
-        std::fs::read_to_string(&file).map_err(|e| format!("file not found: {}: {}", file, e))?;
-    let sec = Sections::active_and_deferred()?;
+    let text = std::fs::read_to_string(&file)
+        .map_err(|e| Fault::input(format!("file not found: {}: {}", file, e)))?;
+    let sec = Sections::active_and_deferred().map_err(Fault::refused)?;
     let live = queue::live_slugs(&text, &sec);
-    let retired = queue::retired_set(&file, &live)?;
+    let retired = queue::retired_set(&file, &live).map_err(Fault::tool)?;
 
     // spec: queue-kit/SPEC.md §The queue-edges arm — a slug that is neither live nor retired is a
     // caller error, not an empty set: silence has to mean "no inbound edges" and nothing else.
     if !a.target.is_empty() && !live.contains(&a.target) && !retired.contains(&a.target) {
-        return Err(format!("not a live or retired slug: {}", a.target));
+        return Err(Fault::refused(format!("not a live or retired slug: {}", a.target)));
     }
     let stems = if retired.is_empty() {
         Vec::new()

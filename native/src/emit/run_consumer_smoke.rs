@@ -1,10 +1,10 @@
 // spec: gate-sdk/SPEC.md §Consumer smoke — the scratch-consumer install, accounting and violation
-// harness, an `Arm::Run` member: its contract is the 0/1/2 exit status an emitting arm collapses.
+// harness, an `Arm::Run` member: its contract is the 0/1/2/3 exit status an emitting arm collapses.
 use crate::emit::csmoke;
 use crate::proc::{self, Sink};
 use crate::programs;
 use crate::registry;
-use crate::walk;
+use crate::{exit, walk};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 use std::time::Instant;
@@ -36,7 +36,7 @@ impl Drop for Teardown {
     }
 }
 
-// spec: gate-sdk/SPEC.md §Consumer smoke — exit 2 is a diagnostic on stderr, exit 1 the verdict
+// spec: gate-sdk/SPEC.md §Consumer smoke — exit 3 is a diagnostic on stderr, exit 1 the verdict
 // lines on stdout
 enum Outcome {
     Clean(String),
@@ -65,7 +65,7 @@ pub fn run(args: &[String]) -> i32 {
             keep = true;
         } else if a.starts_with('-') {
             eprintln!("{}: unknown option: {}", NAME, a);
-            return 2;
+            return exit::USAGE;
         } else {
             given.push(a.clone());
         }
@@ -90,7 +90,7 @@ pub fn run(args: &[String]) -> i32 {
             for l in &lines {
                 eprintln!("{}", l);
             }
-            2
+            exit::TOOL
         }
     }
 }
@@ -153,7 +153,7 @@ fn smoke(given: &[String], teardown: &mut Teardown) -> Outcome {
             keep: false,
         };
         // spec: gate-sdk/SPEC.md §Consumer smoke — the union run already ran this installer green in
-        // this environment, so a red alone is the kit's finding at exit 1, never the exit-2 band
+        // this environment, so a red alone is the kit's finding at exit 1, never the exit-3 band
         let lines = match pass(&sdk, &alone, &mut own, &Sink::Stderr, false) {
             Outcome::Clean(_) => continue,
             Outcome::Fail(l) | Outcome::Env(l) => l,
@@ -427,7 +427,7 @@ enum Probe {
 // the invoking tree's knob state with the probed tree
 fn probe(tree: &str, checks_dir: &str, gate: &str) -> Result<Probe, Outcome> {
     let Some(decl) = registry::resolve(gate, &[checks_dir.to_string()]) else {
-        return Ok(Probe::Exit(2));
+        return Ok(Probe::Exit(exit::REFUSED));
     };
     let bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(env)?;
     let path = format!("{}/{}", tree, bin);
@@ -570,11 +570,11 @@ fn account(scratch: &str, host: &str, roots: &[String]) -> Result<Accounting, Ou
         let scratch_checks = format!("{}/{}/checks", scratch, kit);
         let rc_s = step_probe(probe(scratch, &scratch_checks, g)?)?;
         let mut rc_h: Option<i32> = None;
-        if rc_s == 2 {
+        if rc_s == exit::REFUSED {
             let host_checks = format!("{}/checks", kit_root[*kit]);
             let h = step_probe(probe(host, &host_checks, g)?)?;
             rc_h = Some(h);
-            if h != 2 {
+            if h != exit::REFUSED {
                 if install_token(&scratch_checks, g) == "zero-config" {
                     acct.contradicted.push(format!(
                         "{} ships {} declaring zero-config, yet the probe finds its surface absent in the scratch consumer",
@@ -630,7 +630,7 @@ fn shipped_gates(scratch: &str, roots: &[String]) -> BTreeMap<String, String> {
 }
 
 // spec: gate-sdk/SPEC.md §Consumer smoke — a probe the harness could not dispatch ends the run at
-// exit 2 naming the tree, rather than entering the corroboration table as a verdict
+// exit 3 naming the tree, rather than entering the corroboration table as a verdict
 fn step_probe(p: Probe) -> Result<i32, Outcome> {
     match p {
         Probe::Exit(code) => Ok(code),

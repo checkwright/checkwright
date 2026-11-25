@@ -1,6 +1,7 @@
 // spec: context-kit/SPEC.md §bin/footprint — per-kit two-tier context footprint. Two levels:
 // `measure` produces the figures and `emit` renders them, so the value-rollup join consumes the
 // data rather than re-parsing the page.
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -27,8 +28,9 @@ pub struct Footprint {
 // spec: context-kit/SPEC.md §bin/footprint — the measured set is the kit roster, derived not
 // maintained: the shell form's `*/SPEC.md` glob, whose pathname-expansion rule is what skips
 // dotted names.
-fn kit_roster() -> Result<Vec<String>, String> {
-    let mut kits: Vec<String> = walk::glob_files(Path::new("."), &["*/SPEC.md".to_string()])?
+fn kit_roster() -> Result<Vec<String>, Fault> {
+    let mut kits: Vec<String> = walk::glob_files(Path::new("."), &["*/SPEC.md".to_string()])
+        .map_err(Fault::input)?
         .into_iter()
         .filter_map(|p| {
             p.parent()
@@ -44,7 +46,7 @@ fn kit_roster() -> Result<Vec<String>, String> {
 // spec: context-kit/SPEC.md §bin/footprint — always-loaded tier: the content between a kit's
 // generated begin/end markers. The marker test is a substring match rather than whole-line
 // equality, because the shell form's awk uses index().
-fn kit_always(kit: &str, surfaces: &[String]) -> Result<Tally, String> {
+fn kit_always(kit: &str, surfaces: &[String]) -> Result<Tally, Fault> {
     let begin = format!("<!-- {}:begin -->", kit);
     let end = format!("<!-- {}:end -->", kit);
     let mut cp = 0usize;
@@ -53,7 +55,7 @@ fn kit_always(kit: &str, surfaces: &[String]) -> Result<Tally, String> {
         if !Path::new(sf).is_file() {
             continue;
         }
-        let text = fresh::read_captured(sf)?;
+        let text = fresh::read_captured(sf).map_err(Fault::input)?;
         let mut inb = false;
         let mut block: Vec<&str> = Vec::new();
         for line in fresh::file_lines(&text) {
@@ -85,9 +87,10 @@ fn kit_always(kit: &str, surfaces: &[String]) -> Result<Tally, String> {
 
 // spec: context-kit/SPEC.md §bin/footprint — load-triggered tier: the kit's shipped markdown under
 // its templates tree, sized with the meter's code-point count; bytes are bytes.
-fn kit_triggered(kit: &str) -> Result<Tally, String> {
+fn kit_triggered(kit: &str) -> Result<Tally, Fault> {
     let mut files: Vec<String> =
-        walk::glob_files(Path::new(kit), &["templates/**/*.md".to_string()])?
+        walk::glob_files(Path::new(kit), &["templates/**/*.md".to_string()])
+            .map_err(Fault::input)?
             .into_iter()
             .map(|p| p.display().to_string())
             .collect();
@@ -96,15 +99,15 @@ fn kit_triggered(kit: &str) -> Result<Tally, String> {
     let mut cp = 0usize;
     let mut bytes = 0usize;
     for f in &files {
-        let b = std::fs::read(f).map_err(|e| format!("cannot read {}: {}", f, e))?;
+        let b = std::fs::read(f).map_err(|e| Fault::input(format!("cannot read {}: {}", f, e)))?;
         cp += crate::section::cp_size(String::from_utf8_lossy(&b).lines());
         bytes += b.len();
     }
     Ok(Tally { cp, bytes })
 }
 
-pub fn measure() -> Result<Footprint, String> {
-    let surfaces = walk::knob_array(SURFACES_KNOB)?;
+pub fn measure_fault() -> Result<Footprint, Fault> {
+    let surfaces = walk::knob_array(SURFACES_KNOB).map_err(Fault::refused)?;
     let mut rows: Vec<KitRow> = Vec::new();
     let mut always_total = Tally { cp: 0, bytes: 0 };
     let mut triggered_total = Tally { cp: 0, bytes: 0 };
@@ -192,8 +195,8 @@ Every top-level directory carrying a `SPEC.md` takes a row, kit or not, and one 
 "#
 );
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    Ok(format!("{}{}", PREAMBLE, table(&measure()?)))
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
+    Ok(format!("{}{}", PREAMBLE, table(&measure_fault()?)))
 }
 
 #[cfg(test)]

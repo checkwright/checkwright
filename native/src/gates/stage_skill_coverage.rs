@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-skill-coverage — the configured stage set and the
 // skills dir cover each other, every stage's executed surface carries the journal obligation's
 // citation, and every stage bound to a foreign adapter carries the host protocol's
+use crate::exit;
 use crate::gates::skill_binding;
 use crate::stages;
 use crate::walk;
@@ -67,7 +68,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-stage-skill-coverage: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let dir = match args.first().filter(|a| !a.is_empty()) {
@@ -76,13 +77,13 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-stage-skill-coverage: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
     if !Path::new(&dir).is_dir() {
         eprintln!("check-stage-skill-coverage: skills dir not found: {}", dir);
-        return 2;
+        return exit::REFUSED;
     }
 
     let mut missing: Vec<String> = Vec::new();
@@ -96,7 +97,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-stage-skill-coverage: {}", e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let mut orphan: Vec<String> = Vec::new();
@@ -109,7 +110,7 @@ pub fn run(args: &[String]) -> i32 {
                     f.display(),
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         let base = f
@@ -143,7 +144,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-stage-skill-coverage: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let mut unhosted: Vec<String> = Vec::new();

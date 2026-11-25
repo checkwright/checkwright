@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §The peer request channel — the four arms end-to-end over a scratch channel outside any repository: a request files from a non-git directory and lists as received, every legal move lands and an illegal one is refused leaving the reply byte-identical, both bulk forms move their matches and a bulk form matching none prints nothing, the ready notice prints a later release and stays silent on an earlier one, a malformed body, a tab in the need line or a refused reason, a multibyte filing time, a relative channel, a missing one and one inside a work tree are refused at exit 2, an unset channel reads as nothing, moves nothing in bulk and refuses a filing or a targeted move, and with no repository a stray scripts/ knob file configures neither peer arm
+# spec: lifecycle-kit/SPEC.md §The peer request channel — the four arms end-to-end over a scratch channel outside any repository: a request files from a non-git directory and lists as received, every legal move lands and an illegal one is refused leaving the reply byte-identical, both bulk forms move their matches and a bulk form matching none prints nothing, the ready notice prints a later release and stays silent on an earlier one, a malformed body, a tab in the need line, an edited request and a multibyte filing time are input errors at exit 3, a tab in a refused reason, a relative channel, a missing one and one inside a work tree are refused at exit 2, a same-second refiling is a collision at exit 2 with the id alone on stdout and every other refusal prints nothing there, an unset channel reads as nothing, moves nothing in bulk and refuses a filing or a targeted move, and with no repository a stray scripts/ knob file configures neither peer arm
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -81,29 +81,58 @@ out="$(arm "$CH" --emit-peer-ready peer-c)"; rc=$?
 cp "$CH/$id.md" "$SANDBOX/keep.md"
 printf 'more\n' >>"$CH/$id.md"
 out="$(arm "$CH" --emit-peer-list)"; rc=$?
-[[ "$rc" -eq 2 && "$out" == *"$id.md"*"edited after filing"* ]] || note edited "got $rc -- $out"
+[[ "$rc" -eq 3 && "$out" == *"$id.md"*"edited after filing"* ]] || note edited "got $rc -- $out"
 cp "$SANDBOX/keep.md" "$CH/$id.md"
 
 # --- a malformed body is refused naming the section, and nothing is filed ---
 n="$(find "$CH" -name '*.md' | wc -l)"
 out="$(printf '## need\nx\n\n## wanted\ny\n' | arm "$CH" --emit-peer-file peer-a)"; rc=$?
-[[ "$rc" -eq 2 && "$out" == *"## wanted"*"## repro"* ]] || note malformed "got $rc -- $out"
+[[ "$rc" -eq 3 && "$out" == *"## wanted"*"## repro"* ]] || note malformed "got $rc -- $out"
 [[ "$(find "$CH" -name '*.md' | wc -l)" -eq "$n" ]] || note malformed-write "a malformed body was filed"
 
 # --- a tab is refused where peer-list prints it: the need line and a refused reason ---
 TAB=$'\t'
 out="$(printf '%s' "${BODY/the gate refuses a path/a tabbed${TAB}ask}" | arm "$CH" --emit-peer-file peer-a)"; rc=$?
-[[ "$rc" -eq 2 && "$out" == *"holds a tab"* ]] || note tab-need "got $rc -- $out"
+[[ "$rc" -eq 3 && "$out" == *"holds a tab"* ]] || note tab-need "got $rc -- $out"
 [[ "$(find "$CH" -name '*.md' | wc -l)" -eq "$n" ]] || note tab-need-write "a tabbed need line was filed"
 out="$(arm "$CH" --emit-peer-reply "$id3" refused $'no\tthanks')"; rc=$?
 [[ "$rc" -eq 2 && "$out" == *"holds a tab"* ]] || note tab-reason "got $rc -- $out"
 
-# --- a multibyte character across the filing time's byte 10 is malformed at exit 2, never a panic ---
+# --- a multibyte character across the filing time's byte 10 is malformed at exit 3, never a panic ---
 bad_id=r20261124-00000000
 printf '# peer-request v1\nid: %s\nfrom: peer-a\nfiled: 2026-11-2\xc3\xa910:20:30Z\n\n%s' "$bad_id" "$BODY" >"$CH/$bad_id.md"
 out="$(arm "$CH" --emit-peer-list)"; rc=$?
-[[ "$rc" -eq 2 && "$out" == *"$bad_id.md"*"not a UTC time"* ]] || note multibyte-filed "got $rc -- $out"
+[[ "$rc" -eq 3 && "$out" == *"$bad_id.md"*"not a UTC time"* ]] || note multibyte-filed "got $rc -- $out"
 rm -f "$CH/$bad_id.md"
+
+# --- a collision is exit 2 with the existing id alone on stdout, the streams captured apart ---
+# Two filings straddling a second boundary are two requests, so the pair refiles until one lands in one second.
+split() {  # $1=channel value  $2..=the arm flag and its argv; stdout to $SANDBOX/out, stderr to $SANDBOX/err
+    local ch="$1"; shift
+    ( cd "$FREE" && gate_env LIFECYCLE_KIT_PEER_CHANNEL="$ch" && gate_arm_run "$@" >"$SANDBOX/out" 2>"$SANDBOX/err" )
+}
+CC="$SANDBOX/collide"
+landed=''
+for _ in 1 2 3 4 5; do
+    rm -rf "$CC" && mkdir -p "$CC"
+    printf '%s' "$BODY" | split "$CC" --emit-peer-file peer-a
+    first="$(cat "$SANDBOX/out")"
+    printf '%s' "$BODY" | split "$CC" --emit-peer-file peer-a; rc=$?
+    if [[ "$rc" -ne 0 ]]; then landed=yes; break; fi
+done
+if [[ -z "$landed" ]]; then
+    note collision-pair "five refilings never landed in one second"
+else
+    [[ "$rc" -eq 2 && "$(cat "$SANDBOX/out")" == "$first" && "$(wc -l <"$SANDBOX/out" | tr -d ' ')" -eq 1 ]] \
+        || note collision "want exit 2 and the id alone on stdout, got $rc -- $(cat "$SANDBOX/out")"
+    [[ "$(cat "$SANDBOX/err")" == *"$first"* ]] || note collision-err "stderr does not name the filed ask: $(cat "$SANDBOX/err")"
+fi
+printf '## need\nx\n' | split "$CC" --emit-peer-file peer-a; rc=$?
+[[ "$rc" -eq 3 && ! -s "$SANDBOX/out" ]] || note quiet-malformed "a malformed body printed to stdout or did not exit 3 ($rc)"
+printf '%s' "$BODY" | split "" --emit-peer-file peer-a; rc=$?
+[[ "$rc" -eq 2 && ! -s "$SANDBOX/out" ]] || note quiet-unset "an unset channel printed to stdout or did not exit 2 ($rc)"
+printf '%s' "$BODY" | split "$CC" --emit-peer-file Peer_A; rc=$?
+[[ "$rc" -eq 2 && ! -s "$SANDBOX/out" ]] || note quiet-peer "a peer outside its grammar printed to stdout or did not exit 2 ($rc)"
 
 # --- a bad channel value is refused at exit 2 naming the knob ---
 mkdir -p "$SANDBOX/repo" && git -C "$SANDBOX/repo" init -q

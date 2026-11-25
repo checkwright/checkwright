@@ -1,8 +1,9 @@
 // spec: guard-kit/SPEC.md §rewrite — the fixed-text replacement arm: its effect is its command line,
 // it spawns no program, and it prints every span it changed.
 // spec: gate-sdk/SPEC.md §The non-gate arm — a table member and `Arm::Run`: it resolves
-// `LIFECYCLE_KIT_STATE_FILE`, and its contract is the 0/1/2 split an emitting arm collapses.
+// `LIFECYCLE_KIT_STATE_FILE`, and its contract is the 0/1/2/3 split an emitting arm collapses.
 use crate::ere::Ere;
+use crate::exit::{self, Fault};
 use std::io::Write;
 use std::path::Path;
 
@@ -227,47 +228,47 @@ fn check_operand(
     root: &str,
     is_state: &dyn Fn(&str) -> Result<bool, String>,
     seen: &[Planned],
-) -> Result<(String, Vec<u8>), String> {
+) -> Result<(String, Vec<u8>), Fault> {
     let path = Path::new(op);
-    let meta = std::fs::symlink_metadata(path).map_err(|_| format!("no such file: {}", op))?;
+    let meta = std::fs::symlink_metadata(path).map_err(|_| Fault::input(format!("no such file: {}", op)))?;
     if meta.file_type().is_symlink() {
-        return Err(format!("refusing {} — a symlink", op));
+        return Err(Fault::refused(format!("refusing {} — a symlink", op)));
     }
     if !meta.is_file() {
-        return Err(format!("refusing {} — not a regular file", op));
+        return Err(Fault::refused(format!("refusing {} — not a regular file", op)));
     }
     if has_git_component(path) {
-        return Err(format!("refusing {} — a path through .git", op));
+        return Err(Fault::refused(format!("refusing {} — a path through .git", op)));
     }
     let canonical =
-        crate::walk::canonicalize(path).ok_or_else(|| format!("cannot resolve {}", op))?;
+        crate::walk::canonicalize(path).ok_or_else(|| Fault::input(format!("cannot resolve {}", op)))?;
     if !super::scratch_run::is_inside(root, &canonical) {
-        return Err(format!("refusing {} — outside the working directory {}", op, root));
+        return Err(Fault::refused(format!("refusing {} — outside the working directory {}", op, root)));
     }
     if has_git_component(Path::new(&canonical[root.len()..])) {
-        return Err(format!("refusing {} — resolves through .git", op));
+        return Err(Fault::refused(format!("refusing {} — resolves through .git", op)));
     }
     match is_state(op) {
         Ok(false) => {}
         Ok(true) => {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "refusing {} — the lifecycle state file, written only by the --enter-stage arm",
                 op
-            ))
+            )))
         }
         Err(e) => {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "refusing {} — cannot tell whether it is the lifecycle state file: {}",
                 op, e
-            ))
+            )))
         }
     }
     if seen.iter().any(|p| p.canonical == canonical) {
-        return Err(format!("refusing {} — names a file already listed", op));
+        return Err(Fault::usage(format!("refusing {} — names a file already listed", op)));
     }
-    let content = std::fs::read(path).map_err(|e| format!("cannot read {}: {}", op, e))?;
+    let content = std::fs::read(path).map_err(|e| Fault::input(format!("cannot read {}: {}", op, e)))?;
     if !text_ok(&content) {
-        return Err(format!("refusing {} — not UTF-8 text, or carries a NUL byte", op));
+        return Err(Fault::input(format!("refusing {} — not UTF-8 text, or carries a NUL byte", op)));
     }
     Ok((canonical, content))
 }
@@ -308,24 +309,24 @@ fn execute(
     out: &mut dyn Write,
     err: &mut dyn Write,
 ) -> i32 {
-    let mut refuse = |m: &str| {
+    let mut refuse = |status: i32, m: &str| {
         let _ = writeln!(err, "{}: {}", NAME, m);
-        2
+        status
     };
     let opts = match parse(args) {
         Ok(o) => o,
-        Err(e) => return refuse(&e),
+        Err(e) => return refuse(exit::USAGE, &e),
     };
     let replace = unescape(&opts.replace);
     let matcher = if opts.regex {
         match Ere::compile(&opts.find) {
             Ok(e) => Matcher::Regex(e),
-            Err(e) => return refuse(&format!("cannot compile /{}/: {}", opts.find, e)),
+            Err(e) => return refuse(exit::USAGE, &format!("cannot compile /{}/: {}", opts.find, e)),
         }
     } else {
         let find = unescape(&opts.find);
         if find.is_empty() {
-            return refuse(&format!("an empty <find> matches everywhere\n{}", USAGE));
+            return refuse(exit::USAGE, &format!("an empty <find> matches everywhere\n{}", USAGE));
         }
         Matcher::Literal(find.into_bytes())
     };
@@ -333,7 +334,7 @@ fn execute(
     for op in &opts.files {
         let (canonical, content) = match check_operand(op, root, is_state, &planned) {
             Ok(v) => v,
-            Err(e) => return refuse(&e),
+            Err(e) => return refuse(e.status(), &e),
         };
         let text = String::from_utf8_lossy(&content).into_owned();
         let spans = matcher.spans(&text);
@@ -342,10 +343,10 @@ fn execute(
         } else {
             let (new, changes) = apply(&content, &spans, replace.as_bytes());
             if !text_ok(&new) {
-                return refuse(&format!(
-                    "refusing {} — the rewrite would leave it not UTF-8 (a match split a character)",
-                    op
-                ));
+                return refuse(
+                    exit::REFUSED,
+                    &format!("refusing {} — the rewrite would leave it not UTF-8 (a match split a character)", op),
+                );
             }
             (Some(new), changes)
         };
@@ -388,7 +389,7 @@ fn execute(
             } else {
                 replaced.join(", ")
             };
-            return refuse(&format!("{} — files already replaced: {}", e, done));
+            return refuse(exit::TOOL, &format!("{} — files already replaced: {}", e, done));
         }
         replaced.push(&p.shown);
         for c in &p.changes {
@@ -410,7 +411,7 @@ pub fn run(args: &[String]) -> i32 {
         Some(r) => r,
         None => {
             eprintln!("{}: cannot resolve the working directory", NAME);
-            return 2;
+            return exit::TOOL;
         }
     };
     let stdout = std::io::stdout();
@@ -501,7 +502,7 @@ mod tests {
         assert_eq!(read(&f), b"Xb\nXb\n");
         let g = sb.file("b.md", b"bc\n");
         let (rc, _, err) = sb.run(&["--regex", "x*", "-", &g]);
-        assert_eq!(rc, 2, "a `-`-prefixed operand before `--` is an option: {}", err);
+        assert_eq!(rc, exit::USAGE, "a `-`-prefixed operand before `--` is an option: {}", err);
         let (rc, out, _) = sb.run(&["--regex", "--", "x*", "-", &g]);
         assert_eq!(rc, 0);
         assert_eq!(read(&g), b"-b-c-\n");
@@ -546,7 +547,7 @@ mod tests {
         let sb = Sandbox::new("utf8");
         let f = sb.file("a.md", "é\n".as_bytes());
         let (rc, _, err) = sb.run(&["--regex", "^.", "x", &f]);
-        assert_eq!(rc, 2);
+        assert_eq!(rc, exit::REFUSED);
         assert_eq!(read(&f), "é\n".as_bytes());
         assert!(err.contains("not UTF-8"), "{}", err);
     }
@@ -557,7 +558,7 @@ mod tests {
         let f = sb.file("a.md", b"x\n");
         let dotted = format!("{}/./a.md", sb.root);
         let (rc, _, err) = sb.run(&["x", "y", &f, &dotted]);
-        assert_eq!(rc, 2);
+        assert_eq!(rc, exit::USAGE);
         assert_eq!(read(&f), b"x\n");
         assert!(err.contains("already listed"), "{}", err);
     }
@@ -569,7 +570,7 @@ mod tests {
         let argv: Vec<String> = ["x", "y", f.as_str()].iter().map(|s| s.to_string()).collect();
         let (mut out, mut err) = (Vec::new(), Vec::new());
         let broken = |_: &str| Err("no knob".to_string());
-        assert_eq!(execute(&argv, &sb.canonical, &broken, &mut out, &mut err), 2);
+        assert_eq!(execute(&argv, &sb.canonical, &broken, &mut out, &mut err), exit::REFUSED);
         assert_eq!(read(&f), b"x\n");
     }
 

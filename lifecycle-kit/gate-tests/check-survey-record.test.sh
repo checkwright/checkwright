@@ -10,7 +10,7 @@
 # matching none), the widened arm over git-object-shaped tokens in the OTHER four
 # fields, which the hermetic pair cannot reach for the same reason, and its valve;
 # plus the two inert shapes (no record at all, a header-only record), and a
-# repository git refuses, which exits 2 rather than degrading to grammar only.
+# repository git refuses, which exits 3 rather than degrading to grammar only.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -139,7 +139,7 @@ check_case "valve-no-reason-still-probes" "$noreason" 1 "token names no object i
 refused="$SANDBOX/refused"; mkdir -p "$refused"
 printf 'gitdir: %s/absent\n' "$refused" >"$refused/.git"
 write_record "$refused" "$(printf 'a%.0s' {1..40})"
-check_case "refused-repository" "$refused" 2 "marks a repository"
+check_case "refused-repository" "$refused" 3 "marks a repository"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-survey-record.test.sh: $fails case(s) failed"

@@ -4,6 +4,7 @@
 use super::binding;
 use super::Payload;
 use crate::emit::kpi;
+use crate::exit;
 use crate::{proc, programs, walk};
 use serde_json::Value;
 
@@ -90,7 +91,7 @@ fn log_path() -> Result<String, String> {
 pub fn classify(code: Option<i32>, event: &str, stdout: &[u8], stderr: &[u8]) -> Would {
     let error = || Would { decision: ERROR, reason: first_line(&String::from_utf8_lossy(stderr)) };
     match code {
-        Some(2) => Would { decision: BLOCK, reason: WITHHELD.to_string() },
+        Some(exit::HOOK_BLOCK) => Would { decision: BLOCK, reason: WITHHELD.to_string() },
         Some(0) if stdout.iter().all(u8::is_ascii_whitespace) => Would { decision: NONE, reason: ABSENT.to_string() },
         Some(0) => match serde_json::from_slice::<Value>(stdout) {
             Ok(v) => envelope(&v).unwrap_or_else(error),

@@ -1,6 +1,7 @@
 // spec: docs/site-architecture.md §Site chrome and the nav contract — every kit page beside the
 // Kit Reference page carries the nav child block; the kit rows on that page are
 // check-kit-registration's, through the knob this repo binds
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -19,7 +20,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-docs-kit-parity: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -58,28 +59,28 @@ fn dirname(p: &str) -> String {
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let reg = fresh::positional_or_knob(args, 0, "GATE_LOCAL_KIT_REGISTRY_PAGE")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let reg = fresh::positional_or_knob(args, 0, "GATE_LOCAL_KIT_REGISTRY_PAGE").map_err(Fault::refused)?;
     let reg = reg.as_str();
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a missing page or a sweep finding no kit page
     // is a refusal, since either would otherwise read as a clean nav
     if !Path::new(reg).is_file() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "Kit Reference page not found: {} — the check could not run; treating as failure (not clean)",
             reg
-        ));
+        )));
     }
-    let pages = walk::glob_files(Path::new(&dirname(reg)), &["*/index.md".to_string()])?;
+    let pages = walk::glob_files(Path::new(&dirname(reg)), &["*/index.md".to_string()]).map_err(Fault::input)?;
     if pages.is_empty() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "no kit page (<dir>/index.md) beside {} — the check could not run; treating as failure (not clean)",
             reg
-        ));
+        )));
     }
     let mut navbad: Vec<String> = Vec::new();
     for idx in &pages {
         let p = idx.display().to_string();
-        let text = fresh::read_captured(&p)?;
+        let text = fresh::read_captured(&p).map_err(Fault::input)?;
         if !has_nav_block(&text) {
             navbad.push(p);
         }

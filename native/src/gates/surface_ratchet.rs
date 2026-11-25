@@ -1,5 +1,6 @@
 // spec: context-kit/SPEC.md §The surface ratchet — no governed surface above its committed
 // ceiling. The gate never writes: `--ceiling` raises a row in the commit that grows the file.
+use crate::exit;
 use crate::emit::always_loaded;
 use crate::walk;
 
@@ -10,12 +11,12 @@ pub fn run(_args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
-    // spec: context-kit/SPEC.md §The surface ratchet — an absent ceiling file and an unparsable
-    // row are both exit 2: a ratchet with no ceilings to read is a broken machine, not a clean
-    // tree, and a row silently dropped leaves its surface silently ungoverned.
+    // spec: context-kit/SPEC.md §The surface ratchet — an absent ceiling file is the surface the
+    // consumer has not written, exit 2; an unreadable file or unparsable row is exit 3
+    let absent = !std::path::Path::new(&ceiling_file).exists();
     let rows = match always_loaded::ceiling_rows(&ceiling_file) {
         Ok(r) => r,
         Err(e) => {
@@ -23,14 +24,14 @@ pub fn run(_args: &[String]) -> i32 {
             if let Some(door) = super::door_or_report(NAME, "--emit always-loaded --ceiling") {
                 eprintln!("{}: help: write the ceilings with `{}` and commit them", NAME, door);
             }
-            return 2;
+            return if absent { exit::REFUSED } else { exit::INPUT };
         }
     };
     let governed = match always_loaded::governed() {
         Ok(g) => g,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::TOOL;
         }
     };
 
@@ -54,7 +55,7 @@ pub fn run(_args: &[String]) -> i32 {
 
     if !findings.is_empty() {
         let Some(door) = super::door_or_report(NAME, "--emit always-loaded --ceiling") else {
-            return 2;
+            return exit::REFUSED;
         };
         println!(
             "SURFACE-RATCHET: {} governed surface(s) past their ceiling in {}:",

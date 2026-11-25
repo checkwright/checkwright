@@ -1259,8 +1259,8 @@ pub fn roster() -> Result<String, String> {
     Ok(out)
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    roster()
+pub fn emit(_args: &[String]) -> Result<String, crate::exit::Fault> {
+    roster().map_err(crate::exit::Fault::refused)
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — `--emit knob-values`: the resolved value of each named
@@ -1269,14 +1269,15 @@ pub const ARGV_STATIC_KNOBS: &str = "@argv-static-knobs";
 
 pub const VALUES_USAGE: &str = "usage: --emit knob-values <NAME>...";
 
-pub fn values(args: &[String]) -> Result<String, String> {
+pub fn values(args: &[String]) -> Result<String, crate::exit::Fault> {
+    use crate::exit::Fault;
     if args.is_empty() {
-        return Err(format!("needs at least one static knob name\n{}", VALUES_USAGE));
+        return Err(Fault::usage(format!("needs at least one static knob name\n{}", VALUES_USAGE)));
     }
     let mut out = String::new();
     for name in args {
-        let (_, row) = static_row(name).map_err(|e| format!("{}\n{}", e, VALUES_USAGE))?;
-        let (v, _) = resolve(name)?;
+        let (_, row) = static_row(name).map_err(|e| Fault::refused(format!("{}\n{}", e, VALUES_USAGE)))?;
+        let (v, _) = resolve(name).map_err(Fault::refused)?;
         render(&mut out, row, v);
     }
     Ok(out)

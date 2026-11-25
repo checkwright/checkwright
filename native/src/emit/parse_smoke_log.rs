@@ -2,6 +2,8 @@
 // the roster a driver's top-level headers or, given the log alone, the log's own `smoke-roster:` head
 // spec: gate-sdk/SPEC.md §The non-gate arm — an empty roster of the *happens to read nothing*
 // kind; the driver is the consumer's own file, so it is an operand rather than a crate literal
+use crate::exit::Fault;
+
 pub const KNOBS: &[&str] = &[];
 pub const USAGE: &str = "usage: --emit parse-smoke-log [<driver.sh>] <log>";
 
@@ -29,7 +31,7 @@ fn header(line: &str) -> Option<String> {
 }
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — a driver's *last* top-level header is
-// its completion marker and the ones before it are its arms, so fewer than two is exit 2
+// its completion marker and the ones before it are its arms, so fewer than two is exit 3
 fn roster(driver_text: &str) -> Result<(Vec<String>, String), String> {
     let mut headers: Vec<String> = driver_text.lines().filter_map(header).collect();
     if headers.len() < 2 {
@@ -45,7 +47,7 @@ fn roster(driver_text: &str) -> Result<(Vec<String>, String), String> {
 
 // spec: evidence-kit/SPEC.md §Layout and configuration — the log-only form: the roster is the
 // log's `smoke-roster:` lines, in order, the last naming the marker; every one precedes the first
-// header, and fewer than two is the driver form's own exit 2
+// header, and fewer than two is the driver form's own exit 3
 fn roster_from_log(log_text: &str) -> Result<(Vec<String>, String), String> {
     let mut names: Vec<String> = Vec::new();
     let mut last = 0;
@@ -110,31 +112,31 @@ fn reached(log_text: &str, arms: &[String], marker: &str) -> (Vec<String>, bool)
 // spec: evidence-kit/SPEC.md §Layout and configuration — the smoke aborts at its first failure,
 // so every arm but the last one reached is proved by the arm that followed it; the last is proved
 // by the run's own completion marker and is `fail` without it
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let (driver, log) = match args {
         [l] if !l.is_empty() => (None, l.as_str()),
         [d, l] if !d.is_empty() && !l.is_empty() => (Some(d.as_str()), l.as_str()),
         _ => {
-            return Err(format!(
+            return Err(Fault::usage(format!(
                 "needs a log, after the driver where the roster is a driver's headers — the \
                  driver is the consumer's own file, so the arm holds no default for it\n{}",
                 USAGE
-            ))
+            )))
         }
     };
     if !std::path::Path::new(log).is_file() {
-        return Err(format!("log not found: {}", log));
+        return Err(Fault::input(format!("log not found: {}", log)));
     }
-    let log_text = super::read_text(log)?;
+    let log_text = super::read_text(log).map_err(Fault::input)?;
     let (arms, marker) = match driver {
-        None => roster_from_log(&log_text)?,
+        None => roster_from_log(&log_text).map_err(Fault::input)?,
         Some(d) if !std::path::Path::new(d).is_file() => {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "smoke driver not found: {} — the arm roster is derived from it",
                 d
-            ))
+            )))
         }
-        Some(d) => roster(&super::read_text(d)?)?,
+        Some(d) => roster(&super::read_text(d).map_err(Fault::input)?).map_err(Fault::input)?,
     };
     let (seen, clean) = reached(&log_text, &arms, &marker);
     let mut out = String::new();
@@ -252,7 +254,7 @@ mod tests {
     }
 
     // spec: evidence-kit/SPEC.md §Layout and configuration — fewer than two roster lines, and a
-    // header or the marker ahead of the last roster line, are each exit 2
+    // header or the marker ahead of the last roster line, are each exit 3
     #[test]
     fn a_log_roster_too_short_or_declared_late_fails_closed() {
         assert!(roster_from_log("build\npack\n").is_err(), "a roster-less log was accepted");
@@ -271,7 +273,7 @@ mod tests {
     }
 
     // spec: evidence-kit/SPEC.md §Layout and configuration — the driver is an operand with no
-    // default, so a missing or unresolvable one is exit 2, as an unresolvable log is
+    // default, so a missing one is exit 2 and an unresolvable one exit 3, as an unresolvable log is
     #[test]
     fn a_missing_operand_or_an_unresolvable_one_fails_closed() {
         assert!(emit(&[]).is_err(), "no operand at all was accepted");

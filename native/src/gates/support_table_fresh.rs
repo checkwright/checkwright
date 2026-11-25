@@ -1,6 +1,7 @@
 // spec: companion/SPEC.md §The support table — the page's block carries the arm's rendering,
 // compared in process
 use crate::emit::support_table as st;
+use crate::exit::Fault;
 use crate::fresh;
 
 pub fn run(args: &[String]) -> i32 {
@@ -8,25 +9,25 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-support-table-fresh: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let dir = fresh::positional_or_knob(args, 0, st::COMPANION_KNOB)?;
-    let page = fresh::positional_or_knob(args, 1, st::PAGE_KNOB)?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let dir = fresh::positional_or_knob(args, 0, st::COMPANION_KNOB).map_err(Fault::refused)?;
+    let page = fresh::positional_or_knob(args, 1, st::PAGE_KNOB).map_err(Fault::refused)?;
     let (dir, page) = (dir.as_str(), page.as_str());
-    let want = st::render(dir)?;
-    let text = fresh::read_captured(page).map_err(|e| format!("{}: {}", page, e))?;
-    let blk = st::block(page, &text)?;
+    let want = st::render(dir).map_err(Fault::input)?;
+    let text = fresh::read_captured(page).map_err(|e| Fault::input(format!("{}: {}", page, e)))?;
+    let blk = st::block(page, &text).map_err(Fault::input)?;
     if blk.actual != want {
         println!(
             "check-support-table-fresh: 1 stale block — {}:{} differs from the table {} derives:",
             page, blk.line, dir
         );
         fresh::print_capped_diff(&blk.actual, &want);
-        println!("  help: regenerate — {}", super::door_command("--emit support-table --write")?);
+        println!("  help: regenerate — {}", super::door_command("--emit support-table --write").map_err(Fault::refused)?);
         return Ok(1);
     }
     println!(

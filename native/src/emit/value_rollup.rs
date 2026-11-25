@@ -3,6 +3,7 @@
 // token cost. A consumer docs ruling, not kit mechanism: the join axis and column choice live here.
 use crate::emit::enforcement_map;
 use crate::emit::footprint;
+use crate::exit::Fault;
 use crate::marker;
 
 pub const PAGE_KNOB: &str = "GATE_LOCAL_VALUE_PAGE";
@@ -31,9 +32,9 @@ fn token_cell(cp: usize, bytes: usize) -> String {
     format!("~{}t", bytes / 4)
 }
 
-fn build() -> Result<Join, String> {
-    let enf = enforcement_map::measure()?;
-    let foot = footprint::measure()?;
+fn build() -> Result<Join, Fault> {
+    let enf = enforcement_map::measure().map_err(Fault::input)?;
+    let foot = footprint::measure_fault()?;
 
     let classes: Vec<String> = enf.sections.iter().map(|s| s.title.clone()).collect();
     let mut counts: Vec<(String, String)> = Vec::new();
@@ -95,7 +96,7 @@ fn axis(j: &Join) -> Vec<String> {
     out
 }
 
-fn body() -> Result<String, String> {
+fn body() -> Result<String, Fault> {
     let j = build()?;
     // spec: guard-kit/SPEC.md §check-door-binding — a site-scoped declaration on the line above the
     // banner, written by the emitter because the block it sits in is regenerated whole; the page
@@ -149,11 +150,11 @@ fn body() -> Result<String, String> {
 // spec: gate-sdk/SPEC.md §The non-gate arm — `--write` rewrites the marker block in place through
 // the shared marker writer, which refuses rather than appending on a missing pair; the bare arm
 // prints the block body, the surface check-value-rollup-fresh byte-compares.
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let text = body()?;
     if args.iter().any(|a| a == "--write") {
-        let page = crate::walk::knob_scalar(PAGE_KNOB)?;
-        marker::write_block(&page, BEGIN, END, &text)?;
+        let page = crate::walk::knob_scalar(PAGE_KNOB).map_err(Fault::refused)?;
+        marker::write_block(&page, BEGIN, END, &text).map_err(Fault::input)?;
         return Ok(format!("value-rollup: replaced the block in {}\n", page));
     }
     Ok(text)

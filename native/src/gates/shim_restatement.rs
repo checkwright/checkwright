@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-shim-restatement — no binding shim shares an >=N-word
 // normalized n-gram with the dedup corpus (the agent file + every kit's templates)
+use crate::exit;
 use crate::walk;
 use std::collections::HashMap;
 use std::path::Path;
@@ -55,13 +56,13 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-shim-restatement: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
     if !Path::new(&dir).is_dir() {
         eprintln!("check-shim-restatement: skills dir not found: {}", dir);
-        return 2;
+        return exit::REFUSED;
     }
     let rest: &[String] = if args.is_empty() { &[] } else { &args[1..] };
 
@@ -73,12 +74,12 @@ pub fn run(args: &[String]) -> i32 {
                     "check-shim-restatement: LIFECYCLE_KIT_SHIM_NGRAM '{}' is not a positive integer",
                     v
                 );
-                return 2;
+                return exit::REFUSED;
             }
         },
         Err(e) => {
             eprintln!("check-shim-restatement: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -90,7 +91,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-shim-restatement: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         if !declared.is_empty() {
@@ -100,7 +101,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-shim-restatement: {}", e);
-                    return 2;
+                    return exit::REFUSED;
                 }
             };
             // spec: gate-sdk/SPEC.md §Layout and configuration — `{root}/templates` is statted and
@@ -109,7 +110,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-shim-restatement: {}", e);
-                    return 2;
+                    return exit::REFUSED;
                 }
             };
             let mut c: Vec<String> = Vec::new();
@@ -125,7 +126,7 @@ pub fn run(args: &[String]) -> i32 {
                     Ok(v) => c.extend(v.into_iter().map(|p| p.display().to_string())),
                     Err(e) => {
                         eprintln!("check-shim-restatement: {}", e);
-                        return 2;
+                        return exit::INPUT;
                     }
                 }
             }
@@ -145,7 +146,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(t) => t,
             Err(e) => {
                 eprintln!("check-shim-restatement: {}", e);
-                return 2;
+                return exit::INPUT;
             }
         };
         for g in sorted_unique(ngrams(&text, n)) {
@@ -157,14 +158,14 @@ pub fn run(args: &[String]) -> i32 {
             "check-shim-restatement: dedup corpus produced no {}-word n-grams (corpus files missing or shorter than N)",
             n
         );
-        return 2;
+        return exit::REFUSED;
     }
 
     let files = match walk::glob_files(Path::new(&dir), &["*.md".to_string()]) {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-shim-restatement: {}", e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let mut findings: Vec<String> = Vec::new();
@@ -174,7 +175,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(t) => t,
             Err(e) => {
                 eprintln!("check-shim-restatement: {}", e);
-                return 2;
+                return exit::INPUT;
             }
         };
         if !is_shim(&text) {

@@ -1,11 +1,12 @@
 // spec: gate-sdk/SPEC.md §run-gate-tests — the golden-fixture runner, an `Arm::Run`
-// member: its contract is a three-valued exit — 0 clean, 1 a logic failure in a gate or a unit
-// test, 2 a harness or fixture error — which `Arm::Emit` collapses to 0-or-2.
+// member: 0 clean, 1 a logic failure in a gate or a unit test, 2 a refused invocation, 3 a fixture
+// tree or a case that could not be run — a grammar `Arm::Emit` cannot carry.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: a top-level flag has no row, so
 // the knob-file derivation could not see the three knobs below.
 use crate::output::clean_line;
 use crate::{knobfile, knobs, proc, programs};
+use crate::exit::{self, Fault};
 use crate::walk;
 use std::cell::Cell;
 use std::path::Path;
@@ -44,35 +45,43 @@ pub fn run(args: &[String]) -> i32 {
         Ok(a) => a,
         Err(e) => {
             eprintln!("{}: {}\n{}", NAME, e, USAGE);
-            return 2;
+            return exit::USAGE;
         }
     };
     let harness = match setup(args) {
         Ok(h) => h,
         Err(e) => {
             eprintln!("{}", e);
-            return 2;
+            return e.status();
         }
     };
     let tests_dir = match tests_dir(args) {
         Ok(d) => d,
         Err(e) => {
             eprintln!("{}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if !Path::new(&tests_dir).is_dir() {
         eprintln!("{}: no fixture tree at {}", NAME, tests_dir);
-        return 2;
+        return exit::REFUSED;
     }
     let scratch = match crate::runner::run_scratch(&harness.case_tmp) {
         Ok(s) => RunScratch { root: s, next: Cell::new(0) },
         Err(e) => {
             eprintln!("{}: {} — treating as failure (not clean)", NAME, e);
-            return 2;
+            return exit::TOOL;
         }
     };
     execute(&harness, &scratch, &tests_dir)
+}
+
+// spec: gate-sdk/SPEC.md §run-gate-tests — a case that could not be run, and a gate's own exit 2 or
+// 3 on a case, are the runner's error rather than a gate's logic failure
+const CASE_ERROR: i32 = exit::TOOL;
+
+fn could_not_run(rc: i32) -> bool {
+    rc == exit::REFUSED || rc == exit::TOOL
 }
 
 // spec: gate-sdk/SPEC.md §run-gate-tests — the runner's temporaries are a run scratch's: each case
@@ -101,22 +110,22 @@ fn tests_dir(args: &[String]) -> Result<String, String> {
     }
 }
 
-fn setup(args: &[String]) -> Result<Harness, String> {
-    let here = walk::cwd()?;
-    let sdk = sdk_root()?;
+fn setup(args: &[String]) -> Result<Harness, Fault> {
+    let here = walk::cwd().map_err(Fault::tool)?;
+    let sdk = sdk_root().map_err(Fault::refused)?;
     // spec: gate-sdk/SPEC.md §run-gate-tests — the second position replaces the resolved default,
     // and a named member that is not a directory is a refusal, since dropping it empties the search
     // path with no line naming the argument
     let requested: Vec<String> = if args.len() > 1 {
         if let Some(absent) = args[1..].iter().find(|d| !Path::new(d.as_str()).is_dir()) {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "{}: no checks dir at {} — a named gate-declaration dir must exist\n{}",
                 NAME, absent, USAGE
-            ));
+            )));
         }
         args[1..].to_vec()
     } else {
-        check_dirs(&sdk)?
+        check_dirs(&sdk).map_err(Fault::tool)?
     };
     let gate_dirs: Vec<String> = requested
         .iter()
@@ -127,7 +136,7 @@ fn setup(args: &[String]) -> Result<Harness, String> {
     // spec: gate-sdk/SPEC.md §run-gate-tests — the binary is absolutized at the invoker's root,
     // because a case runs after a `cd` into its own dir and the knob's default is deliberately
     // repo-relative (§lib/gate.sh); the gate dirs above are absolutized for the same reason.
-    let mut bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN")?;
+    let mut bin = walk::knob_scalar("GATE_SDK_NATIVE_BIN").map_err(Fault::refused)?;
     let mut exported: Vec<(String, String)> = vec![("GATE_SDK_ROOT".to_string(), sdk.clone())];
     let absolutized = walk::abs_against(&here, &bin);
     if absolutized != bin && Path::new(&bin).exists() {
@@ -138,7 +147,7 @@ fn setup(args: &[String]) -> Result<Harness, String> {
     // spec: gate-sdk/SPEC.md §run-gate-tests — the scratch dir absolutized for the mirror of that
     // reason, and pinned on the case invocation alone: the pin's scope is the pair loop and the
     // shell that resolves a case's argv, never this process.
-    let case_tmp = walk::abs_against(&here, &walk::knob_scalar("GATE_SDK_TMP_DIR")?);
+    let case_tmp = walk::abs_against(&here, &walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?);
 
     Ok(Harness {
         sdk,
@@ -183,7 +192,7 @@ fn check_dirs(sdk: &str) -> Result<Vec<String>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §run-gate-tests — every subdirectory of a tests dir is read as a case
-// pair and `<tests-dir>/*.test.sh` as a unit test; the runner exits 2 only when it holds
+// pair and `<tests-dir>/*.test.sh` as a unit test; the runner exits 3 only when it holds
 // **neither**, so a gateless kit's unit-test-only dir is a lawful tests dir printing `0 pairs`.
 fn execute(h: &Harness, scratch: &RunScratch, tests_dir: &str) -> i32 {
     let (gate_dirs, unit_tests) = discover(tests_dir);
@@ -192,7 +201,7 @@ fn execute(h: &Harness, scratch: &RunScratch, tests_dir: &str) -> i32 {
             "{}: no gate fixture dirs and no *.test.sh under {}",
             NAME, tests_dir
         );
-        return 2;
+        return exit::INPUT;
     }
 
     let mut pairs = 0;
@@ -227,7 +236,7 @@ fn execute(h: &Harness, scratch: &RunScratch, tests_dir: &str) -> i32 {
         if gc == 1 || bc == 1 {
             logic_fail += 1;
         }
-        if gc == 2 || bc == 2 {
+        if gc == CASE_ERROR || bc == CASE_ERROR {
             harness_fail += 1;
         }
     }
@@ -262,7 +271,7 @@ fn execute(h: &Harness, scratch: &RunScratch, tests_dir: &str) -> i32 {
             "GATE-TESTS: {} harness/fixture error(s) (malformed fixtures — could not test)",
             harness_fail
         );
-        return 2;
+        return exit::INPUT;
     }
     if logic_fail > 0 || unit_fail > 0 {
         println!(
@@ -329,7 +338,7 @@ fn basename(p: &str) -> &str {
 fn run_case(h: &Harness, scratch: &RunScratch, gate: &str, casedir: &str, want: i32, expect: &str) -> i32 {
     let unset = match case_unset(casedir) {
         Ok(names) => names,
-        Err(e) => { println!("  HARNESS: {}", e); return 2; }
+        Err(e) => { println!("  HARNESS: {}", e); return CASE_ERROR; }
     };
     let Some((pinned, mut argv)) = resolve_argv(h, gate, casedir, &unset) else {
         println!(
@@ -337,7 +346,7 @@ fn run_case(h: &Harness, scratch: &RunScratch, gate: &str, casedir: &str, want: 
             gate,
             h.gate_dirs.join(" ")
         );
-        return 2;
+        return CASE_ERROR;
     };
     if argv.is_empty() {
         println!(
@@ -345,20 +354,20 @@ fn run_case(h: &Harness, scratch: &RunScratch, gate: &str, casedir: &str, want: 
             gate,
             h.gate_dirs.join(" ")
         );
-        return 2;
+        return CASE_ERROR;
     }
     // spec: gate-sdk/SPEC.md §run-gate-tests — a path is guarded and absolutized, a bare host name
     // resolved, so the child started from the case dir reaches the program the resolution named
     if argv[0].chars().any(std::path::is_separator) {
         if !proc::is_executable(Path::new(&argv[0])) {
             println!("  HARNESS: {} is not executable", argv[0]);
-            return 2;
+            return CASE_ERROR;
         }
         let here = match walk::cwd() {
             Ok(c) => c,
             Err(e) => {
                 println!("  HARNESS: {}", e);
-                return 2;
+                return CASE_ERROR;
             }
         };
         argv[0] = walk::abs_against(&here, &argv[0]);
@@ -367,7 +376,7 @@ fn run_case(h: &Harness, scratch: &RunScratch, gate: &str, casedir: &str, want: 
             Some(p) => argv[0] = p,
             None => {
                 println!("  HARNESS: {} does not resolve on PATH", argv[0]);
-                return 2;
+                return CASE_ERROR;
             }
         }
     }
@@ -394,9 +403,9 @@ fn run_case(h: &Harness, scratch: &RunScratch, gate: &str, casedir: &str, want: 
     match scratch.child_env() {
         Ok(e) => env.extend(e),
         Err(e) => {
-            println!("  HARNESS: {} {} exited 2 (gate could not run / malformed fixture):", gate, casedir);
+            println!("  HARNESS: {} {} could not run (malformed fixture):", gate, casedir);
             report(&e);
-            return 2;
+            return CASE_ERROR;
         }
     }
     // spec: gate-sdk/SPEC.md §run-gate-tests — a one-element `.sh` argv is a shell member, started
@@ -405,9 +414,9 @@ fn run_case(h: &Harness, scratch: &RunScratch, gate: &str, casedir: &str, want: 
         match crate::registry::shell_start(&argv[0]) {
             Ok(s) => s,
             Err(e) => {
-                println!("  HARNESS: {} {} exited 2 (gate could not run / malformed fixture):", gate, casedir);
+                println!("  HARNESS: {} {} could not run (malformed fixture):", gate, casedir);
                 report(&e);
-                return 2;
+                return CASE_ERROR;
             }
         }
     } else {
@@ -420,21 +429,21 @@ fn run_case(h: &Harness, scratch: &RunScratch, gate: &str, casedir: &str, want: 
     let done = match proc::run_merged_scrubbed(&program, &spawn, &env, Path::new(casedir), &unset) {
         Ok(m) => m,
         Err(e) => {
-            println!("  HARNESS: {} {} exited 2 (gate could not run / malformed fixture):", gate, casedir);
+            println!("  HARNESS: {} {} could not run (malformed fixture):", gate, casedir);
             report(&e);
-            return 2;
+            return CASE_ERROR;
         }
     };
     let out = text(done.output());
     let rc = done.reported_code();
 
-    if rc == 2 {
+    if could_not_run(rc) {
         println!(
-            "  HARNESS: {} {} exited 2 (gate could not run / malformed fixture):",
-            gate, casedir
+            "  HARNESS: {} {} exited {} (gate could not run / malformed fixture):",
+            gate, casedir, rc
         );
         report(&out);
-        return 2;
+        return CASE_ERROR;
     }
     if rc != want {
         println!(
@@ -564,6 +573,18 @@ pub fn help_line(l: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §run-gate-tests — a case's 2 or 3 is the runner's error, never a logic
+    // failure, and the runner's own error exits 3 beside a refused invocation's 2
+    #[test]
+    fn a_case_exiting_2_or_3_could_not_run() {
+        assert!(could_not_run(2));
+        assert!(could_not_run(3));
+        assert!(!could_not_run(0));
+        assert!(!could_not_run(1));
+        assert_eq!(CASE_ERROR, 3);
+        assert_eq!(run(&["-x".to_string()]), 2);
+    }
 
     // spec: gate-sdk/SPEC.md §Output contract — the remedy line opens a word, so an embedded
     // spelling does not satisfy it and an indented one does.

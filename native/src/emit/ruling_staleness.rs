@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the reporting arm over a consumer's
 // ruling record: it dispatches each declared oracle, reports every conditioned ruling left
 // undeclared, quotes the citing sites, and proposes no edit.
+use crate::exit::Fault;
 use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
@@ -321,10 +322,10 @@ fn manual_prose(oracle: &str) -> Option<String> {
         .map(|r| r.trim_matches(WS).to_string())
 }
 
-fn cite_corpus(base: &str, record: &str) -> Result<Vec<String>, String> {
-    let globs = walk::knob_array("LIFECYCLE_KIT_RULING_CITERS")?;
+fn cite_corpus(base: &str, record: &str) -> Result<Vec<String>, Fault> {
+    let globs = walk::knob_array("LIFECYCLE_KIT_RULING_CITERS").map_err(Fault::refused)?;
     let mut out: Vec<String> = Vec::new();
-    for p in walk::glob_corpus(Path::new(base), &globs)? {
+    for p in walk::glob_corpus(Path::new(base), &globs).map_err(Fault::input)? {
         let s = p.display().to_string();
         let rel = walk::rel_under(base, &s)
             .unwrap_or_else(|| s.trim_start_matches("./"))
@@ -363,35 +364,35 @@ fn citing_rows(base: &str, corpus: &[String], name: &str) -> Vec<String> {
     rows
 }
 
-fn timeout_secs() -> Result<u64, String> {
-    let raw = walk::knob_scalar("LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT")?;
+fn timeout_secs() -> Result<u64, Fault> {
+    let raw = walk::knob_scalar("LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT").map_err(Fault::refused)?;
     raw.trim_matches(WS).parse::<u64>().map_err(|_| {
-        format!(
+        Fault::refused(format!(
             "LIFECYCLE_KIT_RULING_ORACLE_TIMEOUT is '{}' — a positive integer of seconds is the \
              only value that bounds a dispatch",
             raw
-        )
+        ))
     })
 }
 
 // spec: lifecycle-kit/SPEC.md §The ruling-staleness probe — the argv tail names rulings a session is
 // about to retire, so the citing report answers "what would go stale" for a retirement the record
 // does not yet carry. With no operand the report covers exactly the fired conditions.
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let args = super::file_survey::positionals(args, "ruling name")
-        .map_err(|e| format!("{}\n{}", e, USAGE))?;
-    let record = walk::knob_scalar("LIFECYCLE_KIT_RULING_RECORD")?;
+        .map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
+    let record = walk::knob_scalar("LIFECYCLE_KIT_RULING_RECORD").map_err(Fault::refused)?;
     let record = record.trim_matches(WS).to_string();
     if record.is_empty() {
         return Ok("ruling-staleness: no ruling record configured \
                    (LIFECYCLE_KIT_RULING_RECORD is empty) — nothing to report\n"
             .to_string());
     }
-    let base = match walk::toplevel_opt()? {
+    let base = match walk::toplevel_opt().map_err(Fault::tool)? {
         Some(t) => t,
-        None => walk::cwd()?,
+        None => walk::cwd().map_err(Fault::tool)?,
     };
-    let text = crate::emit::read_text(&walk::abs_against(&base, &record))?;
+    let text = crate::emit::read_text(&walk::abs_against(&base, &record)).map_err(Fault::input)?;
     let timeout = timeout_secs()?;
 
     let mut out = String::new();

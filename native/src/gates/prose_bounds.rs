@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-prose-bounds — governed prose keeps its sentences and units
 // within a bound and states a repeated rule once, under an optional per-file ceiling
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::collections::{BTreeMap, HashSet};
@@ -10,7 +11,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-prose-bounds: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -358,27 +359,27 @@ fn ceiling(path: &str) -> Result<BTreeMap<String, usize>, String> {
     Ok(rows)
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
     let b = Bounds {
-        sentence_max: bound("CANON_KIT_PROSE_BOUND_SENTENCE_MAX")?,
-        paragraph_max: bound("CANON_KIT_PROSE_BOUND_PARAGRAPH_MAX")?,
-        repeat_words: bound("CANON_KIT_PROSE_BOUND_REPEAT_WORDS")?,
-        repeat_min: bound("CANON_KIT_PROSE_BOUND_REPEAT_MIN")?.unwrap_or(usize::MAX),
+        sentence_max: bound("CANON_KIT_PROSE_BOUND_SENTENCE_MAX").map_err(Fault::refused)?,
+        paragraph_max: bound("CANON_KIT_PROSE_BOUND_PARAGRAPH_MAX").map_err(Fault::refused)?,
+        repeat_words: bound("CANON_KIT_PROSE_BOUND_REPEAT_WORDS").map_err(Fault::refused)?,
+        repeat_min: bound("CANON_KIT_PROSE_BOUND_REPEAT_MIN").map_err(Fault::refused)?.unwrap_or(usize::MAX),
     };
-    let ceiling_file = walk::knob_scalar("CANON_KIT_PROSE_BOUND_CEILING_FILE")?;
-    let rows = if ceiling_file.is_empty() { None } else { Some(ceiling(&ceiling_file)?) };
+    let ceiling_file = walk::knob_scalar("CANON_KIT_PROSE_BOUND_CEILING_FILE").map_err(Fault::refused)?;
+    let rows = if ceiling_file.is_empty() { None } else { Some(ceiling(&ceiling_file).map_err(Fault::input)?) };
 
-    let globs: Vec<String> = walk::knob_array("CANON_KIT_PROSE_BOUND_GLOBS")?
+    let globs: Vec<String> = walk::knob_array("CANON_KIT_PROSE_BOUND_GLOBS").map_err(Fault::refused)?
         .into_iter()
         .filter(|g| !g.is_empty())
         .collect();
     let mut files: Vec<(String, String)> = Vec::new();
     if !globs.is_empty() {
-        for p in walk::glob_corpus(Path::new(root), &globs)? {
+        for p in walk::glob_corpus(Path::new(root), &globs).map_err(Fault::input)? {
             let full = p.display().to_string();
             let rel = match walk::rel_under(root, &full) {
                 Some(r) => r.to_string(),
@@ -397,7 +398,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut per_file: Vec<(String, Vec<Finding>)> = Vec::new();
     for (full, rel) in &files {
         let mut sink = Sink::default();
-        spec::walk_prose(std::slice::from_ref(full), "prose-bound-exempt:", &mut sink)?;
+        spec::walk_prose(std::slice::from_ref(full), "prose-bound-exempt:", &mut sink).map_err(Fault::input)?;
         per_file.push((rel.clone(), sink.judge(&b)));
     }
     let total: usize = per_file.iter().map(|f| f.1.len()).sum();
@@ -456,7 +457,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         println!("{}", help);
     }
     if !under.is_empty() {
-        println!("  help: a pass that removed findings records the lowered row in the same commit, so the slack cannot hide a later regression. The worklist is 'CANON_KIT_PROSE_BOUND_CEILING_FILE= {}'.", super::door_command("--only check-prose-bounds")?);
+        println!("  help: a pass that removed findings records the lowered row in the same commit, so the slack cannot hide a later regression. The worklist is 'CANON_KIT_PROSE_BOUND_CEILING_FILE= {}'.", super::door_command("--only check-prose-bounds").map_err(Fault::refused)?);
     }
     Ok(1)
 }

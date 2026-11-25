@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-crate-arms — the crate's lint and test arms at commit time, as the
 // wrapper a member whose rule *is* an invocation of cargo ports to: the programs stay declared
 // dependencies this spawns, and the source-stamp cache is relocated rather than redesigned
+use crate::exit;
 use crate::fresh;
 use crate::proc;
 use crate::programs::{self, Program, CARGO, RUSTC};
@@ -30,7 +31,7 @@ fn refuse_absent_cargo(crate_dir: &str) -> i32 {
     );
     eprintln!("  help: cargo is the contributor-side toolchain floor for a tree carrying the crate");
     eprintln!("        (context-kit/SPEC.md §bin/env-probe). Install a Rust toolchain, then re-run.");
-    2
+    exit::TOOL
 }
 
 // spec: gate-sdk/SPEC.md §check-crate-arms — `<prog> --version` captured with stderr discarded and
@@ -176,7 +177,7 @@ fn linked_worktree(main: Option<&str>, cache: &str, key: &str, crate_dir: &str) 
     eprintln!("  help: a build here is the mutation isolation exists to prevent, so this gate never runs cargo in a");
     eprintln!("        linked worktree. A crate-source change lands from the main checkout, whose build and green run");
     eprintln!("        answer for it; a worktree holding only source the main checkout recorded is read from that record.");
-    Some(2)
+    Some(exit::REFUSED)
 }
 
 pub fn run(_args: &[String]) -> i32 {
@@ -184,28 +185,28 @@ pub fn run(_args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let target_dir = match walk::knob_scalar("GATE_SDK_CARGO_TARGET_DIR") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let tmp_dir = match walk::knob_scalar("GATE_SDK_TMP_DIR") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let lint = match walk::knob_array(TARGET_LINT_KNOB) {
         Ok(v) => v,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let manifest = format!("{}/Cargo.toml", crate_dir);
@@ -267,7 +268,7 @@ pub fn run(_args: &[String]) -> i32 {
 
     let rustflags = match native_rustflags() {
         Ok(value) => value,
-        Err(e) => { eprintln!("{}: {}", NAME, e); return 2; }
+        Err(e) => { eprintln!("{}: {}", NAME, e); return exit::TOOL; }
     };
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — both arms run even when the first fails, so one
@@ -306,7 +307,7 @@ pub fn run(_args: &[String]) -> i32 {
             Ok(ok) => fail |= !ok,
             Err(e) => {
                 eprintln!("{}: {}", NAME, e);
-                return 2;
+                return exit::TOOL;
             }
         }
     }
@@ -323,7 +324,7 @@ pub fn run(_args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::TOOL;
         }
     };
 
@@ -337,7 +338,7 @@ pub fn run(_args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::TOOL;
         }
     }
 
@@ -515,7 +516,7 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §check-crate-arms — a command that cannot be spawned is the gate's
-    // exit 2 and never a skip: the error names the knob that armed it
+    // exit 3 and never a skip: the error names the knob that armed it
     #[test]
     fn an_unspawnable_target_lint_command_is_an_error_naming_the_knob() {
         let e = target_lint_arm(&["checkwright-no-such-program-exists".to_string()])
@@ -551,7 +552,7 @@ mod tests {
         std::fs::write(main.join(".tmp/crate-arms-x.green"), "stamp v\n").expect("record");
         let recorded = linked_worktree(Some(&m), ".tmp/crate-arms-x.green", "stamp v", "native");
         let _ = std::fs::remove_dir_all(&main);
-        assert_eq!(missed, Some(2));
+        assert_eq!(missed, Some(exit::REFUSED));
         assert!(spawned.is_empty(), "the refusal spawned {:?}", spawned);
         assert_eq!(recorded, Some(0));
         assert_eq!(linked_worktree(None, ".tmp/crate-arms-x.green", "stamp v", "native"), None);

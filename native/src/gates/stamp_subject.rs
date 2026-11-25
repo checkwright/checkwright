@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §check-stamp-subject — a commit adding a stamp line carries the
 // stamped stage as its subject scope, the last added stamp deciding
+use crate::exit;
 use crate::stages;
 use crate::{proc, programs, walk};
 use std::path::Path;
@@ -58,24 +59,24 @@ pub fn run(args: &[String]) -> i32 {
     };
     if args.len() == 2 {
         eprintln!("check-stamp-subject: usage: check-stamp-subject <message-file> [<staged-state> <head-state> [<merge-parent-state>...]]");
-        return 2;
+        return exit::USAGE;
     }
     if !Path::new(msg).is_file() {
         eprintln!("check-stamp-subject: message file not found: {}", msg);
-        return 2;
+        return exit::REFUSED;
     }
     let roster = match stages::stages() {
         Ok(s) => s,
         Err(e) => {
             eprintln!("check-stamp-subject: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let text = match read_file(msg) {
         Ok(t) => t,
         Err(e) => {
             eprintln!("check-stamp-subject: {} — the check could not run; treating as failure (not clean)", e);
-            return 2;
+            return exit::INPUT;
         }
     };
     // spec: lifecycle-kit/SPEC.md §check-stamp-subject — the fixture form hands every state-file
@@ -87,7 +88,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(t) => sides.push(t),
                 Err(e) => {
                     eprintln!("check-stamp-subject: {}", e);
-                    return 2;
+                    return exit::INPUT;
                 }
             }
         }
@@ -98,7 +99,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-stamp-subject: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         match live_state_sides(&state) {

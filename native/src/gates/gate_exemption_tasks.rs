@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — every temporary-disposition annotation a
 // gate declaration carries names a live task: an exception-list element's until:, a descriptor's
 // `# exception:` element's, or the declaration's own port-until: header field
+use crate::exit::Fault;
 use crate::{registry, walk};
 use std::path::Path;
 
@@ -9,7 +10,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-gate-exemption-tasks: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -102,22 +103,22 @@ fn authoring_tree() -> Result<bool, String> {
     Ok(walk::authoring_tree(&walk::knob_scalar("GATE_SDK_NATIVE_CRATE")?))
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let queue = match args.first() {
         Some(q) => q.clone(),
-        None => walk::knob_scalar("GATE_SDK_QUEUE_FILE")?,
+        None => walk::knob_scalar("GATE_SDK_QUEUE_FILE").map_err(Fault::refused)?,
     };
-    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
     let dirs: Vec<String> = if args.len() > 1 {
         args[1..].to_vec()
     } else {
         let mut d = vec![gates_dir.clone()];
-        d.extend(walk::kit_roots_abs()?.into_iter().map(|k| format!("{}/checks", k)));
+        d.extend(walk::kit_roots_abs().map_err(Fault::refused)?.into_iter().map(|k| format!("{}/checks", k)));
         d
     };
 
     let live = live_slugs(Path::new(&queue));
-    let authoring = authoring_tree()?;
+    let authoring = authoring_tree().map_err(Fault::refused)?;
     let gates_dir_abs = canon(Path::new(&gates_dir));
 
     let mut scan_files: Vec<String> = Vec::new();
@@ -167,7 +168,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the header-field arm's corpus is the
     // tracked shell tree beside the declaration set and never instead of it, with the scope rule
     // lifted from a directory to a file so a vendoring adopter is held to no kit author's slug
-    let tree_scoped: Vec<String> = walk::tracked_shell_tree()?;
+    let tree_scoped: Vec<String> = walk::tracked_shell_tree().map_err(Fault::tool)?;
     // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the union de-duplicates against BOTH
     // halves of the declaration walk, in scope and out, canonicalized because the two producers
     // spell one file differently and a raw match would therefore never fire

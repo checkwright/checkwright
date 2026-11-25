@@ -2,6 +2,7 @@
 // nothing else: an entry still at what init wrote is removed, one edited since is kept and
 // reported, and the manifest is narrowed over the survivors rather than deleted.
 use super::{lock, refuse, Refusal, AGENT_FILE, GATES_DIR};
+use crate::exit;
 use std::collections::BTreeSet;
 
 pub(super) const USAGE: &[&str] = &[
@@ -35,7 +36,7 @@ pub(super) fn parse(args: &[String]) -> Result<Option<Flags>, Refusal> {
                 }
                 return Ok(None);
             }
-            other => return Err(refuse(format!("unknown argument: {}", other), "", 2)),
+            other => return Err(refuse(format!("unknown argument: {}", other), "", exit::USAGE)),
         }
     }
     Ok(Some(f))
@@ -118,7 +119,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         return Err(refuse(
             format!("no {} at {}", lock::FILE, root.display()),
             "init is the verb that makes an install, and the manifest it writes is the only record of which files are this installer's to remove. Without one there is nothing here to reverse.",
-            2,
+            exit::REFUSED,
         ));
     }
     let manifest = lock::Manifest::read(&lock_path)
@@ -127,7 +128,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             refuse(
                 format!("{} carries a schema this build does not know", lock::FILE),
                 "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for.",
-                2,
+                exit::INPUT,
             )
         })?;
 
@@ -153,7 +154,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             refuse(
                 format!("could not remove the personal install's exclude block: {}", e),
                 "nothing was removed. Restore this worktree's end marker in the exclude file, or delete its begin line, then re-run.",
-                2,
+                exit::INPUT,
             )
         })?;
     }
@@ -220,7 +221,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         refuse(
             cause.lines().next().unwrap_or_default().to_string(),
             "nothing was removed. Rename the directory to a UTF-8 name, or point core.hooksPath at a directory whose path is UTF-8, then re-run.",
-            2,
+            exit::REFUSED,
         )
     };
     let root_s = root.to_string_lossy();
@@ -251,7 +252,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         if !root.join(kit).is_dir() {
             continue;
         }
-        let found = super::files_under(&root.join(kit)).map_err(|e| refuse(e, "", 2))?;
+        let found = super::files_under(&root.join(kit)).map_err(|e| refuse(e, "", exit::INPUT))?;
         added.extend(
             found
                 .into_iter()
@@ -346,7 +347,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
 
     for p in &remove_set {
         std::fs::remove_file(root.join(p))
-            .map_err(|e| refuse(format!("could not remove {}: {}", p, e), "", 2))?;
+            .map_err(|e| refuse(format!("could not remove {}: {}", p, e), "", exit::TOOL))?;
     }
 
     // spec: installer/SPEC.md §uninstall — pruning is bottom-up and only ever removes a directory
@@ -373,7 +374,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             .map_err(|e| refuse(
                 format!("the doctrine block could not be trimmed out of {}: {}", AGENT_FILE, e),
                 "",
-                2,
+                exit::INPUT,
             ))?;
         trimmed = true;
     }
@@ -395,13 +396,13 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
     let outcome = (|| -> Result<i32, Refusal> {
         if keep.is_empty() {
             std::fs::remove_file(&lock_path)
-                .map_err(|e| refuse(format!("could not remove {}: {}", lock::FILE, e), "", 2))?;
+                .map_err(|e| refuse(format!("could not remove {}: {}", lock::FILE, e), "", exit::TOOL))?;
         } else {
             std::fs::write(&lock_path, residual(&keep)).map_err(|e| {
                 refuse(
                     format!("could not rewrite {} over the kept file(s): {}", lock::FILE, e),
                     "",
-                    2,
+                    exit::TOOL,
                 )
             })?;
         }
@@ -418,7 +419,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
                     (format!("rewrote the personal install's block in {} over the {} kept file(s)", e.shown, kept.len()), e.said)
                 })
             };
-            let (done, said) = done.map_err(|e| refuse(format!("the personal install's exclude block could not be updated: {}", e), "", 2))?;
+            let (done, said) = done.map_err(|e| refuse(format!("the personal install's exclude block could not be updated: {}", e), "", exit::TOOL))?;
             for line in &said {
                 println!("{}", line);
             }
@@ -457,7 +458,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         }
         if !stage.is_empty() {
             super::git_batched(&root, &["add"], &stage)
-                .map_err(|e| refuse(format!("could not stage the removal: {}", e), "", 2))?;
+                .map_err(|e| refuse(format!("could not stage the removal: {}", e), "", exit::TOOL))?;
         }
 
         report_kept(&keep);
@@ -676,6 +677,6 @@ mod tests {
     #[test]
     fn help_answers_and_an_unknown_argument_refuses() {
         assert_eq!(run(&["--help".to_string()]), 0);
-        assert_eq!(run(&["--nope".to_string()]), 2);
+        assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }
 }

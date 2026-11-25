@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-md-unwrapped — no paragraph in the governed markdown set is
 // broken across physical lines; the block scanner here is the one `--emit md-unwrap` joins by
+use crate::exit::Fault;
 use crate::spec;
 
 const NAME: &str = "check-md-unwrapped";
@@ -302,27 +303,27 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let leads = declaration_leads()?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let leads = declaration_leads().map_err(Fault::refused)?;
     let files = if !args.is_empty() {
         args.to_vec()
     } else {
-        let include = spec::knob_array_pub("CANON_KIT_UNWRAP_GLOBS")?;
+        let include = spec::knob_array_pub("CANON_KIT_UNWRAP_GLOBS").map_err(Fault::refused)?;
         if include.is_empty() {
             println!("MD-UNWRAPPED: clean (not applicable: CANON_KIT_UNWRAP_GLOBS is unset; nothing scanned)");
             return Ok(0);
         }
-        let exclude = spec::knob_array_pub("CANON_KIT_UNWRAP_EXCLUDE")?;
-        corpus(&include, &exclude)?
+        let exclude = spec::knob_array_pub("CANON_KIT_UNWRAP_EXCLUDE").map_err(Fault::refused)?;
+        corpus(&include, &exclude).map_err(Fault::tool)?
     };
     let mut findings: Vec<String> = Vec::new();
     for f in &files {
-        let text = std::fs::read_to_string(f).map_err(|e| format!("cannot read {}: {}", f, e))?;
+        let text = std::fs::read_to_string(f).map_err(|e| Fault::input(format!("cannot read {}: {}", f, e)))?;
         for (i, (line, v)) in text.lines().zip(scan(&text, &leads)).enumerate() {
             if v.soft {
                 findings.push(format!("  {}:{}: {}", f, i + 1, head(&line[v.content..])));
@@ -335,7 +336,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             println!("{}", f);
         }
         println!("  help: join each paragraph onto one line —");
-        println!("        {}", super::door_command("--emit md-unwrap --write <file>…")?);
+        println!("        {}", super::door_command("--emit md-unwrap --write <file>…").map_err(Fault::refused)?);
         return Ok(1);
     }
     println!("MD-UNWRAPPED: clean ({} file(s); no paragraph broken across lines)", files.len());

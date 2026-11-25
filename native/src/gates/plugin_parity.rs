@@ -1,6 +1,7 @@
 // spec: plugin/SPEC.md §check-plugin-parity — the plugin package matches this repository: its two
 // manifests (A), its skills (B), its hooks (C), the marketplace pin (D), the pinned release (E) and
 // the license text (F)
+use crate::exit::Fault;
 use super::install_pin::{is_triple, pin_of};
 use super::pinned_release::{self, read, Disposition};
 use super::skill_binding::template_of;
@@ -66,7 +67,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -188,8 +189,8 @@ pub(crate) fn render_antigravity_hooks(template: &Value, package: &str) -> Resul
     Ok(Value::Object(root))
 }
 
-fn json(path: &str) -> Result<Value, String> {
-    serde_json::from_str(&read(path)?).map_err(|e| format!("{} is not JSON: {}", path, e))
+fn json(path: &str) -> Result<Value, Fault> {
+    serde_json::from_str(&read(path)?).map_err(|e| Fault::input(format!("{} is not JSON: {}", path, e)))
 }
 
 fn show(v: Option<&Value>) -> String {
@@ -249,24 +250,24 @@ enum Pinned {
     Lacks,
 }
 
-fn pinned_answer(path: &str) -> Result<Pinned, String> {
+fn pinned_answer(path: &str) -> Result<Pinned, Fault> {
     if path == "-" {
         return Ok(Pinned::Unresolved);
     }
     match read(path)?.split_whitespace().next() {
         Some("carries") => Ok(Pinned::Carries),
         Some("lacks") => Ok(Pinned::Lacks),
-        _ => Err(format!("{}: the pinned answer is neither 'carries' nor 'lacks'", path)),
+        _ => Err(Fault::input(format!("{}: the pinned answer is neither 'carries' nor 'lacks'", path))),
     }
 }
 
 // spec: plugin/SPEC.md §check-plugin-parity — the binding shims' names, each with its template
-fn shims(dir: &str) -> Result<Vec<(String, String)>, String> {
+fn shims(dir: &str) -> Result<Vec<(String, String)>, Fault> {
     if !Path::new(dir).is_dir() {
-        return Err(format!("skills dir not found: {}", dir));
+        return Err(Fault::refused(format!("skills dir not found: {}", dir)));
     }
     let mut out = Vec::new();
-    for f in walk::glob_files(Path::new(dir), &["*.md".to_string()])? {
+    for f in walk::glob_files(Path::new(dir), &["*.md".to_string()]).map_err(Fault::input)? {
         let text = read(&f.to_string_lossy())?;
         if let Some(t) = template_of(&text) {
             let stem = f.file_stem().and_then(|s| s.to_str()).unwrap_or_default();
@@ -286,8 +287,8 @@ fn publication(
     (disposition_path, queue_path): (&str, &str),
     args: &[String],
     findings: &mut Vec<String>,
-) -> Result<String, String> {
-    let pin = pin_of(install_sh, &fresh::read_captured(install_sh)?, "pin")?;
+) -> Result<String, Fault> {
+    let pin = pin_of(install_sh, &fresh::read_captured(install_sh).map_err(Fault::input)?, "pin").map_err(Fault::input)?;
     let tag = format!("v{}", pin);
     let market = json(marketplace)?;
     let entries = market.get("plugins").and_then(Value::as_array).cloned().unwrap_or_default();
@@ -342,16 +343,16 @@ fn publication(
     Ok(format!("marketplace pinned to {}, {}", tag, state))
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let positional = !args.is_empty();
     if positional && args.len() != 9 {
-        return Err("usage: check-plugin-parity [plugin-dir marketplace skills-dir hooks-template install-sh disposition queue pinned license]".to_string());
+        return Err(Fault::usage("usage: check-plugin-parity [plugin-dir marketplace skills-dir hooks-template install-sh disposition queue pinned license]"));
     }
     let arg = |i: usize, d: &str| if positional { args[i].clone() } else { d.to_string() };
-    let knob = |i: usize, k: &str| if positional { Ok(args[i].clone()) } else { walk::knob_scalar(k) };
+    let knob = |i: usize, k: &str| if positional { Ok(args[i].clone()) } else { walk::knob_scalar(k).map_err(Fault::refused) };
     let plugin = knob(0, "GATE_LOCAL_PLUGIN_DIR")?;
     let marketplace = knob(1, "GATE_LOCAL_MARKETPLACE_FILE")?;
-    let skills_dir = if positional { args[2].clone() } else { walk::knob_scalar("LIFECYCLE_KIT_SKILLS_DIR")? };
+    let skills_dir = if positional { args[2].clone() } else { walk::knob_scalar("LIFECYCLE_KIT_SKILLS_DIR").map_err(Fault::refused)? };
     let hooks_template = arg(3, HOOKS_TEMPLATE);
     let install_sh = knob(4, "GATE_LOCAL_INSTALL_SH")?;
     let root_license = knob(8, "GATE_SDK_PAYLOAD_LICENSE")?;
@@ -410,7 +411,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     expected.insert(INSTALL_SKILL.to_string());
     let skills_root = format!("{}/skills", plugin);
     let mut present: BTreeSet<String> = BTreeSet::new();
-    for (name, is_dir) in walk::list_dir(Path::new(&skills_root))? {
+    for (name, is_dir) in walk::list_dir(Path::new(&skills_root)).map_err(Fault::input)? {
         if is_dir {
             present.insert(name);
         }
@@ -476,11 +477,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let template = json(&hooks_template)?;
     let package = portable.get("name").and_then(Value::as_str).unwrap_or("");
     for (path, kind, want) in [
-        (format!("{}/{}", plugin, HOOKS), "rendering", render_hooks(&template)?),
+        (format!("{}/{}", plugin, HOOKS), "rendering", render_hooks(&template).map_err(Fault::input)?),
         (
             format!("{}/{}", plugin, antigravity::HOOK_FILE),
             "Antigravity rendering",
-            render_antigravity_hooks(&template, package)?,
+            render_antigravity_hooks(&template, package).map_err(Fault::input)?,
         ),
     ] {
         if json(&path)? != want {
@@ -498,13 +499,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: plugin/SPEC.md §check-plugin-parity — the marketplace installs `plugin/` alone, so its
     // license text is a tracked byte copy of the root file (F)
-    let want_license = std::fs::read(&root_license).map_err(|e| format!("cannot read {}: {}", root_license, e))?;
+    let want_license = std::fs::read(&root_license).map_err(|e| Fault::input(format!("cannot read {}: {}", root_license, e)))?;
     let license_path = format!("{}/{}", plugin, PLUGIN_LICENSE);
     let license_state = match std::fs::read(&license_path) {
         Ok(got) if got == want_license => None,
         Ok(_) => Some("differs from"),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Some("is absent; expected a byte copy of"),
-        Err(e) => return Err(format!("cannot read {}: {}", license_path, e)),
+        Err(e) => return Err(Fault::input(format!("cannot read {}: {}", license_path, e))),
     };
     if let Some(state) = license_state {
         findings.push(format!(

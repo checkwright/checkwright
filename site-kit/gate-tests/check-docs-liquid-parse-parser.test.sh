@@ -43,14 +43,14 @@ run_case() {
 
 printf '%s\n' 'SITE_KIT_LIQUID_PARSER[] = bash' 'SITE_KIT_LIQUID_PARSER[] = -c' \
     "SITE_KIT_LIQUID_PARSER[] = tr -cd '\\000'" > "$tmp/blind.knobs"
-run_case "a parser answering every document with an empty verdict" "$tmp/blind.knobs" 2 "failed its probe"
+run_case "a parser answering every document with an empty verdict" "$tmp/blind.knobs" 3 "failed its probe"
 
 printf '%s\n' 'SITE_KIT_LIQUID_PARSER[] = bash' 'SITE_KIT_LIQUID_PARSER[] = -c' \
     'SITE_KIT_LIQUID_PARSER[] = cat >/dev/null; printf "\000err\000"' > "$tmp/short.knobs"
-run_case "a parser passing the probe and then returning a short count" "$tmp/short.knobs" 2 "verdict(s) for 3 document(s)"
+run_case "a parser passing the probe and then returning a short count" "$tmp/short.knobs" 3 "verdict(s) for 3 document(s)"
 
 printf '%s\n' 'SITE_KIT_LIQUID_PARSER[] = site-kit-no-such-liquid-parser' > "$tmp/unresolvable.knobs"
-run_case "an unresolvable parser command" "$tmp/unresolvable.knobs" 2 "failed its probe"
+run_case "an unresolvable parser command" "$tmp/unresolvable.knobs" 3 "failed its probe"
 
 run_case "an error below a front-matter block" "" 1 "docs/late.md: Liquid syntax error (line 8):"
 
@@ -58,5 +58,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-docs-liquid-parse-parser.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-docs-liquid-parse-parser.test: ok (a blind parser, a short count and an unresolvable command each exit 2; an error below front matter reports the file's own line)"
+echo "check-docs-liquid-parse-parser.test: ok (a blind parser, a short count and an unresolvable command each exit 3; an error below front matter reports the file's own line)"
 exit 0

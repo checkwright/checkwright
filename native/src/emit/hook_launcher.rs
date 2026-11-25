@@ -2,6 +2,7 @@
 // `GATE_SDK_NATIVE_BIN` names on the `--git-hook` arm and returns its status, never judging itself
 // spec: gate-sdk/SPEC.md §install-hooks — the hooks directory's one derivation, read by the arm that
 // places it and by the installer verbs that report and remove it
+use crate::exit::{self, Fault};
 use crate::knobs::{self, gate_sdk};
 use crate::{knobfile, proc, programs, walk};
 use std::path::{Path, PathBuf};
@@ -282,18 +283,18 @@ fn chain_refusal(hook: &str, cause: &str) -> String {
 
 // spec: gate-sdk/SPEC.md §git-hook — the chained start: `Ok(None)` is no record or no live hook of
 // this name, `Ok(Some(_))` the prior hook's path and status, `Err` the refusal line
-fn run_chained(hook: &str, started_as: &str, args: &[String]) -> Result<Option<(PathBuf, i32)>, String> {
+fn run_chained(hook: &str, started_as: &str, args: &[String]) -> Result<Option<(PathBuf, i32)>, Fault> {
     let Some(dir) = start_dir(started_as) else {
         return Ok(None);
     };
-    let chain = read_chain(dir).map_err(|e| chain_refusal(hook, &e))?;
+    let chain = read_chain(dir).map_err(|e| Fault::input(chain_refusal(hook, &e)))?;
     let Some(chain) = chain else {
         return Ok(None);
     };
-    let Some(path) = live_named(&chain.dir, hook).map_err(|e| chain_refusal(hook, &e))? else {
+    let Some(path) = live_named(&chain.dir, hook).map_err(|e| Fault::input(chain_refusal(hook, &e)))? else {
         return Ok(None);
     };
-    let code = start_prior(hook, &chain.dir, &path, args).map_err(|e| format!("{}: {}", hook, e))?;
+    let code = start_prior(hook, &chain.dir, &path, args).map_err(|e| Fault::tool(format!("{}: {}", hook, e)))?;
     Ok(Some((path, code)))
 }
 
@@ -351,7 +352,7 @@ pub fn forward_run(hook: &str, started_as: &str, args: &[String]) -> i32 {
         Ok(None) => 0,
         Err(e) => {
             eprintln!("{}", e);
-            2
+            e.status()
         }
     }
 }
@@ -361,7 +362,7 @@ pub fn launch(hook: &str, started_as: &str, args: &[String]) -> i32 {
         Ok(b) => b,
         Err(e) => {
             eprintln!("{}: {} — the hook could not run; treating as failure (not clean)", hook, e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if served(&bin).is_some() {
@@ -369,7 +370,7 @@ pub fn launch(hook: &str, started_as: &str, args: &[String]) -> i32 {
             "{}: {} names {}, itself a hook's name, so the launcher would start itself — the hook could not run; treating as failure (not clean)\n  help: point {} at the gate binary",
             hook, BIN_KNOB, bin, BIN_KNOB
         );
-        return 2;
+        return exit::REFUSED;
     }
     match run_chained(hook, started_as, args) {
         Ok(None) | Ok(Some((_, 0))) => {}
@@ -379,7 +380,7 @@ pub fn launch(hook: &str, started_as: &str, args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("{}", e);
-            return 2;
+            return e.status();
         }
     }
     let mut argv: Vec<&str> = vec!["--git-hook", hook];
@@ -388,7 +389,7 @@ pub fn launch(hook: &str, started_as: &str, args: &[String]) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("{}", refusal(hook, &bin, &e));
-            2
+            exit::TOOL
         }
     }
 }

@@ -1,6 +1,7 @@
 // spec: installer/SPEC.md §The front door's verbs — the tables are the binary's rosters (A), and
 // every advertised verb, flag, operand and arm is in the pinned release, or pending its release (B)
 use super::pinned_release::{self, read, Disposition};
+use crate::exit::Fault;
 use crate::knobfile::{self, Form};
 use crate::{fresh, walk};
 use std::collections::BTreeSet;
@@ -27,7 +28,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -76,7 +77,7 @@ impl Tree {
         }
     }
 
-    fn get(&self, rel: &str) -> Result<Option<String>, String> {
+    fn get(&self, rel: &str) -> Result<Option<String>, Fault> {
         match self {
             Tree::Dir(_) => {
                 let p = self.path(rel);
@@ -96,7 +97,7 @@ impl Tree {
         }
     }
 
-    fn required(&self, rel: &str) -> Result<String, String> {
+    fn required(&self, rel: &str) -> Result<String, Fault> {
         match self {
             Tree::Dir(_) => read(&self.path(rel)),
             Tree::Tag(t) => pinned_release::show_at(t, rel),
@@ -106,9 +107,9 @@ impl Tree {
 
 // spec: installer/SPEC.md §The front door's verbs — the gate-sdk knob seam file, in the directory
 // `GATE_SDK_GATES_DIR` names
-fn seam_path() -> Result<String, String> {
-    let kit = crate::knobs::owner(RECIPE_KNOB).ok_or_else(|| format!("no static kit owns {}", RECIPE_KNOB))?;
-    let dir = crate::walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+fn seam_path() -> Result<String, Fault> {
+    let kit = crate::knobs::owner(RECIPE_KNOB).ok_or_else(|| Fault::tool(format!("no static kit owns {}", RECIPE_KNOB)))?;
+    let dir = crate::walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
     Ok(format!("{}/{}-config.knobs", dir.trim_end_matches('/'), kit.stem()))
 }
 
@@ -121,9 +122,9 @@ fn profile_set(text: Option<String>) -> BTreeSet<String> {
 
 // spec: installer/SPEC.md §The front door's verbs — the recipe set: the keys of the recipe knob's
 // lines in the seam file; a tree lacking the file has the empty set
-fn recipe_set(label: &str, text: Option<String>) -> Result<BTreeSet<String>, String> {
+fn recipe_set(label: &str, text: Option<String>) -> Result<BTreeSet<String>, Fault> {
     let Some(text) = text else { return Ok(BTreeSet::new()) };
-    Ok(knobfile::parse(&text, label)?
+    Ok(knobfile::parse(&text, label).map_err(Fault::input)?
         .into_iter()
         .filter(|e| e.name == RECIPE_KNOB)
         .filter_map(|e| match e.form {
@@ -220,35 +221,35 @@ struct Layout {
     checkout: (String, String),
 }
 
-fn layout() -> Result<Layout, String> {
+fn layout() -> Result<Layout, Fault> {
     Ok(Layout {
         // consumer-value-exempt: a file name under the installer directory knob, no layout of its own
-        readme: fresh::knob_joined("GATE_LOCAL_INSTALLER_DIR", "README.md")?,
-        profiles: fresh::knob_joined("GATE_LOCAL_INSTALLER_DIR", "profiles.list")?,
-        emit_src: fresh::knob_joined("GATE_SDK_NATIVE_SRC", "emit/mod.rs")?,
-        main_src: fresh::knob_joined("GATE_SDK_NATIVE_SRC", "main.rs")?,
+        readme: fresh::knob_joined("GATE_LOCAL_INSTALLER_DIR", "README.md").map_err(Fault::refused)?,
+        profiles: fresh::knob_joined("GATE_LOCAL_INSTALLER_DIR", "profiles.list").map_err(Fault::refused)?,
+        emit_src: fresh::knob_joined("GATE_SDK_NATIVE_SRC", "emit/mod.rs").map_err(Fault::refused)?,
+        main_src: fresh::knob_joined("GATE_SDK_NATIVE_SRC", "main.rs").map_err(Fault::refused)?,
         checkout: (
-            walk::knob_scalar("GATE_LOCAL_README_FILE")?,
-            walk::knob_scalar("GATE_LOCAL_CHECKOUT_SECTION")?,
+            walk::knob_scalar("GATE_LOCAL_README_FILE").map_err(Fault::refused)?,
+            walk::knob_scalar("GATE_LOCAL_CHECKOUT_SECTION").map_err(Fault::refused)?,
         ),
     })
 }
 
 // spec: installer/SPEC.md §The front door's verbs — a tree carrying neither source file predates
 // the gate binary and has the empty arm set; one carrying either must yield both arrays
-fn pinned_arms(tree: &Tree, l: &Layout) -> Result<BTreeSet<String>, String> {
+fn pinned_arms(tree: &Tree, l: &Layout) -> Result<BTreeSet<String>, Fault> {
     let (emit_src, main_src) = (l.emit_src.as_str(), l.main_src.as_str());
     let (emit, main) = (tree.get(emit_src)?, tree.get(main_src)?);
     if emit.is_none() && main.is_none() {
         return Ok(BTreeSet::new());
     }
     arm_table(emit.as_deref().unwrap_or(""), main.as_deref().unwrap_or("")).ok_or_else(|| {
-        format!(
+        Fault::input(format!(
             "{} carries no `ARMS` array in {} or no `TOP_LEVEL_FLAGS` array in {}, or one yielding no member, so its arm set could not be read",
             tree.label(),
             emit_src,
             main_src
-        )
+        ))
     })
 }
 
@@ -451,23 +452,23 @@ fn advertised(code: &str) -> Vec<Tok> {
     out
 }
 
-fn table(label: &str, text: &str) -> Result<Vec<String>, String> {
+fn table(label: &str, text: &str) -> Result<Vec<String>, Fault> {
     match verb_table(text) {
         Some(v) if !v.is_empty() => Ok(v),
-        _ => Err(format!(
+        _ => Err(Fault::input(format!(
             "{} carries no verb table (a table whose header row's first cell is 'verb', listing code-spanned verbs)",
             label
-        )),
+        ))),
     }
 }
 
-fn head_flags(label: &str, text: &str) -> Result<BTreeSet<Pair>, String> {
+fn head_flags(label: &str, text: &str) -> Result<BTreeSet<Pair>, Fault> {
     match flag_table(text) {
         Some(v) if !v.is_empty() => Ok(v.into_iter().collect()),
-        _ => Err(format!(
+        _ => Err(Fault::input(format!(
             "{} carries no flag table (a table whose header row's first cell is 'flag', listing a code-spanned flag beside its code-spanned verbs)",
             label
-        )),
+        ))),
     }
 }
 
@@ -514,10 +515,10 @@ struct Findings {
     pending_arms: BTreeSet<String>,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let positional = !args.is_empty();
     if positional && args.len() < 5 {
-        return Err("usage: check-front-door-verbs [head pinned disposition queue page...]".to_string());
+        return Err(Fault::usage("usage: check-front-door-verbs [head pinned disposition queue page...]"));
     }
     let head = Tree::Dir(if positional { args[0].clone() } else { ".".to_string() });
     // spec: installer/SPEC.md §The front door's verbs — the pinned tree is the tag the hosted pin
@@ -535,7 +536,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let pages: Vec<String> = if positional {
         args[4..].to_vec()
     } else {
-        walk::knob_array("GATE_LOCAL_FRONT_DOOR_SURFACES")?
+        walk::knob_array("GATE_LOCAL_FRONT_DOOR_SURFACES").map_err(Fault::refused)?
     };
     let l = layout()?;
 

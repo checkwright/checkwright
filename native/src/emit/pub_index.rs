@@ -1,5 +1,6 @@
 // spec: context-kit/SPEC.md §Index-first reading — the public-surface index: a dispatcher over
 // per-language extractors, whose seam that section rules survives the port intact.
+use crate::exit::Fault;
 use crate::programs;
 use super::pub_lang;
 use super::{corpus, read_text, relative, targets};
@@ -145,25 +146,26 @@ fn block(rel: &str, rows: &[String]) -> String {
     out
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let paths = targets(args, USAGE)?;
-    let root = crate::walk::toplevel_opt()?;
-    let dir = crate::walk::knob_scalar("CONTEXT_KIT_PUB_LANG_DIR")?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let paths = targets(args, USAGE).map_err(|e| if e.ends_with(USAGE) { Fault::usage(e) } else { Fault::tool(e) })?;
+    let root = crate::walk::toplevel_opt().map_err(Fault::tool)?;
+    let dir = crate::walk::knob_scalar("CONTEXT_KIT_PUB_LANG_DIR").map_err(Fault::refused)?;
+    crate::walk::knob_array("CONTEXT_KIT_PRUNE_DIRS").map_err(Fault::refused)?;
     // spec: context-kit/SPEC.md §Layout and configuration — an empty `CONTEXT_KIT_PUB_LANGS` means *derive
     // it*, not *no languages*: a repo-relative literal cannot express the shipped roster, so the
     // one reader of the knob expands it to the built-in set.
-    let mut langs = crate::walk::knob_array("CONTEXT_KIT_PUB_LANGS")?;
+    let mut langs = crate::walk::knob_array("CONTEXT_KIT_PUB_LANGS").map_err(Fault::refused)?;
     if langs.is_empty() {
         langs = pub_lang::langs().into_iter().map(String::from).collect();
     }
     let mut out = String::new();
     for lang in &langs {
-        let extractor = resolve(lang, &dir)?;
-        let patterns = globs(&extractor)?;
+        let extractor = resolve(lang, &dir).map_err(Fault::refused)?;
+        let patterns = globs(&extractor).map_err(Fault::tool)?;
         let refs: Vec<&str> = patterns.iter().map(String::as_str).collect();
-        let files = corpus(&paths, &refs)?;
+        let files = corpus(&paths, &refs).map_err(Fault::input)?;
         let mut lang_block = String::new();
-        for (file, mut rows) in rows_by_file(&extractor, &files)? {
+        for (file, mut rows) in rows_by_file(&extractor, &files).map_err(Fault::tool)? {
             if rows.is_empty() {
                 continue;
             }

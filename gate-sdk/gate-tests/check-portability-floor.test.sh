@@ -100,7 +100,7 @@ if ! head -c1 "$SANDBOX/repo/locked.list" >/dev/null 2>&1; then
     out="$( cd "$SANDBOX/repo" \
         && gate_env GATE_SDK_PORTABILITY_PATHS=. \
         && gate_run check-portability-floor "$CHECKS" locked.list 2>&1 )"; rc=$?
-    expect unreadable-pattern-file 2 'pattern file not readable' "$rc" "$out"
+    expect unreadable-pattern-file 3 'pattern file not readable' "$rc" "$out"
 else
     echo "  SKIP [unreadable-pattern-file]: chmod 000 left the file readable — this account or filesystem does not enforce POSIX modes, so the arm's precondition is absent and it declares the skip rather than reporting a failure."
 fi

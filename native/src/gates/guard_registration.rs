@@ -1,6 +1,7 @@
 // spec: guard-kit/SPEC.md §check-guard-registration — the rule roster, the crate's rule table and
 // every rule citation agree, fail-closed on a roster, table or corpus it cannot read
 use crate::diff;
+use crate::exit::Fault;
 use crate::guard::engine::Shell;
 use crate::guard::reader::View;
 use crate::walk;
@@ -38,22 +39,22 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let given = |at: usize| args.get(at).filter(|a| !a.is_empty()).cloned();
     let spec = match given(0) {
         Some(s) => s,
-        None => format!("{}/SPEC.md", kit_root()?),
+        None => format!("{}/SPEC.md", kit_root().map_err(Fault::refused)?),
     };
     let table = match given(1) {
-        Some(f) => table_file(&read(&f)?, &f)?,
+        Some(f) => table_file(&read(&f).map_err(Fault::input)?, &f).map_err(Fault::input)?,
         None => compiled(),
     };
-    let items = roster(&read(&spec)?, &spec)?;
+    let items = roster(&read(&spec).map_err(Fault::input)?, &spec).map_err(Fault::input)?;
     let mut findings = 0usize;
 
     let mut grammar = false;
@@ -92,7 +93,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut declaring = false;
     for it in &items {
         let label = it.name.as_deref().unwrap_or("?");
-        let clauses = declarations(&it.body, &spec, it.line)?;
+        let clauses = declarations(&it.body, &spec, it.line).map_err(Fault::input)?;
         if clauses.len() != 1 {
             println!(
                 "{}:{}: roster item `{}` carries {} declaration clause(s) where exactly one is owed",
@@ -105,7 +106,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             findings += 1;
             continue;
         }
-        let named = shells_clauses(&it.body, &spec, it.line)?;
+        let named = shells_clauses(&it.body, &spec, it.line).map_err(Fault::input)?;
         if named.len() > 1 {
             println!(
                 "{}:{}: roster item `{}` carries {} shells clauses where at most one is owed",
@@ -176,26 +177,26 @@ fn rule(args: &[String]) -> Result<i32, String> {
         Some(p) if !p.is_empty() => p,
         _ => ".".to_string(),
     };
-    let mut inner = ls(&kit_dir)?;
-    let guard_dir = format!("{}/guard", walk::knob_scalar("GATE_SDK_NATIVE_SRC")?.trim_end_matches('/'));
+    let mut inner = ls(&kit_dir).map_err(Fault::tool)?;
+    let guard_dir = format!("{}/guard", walk::knob_scalar("GATE_SDK_NATIVE_SRC").map_err(Fault::refused)?.trim_end_matches('/'));
     if Path::new(&guard_dir).is_dir() {
-        inner.extend(ls(&guard_dir)?);
+        inner.extend(ls(&guard_dir).map_err(Fault::tool)?);
     }
-    let workflow = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?;
+    let workflow = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?;
     let skipped: BTreeSet<String> = if Path::new(&workflow).is_dir() {
-        ls(&workflow)?.into_iter().collect()
+        ls(&workflow).map_err(Fault::tool)?.into_iter().collect()
     } else {
         BTreeSet::new()
     };
-    let prune = walk::prune_dirs()?;
+    let prune = walk::prune_dirs().map_err(Fault::refused)?;
     let mut cited = 0usize;
     let mut citing = false;
-    for file in ls(".")? {
+    for file in ls(".").map_err(Fault::tool)? {
         let own = inner.contains(&file);
         if skipped.contains(&file) || (!own && walk::path_pruned(&file, &prune)) {
             continue;
         }
-        let Some(text) = corpus_file(&file)? else {
+        let Some(text) = corpus_file(&file).map_err(Fault::input)? else {
             continue;
         };
         for (n, line) in text.lines().enumerate() {

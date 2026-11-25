@@ -1,5 +1,6 @@
 // spec: companion/SPEC.md §The support table — one row per check the fixture tree proves or
 // native.list rosters, one column per toolkits.list line; one function the gate calls in process
+use crate::exit::Fault;
 use crate::fresh;
 use std::path::Path;
 
@@ -180,21 +181,21 @@ fn rewrite(page: &str, text: &str, begin: &str, end: &str, table: &str) -> Resul
 
 // spec: companion/SPEC.md §The support table — `--write` rewrites the block in place and touches
 // nothing else; `arm` names the table in the report
-pub fn write_marked(arm: &str, page: &str, begin: &str, end: &str, table: &str) -> Result<String, String> {
-    let text = crate::emit::read_text(page)?;
-    let new = rewrite(page, &text, begin, end, table)?;
+pub fn write_marked(arm: &str, page: &str, begin: &str, end: &str, table: &str) -> Result<String, Fault> {
+    let text = crate::emit::read_text(page).map_err(Fault::input)?;
+    let new = rewrite(page, &text, begin, end, table).map_err(Fault::input)?;
     if new == text {
         return Ok(format!("{}: {} already fresh\n", arm, page));
     }
-    std::fs::write(page, new).map_err(|e| format!("cannot write {}: {}", page, e))?;
+    std::fs::write(page, new).map_err(|e| Fault::tool(format!("cannot write {}: {}", page, e)))?;
     Ok(format!("{}: rewrote {}\n", arm, page))
 }
 
 // spec: companion/SPEC.md §The support table — the bare arm prints the block
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let table = render(&crate::walk::knob_scalar(COMPANION_KNOB)?)?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let table = render(&crate::walk::knob_scalar(COMPANION_KNOB).map_err(Fault::refused)?).map_err(Fault::input)?;
     if args.iter().any(|a| a == "--write") {
-        let page = crate::walk::knob_scalar(PAGE_KNOB)?;
+        let page = crate::walk::knob_scalar(PAGE_KNOB).map_err(Fault::refused)?;
         return write_marked("support-table", &page, BEGIN, END, &table);
     }
     Ok(format!("{}\n", table.trim_matches('\n')))

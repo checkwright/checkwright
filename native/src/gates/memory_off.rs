@@ -2,7 +2,7 @@
 // memory dir stays empty and no local settings override re-enables a pinned key
 use crate::gates::template_registry_parity::list_members;
 use crate::json::{values_equal, Path};
-use crate::walk;
+use crate::{exit::{self, Fault}, walk};
 use serde_json::Value;
 
 fn trim(s: &str) -> &str {
@@ -14,8 +14,8 @@ use crate::sessions::HOME_VAR;
 // spec: context-kit/SPEC.md §Layout and configuration — the project dir under the harness's
 // config home, named by the session encoder over the repository toplevel, the spelling the
 // harness was observed folding on every substrate
-fn memory_dir_default() -> Result<Option<String>, String> {
-    let Some(top) = walk::toplevel_opt()? else {
+fn memory_dir_default() -> Result<Option<String>, Fault> {
+    let Some(top) = walk::toplevel_opt().map_err(Fault::tool)? else {
         return Ok(None);
     };
     let config_dir = std::env::var(crate::hook::binding::CONFIG_DIR_VAR).unwrap_or_default();
@@ -23,10 +23,10 @@ fn memory_dir_default() -> Result<Option<String>, String> {
     // deriving a path under `/` that would be absent and therefore read as clean
     let home = if config_dir.is_empty() {
         std::env::var(HOME_VAR).map_err(|_| {
-            format!(
+            Fault::refused(format!(
                 "{} is unset — the harness memory dir cannot be derived; treating as failure (not clean)",
                 HOME_VAR
-            )
+            ))
         })?
     } else {
         String::new()
@@ -52,11 +52,11 @@ fn split_pin(line: &str) -> Option<(&str, &str)> {
     Some((path, expected))
 }
 
-pub(crate) fn resolve_memory_dirs() -> Result<Vec<String>, String> {
+pub(crate) fn resolve_memory_dirs() -> Result<Vec<String>, Fault> {
     // spec: context-kit/SPEC.md §check-memory-off — the knob is a word-split list of globs, so
     // each element splits again on whitespace exactly as the shell's unquoted `$memdirs`
     // does; empty means "derive it", not "no dir"
-    let words: Vec<String> = walk::knob_array("CONTEXT_KIT_MEMORY_DIRS")?
+    let words: Vec<String> = walk::knob_array("CONTEXT_KIT_MEMORY_DIRS").map_err(Fault::refused)?
         .iter()
         .flat_map(|e| e.split_whitespace().map(String::from).collect::<Vec<_>>())
         .collect();
@@ -77,28 +77,28 @@ pub(crate) fn resolve_memory_dirs() -> Result<Vec<String>, String> {
 
 // spec: context-kit/SPEC.md §check-memory-off — the scan set the gate reads, one dir per line, so
 // the session-context hook's step 5 folds nothing of its own
-pub fn emit_memory_dirs(_args: &[String]) -> Result<String, String> {
+pub fn emit_memory_dirs(_args: &[String]) -> Result<String, Fault> {
     Ok(resolve_memory_dirs()?.into_iter().map(|d| format!("{}\n", d)).collect())
 }
 
 pub fn run(args: &[String]) -> i32 {
     if let Some(a) = args.first() {
         eprintln!("check-memory-off: unexpected argument: {}", a);
-        return 2;
+        return exit::USAGE;
     }
 
     let pins_file = match walk::knob_scalar("CONTEXT_KIT_SETTINGS_PINS") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-memory-off: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let settings_file = match walk::knob_scalar("CONTEXT_KIT_SETTINGS_FILE") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-memory-off: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let local_settings = format!(
@@ -112,7 +112,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(d) => d,
         Err(e) => {
             eprintln!("check-memory-off: {}", e);
-            return 2;
+            return e.status();
         }
     };
 
@@ -127,7 +127,7 @@ pub fn run(args: &[String]) -> i32 {
             continue;
         }
         // spec: gate-sdk/SPEC.md §Fail-closed contract — the shell's bare `find` prunes nothing,
-        // so neither does this walk; a dir it cannot read is exit 2, never a smaller corpus
+        // so neither does this walk; a dir it cannot read is exit 3, never a smaller corpus
         let files = match walk::find_with_prune(p, &|_| false) {
             Ok(f) => f,
             Err(e) => {
@@ -135,7 +135,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-memory-off: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         if files
@@ -157,14 +157,14 @@ pub fn run(args: &[String]) -> i32 {
                         "check-memory-off: {} is not readable — the check could not run; treating as failure (not clean)",
                         local_settings
                     );
-                    return 2;
+                    return exit::INPUT;
                 }
             };
             let doc: Value = match serde_json::from_str(&text) {
                 Ok(v) => v,
                 Err(_) => {
                     eprintln!("check-memory-off: {} is not valid JSON", local_settings);
-                    return 2;
+                    return exit::INPUT;
                 }
             };
             for line in list_members(&pins_text) {

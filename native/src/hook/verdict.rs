@@ -1,6 +1,7 @@
 // spec: delegation-kit/SPEC.md §usage-verdict — the trustworthy budget verdict: one decision table
 // over a usage snapshot, a three-state exit contract (0 OK/RESET-OK, 1 PAUSE, 2 STALE) and one
 // verdict line. Two callers read it — the `--usage-verdict` arm and `agent-budget-guard` in process.
+use crate::exit;
 use crate::proc;
 use crate::walk;
 
@@ -429,12 +430,12 @@ pub fn verdict(args: &[String]) -> (String, i32) {
         Err(e) => {
             eprintln!("{}", e);
             eprintln!("{}", USAGE);
-            return (String::new(), 2);
+            return (String::new(), exit::USAGE);
         }
     };
     let mut cfg = match config() {
         Ok(c) => c,
-        Err(e) => return (format!("usage-verdict: {} -> STALE ({})", e, NEVER_BLOCKS), 2),
+        Err(e) => return (format!("usage-verdict: {} -> STALE ({})", e, NEVER_BLOCKS), exit::STALE),
     };
     if let Some(p) = usage_arg {
         cfg.usage_file = p.to_string();
@@ -448,7 +449,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
     let live = crate::hook::usage::json_field(&cfg.account_config, &["oauthAccount", "accountUuid"]);
     refresh(&cfg, &live);
 
-    let stale = |body: String| (format!("{} -> STALE ({})", body, NEVER_BLOCKS), 2);
+    let stale = |body: String| (format!("{} -> STALE ({})", body, NEVER_BLOCKS), exit::STALE);
 
     let snap = match load(&cfg.usage_file) {
         Loaded::Read(s) => s,
@@ -530,7 +531,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
                     "{} -> STALE (reading older than {}s; pct may lag reality; {})",
                     reading, cfg.stale_age, NEVER_BLOCKS
                 ),
-                2,
+                exit::STALE,
             );
         }
         Judged::Pause { long: true } => {
@@ -567,7 +568,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
                 "{} -> STALE (snapshot predates an account switch; {})",
                 reading, NEVER_BLOCKS
             ),
-            2,
+            exit::STALE,
         );
     }
     let cred_age = now - login_at;
@@ -583,7 +584,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
                 "{} -> STALE (auth changed {}s ago; a /login starts fresh windows the server-fed pct lags; {})",
                 reading, cred_age, NEVER_BLOCKS
             ),
-            2,
+            exit::STALE,
         );
     }
 
@@ -660,14 +661,14 @@ pub fn keyed(cfg: &KeyedConfig, adapter: &str) -> Keyed {
                 head
             ),
             word: "OFF",
-            code: 2,
+            code: exit::OFF,
         };
     };
     produce(cfg, adapter, &path, None);
     let stale = |body: String| Keyed {
         line: format!("{} {} -> STALE (budget unknown; {})", head, body, KEYED_NEVER_BLOCKS),
         word: "STALE",
-        code: 2,
+        code: exit::STALE,
     };
     let snap = match load(&path) {
         Loaded::Read(s) => s,
@@ -734,7 +735,7 @@ pub fn keyed(cfg: &KeyedConfig, adapter: &str) -> Keyed {
         ),
         Judged::AgeStale => (
             "STALE",
-            2,
+            exit::STALE,
             format!(
                 "reading older than {}s and under its pause thresholds; pct may lag reality; {}",
                 cfg.stale_age, KEYED_NEVER_BLOCKS

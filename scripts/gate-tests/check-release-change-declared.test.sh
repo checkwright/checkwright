@@ -105,7 +105,7 @@ mkrepo "$h"
 git -C "$h" tag -a v9.1.0 -m v9.1.0
 printf '## Behavior changes\n' >"$h/.workflow/release-declarations.md"
 git -C "$h" add -A
-check_case "surface-missing-header" "$h" 2 "lacks its \`# contract:\` header" ""
+check_case "surface-missing-header" "$h" 3 "lacks its \`# contract:\` header" ""
 
 i="$tmp/nosurface"
 mkrepo "$i"
@@ -117,7 +117,7 @@ mkdir -p "$j"
 cp "$FIXTURES/good/release-declarations.md" "$j/"
 printf 'D\talpha-kit/bin/x.sh\n' >"$j/changes.txt"
 mkdir -p "$j/alpha-kit/bin"
-check_case "dump-without-base" "$j" 2 "base <tag>" "" release-declarations.md changes.txt base
+check_case "dump-without-base" "$j" 3 "base <tag>" "" release-declarations.md changes.txt base
 
 check_case "dump-without-base-dir" "$j" 2 "together" "" release-declarations.md changes.txt
 

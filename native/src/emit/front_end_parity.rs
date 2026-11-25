@@ -1,5 +1,7 @@
 // spec: gate-sdk/SPEC.md §run-gates — the front-end parity oracle, an `Arm::Run` member: the
-// contract is the 0/1/2 split — identical, divergent, could not run — which `Arm::Emit` cannot carry
+// contract is the 0/1/2/3 split — identical, divergent, refused, could not run — which `Arm::Emit`
+// cannot carry
+use crate::exit;
 use crate::proc::{self, ChildEnv, Completed};
 use crate::programs::{self, Program};
 use crate::walk;
@@ -125,7 +127,7 @@ const fn absent(
         files,
         runnable_bin: false,
         stdin: "",
-        expect_code: 2,
+        expect_code: exit::TOOL,
         expect_text,
         expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
@@ -196,7 +198,7 @@ const CORPUS: &[Case] = &[
         files: &[],
         runnable_bin: false,
         stdin: "",
-        expect_code: 2,
+        expect_code: exit::REFUSED,
         expect_text: "run-gates: not inside a git repository",
         expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
@@ -211,7 +213,7 @@ const CORPUS: &[Case] = &[
         files: &[(".git", "gitdir: absent\n")],
         runnable_bin: false,
         stdin: "",
-        expect_code: 2,
+        expect_code: exit::TOOL,
         expect_text: "run-gates: git refuses the repository marked here",
         expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
@@ -226,7 +228,7 @@ const CORPUS: &[Case] = &[
         files: &[(".git", "gitdir: absent\n")],
         runnable_bin: false,
         stdin: "",
-        expect_code: 2,
+        expect_code: exit::TOOL,
         expect_text: "run-gates: git refuses the repository marked here",
         expect_stdout: Stdout::Unchecked,
         linked: Linked::No,
@@ -246,7 +248,7 @@ const CORPUS: &[Case] = &[
         expect_stdout: Stdout::SystemMessage,
         linked: Linked::No,
     },
-    nested("an empty nested .git directory git skips", Nested::EmptyDir, &[], 2, SKIPPED),
+    nested("an empty nested .git directory git skips", Nested::EmptyDir, &[], exit::TOOL, SKIPPED),
     Case {
         name: "an empty nested .git directory git skips, leading --hook",
         argv: &["--hook", "escalation-guard"],
@@ -254,21 +256,21 @@ const CORPUS: &[Case] = &[
         expect_stdout: Stdout::SystemMessage,
         ..nested("", Nested::EmptyDir, &[], 0, SKIPPED)
     },
-    nested("a nested .git holding a garbage HEAD git skips", Nested::GarbageHead, &[], 2, SKIPPED),
+    nested("a nested .git holding a garbage HEAD git skips", Nested::GarbageHead, &[], exit::TOOL, SKIPPED),
     nested(
         "an empty nested .git directory under a GIT_DIR, which discovers nothing",
         Nested::EmptyDir,
         &[("GIT_DIR", "../../.git")],
-        2,
+        exit::TOOL,
         ABSENT,
     ),
-    nested("a valid nested repository, the control", Nested::Repo, &[], 2, ABSENT),
-    nested("a valid nested repository a GIT_WORK_TREE above it selects", Nested::Repo, ABOVE, 2, ABSENT),
+    nested("a valid nested repository, the control", Nested::Repo, &[], exit::TOOL, ABSENT),
+    nested("a valid nested repository a GIT_WORK_TREE above it selects", Nested::Repo, ABOVE, exit::TOOL, ABSENT),
     nested(
         "a nested CRLF gitfile naming the repository a GIT_WORK_TREE above it selects",
         Nested::Gitfile,
         ABOVE,
-        2,
+        exit::TOOL,
         ABSENT,
     ),
     absent("binary absent, leading --emit", &[], &[], ABSENT),
@@ -385,12 +387,12 @@ const CORPUS: &[Case] = &[
     ),
     grammar("-h", &["-h"], 0, "usage: --run"),
     grammar("--help", &["--help"], 0, "usage: --run"),
-    grammar("--only <name>", &["--only", "check-x"], 2, "scripts/gates.list"),
-    grammar("--for <path>", &["--for", "README.md"], 2, "scripts/gates.list"),
-    grammar("--", &["--"], 2, "scripts/gates.list"),
-    grammar("-- <dir>", &["--", "elsewhere", "ignored"], 2, "elsewhere/gates.list"),
-    grammar("no argument", &[], 2, "scripts/gates.list"),
-    grammar("a bare positional", &["positional", "ignored"], 2, "positional/gates.list"),
+    grammar("--only <name>", &["--only", "check-x"], exit::REFUSED, "scripts/gates.list"),
+    grammar("--for <path>", &["--for", "README.md"], exit::REFUSED, "scripts/gates.list"),
+    grammar("--", &["--"], exit::REFUSED, "scripts/gates.list"),
+    grammar("-- <dir>", &["--", "elsewhere", "ignored"], exit::REFUSED, "elsewhere/gates.list"),
+    grammar("no argument", &[], exit::REFUSED, "scripts/gates.list"),
+    grammar("a bare positional", &["positional", "ignored"], exit::REFUSED, "positional/gates.list"),
     grammar(
         "a leading --emit <arm>",
         &["--emit", "knob-values", "GATE_SDK_NATIVE_BIN"],
@@ -434,39 +436,39 @@ const CORPUS: &[Case] = &[
 ];
 
 const UNIX_CORPUS: &[Case] = &[
-    nested("a dangling nested .git symlink git skips", Nested::DanglingLink, &[], 2, SKIPPED),
+    nested("a dangling nested .git symlink git skips", Nested::DanglingLink, &[], exit::TOOL, SKIPPED),
     nested(
         "a nested .git symlink naming the repository a GIT_WORK_TREE above it selects",
         Nested::RepoLink,
         ABOVE,
-        2,
+        exit::TOOL,
         ABSENT,
     ),
     nested(
         "a nested gitfile through a symlinked directory naming the selected repository",
         Nested::GitfileViaLink,
         ABOVE,
-        2,
+        exit::TOOL,
         ABSENT,
     ),
     nested(
         "a nested gitfile naming the selected repository as a symlink's physical parent",
         Nested::GitfileLinkThenParent,
         ABOVE,
-        2,
+        exit::TOOL,
         ABSENT,
     ),
     nested(
         "a nested gitfile whose symlink's physical parent folds lexically to a directory",
         Nested::GitfileLinkParentFoldsToDir,
         ABOVE,
-        2,
+        exit::TOOL,
         ABSENT,
     ),
     Case {
         name: "a starting directory reached through a symlink, its repository selected from above",
         start: VIA_DEEP,
-        ..nested("", Nested::StartViaLink, ABOVE, 2, ABSENT)
+        ..nested("", Nested::StartViaLink, ABOVE, exit::TOOL, ABSENT)
     },
 ];
 
@@ -478,7 +480,7 @@ fn corpus() -> Vec<&'static Case> {
 pub fn run(args: &[String]) -> i32 {
     if let Some(a) = args.first() {
         eprintln!("{}: unknown argument: {}; usage: --run-front-end-parity", NAME, a);
-        return 2;
+        return exit::USAGE;
     }
     match check() {
         Ok(true) => 0,
@@ -488,7 +490,7 @@ pub fn run(args: &[String]) -> i32 {
                 "{}: {} — the check could not run; treating as failure (not clean)",
                 NAME, e
             );
-            2
+            exit::TOOL
         }
     }
 }

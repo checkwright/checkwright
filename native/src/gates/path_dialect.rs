@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-path-dialect — every platform-native path producer in the two
 // corpora converts at its own point of production, or records at the site why it does not
+use crate::exit::Fault;
 use crate::walk;
 use std::path::Path;
 
@@ -35,7 +36,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -575,12 +576,12 @@ fn read(p: &Path) -> Result<String, String> {
         .map_err(|e| format!("cannot read {}: {}", p.display(), e))
 }
 
-fn rule(_args: &[String]) -> Result<i32, String> {
+fn rule(_args: &[String]) -> Result<i32, Fault> {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the shell corpus degrades to empty outside a
     // work tree, so the repository is probed first and an absent one refuses rather than reporting
     // a clean scan over nothing
-    if crate::walk::toplevel_opt()?.is_none() {
-        return Err("not a git repository — the tracked shell corpus cannot be resolved".into());
+    if crate::walk::toplevel_opt().map_err(Fault::tool)?.is_none() {
+        return Err(Fault::refused("not a git repository — the tracked shell corpus cannot be resolved"));
     }
 
     let mut t = Tally {
@@ -600,26 +601,26 @@ fn rule(_args: &[String]) -> Result<i32, String> {
     };
     let mut findings: Vec<String> = Vec::new();
 
-    let shell = walk::tracked_shell_tree()?;
+    let shell = walk::tracked_shell_tree().map_err(Fault::tool)?;
     for f in &shell {
-        let text = read(Path::new(f))?;
+        let text = read(Path::new(f)).map_err(Fault::input)?;
         scan_shell(f, &text, &mut t, &mut findings);
         scan_anchor(f, &text, &mut t, &mut findings);
         scan_shell_locality(f, &text, &mut t, &mut findings);
     }
 
-    let src = walk::knob_scalar("GATE_SDK_NATIVE_SRC")?;
-    let prune = walk::prune_dirs()?;
+    let src = walk::knob_scalar("GATE_SDK_NATIVE_SRC").map_err(Fault::refused)?;
+    let prune = walk::prune_dirs().map_err(Fault::refused)?;
     let crosser = format!("{}/walk.rs", src.trim_end_matches('/'));
     let mut rust_files = 0usize;
     if Path::new(&src).is_dir() {
-        for f in walk::find_with_prune(Path::new(&src), &|n| prune.iter().any(|d| d == n))? {
+        for f in walk::find_with_prune(Path::new(&src), &|n| prune.iter().any(|d| d == n)).map_err(Fault::input)? {
             let p = f.display().to_string();
             if !p.ends_with(".rs") {
                 continue;
             }
             rust_files += 1;
-            let text = read(&f)?;
+            let text = read(&f).map_err(Fault::input)?;
             scan_rust(&p, &text, p == crosser, &mut t, &mut findings);
             scan_locality(&p, &text, p == crosser, &mut t, &mut findings);
         }

@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §Consumer smoke — the binary placement calls the in-crate scratch-consumer
 // builder's own placement, so the walkthrough holds no second copy of it.
 use crate::emit::csmoke;
+use crate::exit;
 use crate::proc::{self, Sink, Stderr};
 use crate::programs;
 use crate::walk;
@@ -32,7 +33,7 @@ enum Outcome {
 pub fn run(args: &[String]) -> i32 {
     if let Some(a) = args.first() {
         eprintln!("{}: unknown option: {}; {}", NAME, a, USAGE);
-        return 2;
+        return exit::USAGE;
     }
     let mut scratch = Scratch { dir: None };
     match walkthrough(&mut scratch) {
@@ -47,7 +48,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         Outcome::Refuse(why) => {
             eprintln!("\n{}: FAIL(env) — {}", VERDICT, why);
-            2
+            exit::FAIL_ENV
         }
     }
 }

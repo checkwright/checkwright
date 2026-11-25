@@ -2,6 +2,7 @@
 // verbatim: `checkwright.lock` must already exist, so a verb named update can manage an install but
 // never perform the first one. Every init flag stays valid, `--dry-run` included.
 use super::{lock, refuse, Refusal};
+use crate::exit;
 
 pub(super) const USAGE: &[&str] = &[
     "usage: checkwright update [--profile <name>] [--recipe <name>]... [--no-recipe] [--with-kit <kit>]... [--without-kit <kit>]... [--with-gate <gate>]... [--without-gate <gate>]... [--no-selection] [--dry-run] [--force] [--no-commit] [--personal] [--user]",
@@ -46,7 +47,7 @@ fn precondition() -> Result<(), Refusal> {
     Err(refuse(
         format!("no {} at {}", lock::FILE, root.display()),
         "update manages an install init already made; there isn't one yet. Run 'checkwright init' first.",
-        2,
+        exit::REFUSED,
     ))
 }
 

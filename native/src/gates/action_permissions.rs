@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-action-permissions — a job that consumes the GitHub token has
 // the scopes it takes declared rather than inherited from an invisible repository default
 use crate::actions::{self, Ev, Perms};
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -180,14 +181,14 @@ pub fn run(args: &[String]) -> i32 {
     let root = Path::new(scanroot);
     if !root.is_dir() {
         eprintln!("check-action-permissions: scan root not found: {}", scanroot);
-        return 2;
+        return exit::REFUSED;
     }
 
     let files = match walk::find_files(root, &["yml", "yaml"]) {
         Ok(f) => f,
         Err(e) => {
             eprintln!("check-action-permissions: {} — the check could not run; treating as failure (not clean)", e);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -211,7 +212,7 @@ pub fn run(args: &[String]) -> i32 {
                     f.display(),
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         walked += 1;
@@ -244,7 +245,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-action-permissions: {}:{}: a permissions: value that is neither a mapping, nor read-all/write-all, nor empty ({}) — the check could not run; treating as failure (not clean)",
                     a.curfile, l, v
                 );
-                return 2;
+                return exit::INPUT;
             }
         }
 

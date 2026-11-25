@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — the harness-integration arms: non-gate arms
 // whose named caller is the coding harness, so their channels are the harness's rather than the
 // gate output contract's. `--hook <member>` is the one dispatching arm of that sub-class.
+use crate::exit;
 use serde_json::Value;
 
 pub mod antigravity;
@@ -354,7 +355,7 @@ pub fn quote(s: &str) -> String {
 // shows, and exit 2 is the harness's block signal; the `<name>: ` prefix matches the shell guard's.
 pub fn block(name: &str, msg: &str) -> i32 {
     eprintln!("{}: {}", name, msg);
-    2
+    exit::HOOK_BLOCK
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the member's own face of the fail-open
@@ -578,7 +579,7 @@ pub fn run(args: &[String]) -> i32 {
     let Some(member) = args.first() else {
         eprintln!("checkwright-gates: --hook needs a member name — the hook could not run");
         eprintln!("  help: this binary carries: {}", members().join(", "));
-        return 2;
+        return exit::HOOK_BLOCK;
     };
     let Some(&(_, f, _, _, _, _, _)) = row else {
         return no_member(member);
@@ -591,7 +592,7 @@ pub fn run(args: &[String]) -> i32 {
                 token
             );
             eprintln!("  help: the grammar: {}", GRAMMAR);
-            return 2;
+            return exit::HOOK_BLOCK;
         }
     };
     match binding_of(binding) {
@@ -605,13 +606,13 @@ pub fn run(args: &[String]) -> i32 {
 fn no_member(member: &str) -> i32 {
     eprintln!("checkwright-gates: no such hook member: {} — the hook could not run", member);
     eprintln!("  help: this binary carries: {}", members().join(", "));
-    2
+    exit::HOOK_BLOCK
 }
 
 fn no_binding(given: &str) -> i32 {
     eprintln!("checkwright-gates: no such hook binding: {} — the hook could not run", given);
     eprintln!("  help: this binary carries: {}", BINDINGS.join(", "));
-    2
+    exit::HOOK_BLOCK
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — `--knobs` puts the arm under the tree-free
@@ -628,7 +629,7 @@ fn under_knobs(member: &str, row: Option<&Row>, observe: bool, binding: Option<&
             KNOBS_FLAG, name
         );
         eprintln!("  help: {} serves the tree-free members only: {}", KNOBS_FLAG, tree_free_members().join(", "));
-        return 2;
+        return exit::HOOK_BLOCK;
     }
     if let Err(given) = binding_of(binding) {
         return no_binding(&given);

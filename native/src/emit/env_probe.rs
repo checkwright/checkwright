@@ -1,6 +1,7 @@
 // spec: context-kit/SPEC.md §bin/env-probe — the marker-bounded machine profile, derived into the
 // consumer-local, gitignored profile file; hand-authored gotchas live outside the markers and
 // survive every re-probe. An action that reports: it rewrites a block and prints what it did.
+use crate::exit::Fault;
 use crate::{proc, programs};
 use crate::toolfloor;
 
@@ -252,25 +253,25 @@ fn comparable(block: &str) -> String {
         .join("\n")
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    let file = crate::walk::knob_scalar("CONTEXT_KIT_ENV_PROFILE_FILE")?;
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
+    let file = crate::walk::knob_scalar("CONTEXT_KIT_ENV_PROFILE_FILE").map_err(Fault::refused)?;
     // spec: context-kit/SPEC.md §bin/env-probe — the roster is the crate's own, read from the
     // module that also holds the floor predicate, so the probe and the verdict share one owner.
     let roster: Vec<String> = toolfloor::PROBE_SET.iter().map(|e| e.to_string()).collect();
 
     let date = crate::emit::kpi::today_iso();
     if date.is_empty() {
-        return Err("cannot read the probe date".to_string());
+        return Err(Fault::tool("cannot read the probe date"));
     }
     // spec: context-kit/SPEC.md §bin/env-probe — a contributor-side reader walks the roster whole,
     // so it derives the audience against the tree it is probing rather than against a selection
-    let derived = toolfloor::derived_audience_here()?;
+    let derived = toolfloor::derived_audience_here().map_err(Fault::input)?;
     let new_body = body(&roster, &date, &derived);
 
     // spec: context-kit/SPEC.md §bin/env-probe — seed the gotchas scaffold once, outside the
     // markers; every re-probe replaces only the block.
     if !std::path::Path::new(&file).is_file() {
-        std::fs::write(&file, SEED).map_err(|e| format!("cannot write {}: {}", file, e))?;
+        std::fs::write(&file, SEED).map_err(|e| Fault::tool(format!("cannot write {}: {}", file, e)))?;
     }
 
     if unchanged(&file, &new_body)? {
@@ -281,7 +282,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     }
 
     let action = crate::marker::install_block(&file, BEGIN, END, &new_body)
-        .map_err(|e| format!("failed to write profile block: {}", e))?;
+        .map_err(|e| Fault::tool(format!("failed to write profile block: {}", e)))?;
     Ok(format!(
         "env-probe: {} the env profile block in {}\n",
         action, file
@@ -290,11 +291,11 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the writer's refusal of markers that do not pair runs
 // ahead of the comparison, so an unchanged block between them refuses as a changed one does
-fn unchanged(file: &str, new_body: &str) -> Result<bool, String> {
-    crate::marker::installable(file, BEGIN, END).map_err(|e| format!("failed to write profile block: {}", e))?;
+fn unchanged(file: &str, new_body: &str) -> Result<bool, Fault> {
+    crate::marker::installable(file, BEGIN, END).map_err(|e| Fault::input(format!("failed to write profile block: {}", e)))?;
     // spec: gate-sdk/SPEC.md §lib/inject.sh — the presence test is whole-line on both halves, the
     // ruled resolution of the shell form's substring `grep` guarding a whole-line `awk` extract.
-    let text = crate::fresh::read_captured(file)?;
+    let text = crate::fresh::read_captured(file).map_err(Fault::input)?;
     Ok(crate::fresh::file_lines(&text).contains(&BEGIN)
         && comparable(new_body) == comparable(&crate::marker::read_block(&text, BEGIN, END)))
 }

@@ -5,6 +5,7 @@
 // builder, so the smoke holds no second copy of the build.
 use crate::emit::csmoke;
 use crate::ere::Ere;
+use crate::exit;
 use crate::proc::{self, Sink, Stderr};
 use crate::programs;
 use crate::walk;
@@ -25,6 +26,7 @@ enum Outcome {
     Clean(String),
     Fail(Vec<String>),
     Refuse(String),
+    Declined(String),
 }
 
 fn fail(line: String) -> Outcome {
@@ -63,7 +65,7 @@ pub fn run(args: &[String]) -> i32 {
             keep = true;
         } else {
             eprintln!("{}: unknown option: {}; {}", NAME, a, USAGE);
-            return 2;
+            return exit::USAGE;
         }
     }
     let mut scratch = Scratch {
@@ -84,7 +86,11 @@ pub fn run(args: &[String]) -> i32 {
         }
         Outcome::Refuse(line) => {
             eprintln!("{}", line);
-            2
+            exit::TOOL
+        }
+        Outcome::Declined(line) => {
+            eprintln!("{}", line);
+            exit::REFUSED
         }
     };
     code
@@ -108,7 +114,7 @@ fn smoke(scratch: &mut Scratch) -> Outcome {
     let host = step!(parent_of(&sdk));
     for r in &roots {
         if !Path::new(&format!("{}/smoke/install.sh", r)).is_file() {
-            return Outcome::Refuse(format!(
+            return Outcome::Declined(format!(
                 "{}: {} has no smoke/install.sh",
                 NAME,
                 basename(r)
@@ -141,13 +147,13 @@ fn smoke(scratch: &mut Scratch) -> Outcome {
 // what tells the arm which kits to vendor; a compiled member has no `BASH_SOURCE` anchor to find
 // gate-sdk from instead.
 fn kit_roots() -> Result<Vec<String>, Outcome> {
-    let roots = walk::kit_roots_abs().map_err(|e| Outcome::Refuse(format!("{}: {}", NAME, e)))?;
+    let roots = walk::kit_roots_abs().map_err(|e| Outcome::Declined(format!("{}: {}", NAME, e)))?;
     let sdk = roots
         .iter()
         .find(|r| basename(r) == "gate-sdk")
         .cloned()
         .ok_or_else(|| {
-            Outcome::Refuse(format!(
+            Outcome::Declined(format!(
                 "{}: the kit roots name no gate-sdk root, so the bin/run-gates.sh front-end every scratch battery runs through cannot be vendored",
                 NAME
             ))
@@ -160,7 +166,7 @@ fn kit_roots() -> Result<Vec<String>, Outcome> {
 fn parent_of(dir: &str) -> Result<String, Outcome> {
     match dir.trim_end_matches('/').rsplit_once('/') {
         Some((head, _)) if !head.is_empty() => Ok(head.to_string()),
-        _ => Err(Outcome::Refuse(format!(
+        _ => Err(Outcome::Declined(format!(
             "{}: the gate-sdk root {} has no parent checkout to take a gate binary from",
             NAME, dir
         ))),
@@ -532,7 +538,7 @@ mod tests {
     // anything else is a refusal rather than a silently ignored word.
     #[test]
     fn the_member_takes_only_keep() {
-        assert_eq!(run(&["--nope".to_string()]), 2);
+        assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }
 
     // spec: context-kit/SPEC.md §Testing — the gate-sdk root leads the vendoring order and appears

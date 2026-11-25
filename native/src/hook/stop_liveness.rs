@@ -8,7 +8,7 @@ use crate::hook::binding::{
     TASK_KIND_CHILD, TASK_KIND_SHELL, TASK_RUNNING, TASK_STATUS,
 };
 use crate::{proc, programs};
-use crate::walk;
+use crate::{exit, walk};
 use serde_json::Value;
 
 // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the bounded call keeps a hung READER
@@ -142,11 +142,11 @@ pub fn fire(
         Some(Reading::Unanswered) => "error",
         Some(Reading::Exit(0)) => "green",
         Some(Reading::Exit(1)) => "red",
-        // spec: delegation-kit/SPEC.md §The turn-end liveness hook — reader exit 2 splits by record
-        // count, and the split names the DIAGNOSIS without deciding the refusal: over a non-empty
-        // set it is `corrupt`, over an empty one `unresolved`, and both refuse
-        Some(Reading::Exit(2)) if records > 0 => "corrupt",
-        Some(Reading::Exit(2)) => "unresolved",
+        // spec: delegation-kit/SPEC.md §The turn-end liveness hook — reader exit 2 or 3 splits by
+        // record count, naming the DIAGNOSIS without deciding the refusal: over a non-empty set it
+        // is `corrupt`, over an empty one `unresolved`, and both refuse
+        Some(Reading::Exit(c)) if reader_could_not_read(*c) && records > 0 => "corrupt",
+        Some(Reading::Exit(c)) if reader_could_not_read(*c) => "unresolved",
         Some(Reading::Exit(_)) => "error",
     };
     let spawn = match &reading {
@@ -213,10 +213,14 @@ pub fn fire(
         return Firing { code: 0, stderr: String::new() };
     }
     if !reader_refused {
-        return Firing { code: 2, stderr: TASK_REFUSAL.to_string() };
+        return Firing { code: exit::HOOK_BLOCK, stderr: TASK_REFUSAL.to_string() };
     }
     let marked = (wait == Wait::ResumeWait && verdict == "red").then_some(marked.as_slice());
-    Firing { code: 2, stderr: refusal(verdict, reader, run_dir, &runs, marked) }
+    Firing { code: exit::HOOK_BLOCK, stderr: refusal(verdict, reader, run_dir, &runs, marked) }
+}
+
+fn reader_could_not_read(code: i32) -> bool {
+    code == exit::REFUSED || code == exit::INPUT
 }
 
 const TASK_REFUSAL: &str = "turn-end refused: the harness shows a background shell task of this session still running (a call moved to the background, or a backgrounded launch); await its completion notification before ending the turn. Where the task is this session's own wait and nothing will make its condition true, stop it instead: an observer wrote nothing, so stopping it loses nothing.\n";
@@ -687,9 +691,10 @@ mod tests {
             ("green", 0, "live=no", "allow", 0),
             ("red", 1, "live=yes", "refuse", 2),
             ("corrupt", 2, "live=no", "refuse", 2),
+            ("corrupt", 3, "live=no", "refuse", 2),
             ("error", 77, "live=no", "allow", 0),
         ] {
-            let s = Scratch::new(&format!("class-{}", verdict));
+            let s = Scratch::new(&format!("class-{}-{}", verdict, code));
             s.record("k.run");
             let stub = s.reader(&format!("reader-{}", verdict), code);
             let log = s.at(&format!("{}.log", verdict));
@@ -743,6 +748,10 @@ mod tests {
             !f.stderr.contains("does not parse"),
             "the unresolved arm reused the corrupt arm's wording over a case holding no record"
         );
+        let t = Scratch::new("unresolved-3");
+        let f = fire(payload(PAYLOAD).as_ref(), &t.at("u.log"), Some(&t.reader("ru", 3)), &t.at("runs"), Wait::Refuse);
+        assert_eq!(f.code, 2, "{}", t.log("u.log"));
+        want(&t.log("u.log"), "unresolved-3", &["verdict=unresolved", "records=0", "decision=refuse"]);
     }
 
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the task view: a green reader over

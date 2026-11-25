@@ -1,5 +1,6 @@
 // spec: docs/generated-projections.md §Generated projections and their freshness gates — the
 // value-rollup block in docs/value.md is the byte-fresh projection of the value-rollup join
+use crate::exit::Fault;
 use crate::fresh;
 use std::path::Path;
 
@@ -11,7 +12,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-value-rollup-fresh: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -22,28 +23,28 @@ fn marker_block(text: &str) -> String {
     crate::marker::read_block(text, BEGIN, END)
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let projection = fresh::positional_or_knob(args, 0, "GATE_LOCAL_VALUE_PAGE")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let projection = fresh::positional_or_knob(args, 0, "GATE_LOCAL_VALUE_PAGE").map_err(Fault::refused)?;
     let projection = projection.as_str();
     let emit_src = args.get(1).map(String::as_str).unwrap_or("");
 
     if !Path::new(projection).is_file() {
-        return Err(format!("projection not found: {}", projection));
+        return Err(Fault::refused(format!("projection not found: {}", projection)));
     }
 
-    let block = marker_block(&fresh::read_captured(projection)?);
+    let block = marker_block(&fresh::read_captured(projection).map_err(Fault::input)?);
     if block.is_empty() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "no value-rollup marker block in {}",
             projection
-        ));
+        )));
     }
 
     let emitted = if !emit_src.is_empty() {
         if !Path::new(emit_src).is_file() {
-            return Err(format!("emit source not found: {}", emit_src));
+            return Err(Fault::refused(format!("emit source not found: {}", emit_src)));
         }
-        fresh::read_captured(emit_src)?
+        fresh::read_captured(emit_src).map_err(Fault::input)?
     } else {
         // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the join
         // is a function call, not a spawn: it ported in the same unit, so there is no shell left
@@ -60,7 +61,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         // spec: gate-sdk/SPEC.md §The consumer remainder cohort — both sides are
         // `printf '%s\n'` process substitutions here, so both carry one terminating newline
         fresh::print_capped_diff(&format!("{}\n", emitted), &format!("{}\n", block));
-        println!("  help: regenerate — {}", super::door_command("--emit value-rollup --write")?);
+        println!("  help: regenerate — {}", super::door_command("--emit value-rollup --write").map_err(Fault::refused)?);
         return Ok(1);
     }
     println!(

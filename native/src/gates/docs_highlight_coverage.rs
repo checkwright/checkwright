@@ -1,5 +1,6 @@
 // spec: site-kit/SPEC.md §check-docs-highlight-coverage — the layout overrides every token class the
 // tracked snapshot declares the theme colours
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -11,8 +12,8 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}: {}", TOOL, msg);
-            eprintln!("DOCS-HIGHLIGHT-COVERAGE: {}", fresh::fail_closed("highlight-coverage", Some(2)));
-            2
+            eprintln!("DOCS-HIGHLIGHT-COVERAGE: {}", fresh::fail_closed("highlight-coverage", Some(msg.status())));
+            msg.status()
         }
     }
 }
@@ -89,8 +90,8 @@ fn covers(selector: &str, scope: &str, class: &str) -> bool {
     }
 }
 
-fn inner(_args: &[String]) -> Result<i32, String> {
-    let snapshot = walk::knob_scalar("SITE_KIT_HIGHLIGHT_TOKENS")?;
+fn inner(_args: &[String]) -> Result<i32, Fault> {
+    let snapshot = walk::knob_scalar("SITE_KIT_HIGHLIGHT_TOKENS").map_err(Fault::refused)?;
     // spec: site-kit/SPEC.md §check-docs-highlight-coverage — the arming knob: empty asserts nothing and
     // says so, a different sentence from a snapshot found covered
     if snapshot.is_empty() {
@@ -99,14 +100,14 @@ fn inner(_args: &[String]) -> Result<i32, String> {
         );
         return Ok(0);
     }
-    let globs = walk::knob_array("SITE_KIT_HIGHLIGHT_OVERRIDES")?;
-    let scope = walk::knob_scalar("SITE_KIT_HIGHLIGHT_SCOPE")?;
+    let globs = walk::knob_array("SITE_KIT_HIGHLIGHT_OVERRIDES").map_err(Fault::refused)?;
+    let scope = walk::knob_scalar("SITE_KIT_HIGHLIGHT_SCOPE").map_err(Fault::refused)?;
     if !Path::new(&snapshot).is_file() {
-        return Err(format!("the snapshot {} (SITE_KIT_HIGHLIGHT_TOKENS) does not exist", snapshot));
+        return Err(Fault::refused(format!("the snapshot {} (SITE_KIT_HIGHLIGHT_TOKENS) does not exist", snapshot)));
     }
     let text = std::fs::read(&snapshot)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| format!("cannot read the snapshot {}: {}", snapshot, e))?;
+        .map_err(|e| Fault::input(format!("cannot read the snapshot {}: {}", snapshot, e)))?;
 
     let mut findings: Vec<String> = Vec::new();
     let mut classes: Vec<(usize, String)> = Vec::new();
@@ -130,7 +131,7 @@ fn inner(_args: &[String]) -> Result<i32, String> {
 
     let mut files: Vec<String> = Vec::new();
     for g in &globs {
-        let listing = crate::listing::tracked(None, &[g]).map_err(|e| e.text())?;
+        let listing = crate::listing::tracked(None, &[g]).map_err(|e| Fault::tool(e.text()))?;
         let hits: Vec<&str> = listing.iter().map(String::as_str).filter(|p| Path::new(p).is_file()).collect();
         if hits.is_empty() {
             findings.push(format!(
@@ -149,7 +150,7 @@ fn inner(_args: &[String]) -> Result<i32, String> {
     for f in &files {
         let raw = std::fs::read(f)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .map_err(|e| format!("cannot read the override file {}: {}", f, e))?;
+            .map_err(|e| Fault::input(format!("cannot read the override file {}: {}", f, e)))?;
         all_rules.extend(rules(&css_text(&raw)));
     }
     let mut covering = vec![false; all_rules.len()];

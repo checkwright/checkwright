@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-citation-link — on a declared page every section citation sits in a
 // link's text, and a link whose text carries a citation targets the section it names
 use super::spec_pointer::{opens_heading, paragraphs, sites};
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -13,21 +14,21 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-citation-link: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let globs = spec::knob_array_pub(PAGES_KNOB)?;
+    let globs = spec::knob_array_pub(PAGES_KNOB).map_err(Fault::refused)?;
     let mut pages: Vec<String> = if globs.is_empty() {
         Vec::new()
     } else {
-        walk::glob_corpus(Path::new(root), &globs)?
+        walk::glob_corpus(Path::new(root), &globs).map_err(Fault::input)?
             .into_iter()
             .filter(|p| p.is_file())
             .map(|p| spec::strip_dot_slash(&p.display().to_string()))
@@ -39,7 +40,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut findings: Vec<(String, Finding)> = Vec::new();
     let mut tally = Tally::default();
     for page in &pages {
-        let scan = scan(&read_page(page)?);
+        let scan = scan(&read_page(page).map_err(Fault::input)?);
         tally.linked += scan.tally.linked;
         tally.later += scan.tally.later;
         tally.valved += scan.tally.valved;
@@ -384,7 +385,7 @@ mod tests {
         assert_eq!(arms(page), vec![(4, Arm::Unlinked)]);
     }
 
-    // spec: canon-kit/SPEC.md §check-citation-link — the exit-2 path, which a `bad/` fixture held
+    // spec: canon-kit/SPEC.md §check-citation-link — the exit-3 path, which a `bad/` fixture held
     // to exit 1 cannot express
     #[test]
     fn an_unreadable_page_is_a_refusal() {

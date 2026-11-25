@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-root-tiering — the repo root holds only allowlisted orientation
 // entries; workflow machinery stays under the configured dirs
+use crate::exit;
 use crate::gates::template_registry_parity::list_members;
 use crate::walk;
 
@@ -26,7 +27,7 @@ fn covered(allow: &[String], entry: &str) -> bool {
 pub fn run(args: &[String]) -> i32 {
     if args.len() > 2 {
         eprintln!("check-root-tiering: unexpected argument: {}", args[2]);
-        return 2;
+        return exit::USAGE;
     }
 
     let allowfile = match args.first() {
@@ -35,7 +36,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-root-tiering: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -49,11 +50,11 @@ pub fn run(args: &[String]) -> i32 {
             eprintln!(
                 "check-root-tiering: not a git repository — cannot enumerate tracked root entries"
             );
-            return 2;
+            return exit::REFUSED;
         }
         Err(e) => {
             eprintln!("check-root-tiering: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     }
 
@@ -62,7 +63,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(t) => (list_members(&t), allowfile.clone()),
             Err(_) => {
                 eprintln!("check-root-tiering: allowlist not readable: {}", allowfile);
-                return 2;
+                return exit::INPUT;
             }
         }
     } else {
@@ -72,14 +73,14 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-root-tiering: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         let agent = match walk::knob_scalar("GATE_SDK_AGENT_FILE") {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-root-tiering: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         };
         (
@@ -92,7 +93,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(names) => names,
         Err(e) => {
             eprintln!("check-root-tiering: {}", e.text());
-            return 2;
+            return exit::TOOL;
         }
     };
 

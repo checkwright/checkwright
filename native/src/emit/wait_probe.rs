@@ -1,8 +1,9 @@
 // spec: delegation-kit/SPEC.md §bin/wait-probe — the wait-primitive instrument, an `Arm::Run`
 // rather than an `Arm::Emit` member because `report` returns 1 on an empty evidence file and the
-// emitting variant collapses every outcome to {0, 2}
+// emitting variant collapses every outcome to {0, 2, 3}
 // spec: gate-sdk/SPEC.md §The non-gate arm — the member whose subject, not whose implementation,
 // fixes its spawned-program set: the wait body, the local arming and the producer stay shell
+use crate::exit::Fault;
 use crate::{proc, programs};
 use crate::walk;
 use std::io::Write;
@@ -78,16 +79,16 @@ const ROSTER: &str = "usage: --wait-probe <subcommand> [args]
 
 Scratch resolves through GATE_SDK_TMP_DIR; the evidence file through GATE_SDK_WORKFLOW_DIR.";
 
-// spec: delegation-kit/SPEC.md §bin/wait-probe — the three-state exit contract, and the misuse arm
-// is the only one this wrapper decides: 0 and 1 both arrive from the subcommand, so no `Err` path
-// may collapse the honest empty reading into the typo code
+// spec: delegation-kit/SPEC.md §bin/wait-probe — the four-state exit contract, and the misuse arm
+// (2) and the tool error (3) are the only ones this wrapper decides: 0 and 1 both arrive from the
+// subcommand, so no `Err` path may collapse the honest empty reading into the typo code
 pub fn run(args: &[String]) -> i32 {
     match dispatch(args) {
         Ok(code) => code,
         Err(e) => {
             eprintln!("checkwright-gates: --wait-probe: {}", e);
             eprintln!("{}", ROSTER);
-            2
+            e.status()
         }
     }
 }
@@ -95,7 +96,7 @@ pub fn run(args: &[String]) -> i32 {
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — the shape half crosses the port: an argument
 // beginning with `-` that names no subcommand is a refusal with the roster on stderr, `--` ends
 // option processing, and the `-h`/`--help` arm retires to the front-end
-fn dispatch(args: &[String]) -> Result<i32, String> {
+fn dispatch(args: &[String]) -> Result<i32, Fault> {
     let mut rest: Vec<&str> = Vec::new();
     let mut escaped = false;
     for a in args {
@@ -106,11 +107,11 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
         rest.push(a.as_str());
     }
     let Some(sub) = rest.first().copied() else {
-        return Err("needs a <subcommand>".to_string());
+        return Err(Fault::usage("needs a <subcommand>"));
     };
     let operands = &rest[1..];
     if !escaped && sub.starts_with('-') {
-        return Err(format!("unrecognized option: {}", sub));
+        return Err(Fault::usage(format!("unrecognized option: {}", sub)));
     }
     match (sub, operands.len()) {
         ("produce", 2) => cmd_produce(operands[0], operands[1]),
@@ -121,11 +122,11 @@ fn dispatch(args: &[String]) -> Result<i32, String> {
         ("record", 3) => cmd_record(operands[0], operands[1], operands[2]),
         ("report", 0) => cmd_report(),
         ("sweep", 0) => cmd_sweep(),
-        ("produce" | "waiter" | "arm-local" | "record" | "report" | "sweep", n) => Err(format!(
+        ("produce" | "waiter" | "arm-local" | "record" | "report" | "sweep", n) => Err(Fault::usage(format!(
             "{} does not take {} argument(s)",
             sub, n
-        )),
-        _ => Err(format!("no such subcommand: {}", sub)),
+        ))),
+        _ => Err(Fault::usage(format!("no such subcommand: {}", sub))),
     }
 }
 
@@ -135,9 +136,9 @@ struct Paths {
     evidence: String,
 }
 
-fn paths() -> Result<Paths, String> {
-    let scratch = walk::knob_scalar("GATE_SDK_TMP_DIR")?;
-    let workflow = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?;
+fn paths() -> Result<Paths, Fault> {
+    let scratch = walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?;
+    let workflow = walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?;
     Ok(Paths {
         work: format!("{}/wait-probe", scratch),
         evidence: format!("{}/wait-primitive-evidence.txt", workflow),
@@ -148,39 +149,39 @@ fn paths() -> Result<Paths, String> {
 // spec: delegation-kit/SPEC.md §bin/wait-probe — the `t0` stamp is the instrument's own bookkeeping
 // and crosses the seam; the *marker* stays `date +%s%3N` inside the producer's shell, both being
 // epoch milliseconds
-fn now_ms() -> Result<u128, String> {
+fn now_ms() -> Result<u128, Fault> {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_millis())
-        .map_err(|e| format!("cannot read the clock: {}", e))
+        .map_err(|e| Fault::tool(format!("cannot read the clock: {}", e)))
 }
 
-fn write_file(path: &str, body: &str) -> Result<(), String> {
-    std::fs::write(path, body).map_err(|e| format!("cannot write {}: {}", path, e))
+fn write_file(path: &str, body: &str) -> Result<(), Fault> {
+    std::fs::write(path, body).map_err(|e| Fault::tool(format!("cannot write {}: {}", path, e)))
 }
 
-fn read_trimmed(path: &str) -> Result<String, String> {
+fn read_trimmed(path: &str) -> Result<String, Fault> {
     std::fs::read_to_string(path)
         .map(|s| s.trim_end_matches(['\n', '\r']).to_string())
-        .map_err(|e| format!("cannot read {}: {}", path, e))
+        .map_err(|e| Fault::input(format!("cannot read {}: {}", path, e)))
 }
 
 fn non_empty(path: &str) -> bool {
     std::fs::metadata(path).map(|m| m.len() > 0).unwrap_or(false)
 }
 
-fn make_scratch(path: &str) -> Result<(), String> {
-    walk::make_scratch(path).map_err(|e| format!("cannot create {}: {}", path, e))
+fn make_scratch(path: &str) -> Result<(), Fault> {
+    walk::make_scratch(path).map_err(|e| Fault::tool(format!("cannot create {}: {}", path, e)))
 }
 
-fn mkdir_p(path: &str) -> Result<(), String> {
-    std::fs::create_dir_all(path).map_err(|e| format!("cannot create {}: {}", path, e))
+fn mkdir_p(path: &str) -> Result<(), Fault> {
+    std::fs::create_dir_all(path).map_err(|e| Fault::tool(format!("cannot create {}: {}", path, e)))
 }
 
 // spec: delegation-kit/SPEC.md §bin/wait-probe — the producer's own pid is recorded at launch and
 // never logged in a trial line: the `<key>.run` record holds it for the lifetime the wait needs, and
 // `check-producer-liveness` and guard-kit rule `git_mutation_under_producer` read the probe's own producers like any other
-fn cmd_produce(key: &str, ms: &str) -> Result<i32, String> {
+fn cmd_produce(key: &str, ms: &str) -> Result<i32, Fault> {
     let p = paths()?;
     make_scratch(&p.scratch)?;
     mkdir_p(&p.work)?;
@@ -202,10 +203,10 @@ fn cmd_produce(key: &str, ms: &str) -> Result<i32, String> {
 
 // spec: delegation-kit/SPEC.md §bin/wait-probe — the launched pid is read back out of the shell that
 // backgrounded it, so the record names the process the harness would signal
-fn spawned_pid(script: &str, argv: &[&str]) -> Result<u32, String> {
+fn spawned_pid(script: &str, argv: &[&str]) -> Result<u32, Fault> {
     let mut call: Vec<&str> = vec!["-c", script];
     call.extend_from_slice(argv);
-    let done = proc::run(&programs::BASH, &call)?;
+    let done = proc::run(&programs::BASH, &call).map_err(Fault::tool)?;
     let out = done
         .stdout()
         .map(|b| String::from_utf8_lossy(b).to_string())
@@ -213,12 +214,12 @@ fn spawned_pid(script: &str, argv: &[&str]) -> Result<u32, String> {
     out.lines()
         .find_map(|l| l.strip_prefix("pid="))
         .and_then(|n| n.trim().parse::<u32>().ok())
-        .ok_or_else(|| format!("the arming shell reported no pid: {}", out.trim()))
+        .ok_or_else(|| Fault::tool(format!("the arming shell reported no pid: {}", out.trim())))
 }
 
 // spec: delegation-kit/SPEC.md §bin/wait-probe — this arm `exec`s into the wait body rather than
 // spawning and waiting on it, so the process depth between the harness and the loop stays one
-fn cmd_waiter(key: &str, form: &str, pred: &str) -> Result<i32, String> {
+fn cmd_waiter(key: &str, form: &str, pred: &str) -> Result<i32, Fault> {
     let p = paths()?;
     let marker = format!("{}/{}.marker", p.work, key);
     let hb = format!("{}/{}.{}.hb", p.work, key, form);
@@ -226,7 +227,7 @@ fn cmd_waiter(key: &str, form: &str, pred: &str) -> Result<i32, String> {
     let t0 = read_trimmed(&format!("{}/{}.t0", p.work, key))?;
     let run = read_trimmed(&format!("{}/{}.run", p.scratch, key))?;
     let ppid = recorded_pid(&run)
-        .ok_or_else(|| format!("no pid= field in the launch record for {}", key))?;
+        .ok_or_else(|| Fault::input(format!("no pid= field in the launch record for {}", key)))?;
     write_file(&format!("{}/{}.{}.pred", p.work, key, form), &format!("{}\n", pred))?;
     exec_wait_body(&[
         "_", &t0, &ppid, &hb, &marker, pred, &st, key, form,
@@ -246,28 +247,28 @@ fn recorded_pid(record: &str) -> Option<String> {
 // replaces its own process image with it; a host with no `exec` has no such subject to measure, so
 // the arm refuses rather than silently measuring a spawned-and-waited configuration
 #[cfg(unix)]
-fn exec_wait_body(argv: &[&str]) -> Result<i32, String> {
+fn exec_wait_body(argv: &[&str]) -> Result<i32, Fault> {
     use std::os::unix::process::CommandExt;
     // spec: gate-sdk/SPEC.md §Fail-closed contract — spawn-funnel-exempt: `exec` replaces this
     // process image rather than spawning a child, the one shape `proc::run*` cannot carry, since
     // a funnel that returned would have no image to return into
     let mut cmd = std::process::Command::new("bash");
     cmd.arg("-c").arg(WAIT_BODY).args(argv);
-    Err(format!("cannot exec the wait body: {}", cmd.exec()))
+    Err(Fault::tool(format!("cannot exec the wait body: {}", cmd.exec())))
 }
 
 #[cfg(not(unix))]
-fn exec_wait_body(_argv: &[&str]) -> Result<i32, String> {
-    Err("the wait body is a POSIX shell loop and this host cannot exec into one".to_string())
+fn exec_wait_body(_argv: &[&str]) -> Result<i32, Fault> {
+    Err(Fault::tool("the wait body is a POSIX shell loop and this host cannot exec into one"))
 }
 
-fn cmd_arm_local(key: &str, pred: &str) -> Result<i32, String> {
+fn cmd_arm_local(key: &str, pred: &str) -> Result<i32, Fault> {
     let p = paths()?;
     make_scratch(&p.scratch)?;
     let out = format!("{}/{}.local.out", p.work, key);
     let run_path = format!("{}/{}-local.run", p.scratch, key);
     let me = crate::proc::self_path()
-        .map_err(|e| format!("cannot resolve this binary's own path: {}", e))?
+        .map_err(|e| Fault::tool(format!("cannot resolve this binary's own path: {}", e)))?
         .display()
         .to_string();
     let pid = spawned_pid(ARM_LOCAL_SH, &["_", &me, key, pred, &out])?;
@@ -276,7 +277,7 @@ fn cmd_arm_local(key: &str, pred: &str) -> Result<i32, String> {
     Ok(0)
 }
 
-fn cmd_record(key: &str, form: &str, ms: &str) -> Result<i32, String> {
+fn cmd_record(key: &str, form: &str, ms: &str) -> Result<i32, Fault> {
     let p = paths()?;
     let marker = format!("{}/{}.marker", p.work, key);
     let hb = format!("{}/{}.{}.hb", p.work, key, form);
@@ -289,13 +290,13 @@ fn cmd_record(key: &str, form: &str, ms: &str) -> Result<i32, String> {
     }
     let t0: i128 = read_trimmed(&format!("{}/{}.t0", p.work, key))?
         .parse()
-        .map_err(|_| "the t0 stamp is not a number".to_string())?;
+        .map_err(|_| Fault::input("the t0 stamp is not a number"))?;
 
     let mut marker_at = "-".to_string();
     if std::path::Path::new(&marker).exists() {
         let at: i128 = read_trimmed(&marker)?
             .parse()
-            .map_err(|_| "the marker is not a number".to_string())?;
+            .map_err(|_| Fault::input("the marker is not a number"))?;
         marker_at = (at - t0).to_string();
     }
     let mut waiter_at = "-".to_string();
@@ -323,9 +324,9 @@ fn cmd_record(key: &str, form: &str, ms: &str) -> Result<i32, String> {
         .create(true)
         .append(true)
         .open(&evidence)
-        .map_err(|e| format!("cannot open the evidence file {}: {}", p.evidence, e))?;
+        .map_err(|e| Fault::tool(format!("cannot open the evidence file {}: {}", p.evidence, e)))?;
     f.write_all(line.as_bytes())
-        .map_err(|e| format!("cannot append to {}: {}", p.evidence, e))?;
+        .map_err(|e| Fault::tool(format!("cannot append to {}: {}", p.evidence, e)))?;
     print!("{}", line);
     Ok(0)
 }
@@ -361,14 +362,14 @@ struct Cell {
 // spec: delegation-kit/SPEC.md §bin/wait-probe — cause (ii)'s tell is a threshold across the sweep,
 // so the report is the only reader that can see it, and the ceiling line is the one verdict no
 // trial line can carry
-fn cmd_report() -> Result<i32, String> {
+fn cmd_report() -> Result<i32, Fault> {
     let p = paths()?;
     if !non_empty(&p.evidence) {
         eprintln!("wait-probe: no trials recorded in {}", p.evidence);
         return Ok(1);
     }
     let body = std::fs::read_to_string(&p.evidence)
-        .map_err(|e| format!("cannot read the evidence file {}: {}", p.evidence, e))?;
+        .map_err(|e| Fault::input(format!("cannot read the evidence file {}: {}", p.evidence, e)))?;
     println!("=== trials ===");
     print!("{}", body);
     println!("\n=== verdict ===");
@@ -479,7 +480,7 @@ fn push_once(seen: &mut Vec<String>, v: &str) {
 // spec: delegation-kit/SPEC.md §bin/wait-probe — the sweep waits on the *recorded* pid's liveness
 // with a `while` polarity, never a `until`: an `until` here would reproduce inside the instrument
 // the very defect the instrument's own trials found
-fn cmd_sweep() -> Result<i32, String> {
+fn cmd_sweep() -> Result<i32, Fault> {
     let p = paths()?;
     make_scratch(&p.scratch)?;
     mkdir_p(&p.work)?;

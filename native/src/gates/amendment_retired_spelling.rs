@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — every amendment carries a
 // `## Retired spellings` block, and every spelling it declares survives only at a path its
 // `## Existing sections updated` roster names
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -20,7 +21,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-amendment-retired-spelling: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -182,19 +183,19 @@ struct Declared {
 
 // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — the reconciliation corpus:
 // `git ls-files` minus the amendment set, minus the configured exclusion
-fn corpus(root: &str, amendments: &[String]) -> Result<Vec<String>, String> {
-    if crate::walk::toplevel_opt()?.is_none() {
-        return Err("not a git repository — cannot enumerate the reconciliation corpus".into());
+fn corpus(root: &str, amendments: &[String]) -> Result<Vec<String>, Fault> {
+    if crate::walk::toplevel_opt().map_err(Fault::tool)?.is_none() {
+        return Err(Fault::refused("not a git repository — cannot enumerate the reconciliation corpus"));
     }
     let listing = crate::listing::tracked(None, &[root]).map_err(|e| {
-        e.text_or(|code| {
+        Fault::tool(e.text_or(|code| {
             format!(
                 "git ls-files exited {} — the reconciliation corpus could not be enumerated",
                 code.unwrap_or(-1)
             )
-        })
+        }))
     })?;
-    let exclude = spec::knob_array_pub(EXCLUDE_KNOB)?;
+    let exclude = spec::knob_array_pub(EXCLUDE_KNOB).map_err(Fault::refused)?;
     Ok(listing
         .into_iter()
         .filter(|p| !amendments.iter().any(|a| a == p))
@@ -202,15 +203,15 @@ fn corpus(root: &str, amendments: &[String]) -> Result<Vec<String>, String> {
         .collect())
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
     // spec: canon-kit/SPEC.md §check-amendment-retired-spelling — the strict finder, following
     // §check-amendment-update-target and not §check-amendment-queue: an empty amendment set
     // hides every violation here, where the queue gate has a second direction contradicting it
-    let files: Vec<String> = spec::amendments_strict(root)?
+    let files: Vec<String> = spec::amendments_strict(root).map_err(Fault::input)?
         .into_iter()
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
         .collect();
@@ -222,14 +223,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut negatives = 0usize;
 
     for f in &files {
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         let s = scan(&text);
         if s.has_retired && !s.has_what {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "{}: carries '{}' but no '{}' — no bullet can cite a delta here and no arm could \
                  say which to blame",
                 f, RETIRED, WHAT_CHANGES
-            ));
+            )));
         }
         if !s.has_what {
             continue;
@@ -315,7 +316,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut survivors: Vec<String> = Vec::new();
     if !declared.is_empty() {
         for f in &files {
-            let text = spec::read_text(Path::new(f))?;
+            let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
             rosters.push((f.clone(), scan(&text).roster_paths));
         }
         let paths = corpus(root, &files)?;
@@ -324,7 +325,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             if !p.is_file() {
                 continue;
             }
-            let text = spec::read_text(p)?;
+            let text = spec::read_text(p).map_err(Fault::input)?;
             for d in &declared {
                 let named = rosters
                     .iter()

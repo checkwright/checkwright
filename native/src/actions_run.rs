@@ -671,7 +671,7 @@ pub struct ActionsFiles {
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — the one walk-and-predicate every reader of
 // the actions-shaped corpus calls, so no two of them can disagree about its membership; an
-// unwalkable root or an unreadable file is the `Err` every caller turns into exit 2
+// unwalkable root or an unreadable file is the `Err` every caller turns into exit 3
 pub fn actions_files(root: &Path) -> Result<ActionsFiles, String> {
     let walked = crate::walk::find_files(root, &["yml", "yaml"])?;
     let mut out = ActionsFiles {
@@ -698,7 +698,7 @@ pub fn print_refusal(name: &str, doing: &str, file: &Path, r: &Refusal) -> i32 {
     eprintln!("        balanced. A 'defaults:' subtree carrying a 'run:' key is refused too —");
     eprintln!("        it overrides the runner default for every step beneath it, so name the");
     eprintln!("        dialect on each step instead.");
-    2
+    crate::exit::INPUT
 }
 
 #[cfg(test)]

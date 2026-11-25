@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §check-queue-hygiene — the queue holds only tasks, tags, and
 // structure: no HTML comments, no duplicate lines, no column-0 prose, no line-number cites,
 // no -S pickaxe on the queue, no malformed recurrence date
+use crate::exit;
 use crate::queue;
 use std::collections::HashMap;
 
@@ -122,7 +123,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-queue-hygiene: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let file = match args.first() {
@@ -131,7 +132,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-queue-hygiene: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -139,7 +140,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-queue-hygiene: file not found: {}", file);
-            return 2;
+            return exit::REFUSED;
         }
     };
 

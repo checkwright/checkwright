@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-pipe-membership — no set producer feeds a short-circuiting reader
 // in a shell file under `pipefail`
+use crate::exit::Fault;
 use crate::gates::path_dialect::shell_split;
 use crate::walk;
 use std::path::Path;
@@ -15,7 +16,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -221,20 +222,20 @@ fn scan(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>) {
     }
 }
 
-fn rule(_args: &[String]) -> Result<i32, String> {
+fn rule(_args: &[String]) -> Result<i32, Fault> {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — the tracked corpus degrades to empty outside a
     // work tree, so the repository is probed first and an absent one refuses
-    if walk::toplevel_opt()?.is_none() {
-        return Err("not a git repository — the tracked shell corpus cannot be resolved".into());
+    if walk::toplevel_opt().map_err(Fault::tool)?.is_none() {
+        return Err(Fault::refused("not a git repository — the tracked shell corpus cannot be resolved"));
     }
-    let shell = walk::tracked_shell_tree()?;
-    let suites = walk::tracked_suites()?;
+    let shell = walk::tracked_shell_tree().map_err(Fault::tool)?;
+    let suites = walk::tracked_suites().map_err(Fault::tool)?;
     let mut t = Tally { in_scope: 0, readers: 0 };
     let mut findings: Vec<String> = Vec::new();
     for f in shell.iter().chain(&suites) {
         let text = std::fs::read(Path::new(f))
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .map_err(|e| format!("cannot read {}: {}", f, e))?;
+            .map_err(|e| Fault::input(format!("cannot read {}: {}", f, e)))?;
         scan(f, &text, &mut t, &mut findings);
     }
     if !findings.is_empty() {

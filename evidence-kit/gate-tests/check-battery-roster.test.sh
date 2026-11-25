@@ -40,9 +40,9 @@ BLOCK='<!-- battery-roster:begin -->\nbash bin/run-alpha.sh\n<!-- battery-roster
 case_run "no-doc" "$CFG1" SKIP 2 "runner doc not found"
 
 # B — the doc exists but carries no marker block: a consumer keeping no register
-#     opts out by not registering the gate, so an unmarked doc is exit 2 and
+#     opts out by not registering the gate, so an unmarked doc is exit 3 and
 #     never a vacuous pass over a doc the gate cannot locate the register in.
-case_run "no-markers" "$CFG1" 'nothing to see\n' 2 "marker block"
+case_run "no-markers" "$CFG1" 'nothing to see\n' 3 "marker block"
 
 # C — an empty suite roster leaves nothing to hold the doc against.
 case_run "empty-suites" 'EVIDENCE_KIT_SUITES =\n' "$BLOCK" 2 "EVIDENCE_KIT_SUITES is empty"

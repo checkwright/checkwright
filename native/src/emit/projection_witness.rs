@@ -2,6 +2,7 @@
 // trigger: perturb a history-bearing tracked-tree scratch outside each declaring gate's trigger set
 // and red where the gate goes red, reporting a coupled file whose edit moves nothing
 use crate::emit::csmoke;
+use crate::exit;
 use crate::proc;
 use crate::programs;
 use crate::registry;
@@ -42,7 +43,7 @@ struct Report {
 pub fn run(args: &[String]) -> i32 {
     if let Some(a) = args.first() {
         eprintln!("{}: unknown option: {}; {}", NAME, a, USAGE);
-        return 2;
+        return exit::USAGE;
     }
     let outcome = members().and_then(|members| {
         if members.is_empty() {
@@ -67,7 +68,7 @@ pub fn run(args: &[String]) -> i32 {
     match outcome {
         Err(e) => {
             println!("WITNESS: FAIL(env) {}", e);
-            2
+            exit::FAIL_ENV
         }
         Ok(None) => {
             println!(

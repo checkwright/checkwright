@@ -2,6 +2,7 @@
 // backticked/fenced kit-prefixed env knob and every inline-span path citation in the governed doc
 // set resolves against the tree or names no path the tree has retired
 use super::manifest_temporal::{LineKind, TemporalValve};
+use crate::exit::Fault;
 use crate::{proc, programs};
 use crate::spec;
 use crate::walk;
@@ -13,7 +14,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-docs-cmd: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -30,15 +31,16 @@ enum Token {
     Amendment(usize, String),
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let top = walk::toplevel_opt()?
-        .ok_or_else(|| "not a git repository — cannot verify tracked paths/knobs".to_string())?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let top = walk::toplevel_opt()
+        .map_err(Fault::tool)?
+        .ok_or_else(|| Fault::refused("not a git repository — cannot verify tracked paths/knobs"))?;
 
-    let exclude = spec::knob_array_pub("CANON_KIT_MDREF_EXCLUDE")?;
+    let exclude = spec::knob_array_pub("CANON_KIT_MDREF_EXCLUDE").map_err(Fault::refused)?;
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        spec::manifest_files(".")?
+        spec::manifest_files(".").map_err(Fault::input)?
             .into_iter()
             .map(|p| p.display().to_string())
             .filter(|f| {
@@ -48,21 +50,21 @@ fn rule(args: &[String]) -> Result<i32, String> {
             .collect()
     };
 
-    let prefixes = kit_knob_prefixes()?;
-    let roots: Vec<String> = walk::kit_roots_under(&top)?
+    let prefixes = kit_knob_prefixes().map_err(Fault::refused)?;
+    let roots: Vec<String> = walk::kit_roots_under(&top).map_err(Fault::refused)?
         .into_iter()
         .map(|r| r.trim_end_matches('/').to_string())
         .filter(|r| !r.is_empty())
         .collect();
 
-    let mut defined = defined_knobs(&top, &roots, &prefixes)?;
+    let mut defined = defined_knobs(&top, &roots, &prefixes).map_err(Fault::tool)?;
     // spec: canon-kit/SPEC.md §check-docs-cmd — a static kit's knobs left kit-root source with its
     // library, so the set is unioned with the names the static reader reads
     defined.extend(crate::knobs::static_names());
-    let amend_glob = spec::knob_pub("CANON_KIT_AMENDMENT_GLOB")?;
-    let valve = TemporalValve::load()?;
-    let tree = Tree::read(&top)?;
-    let cwd = walk::cwd()?;
+    let amend_glob = spec::knob_pub("CANON_KIT_AMENDMENT_GLOB").map_err(Fault::refused)?;
+    let valve = TemporalValve::load().map_err(Fault::refused)?;
+    let tree = Tree::read(&top).map_err(Fault::tool)?;
+    let cwd = walk::cwd().map_err(Fault::tool)?;
 
     let mut found: Vec<Finding> = Vec::new();
     let mut cands: HashSet<String> = HashSet::new();
@@ -74,13 +76,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         let docdir = dirname(f);
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         let cite = !valve.path_exempt(&spec::strip_dot_slash(f));
         for tok in scan(&text, &prefixes, &amend_glob, &valve, cite) {
             match tok {
                 Token::Path(ln, t) => {
                     npath += 1;
-                    if !path_ok(&docdir, &t)? {
+                    if !path_ok(&docdir, &t).map_err(Fault::tool)? {
                         found.push(Finding::Red(format!("{}:{}: invoked script '{}' is not a tracked file", f, ln, t)));
                     }
                 }
@@ -122,7 +124,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let retired = if cands.is_empty() {
         HashSet::new()
     } else {
-        retired_knobs(&top, &cands)?
+        retired_knobs(&top, &cands).map_err(Fault::tool)?
     };
     let mut bad: Vec<String> = Vec::new();
     let mut nretired = 0usize;

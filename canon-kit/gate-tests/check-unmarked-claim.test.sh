@@ -55,21 +55,21 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=config
 
 # The configured baseline: with a class declared, the sentence above is red.
 # Every fail-closed case below differs from this one only in the vocabulary, so
-# a case that exits 2 proves the loader refused rather than that nothing matched.
+# a case that exits 3 proves the loader refused rather than that nothing matched.
 check_case "declared-class-is-red" 1 "falls in claim class 'engine-substrate'" ok.knobs
 
 # Arm B, inherited whole from the shared command adapter: a roster that cannot be
 # read leaves the gate holding no class, and a gate holding no class must not
 # report the clean it did not earn.
-check_case "emitter-error-fails-closed"  2 "exited 3"                    err.knobs
-check_case "no-tab-fails-closed"         2 "line has no tab"             notab.knobs
-check_case "non-slug-id-fails-closed"    2 "id is not slug-shaped"       badid.knobs
-check_case "duplicate-id-fails-closed"   2 "duplicate id"                dup.knobs
-check_case "extra-tab-fails-closed"      2 "extra tab in line"           extratab.knobs
+check_case "emitter-error-fails-closed"  3 "exited 3"                    err.knobs
+check_case "no-tab-fails-closed"         3 "line has no tab"             notab.knobs
+check_case "non-slug-id-fails-closed"    3 "id is not slug-shaped"       badid.knobs
+check_case "duplicate-id-fails-closed"   3 "duplicate id"                dup.knobs
+check_case "extra-tab-fails-closed"      3 "extra tab in line"           extratab.knobs
 
 # The pattern is consumer-authored, so an ERE that does not compile is the same
 # unreadable-roster failure one step later, and takes the same exit.
-check_case "uncompilable-ere-fails-closed" 2 "does not compile" uncompilable.knobs
+check_case "uncompilable-ere-fails-closed" 3 "does not compile" uncompilable.knobs
 
 # The two clean skips a fixture pair cannot tell apart: no vocabulary configured
 # at all, and one configured that declared nothing. Both are green and they are

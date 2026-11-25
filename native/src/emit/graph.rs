@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-graph — the coupling-graph projection: one node per `couples=`
 // surface, one edge per registry member, grouped into the consumer's declared layers.
 // `native/src/gates/graph.rs` reaches it in process rather than spawning it.
+use crate::exit::Fault;
 use crate::registry;
 use crate::walk;
 use std::collections::BTreeMap;
@@ -348,9 +349,9 @@ pub fn render(cfg: &Config, members: &[Member]) -> String {
     out
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    let cfg = Config::resolve()?;
-    let members = projected_members(&cfg)?;
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
+    let cfg = Config::resolve().map_err(Fault::refused)?;
+    let members = projected_members(&cfg).map_err(Fault::input)?;
     Ok(render(&cfg, &members))
 }
 

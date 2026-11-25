@@ -239,9 +239,9 @@ fn separator_variants(cell: &str, mask: &[bool], out: &mut Vec<Variant>) {
         let len = match bytes[at] {
             _ if !mask[at] => 0,
             b';' if next != Some(b';') && next != Some(b'&') && prev != Some(b';') => 1,
-            b'&' if next == Some(b'&') && prev.map_or(true, |b| !b"&<>|".contains(&b)) => 2,
+            b'&' if next == Some(b'&') && prev.map_or(true, |b| !b"&<>|".contains(&b)) => 2, // status-literal-exempt: an operator's byte length
             b'|' if prev != Some(b'>') && prev != Some(b'|') => match next {
-                Some(b'|') | Some(b'&') => 2,
+                Some(b'|') | Some(b'&') => 2, // status-literal-exempt: an operator's byte length
                 _ => 1,
             },
             _ => 0,

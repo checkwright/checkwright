@@ -1,9 +1,11 @@
 // spec: evidence-kit/SPEC.md §bin/run-validate.sh — the codified validate spine: the guards, the
 // producer-liveness claim, then each suite run foreground, parsed, diffed and batched, and one fold
 // into the tracked manifest after the whole roster has run.
-// spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the exit contract is three-state
-// and the difference is the product: 1 is the verdict a suite regressed, 2 the run could not start.
+// spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because the exit contract is four-state
+// and the difference is the product: 1 is the verdict a suite regressed, 2 a refused invocation, 3
+// a run that could not start.
 use crate::evidence::{self, LockRead, PidProbe};
+use crate::exit::{self, Fault};
 use crate::{proc, programs};
 use crate::walk;
 use std::io::Write;
@@ -33,16 +35,30 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_KIT_DIRS",
 ];
 
-// spec: evidence-kit/SPEC.md §bin/run-validate.sh — the two non-zero exits kept apart by carrying
-// the code with the message: the guards' 2 is a start-time verdict about the world, the 1 is a
-// result, and a refusal shape holding only text would have to guess which it was.
+// spec: evidence-kit/SPEC.md §bin/run-validate.sh — the non-zero exits kept apart by carrying the
+// code with the message: a guard's 2 or 3 is a start-time verdict about the request or the world,
+// the 1 is a result, and a refusal shape holding only text would have to guess which it was.
 pub(crate) struct Refusal {
     pub(crate) code: i32,
     pub(crate) message: String,
 }
 
 pub(crate) fn guard(message: String) -> Refusal {
-    Refusal { code: 2, message }
+    Refusal { code: exit::REFUSED, message }
+}
+
+pub(crate) fn unreadable(message: String) -> Refusal {
+    Refusal { code: exit::INPUT, message }
+}
+
+pub(crate) fn failed(message: String) -> Refusal {
+    Refusal { code: exit::TOOL, message }
+}
+
+impl From<Fault> for Refusal {
+    fn from(f: Fault) -> Self {
+        Refusal { code: f.status(), message: f.message }
+    }
 }
 
 pub fn run(args: &[String]) -> i32 {
@@ -100,20 +116,20 @@ fn config() -> Result<Cfg, Refusal> {
 
 // spec: evidence-kit/SPEC.md §Evidence manifest — the guard reads the header before the claim: a v1
 // header is the fold's to rewrite, a v2 one is kept, and any other refuses with nothing run
-pub(crate) fn manifest_guard(manifest: &str) -> Result<(), String> {
+pub(crate) fn manifest_guard(manifest: &str) -> Result<(), Refusal> {
     if !Path::new(manifest).is_file() {
-        return Err(format!(
+        return Err(guard(format!(
             "manifest not found: {} (seed it with a '# contract: {}' header)",
             manifest,
             evidence::MANIFEST_CONTRACT
-        ));
+        )));
     }
     let text = std::fs::read(manifest)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| format!("cannot read {}: {}", manifest, e))?;
+        .map_err(|e| unreadable(format!("cannot read {}: {}", manifest, e)))?;
     match evidence::manifest_header(&text) {
         evidence::Header::V2 | evidence::Header::V1 => Ok(()),
-        evidence::Header::Unknown(found) => Err(format!(
+        evidence::Header::Unknown(found) => Err(unreadable(format!(
             "manifest {} {} — want '# contract: {}' (a legacy '# contract: {}' is rewritten at the fold); \
              nothing run, nothing written",
             manifest,
@@ -124,7 +140,7 @@ pub(crate) fn manifest_guard(manifest: &str) -> Result<(), String> {
             },
             evidence::MANIFEST_CONTRACT,
             evidence::MANIFEST_CONTRACT_V1
-        )),
+        ))),
     }
 }
 
@@ -212,11 +228,11 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             cfg.queue
         )));
     };
-    manifest_guard(&cfg.manifest).map_err(guard)?;
+    manifest_guard(&cfg.manifest)?;
 
     std::fs::create_dir_all(&cfg.tmpdir)
-        .map_err(|e| guard(format!("cannot create {}: {}", cfg.tmpdir, e)))?;
-    let today = date_today().map_err(guard)?;
+        .map_err(|e| failed(format!("cannot create {}: {}", cfg.tmpdir, e)))?;
+    let today = date_today().map_err(failed)?;
 
     let mut claimed = claim(&cfg.tmpdir, &cfg.lock, &key)?;
 
@@ -243,7 +259,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
         std::process::id()
     );
     std::fs::write(&batch, b"")
-        .map_err(|e| guard(format!("cannot create the batch file {}: {}", batch, e)))?;
+        .map_err(|e| failed(format!("cannot create the batch file {}: {}", batch, e)))?;
     claimed.batch = Some(batch.clone());
 
     let mut overall = 0;
@@ -265,21 +281,21 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             )));
         }
 
-        // spec: evidence-kit/SPEC.md §bin/run-validate.sh — a failing pre-hook aborts the run at the
-        // guards' code with no evidence appended, and that ordering is the contract: it is what
+        // spec: evidence-kit/SPEC.md §bin/run-validate.sh — a failing pre-hook aborts the run at
+        // exit 3, a run that could not start, with no evidence appended, and that ordering is the contract: it is what
         // keeps a refused run from writing a line.
         if !cfg.pre_hook.is_empty() {
             let status = spawn("EVIDENCE_KIT_PRE_HOOK", &cfg.pre_hook, Some(suite), &[], &proc::Sink::Inherit)
-                .map_err(guard)?;
+                .map_err(failed)?;
             if status != 0 {
-                return Err(guard(format!(
+                return Err(failed(format!(
                     "pre-hook failed for suite '{}' — aborting (no evidence appended)",
                     suite
                 )));
             }
         }
 
-        let (commit, tree) = head_state(&cfg).map_err(guard)?;
+        let (commit, tree) = head_state(&cfg).map_err(failed)?;
         // spec: evidence-kit/SPEC.md §bin/run-validate.sh — a Statement never attests a suite at a
         // commit other than its subject, so a pre-hook that moved `HEAD` refuses the whole run
         if let Some((subject, _)) = &attest {
@@ -295,7 +311,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
         let parser = evidence::parser_for(&cfg.parser_family, suite, &cfg.parser);
         let log = format!("{}/validate-{}.log", cfg.tmpdir, suite);
         let status = spawn("EVIDENCE_KIT_RUN_*", &cmd, None, &[], &proc::Sink::File(log.clone().into()))
-            .map_err(guard)?;
+            .map_err(failed)?;
         if status != 0 {
             eprintln!(
                 "run-validate: suite '{}' exited {} (log: {})",
@@ -303,9 +319,9 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             );
         }
 
-        let lines = evidence::parse(suite, Path::new(&log), status, &parser).map_err(guard)?;
+        let lines = evidence::parse(suite, Path::new(&log), status, &parser).map_err(unreadable)?;
         let parsed = format!("{}/validate-{}.parsed", cfg.tmpdir, suite);
-        write_lines(&parsed, &lines).map_err(guard)?;
+        write_lines(&parsed, &lines).map_err(failed)?;
         if lines.is_empty() {
             return Err(Refusal {
                 code: 1,
@@ -331,7 +347,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
         let row = evidence::SuiteLine {
             key: key.clone(),
             suite: suite.clone(),
-            log: crate::sha256::file_hex(Path::new(&log)).map_err(guard)?,
+            log: crate::sha256::file_hex(Path::new(&log)).map_err(unreadable)?,
             counts: (npass as u64, nfail as u64, nignore as u64),
             verdict: verdict.to_string(),
             date: today.clone(),
@@ -340,7 +356,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             cmd: evidence::command_digest(&cmd, &parser),
             origin: "local".to_string(),
         };
-        append_line(&batch, &row.render()).map_err(guard)?;
+        append_line(&batch, &row.render()).map_err(failed)?;
         println!(
             "run-validate: {} -> {} (pass={} fail={} ignore={})",
             suite, verdict, npass, nfail, nignore
@@ -351,9 +367,9 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
         for c in controls.iter().filter(|c| &c.suite == suite) {
             let (clog, cparsed) = control_paths(&cfg.tmpdir, suite, &c.name);
             let status = spawn("EVIDENCE_KIT_RUN_*", &cmd, None, &c.env, &proc::Sink::File(clog.clone().into()))
-                .map_err(guard)?;
-            let lines = evidence::parse(suite, Path::new(&clog), status, &parser).map_err(guard)?;
-            write_lines(&cparsed, &lines).map_err(guard)?;
+                .map_err(failed)?;
+            let lines = evidence::parse(suite, Path::new(&clog), status, &parser).map_err(unreadable)?;
+            write_lines(&cparsed, &lines).map_err(failed)?;
             if lines.is_empty() {
                 return Err(Refusal {
                     code: 1,
@@ -375,7 +391,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
                 cmd: row.cmd.clone(),
                 assign: evidence::assignments_digest(c),
             };
-            append_line(&batch, &line.render()).map_err(guard)?;
+            append_line(&batch, &line.render()).map_err(failed)?;
             if witnessed != "red" {
                 overall = 1;
                 println!(
@@ -407,13 +423,13 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
             let body = evidence::statement(&key, subject, block.clone(), &rows) + "\n";
             claimed.statement = Some(staged.clone());
             std::fs::write(&staged, &body)
-                .map_err(|e| guard(format!("cannot stage the Statement {}: {} — nothing recorded", staged, e)))?;
+                .map_err(|e| failed(format!("cannot stage the Statement {}: {} — nothing recorded", staged, e)))?;
             Some(Staged { path: staged, body: body.into_bytes(), subject: subject.clone() })
         }
     };
-    fold(&cfg.manifest, &cfg.tmpdir, &key, &rows, &control_lines).map_err(guard)?;
+    fold(&cfg.manifest, &cfg.tmpdir, &key, &rows, &control_lines).map_err(failed)?;
     if let Some(staged) = staged {
-        publish(&staged, &cfg.manifest, &cfg.statement, &cfg.write_cmd).map_err(guard)?;
+        publish(&staged, &cfg.manifest, &cfg.statement, &cfg.write_cmd).map_err(failed)?;
     }
     Ok(overall)
 }
@@ -515,21 +531,21 @@ pub(crate) fn claim(tmpdir: &str, lock: &str, key: &str) -> Result<Claimed, Refu
     let pid = std::process::id();
     let tmp = format!("{}/run-validate-lock.{}", tmpdir, pid);
     std::fs::write(&tmp, format!("pid={} run={}\n", pid, key))
-        .map_err(|e| guard(format!("cannot stage the lock record {}: {}", tmp, e)))?;
-    let refuse = |m: String| {
+        .map_err(|e| failed(format!("cannot stage the lock record {}: {}", tmp, e)))?;
+    let refuse = |r: Refusal| {
         let _ = std::fs::remove_file(&tmp);
-        guard(m)
+        r
     };
 
     let mut reclaimed = false;
     while std::fs::hard_link(&tmp, lock).is_err() {
         match evidence::lock_read(Path::new(lock)) {
             LockRead::Corrupt => {
-                return Err(refuse(format!(
+                return Err(refuse(unreadable(format!(
                     "the lock {} carries no readable 'pid=<n> run=<key>[ handoff=<path>]' record — refusing to \
                      start; delete it if no producer is running",
                     lock
-                )))
+                ))))
             }
             LockRead::Held {
                 pid: holder,
@@ -537,17 +553,17 @@ pub(crate) fn claim(tmpdir: &str, lock: &str, key: &str) -> Result<Claimed, Refu
                 ..
             } => match evidence::pid_alive(&holder) {
                 Ok(true) => {
-                    return Err(refuse(format!(
+                    return Err(refuse(guard(format!(
                         "a producer is already running for run key '{}' (pid {}) — refusing to \
                          start; wait for that run to finish, or delete {} once pid {} is gone",
                         run_key, holder, lock, holder
-                    )))
+                    ))))
                 }
                 Ok(false) => {}
                 // spec: evidence-kit/SPEC.md §The producer-liveness lock — the writer takes the
                 // readers' disposition rather than the shell form's: reclaiming a holder the probe
                 // could not classify is the false *free* answer that section forbids.
-                Err(e) => return Err(refuse(probe_message(e, lock))),
+                Err(e) => return Err(refuse(failed(probe_message(e, lock)))),
             },
             LockRead::Absent => {}
         }
@@ -555,11 +571,11 @@ pub(crate) fn claim(tmpdir: &str, lock: &str, key: &str) -> Result<Claimed, Refu
         // exactly once; a second failed claim means the slot is not ours to take, so refusing beats
         // looping — both contenders may relink, exactly one wins, and the loser re-reads a live PID.
         if reclaimed {
-            return Err(refuse(format!(
+            return Err(refuse(guard(format!(
                 "could not claim {} after reclaiming a stale lock — refusing to start rather than \
                  retrying; another producer won the reclaim race, or that path is not writable",
                 lock
-            )));
+            ))));
         }
         reclaimed = true;
         let _ = std::fs::remove_file(lock);

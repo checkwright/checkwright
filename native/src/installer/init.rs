@@ -4,7 +4,7 @@
 use crate::programs;
 use super::selection::{self, Selection};
 use super::{lock, payload_recipe, personal, profile, recipe, refuse, workflow, Package, Refusal, AGENT_FILE, GATES_DIR, QUEUE_FILE, WORKFLOW_DIR};
-use crate::{install, sha256, toolfloor};
+use crate::{exit, install, sha256, toolfloor};
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -136,7 +136,7 @@ pub(super) fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Fla
                 help(pkg);
                 return Ok(None);
             }
-            other => return Err(refuse(format!("unknown argument: {}", other), "", 2)),
+            other => return Err(refuse(format!("unknown argument: {}", other), "", exit::USAGE)),
         }
     }
     // spec: installer/SPEC.md §Selecting kits and gates — `--no-selection` clears the recorded
@@ -146,7 +146,7 @@ pub(super) fn parse(args: &[String], pkg: Option<&Package>) -> Result<Option<Fla
             return Err(refuse(
                 "--no-selection beside another selection flag",
                 "--no-selection clears the recorded selection; pass it alone, or pass the whole new selection without it.",
-                2,
+                exit::USAGE,
             ));
         }
         f.selection = Some(Selection::default());
@@ -163,7 +163,7 @@ fn no_commit_beside_personal() -> Refusal {
     refuse(
         "--personal beside --no-commit",
         "a personal install stages and commits nothing, and --no-commit stages the vendoring for you to commit; pass one of them.",
-        2,
+        exit::USAGE,
     )
 }
 
@@ -272,10 +272,10 @@ fn copy_in(
         let target = root.join(dest);
         if let Some(parent) = target.parent() {
             std::fs::create_dir_all(parent)
-                .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", 2))?;
+                .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", exit::TOOL))?;
         }
         std::fs::copy(src, &target)
-            .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", 2))?;
+            .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", exit::TOOL))?;
     }
     r.record(dest, None);
     Ok(())
@@ -389,7 +389,7 @@ fn write_in(
     }
     if !f.dry {
         std::fs::write(root.join(dest), text)
-            .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", 2))?;
+            .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", exit::TOOL))?;
     }
     r.record(dest, None);
     Ok(true)
@@ -452,7 +452,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         return Err(refuse(
             "this package carries no version stamp",
             "the version is stamped at pack time from the release tag; a package without one was not assembled by the pack step.",
-            2,
+            exit::INPUT,
         ));
     }
 
@@ -468,7 +468,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 refuse(
                     format!("{} carries a schema this build does not know", lock::FILE),
                     "this manifest was written by a different Checkwright release. Upgrade the installer rather than letting it guess at a shape it was not built for.",
-                    2,
+                    exit::INPUT,
                 )
             })?;
         let prior_version = manifest.field("version");
@@ -512,7 +512,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 "selectable profiles: {} ",
                 profile::names(&pkg.root).join(" ")
             ),
-            2,
+            exit::REFUSED,
         ));
     }
 
@@ -521,7 +521,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         return Err(refuse(
             format!("profile '{}' resolves to no kit in this payload", profile_name),
             "every kit a profile names must exist in the package payload; this one names none that do.",
-            2,
+            exit::REFUSED,
         ));
     }
     // spec: installer/SPEC.md §Selecting kits and gates — a run passing no selection flag re-applies
@@ -570,7 +570,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 continue;
             }
             let template = std::fs::read_to_string(&src)
-                .map_err(|e| refuse(format!("could not read {}: {}", src, e), "", 2))?;
+                .map_err(|e| refuse(format!("could not read {}: {}", src, e), "", exit::INPUT))?;
             let text = payload_recipe::compose(&template, &recipes, file_name(&dest));
             payload_recipe::check_composed(file_name(&dest), &text, &recipes)?;
             composed.push((dest, text));
@@ -610,7 +610,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         &crate::walk::sdk_root(),
         None,
     )
-    .map_err(|e| refuse(format!("could not derive the bash audience: {}", e), "", 2))?;
+    .map_err(|e| refuse(format!("could not derive the bash audience: {}", e), "", exit::TOOL))?;
     let selection = toolfloor::Selection {
         kits: kits.clone(),
         gates,
@@ -630,13 +630,13 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     // from: the bootstrap resolved and verified it at step 4, so nothing here re-selects a platform
     // and nothing hashes with an external tool.
     let artifact_digest = sha256::file_hex(&pkg.artifact)
-        .map_err(|e| refuse(format!("could not hash the gate binary: {}", e), "", 2))?;
+        .map_err(|e| refuse(format!("could not hash the gate binary: {}", e), "", exit::INPUT))?;
 
     let gates_list = format!("{}/gates.list", GATES_DIR);
     if personal {
         let planned = planned_paths(pkg, &root, &kits, &[&gates_list, &artifact_dest, &seam])?;
         let tracked = personal::tracked(&root, &planned)
-            .map_err(|e| refuse(format!("could not read which planned paths this repository tracks: {}", e), "", 2))?;
+            .map_err(|e| refuse(format!("could not read which planned paths this repository tracks: {}", e), "", exit::TOOL))?;
         if !tracked.is_empty() {
             return Err(refuse(
                 format!(
@@ -645,14 +645,14 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                     crate::emit::pack_installer::bounded_entries(&tracked)
                 ),
                 "a personal install writes only paths the repository does not track: an exclude line cannot hide a tracked file, and writing one would edit the project's own tree.",
-                2,
+                exit::REFUSED,
             ));
         }
         personal::check(&root).map_err(|e| {
             refuse(
                 format!("could not write the personal install's exclude block: {}", e),
                 "nothing was written. Restore this worktree's end marker in the exclude file, or delete its begin line, then re-run.",
-                2,
+                exit::INPUT,
             )
         })?;
     }
@@ -665,12 +665,12 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         if !crate::walk::under(GATES_DIR, &dest) && !kits.iter().any(|k| crate::walk::under(k, &dest)) {
             continue;
         }
-        let link = super::link_below(&root, &dest).map_err(|e| refuse(format!("could not read where {} lands: {}", dest, e), "", 2))?;
+        let link = super::link_below(&root, &dest).map_err(|e| refuse(format!("could not read where {} lands: {}", dest, e), "", exit::INPUT))?;
         if let Some(at) = link {
             return Err(refuse(
                 format!("{} reaches through a link at {}", dest, at),
                 "init writes each file at its own path, never through a link or junction, which could land it outside this repository. Replace the link with the directory or file itself, or remove it, then re-run.",
-                2,
+                exit::REFUSED,
             ));
         }
     }
@@ -697,18 +697,18 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             return Err(refuse(
                 format!("profile '{}' names {}, which this payload does not carry", profile_name, kit),
                 "the payload's kit set is derived from the source tree at pack time; a profile naming a kit that is not there is a roster that has drifted.",
-                2,
+                exit::REFUSED,
             ));
         }
         // spec: installer/SPEC.md §What init seeds — the count is asserted rather than trusted:
         // a failed enumeration and an empty kit reach this loop identically, so the next construct
         // that fails on an untested host would again install a tree silently missing a kit.
-        let files = super::files_under(&kit_payload).map_err(|e| refuse(e, "", 2))?;
+        let files = super::files_under(&kit_payload).map_err(|e| refuse(e, "", exit::INPUT))?;
         if files.is_empty() {
             return Err(refuse(
                 format!("the payload carries {} but enumerating its files produced nothing", kit),
                 format!("a kit directory this payload ships is never empty, so either the package is damaged or this host refused the walk. Re-install the package; if it still refuses, report what this prints: ls -R {}", kit_payload.display()),
-                2,
+                exit::INPUT,
             ));
         }
         for rel in files {
@@ -727,7 +727,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     if claim(&root, &gates_list, &prior, f.force, &mut r) {
         if !f.dry {
             std::fs::write(root.join(&gates_list), &planned_registry)
-                .map_err(|e| refuse(format!("could not write {}: {}", gates_list, e), "", 2))?;
+                .map_err(|e| refuse(format!("could not write {}: {}", gates_list, e), "", exit::TOOL))?;
         }
         r.record(&gates_list, None);
     } else {
@@ -776,7 +776,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             );
             if !f.dry {
                 std::fs::write(root.join(AGENT_FILE), body)
-                    .map_err(|e| refuse(format!("could not seed {}: {}", AGENT_FILE, e), "", 2))?;
+                    .map_err(|e| refuse(format!("could not seed {}: {}", AGENT_FILE, e), "", exit::TOOL))?;
             }
             // spec: installer/SPEC.md §What init seeds — a seed-once surface is written only where
             // absent, so it is recorded unclaimed: a claim after the write would read init's own
@@ -784,7 +784,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             r.record(AGENT_FILE, None);
         }
         for seeded in recipe::seed(kit, &kit_payload, &root, f.dry)
-            .map_err(|e| refuse(e, "", 2))?
+            .map_err(|e| refuse(e, "", exit::TOOL))?
         {
             match seeded {
                 recipe::Seeded::Path(p) => r.record(&p, None),
@@ -801,7 +801,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     if let Some(src) = recipe::queue_source(&pkg.payload, &kits) {
         if !root.join(QUEUE_FILE).is_file() {
             if !f.dry {
-                recipe::write_queue(&src, &root, QUEUE_FILE).map_err(|e| refuse(e, "", 2))?;
+                recipe::write_queue(&src, &root, QUEUE_FILE).map_err(|e| refuse(e, "", exit::TOOL))?;
             }
             r.record(QUEUE_FILE, None);
         }
@@ -826,11 +826,11 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                     let target = root.join(workflow::PATH);
                     if let Some(parent) = target.parent() {
                         std::fs::create_dir_all(parent).map_err(|e| {
-                            refuse(format!("could not seed {}: {}", workflow::PATH, e), "", 2)
+                            refuse(format!("could not seed {}: {}", workflow::PATH, e), "", exit::TOOL)
                         })?;
                     }
                     std::fs::write(&target, body).map_err(|e| {
-                        refuse(format!("could not seed {}: {}", workflow::PATH, e), "", 2)
+                        refuse(format!("could not seed {}: {}", workflow::PATH, e), "", exit::TOOL)
                     })?;
                 }
                 r.record(workflow::PATH, None);
@@ -863,9 +863,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         force: f.force,
         dry: f.dry,
     };
-    let recorded = install::Recorded::read(&lock_path).map_err(|e| refuse(e, "", 2))?;
+    let recorded = install::Recorded::read(&lock_path).map_err(|e| refuse(e, "", exit::INPUT))?;
     let placed = install::place(&placement, &recorded)
-        .map_err(|e| refuse(format!("the gate binary could not be placed: {}", e), "", 2))?;
+        .map_err(|e| refuse(format!("the gate binary could not be placed: {}", e), "", exit::TOOL))?;
     for line in placed {
         let mut fields = line.split('\t');
         match (fields.next(), fields.next(), fields.next()) {
@@ -1028,9 +1028,9 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         println!("\n{} that would be written:", lock::FILE);
         print!("{}", manifest_text(&r));
         if personal {
-            let ex = personal::exclude(&root).map_err(|e| refuse(e, "", 2))?;
-            let block = personal::body(&root, &r.written, &kits).map_err(|e| refuse(e, "", 2))?;
-            let wt = personal::worktree(&root).map_err(|e| refuse(e, "", 2))?;
+            let ex = personal::exclude(&root).map_err(|e| refuse(e, "", exit::TOOL))?;
+            let block = personal::body(&root, &r.written, &kits).map_err(|e| refuse(e, "", exit::TOOL))?;
+            let wt = personal::worktree(&root).map_err(|e| refuse(e, "", exit::TOOL))?;
             let (begin, end) = personal::markers(wt.key.as_deref());
             println!("\nwould write this block to {}:", ex.shown);
             print!("{}\n{}{}\n", begin, block, end);
@@ -1040,7 +1040,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     }
 
     std::fs::write(&lock_path, manifest_text(&r))
-        .map_err(|e| refuse(format!("could not write {}: {}", lock::FILE, e), "", 2))?;
+        .map_err(|e| refuse(format!("could not write {}: {}", lock::FILE, e), "", exit::TOOL))?;
     r.written.push(lock::FILE.to_string());
     stage.push(lock::FILE.to_string());
 
@@ -1059,7 +1059,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     let phrase = profile_phrase(&profile_name, &profile_kits, &kits);
     if personal {
         let ex = personal::write(&root, &r.written, &kits)
-            .map_err(|e| refuse(format!("could not write the personal install's exclude block: {}", e), "", 2))?;
+            .map_err(|e| refuse(format!("could not write the personal install's exclude block: {}", e), "", exit::TOOL))?;
         for line in &ex.said {
             println!("{}", line);
         }
@@ -1075,7 +1075,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     }
 
     super::git_batched(&root, &["add"], &stage)
-        .map_err(|e| refuse(format!("could not stage the vendored files: {}", e), "", 2))?;
+        .map_err(|e| refuse(format!("could not stage the vendored files: {}", e), "", exit::TOOL))?;
 
     // spec: installer/SPEC.md §init — idempotence is a property of the tree, so a re-run that
     // changed nothing exits clean rather than on an empty commit. The predicate reads the index and
@@ -1087,13 +1087,13 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         // committed tree. `--no-commit` is exempt, having waived the attribution it rests on.
         if f.commit {
             let residue_status = super::git_batched(&root, &["status", "--porcelain"], &r.written)
-                .map_err(|e| refuse(format!("could not read the install's own status: {}", e), "", 2))?;
+                .map_err(|e| refuse(format!("could not read the install's own status: {}", e), "", exit::TOOL))?;
             if !String::from_utf8_lossy(&residue_status).trim().is_empty() {
                 super::git_batched(&root, &["add"], &r.written).map_err(|_| {
                     refuse(
                         "could not stage the files init rewrote but left out of the vendoring commit",
                         "",
-                        2,
+                        exit::TOOL,
                     )
                 })?;
                 if super::git_code(&root, &["diff", "--cached", "--quiet"]) != Some(0) {
@@ -1201,7 +1201,7 @@ fn refuse_process_records(pkg: &Package, kits: &[String]) -> Result<(), Refusal>
             "the workflow commits its own record, and an excluded path cannot hold one; the profiles whose kits pass are {}.",
             passing.join(" ")
         ),
-        2,
+        exit::REFUSED,
     ))
 }
 
@@ -1213,11 +1213,11 @@ fn planned_paths(pkg: &Package, root: &Path, kits: &[String], fixed: &[&str]) ->
     out.push(lock::FILE.to_string());
     for kit in kits {
         let kit_payload = pkg.payload.join(kit);
-        for rel in super::files_under(&kit_payload).map_err(|e| refuse(e, "", 2))? {
+        for rel in super::files_under(&kit_payload).map_err(|e| refuse(e, "", exit::INPUT))? {
             out.push(format!("{}/{}", kit, rel));
         }
         out.extend(recipe::config_seam_plan(&kit_payload, GATES_DIR).into_iter().map(|(_, dest)| dest));
-        for s in recipe::seed(kit, &kit_payload, root, true).map_err(|e| refuse(e, "", 2))? {
+        for s in recipe::seed(kit, &kit_payload, root, true).map_err(|e| refuse(e, "", exit::TOOL))? {
             out.push(match s {
                 recipe::Seeded::Path(p) => p,
                 recipe::Seeded::Plan(_, dest) => dest,
@@ -1281,17 +1281,17 @@ fn run_vendored(
     let env = [("GATE_SDK_ROOT".to_string(), "gate-sdk".to_string())];
     let what = format!("{} {}", artifact, args.join(" "));
     let out = crate::proc::run_merged_in(&bin, args, &env, Some(root))
-        .map_err(|e| refuse(format!("{} failed: {}", what, e), "", 2))?;
+        .map_err(|e| refuse(format!("{} failed: {}", what, e), "", exit::TOOL))?;
     if !out.succeeded() {
         eprintln!("{}", String::from_utf8_lossy(out.output()));
-        return Err(refuse(format!("{} failed", what), "", 2));
+        return Err(refuse(format!("{} failed", what), "", exit::TOOL));
     }
     if let Some(dest) = capture_to {
         if let Some(parent) = dest.parent() {
             let _ = std::fs::create_dir_all(parent);
         }
         std::fs::write(dest, out.output())
-            .map_err(|e| refuse(format!("could not write {}: {}", dest.display(), e), "", 2))?;
+            .map_err(|e| refuse(format!("could not write {}: {}", dest.display(), e), "", exit::TOOL))?;
     }
     Ok(())
 }
@@ -1300,7 +1300,7 @@ fn run_vendored(
 // directory's knob files as the battery run at the root resolves it
 fn knob_at(root: &Path, knob: &str) -> Result<String, Refusal> {
     let gates = root.join(GATES_DIR).to_string_lossy().into_owned();
-    crate::knobs::wire_in(root, &gates, knob).map_err(|e| refuse(format!("{} does not resolve: {}", knob, e), "", 2))
+    crate::knobs::wire_in(root, &gates, knob).map_err(|e| refuse(format!("{} does not resolve: {}", knob, e), "", exit::REFUSED))
 }
 
 // spec: installer/SPEC.md §The manifest — the roster holds repo-relative paths, so a projection a

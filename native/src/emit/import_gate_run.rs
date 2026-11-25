@@ -2,8 +2,9 @@
 // re-running and recorded as `origin=imported` suite lines under this tree's run key, written as the
 // spine writes the manifest: under the producer-liveness claim, folded and published by rename.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an `Arm::Run` because 1 nothing recorded on a
-// contradiction and 2 a refusal are different answers, which the `--emit-` collapse would merge.
-use super::run_validate::{self, guard, Refusal};
+// contradiction, 2 a refusal and 3 an unreadable input are different answers, which the `--emit-`
+// collapse would merge.
+use super::run_validate::{self, failed, guard, Refusal};
 use super::verify_gate_run;
 use crate::{evidence, walk};
 
@@ -48,8 +49,8 @@ fn import(args: &[String]) -> Result<i32, Refusal> {
     let lock = scalar("EVIDENCE_KIT_LOCK_FILE")?;
     let run_id = scalar("EVIDENCE_KIT_RUN_ID")?;
 
-    let bytes = verify_gate_run::read_input("--import-gate-run", args).map_err(guard)?;
-    let judged = verify_gate_run::judge(&bytes).map_err(guard)?;
+    let bytes = verify_gate_run::read_input("--import-gate-run", args)?;
+    let judged = verify_gate_run::judge(&bytes)?;
     judged.report("IMPORT-GATE-RUN");
     if !judged.findings.is_empty() {
         println!("  nothing recorded");
@@ -60,8 +61,8 @@ fn import(args: &[String]) -> Result<i32, Refusal> {
     let key = evidence::run_key(queue_text.as_deref(), &run_id).ok_or_else(|| {
         guard(format!("no evidence-line key — name the iteration in {} or set EVIDENCE_KIT_RUN_ID", queue))
     })?;
-    run_validate::manifest_guard(&manifest).map_err(guard)?;
-    std::fs::create_dir_all(&tmpdir).map_err(|e| guard(format!("cannot create {}: {}", tmpdir, e)))?;
+    run_validate::manifest_guard(&manifest)?;
+    std::fs::create_dir_all(&tmpdir).map_err(|e| failed(format!("cannot create {}: {}", tmpdir, e)))?;
     let _claimed = run_validate::claim(&tmpdir, &lock, &key)?;
 
     let st = &judged.statement;
@@ -81,7 +82,7 @@ fn import(args: &[String]) -> Result<i32, Refusal> {
             origin: "imported".to_string(),
         })
         .collect();
-    run_validate::fold(&manifest, &tmpdir, &key, &rows, &[]).map_err(guard)?;
+    run_validate::fold(&manifest, &tmpdir, &key, &rows, &[]).map_err(failed)?;
     println!(
         "  recorded {} suite line(s) under '{}' in {} (origin=imported)",
         rows.len(),

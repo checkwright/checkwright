@@ -1,6 +1,7 @@
 // spec: evidence-kit/SPEC.md §check-evidence-baseline — baseline grammar, blocking-slug
 // liveness against the queue, per-suite manifest↔disk set equality, and flip causation
 use crate::evidence::data_lines;
+use crate::exit;
 use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
@@ -147,7 +148,7 @@ pub fn run(args: &[String]) -> i32 {
                 .next()
                 .unwrap_or_default();
             eprintln!("check-evidence-baseline: {}", err);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -163,7 +164,7 @@ pub fn run(args: &[String]) -> i32 {
                 "check-evidence-baseline: cannot read {}: {} — the check could not run; treating as failure (not clean)",
                 baseline, e
             );
-            return 2;
+            return exit::INPUT;
         }
     };
     let blines = data_lines(&btext);
@@ -255,7 +256,7 @@ pub fn run(args: &[String]) -> i32 {
                     "check-evidence-baseline: {} — the check could not run; treating as failure (not clean)",
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         let mut on_disk: Vec<String> = files
@@ -303,7 +304,7 @@ pub fn run(args: &[String]) -> i32 {
                 "check-evidence-baseline: {} — the check could not run; treating as failure (not clean)",
                 e
             );
-            return 2;
+            return exit::REFUSED;
         }
     };
     if !suites.is_empty() {
@@ -334,7 +335,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(f) => f,
         Err(e) => {
             eprintln!("check-evidence-baseline: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     };
 

@@ -1,6 +1,7 @@
 // spec: guard-kit/SPEC.md §The shell guard — the `PreToolUse` shell guard: the consumer's rule
 // command runs first, then the payload's tool selects a reader, the rule table decides, and a call
 // nothing decided is logged.
+use crate::exit;
 use crate::guard::engine::{self, Cmd, Verdict};
 use crate::guard::host::{self, Host};
 use crate::guard::reader;
@@ -33,7 +34,7 @@ pub fn run(payload: &Payload) -> i32 {
         Stage::Pass => None,
         Stage::Block(err) => {
             let _ = std::io::stderr().write_all(&err);
-            return 2;
+            return exit::HOOK_BLOCK;
         }
         Stage::Decide(out) => {
             let _ = std::io::stdout().write_all(&out);
@@ -135,7 +136,7 @@ fn consumer_stage(argv: &[String], input: &[u8]) -> Stage {
 // a fault is described here, or left `None` for a kill whose status only the caller holds.
 fn classify(code: Option<i32>, out: &[u8], err: &[u8]) -> Result<Stage, Option<String>> {
     match code {
-        Some(2) => Ok(Stage::Block(err.to_vec())),
+        Some(exit::HOOK_BLOCK) => Ok(Stage::Block(err.to_vec())),
         Some(0) if out.iter().all(u8::is_ascii_whitespace) => Ok(Stage::Pass),
         Some(0) => match serde_json::from_slice::<Value>(out) {
             Ok(Value::Object(_)) => Ok(Stage::Decide(out.to_vec())),

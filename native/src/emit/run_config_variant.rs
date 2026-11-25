@@ -4,7 +4,7 @@ use crate::emit::csmoke;
 use crate::emit::parse_gates_log::{sections, Section};
 use crate::proc;
 use crate::programs;
-use crate::walk;
+use crate::{exit, walk};
 use std::path::{Path, PathBuf};
 
 pub const KNOBS: &[&str] = &["GATE_SDK_TMP_DIR", "GATE_SDK_GATES_DIR", "GATE_SDK_NATIVE_BIN"];
@@ -38,20 +38,20 @@ pub fn run(args: &[String]) -> i32 {
             "--keep" => keep = true,
             s if s.starts_with('-') || dir.is_some() => {
                 eprintln!("{}: unexpected argument: {}\n{}", NAME, s, USAGE);
-                return 2;
+                return exit::USAGE;
             }
             s => dir = Some(s),
         }
     }
     let Some(dir) = dir else {
         eprintln!("{}: needs a variant <dir>\n{}", NAME, USAGE);
-        return 2;
+        return exit::USAGE;
     };
     let files = match variant_files(Path::new(dir)) {
         Ok(f) => f,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            return 2;
+            return exit::NO_COMPARISON;
         }
     };
     for n in notes(&|v| std::env::var(v).ok()) {
@@ -68,7 +68,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            exit::NO_COMPARISON
         }
     }
 }
@@ -180,7 +180,7 @@ fn git(dir: &Path, args: &[&str]) -> Result<(), String> {
 
 fn battery_in(battery: Battery, cwd: &Path, which: &str) -> Result<String, String> {
     let (rc, log) = battery(cwd)?;
-    if rc != 0 && rc != 1 {
+    if rc != 0 && rc != 1 && rc != exit::TOOL {
         return Err(format!("the {} battery could not run (exit {}):\n{}", which, rc, log.trim_end()));
     }
     Ok(log)

@@ -199,7 +199,7 @@ pub fn read_text(path: &str) -> Result<String, String> {
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own argv tail, so a projection whose
 // generator has a write-in-place mode takes it as a flag rather than needing a second arm. The
 // returned string is what the arm prints: the document, or the action a write performed.
-pub type EmitFn = fn(&[String]) -> Result<String, String>;
+pub type EmitFn = fn(&[String]) -> Result<String, crate::exit::Fault>;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — a non-gate arm either renders a document or returns an
 // exit code; the class the table keys is *non-gate*, not *emitting*. The variant is a return shape,
@@ -233,13 +233,13 @@ impl Grammar {
 
 // spec: gate-sdk/SPEC.md §The bin/-tool contract — a token a `Flags` grammar does not name is
 // refused before the member runs; a `Parsed` member's refusal prints as the member spelled it.
-pub fn dispatch(arm: &str, f: EmitFn, grammar: &Grammar, args: &[String]) -> Result<String, String> {
+pub fn dispatch(arm: &str, f: EmitFn, grammar: &Grammar, args: &[String]) -> Result<String, crate::exit::Fault> {
     if let Grammar::Flags(flags) = grammar {
         if let Some(a) = args.iter().find(|a| !flags.contains(&a.as_str())) {
-            return Err(format!("{}: unrecognized argument: {}\n{}", arm, a, grammar.usage(arm)));
+            return Err(crate::exit::Fault::usage(format!("{}: unrecognized argument: {}\n{}", arm, a, grammar.usage(arm))));
         }
     }
-    f(args).map_err(|e| format!("{}: {}", arm, e))
+    f(args).map_err(|e| e.prefixed(arm))
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the registry union sentinel, owned beside `knobs`
@@ -686,7 +686,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         install_evidence::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The overhead meter — an `Arm::Emit` on the variant's own test: the
-    // meter is advisory and exit is always 0, so no `1` is load-bearing and the `{0, 2}` collapse
+    // meter is advisory and exit is always 0, so no `1` is load-bearing and the `{0, 2, 3}` collapse
     // costs nothing. `--emit-kfric`'s shape — a document returned, a line appended beside it.
     (
         "--emit-overhead-meter",
@@ -718,7 +718,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         queue_flow::KNOBS,
     ),
     // spec: drift-kit/SPEC.md §The statistics view — an `Arm::Emit` because its whole exit grammar
-    // is the 0/2 collapse; its roster is its file and the knobs of the harvests and reads it calls
+    // is the 0/2/3 collapse; its roster is its file and the knobs of the harvests and reads it calls
     (
         "--emit-statistics",
         Arm::Emit(statistics::emit, Grammar::Parsed(statistics::USAGE)),
@@ -732,7 +732,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         cite_survey::KNOBS,
     ),
     // spec: doctrine-kit/SPEC.md §stage-rules — an `Arm::Emit` because the contract is a document
-    // and both its failures are already exit 2, which is the variant's own collapse; reached
+    // and both its failures are already exit 2 or 3, which is the variant's own collapse; reached
     // through the generic `--emit <name>` composer rather than a front-end branch of its own
     (
         "--emit-stage-rules",
@@ -740,7 +740,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         stage_rules::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §The stage-contract arm — an `Arm::Emit` on stage-rules'
-    // precedent: the contract is a document and each failure is exit 2
+    // precedent: the contract is a document and each failure is exit 2 or 3
     (
         "--emit-stage-contract",
         Arm::Emit(stage_contract::emit, Grammar::Parsed(stage_contract::USAGE)),
@@ -755,7 +755,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         session_id::KNOBS,
     ),
     // spec: canon-kit/SPEC.md §check-prose-enum — the bundled enum-set emitter, an `Arm::Emit`:
-    // the contract is a document and every failure is already exit 2 spec: gate-sdk/SPEC.md §The
+    // the contract is a document and every failure is already exit 2 or 3 spec: gate-sdk/SPEC.md §The
     // non-gate arm — a **two-kit** declared roster
     (
         "--emit-enum-sets",
@@ -827,7 +827,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         parse_smoke_log::KNOBS,
     ),
     // spec: context-kit/SPEC.md §bin/env-probe — an action that reports, so an `Arm::Emit`: both
-    // its failures are already exit 2, which is the variant's own collapse. Its one declared knob
+    // its failures are already exit 2 or 3, which is the variant's own collapse. Its one declared knob
     // is a row of context-kit's table.
     (
         "--emit-env-probe",
@@ -844,7 +844,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     ),
     // spec: delegation-kit/SPEC.md §check-agent-tier-explicit — the definitions' `model:` generator,
     // an `--emit-` member because its exit grammar is the collapse: 0 a report or a write, 2 an
-    // unbound class or an unreadable definition
+    // unbound class, 3 an unreadable definition
     (
         "--emit-agent-tiers",
         Arm::Emit(agent_tiers::emit, Grammar::Flags(&["--write"])),
@@ -888,7 +888,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         selection_probe::KNOBS,
     ),
     // spec: delegation-kit/SPEC.md §usage-verdict — an `Arm::Run` because its three-state exit
-    // status carries a 1 a hook grades, which an emitting arm collapses to {0, 2}; its callers are
+    // status carries a 1 a hook grades, which an emitting arm collapses to {0, 2, 3}; its callers are
     // a session brief, a kit smoke and a gate in process, so it is no harness-integration arm
     (
         "--usage-verdict",
@@ -924,7 +924,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(scratch_run::run),
         scratch_run::KNOBS,
     ),
-    // spec: guard-kit/SPEC.md §rewrite — an `Arm::Run` because its contract is the 0/1/2 split an
+    // spec: guard-kit/SPEC.md §rewrite — an `Arm::Run` because its contract is the 0/1/2/3 split an
     // emitting arm collapses, and a table member because it resolves `LIFECYCLE_KIT_STATE_FILE`
     (
         "--rewrite",
@@ -997,15 +997,15 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         git_hook::KNOBS,
     ),
     // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — an `Arm::Run` because the exit contract
-    // is three-state and every code is load-bearing: 0 a stamp or a reported no-op, 1 a refusal,
-    // 2 a usage or configuration error, and the state machine reads that difference.
+    // is four-state and every code is load-bearing: 0 a stamp or a no-op, 1 a refusal, 2 a
+    // usage or configuration refusal, 3 a tool error, and the state machine reads the difference.
     (
         "--enter-stage",
         Arm::Run(enter_stage::run),
         enter_stage::KNOBS,
     ),
     // spec: delegation-kit/SPEC.md §bin/wait-probe — an `Arm::Run` because its exit contract is
-    // three-state: `report` returns 1 on an empty evidence file, an honest empty reading an emitting
+    // four-state: `report` returns 1 on an empty evidence file, an honest empty reading an emitting
     // arm would rewrite to the misuse code. Its subcommand word is an operand on `--hook`'s precedent
     (
         "--wait-probe",
@@ -1013,7 +1013,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         wait_probe::KNOBS,
     ),
     // spec: evidence-kit/SPEC.md §bin/run-validate.sh — an `Arm::Run` because the contract is
-    // three-state and the difference is the member's whole product: the `--emit-` collapse makes
+    // four-state and the difference is the member's whole product: the `--emit-` collapse makes
     // *a suite regressed* indistinguishable from *the run could not start*
     (
         "--run-validate",
@@ -1029,28 +1029,29 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         diff_baseline::KNOBS,
     ),
     // spec: evidence-kit/SPEC.md §verify-gate-run — an `Arm::Run` because 1 is a contradiction and 2
-    // a Statement that could not be read or judged, a difference the `--emit-` collapse would erase
+    // or 3 a Statement that could not be read or judged, a difference the `--emit-` collapse would erase
     (
         "--verify-gate-run",
         Arm::Run(verify_gate_run::run),
         verify_gate_run::KNOBS,
     ),
     // spec: evidence-kit/SPEC.md §import-gate-run — an `Arm::Run` because 1 is a contradiction with
-    // nothing recorded and 2 a refusal, a difference the `--emit-` collapse would erase
+    // nothing recorded, 2 a refusal and 3 an unreadable input, a difference the `--emit-` collapse
+    // would erase
     (
         "--import-gate-run",
         Arm::Run(import_gate_run::run),
         import_gate_run::KNOBS,
     ),
-    // spec: gate-sdk/SPEC.md §run-gate-tests — an `Arm::Run` because the contract is a three-valued
-    // exit — 0 clean, 1 a logic failure, 2 a harness or fixture error — and a table member because
-    // it reads three knobs a hardcoded flag would hide from the knob-file derivation
+    // spec: gate-sdk/SPEC.md §run-gate-tests — an `Arm::Run` because the contract is a four-valued
+    // exit — 0 clean, 1 a logic failure, 2 a refusal, 3 a harness or fixture error — and a table
+    // member because it reads three knobs a hardcoded flag would hide from the knob-file derivation
     (
         "--run-gate-tests",
         Arm::Run(run_gate_tests::run),
         run_gate_tests::KNOBS,
     ),
-    // spec: guard-kit/SPEC.md §Testing — an `Arm::Run` because the contract is a three-valued exit
+    // spec: guard-kit/SPEC.md §Testing — an `Arm::Run` because the contract is a four-valued exit
     // an emitting arm collapses, and a table member because the arm needs the vendored guard-kit
     // root, a read a hardcoded flag would hide from the knob-file derivation
     (
@@ -1071,7 +1072,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Emit(run_guard_tests::emit_ps_variants, Grammar::Flags(&[])),
         &["GATE_SDK_KIT_DIRS"],
     ),
-    // spec: context-kit/SPEC.md §Testing — an `Arm::Run` because the contract is the three-valued
+    // spec: context-kit/SPEC.md §Testing — an `Arm::Run` because the contract is the four-valued
     // exit the `index_tests` validate suite reads, and a table member because it reaches two kit
     // roots, a read a hardcoded flag would hide from the knob-file derivation
     (
@@ -1091,7 +1092,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // split of its exit status, which an emitting arm collapses, and a table member because the
     // vendoring and the binary placement both read the consumer's own knobs
     ("--run-demo", Arm::Run(demo::run), demo::KNOBS),
-    // spec: gate-sdk/SPEC.md §Consumer smoke — an `Arm::Run` because the contract is the 1-versus-2
+    // spec: gate-sdk/SPEC.md §Consumer smoke — an `Arm::Run` because the contract is the 1-versus-3
     // split of its exit status, and a table member because the vendoring and the probes read the
     // consumer's kit roots and binary path
     (
@@ -1100,7 +1101,7 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         run_consumer_smoke::KNOBS,
     ),
     // spec: installer/SPEC.md §The consumer smoke — an `Arm::Run` because the contract is the
-    // 0/1/2 split of clean, a finding about the payload and a harness precondition; a bare flag
+    // 0/1/3 split of clean, a finding about the payload and a harness precondition; a bare flag
     // because it spawns `npm`, so it may not join the fence-safe set by derivation
     (
         "--installer-smoke",
@@ -1123,14 +1124,14 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         pack_installer::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §run-gates — the front-end twin's held comparison, an `Arm::Run`
-    // because its contract is the 0/1/2 split of identical, divergent and could-not-run
+    // because its contract is the 0/1/3 split of identical, divergent and could-not-run
     (
         "--run-front-end-parity",
         Arm::Run(front_end_parity::run),
         front_end_parity::KNOBS,
     ),
     // spec: gate-sdk/SPEC.md §with-foreign-shells — an `Arm::Run` because the wrapped command's
-    // status passes through and exit 2 is the arm's own
+    // status passes through and exits 2 and 3 are the arm's own
     (
         "--with-foreign-shells",
         Arm::Run(foreign_shells::run),
@@ -1304,7 +1305,7 @@ mod tests {
         }
     }
 
-    fn never_runs(_: &[String]) -> Result<String, String> {
+    fn never_runs(_: &[String]) -> Result<String, crate::exit::Fault> {
         panic!("the dispatcher ran a member whose argv it should have refused")
     }
 
@@ -1315,6 +1316,7 @@ mod tests {
     fn a_flags_grammar_refuses_every_token_it_does_not_name() {
         let none = Grammar::Flags(&[]);
         let err = dispatch("--emit-x", never_runs, &none, &["bogus".to_string()]).expect_err("surplus");
+        assert_eq!(err.kind, crate::exit::Kind::Usage);
         assert!(err.contains("unrecognized argument: bogus"), "{}", err);
         assert!(err.ends_with("usage: --emit x   (it takes no argument)"), "{}", err);
         let one = Grammar::Flags(&["--write"]);
@@ -1329,12 +1331,14 @@ mod tests {
     #[test]
     fn a_parsed_refusal_prints_as_the_member_spelled_it() {
         let g = Grammar::Parsed("usage: --emit x <arg>");
-        let shape = |_: &[String]| Err("unrecognized option: --help\nusage: --emit x <arg>".to_string());
+        let shape = |_: &[String]| Err(crate::exit::Fault::usage("unrecognized option: --help\nusage: --emit x <arg>"));
         let err = dispatch("--emit-x", shape, &g, &["--help".to_string()]).expect_err("refusal");
-        assert_eq!(err, "--emit-x: unrecognized option: --help\nusage: --emit x <arg>");
-        let runtime = |_: &[String]| Err("not a git repository".to_string());
+        assert_eq!(&*err, "--emit-x: unrecognized option: --help\nusage: --emit x <arg>");
+        assert_eq!(err.status(), crate::exit::USAGE);
+        let runtime = |_: &[String]| Err(crate::exit::Fault::tool("cannot run git"));
         let err = dispatch("--emit-x", runtime, &g, &[]).expect_err("refusal");
-        assert_eq!(err, "--emit-x: not a git repository");
+        assert_eq!(&*err, "--emit-x: cannot run git");
+        assert_eq!(err.status(), crate::exit::TOOL);
     }
 
     // spec: gate-sdk/SPEC.md §The bin/-tool contract — every emitting row declares a usage block that

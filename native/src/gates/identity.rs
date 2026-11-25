@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-identity — every expectation in the identity manifest matches
 // this clone's local git identity
+use crate::exit;
 use crate::fresh;
 use crate::{proc, programs};
 use crate::walk;
@@ -193,35 +194,35 @@ pub fn run(_args: &[String]) -> i32 {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-identity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let email_file = match knob("GATE_SDK_GIT_EMAIL_FILE") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-identity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let remotes_file = match knob("GATE_SDK_GIT_REMOTES_FILE") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-identity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let hosts_knob = match knob("GATE_SDK_GH_HOSTS_FILE") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-identity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let gh_host = match knob("GATE_SDK_GH_HOST") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-identity: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -236,7 +237,7 @@ pub fn run(_args: &[String]) -> i32 {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(_) => {
             eprintln!("check-identity: manifest not readable: {}", manifest);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -255,11 +256,11 @@ pub fn run(_args: &[String]) -> i32 {
             Ok(Some(_)) => {}
             Ok(None) => {
                 eprintln!("check-identity: not a git repository — cannot verify identity");
-                return 2;
+                return exit::REFUSED;
             }
             Err(e) => {
                 eprintln!("check-identity: {}", e);
-                return 2;
+                return exit::TOOL;
             }
         }
     }
@@ -365,7 +366,7 @@ pub fn run(_args: &[String]) -> i32 {
         for m in &malformed {
             eprintln!("  {}", m);
         }
-        return 2;
+        return exit::REFUSED;
     }
 
     // spec: gate-sdk/SPEC.md §check-identity — a surface that exists and cannot be read is
@@ -375,7 +376,7 @@ pub fn run(_args: &[String]) -> i32 {
         for u in &unreadable {
             eprintln!("  {}", u);
         }
-        return 2;
+        return exit::INPUT;
     }
 
     if !mismatches.is_empty() {

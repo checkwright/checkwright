@@ -1,6 +1,7 @@
 // spec: installer/SPEC.md §Versioning — the derivable bump floor: a release note carrying a bullet
 // in any declaration-bearing section, or inheriting an outstanding deferred release's floor, may
 // not ride a patch-only bump over its predecessor
+use crate::exit::Fault;
 use crate::declaration;
 use crate::release_sections;
 use crate::spec;
@@ -137,34 +138,34 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-release-bump: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR").map_err(Fault::refused)?;
     let posts = posts.as_str();
     let disposition = match args.get(1).filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => disposition_file()?,
+        None => disposition_file().map_err(Fault::refused)?,
     };
     let disposition = disposition.as_str();
     if !Path::new(posts).is_dir() {
-        return Err(format!("posts dir not found: {}", posts));
+        return Err(Fault::refused(format!("posts dir not found: {}", posts)));
     }
 
     let mut rows: Vec<Row> = Vec::new();
-    for f in walk::glob_files(Path::new(posts), &["*.md".to_string()])? {
+    for f in walk::glob_files(Path::new(posts), &["*.md".to_string()]).map_err(Fault::input)? {
         let path = f.display().to_string();
-        let text = read_text(&path)?;
+        let text = read_text(&path).map_err(Fault::input)?;
         if let Some(v) = front_matter_release(&text) {
             if v.is_empty() {
                 continue;
             }
             let raw = v.strip_prefix('v').unwrap_or(&v).to_string();
             rows.push(Row {
-                version: parse_version(&raw, &path)?,
+                version: parse_version(&raw, &path).map_err(Fault::input)?,
                 raw,
                 file: path,
             });
@@ -178,9 +179,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
     for line in collect_dispositions(disposition) {
         let value = line.split_whitespace().nth(2).unwrap_or("");
         if let Some(v) = value.strip_prefix("deferred:v") {
-            deferred.push((parse_version(v, &line)?, v.to_string()));
+            deferred.push((parse_version(v, &line).map_err(Fault::input)?, v.to_string()));
         } else if let Some(v) = value.strip_prefix('v') {
-            released.push(parse_version(v, &line)?);
+            released.push(parse_version(v, &line).map_err(Fault::input)?);
         }
     }
     let mut floor: Option<&(Version, String)> = None;
@@ -216,13 +217,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // composition, under each section's own heading; a tagged note is history and is not
     // retro-fitted
     let tag = format!("refs/tags/v{}", newest.raw);
-    let under_composition = proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", &tag])?.code() != Some(0);
-    let text = read_text(&newest.file)?;
-    let roster = release_sections::roster()?;
+    let under_composition = proc::run(&programs::GIT, &["rev-parse", "-q", "--verify", &tag]).map_err(Fault::tool)?.code() != Some(0);
+    let text = read_text(&newest.file).map_err(Fault::input)?;
+    let roster = release_sections::roster().map_err(Fault::refused)?;
     let roster_state = if under_composition {
         for s in &roster {
             if declaration::section_bullets(&text, &[s.heading.as_str()]).is_none() {
-                return Err(format!("newest note {} is under composition (v{} carries no tag) and has no '{}' section — every roster section is fixed on a note under composition, not optional (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, newest.raw, s.heading));
+                return Err(Fault::input(format!("newest note {} is under composition (v{} carries no tag) and has no '{}' section — every roster section is fixed on a note under composition, not optional (installer/SPEC.md §The upgrade contract owns the note grammar)", newest.file, newest.raw, s.heading)));
             }
         }
         "asserted"

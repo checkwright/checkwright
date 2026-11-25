@@ -1,6 +1,7 @@
 // spec: doctrine-kit/SPEC.md §install-doctrine — idempotent insert/replace of the doctrine
 // reference block between fixed markers in the always-loaded agent file, carrying the consumer's
 // declared trims across the rewrite. Here: the digest and the preservation rule, nothing else.
+use crate::exit::Fault;
 use crate::marker;
 use crate::walk;
 
@@ -326,7 +327,7 @@ pub fn run(args: &[String]) -> i32 {
         }
         Err(e) => {
             eprintln!("install-doctrine: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -334,27 +335,29 @@ pub fn run(args: &[String]) -> i32 {
 // spec: doctrine-kit/SPEC.md §install-doctrine — the positional overrides
 // `[agent-file [doctrine-file]]` and `--remove [agent-file]`; each names the file the rule writes
 // into rather than selecting where configuration comes from, so each arrives as argv.
-fn dispatch(args: &[String]) -> Result<Report, String> {
+fn dispatch(args: &[String]) -> Result<Report, Fault> {
     let removing = args.first().map(String::as_str) == Some("--remove");
     let rest: &[String] = if removing { &args[1..] } else { args };
     if let Some(a) = rest.first().filter(|a| a.starts_with('-')) {
-        return Err(format!("unknown option: {}", a));
+        return Err(Fault::usage(format!("unknown option: {}", a)));
     }
     let agent = match rest.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => walk::knob_scalar("DOCTRINE_KIT_AGENT_FILE")?,
+        None => walk::knob_scalar("DOCTRINE_KIT_AGENT_FILE").map_err(Fault::refused)?,
     };
     if removing {
-        return remove(&agent).map(|line| Report {
-            line,
-            findings: Vec::new(),
-        });
+        return remove(&agent)
+            .map(|line| Report {
+                line,
+                findings: Vec::new(),
+            })
+            .map_err(Fault::input);
     }
     let doctrine = match rest.get(1).filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => walk::knob_scalar("DOCTRINE_KIT_DOCTRINE_FILE")?,
+        None => walk::knob_scalar("DOCTRINE_KIT_DOCTRINE_FILE").map_err(Fault::refused)?,
     };
-    install(&agent, &doctrine)
+    install(&agent, &doctrine).map_err(Fault::input)
 }
 
 #[cfg(test)]

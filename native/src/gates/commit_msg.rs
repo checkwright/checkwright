@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-commit-msg — the commit message matches no banned pattern, the
 // leak guard for the message surface the pre-commit hook never sees
 use crate::ere::Ere;
+use crate::exit::{self, Fault};
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -20,23 +21,24 @@ pub(super) fn print_reissue_remedy() {
 }
 
 // spec: gate-sdk/SPEC.md §check-commit-msg — `gate_msg_pattern_files` with no positional: every
-// required file must exist and be readable, and each local one joins where it does
-pub(crate) fn resolve_files() -> Result<Vec<String>, String> {
-    let required = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES")?;
-    let local = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES_LOCAL")?;
+// required file must exist and be readable, and each local one joins where it does; a missing one
+// is a refusal and an unreadable one an input error, as `lib/gate.sh` splits them
+pub(crate) fn resolve_files() -> Result<Vec<String>, Fault> {
+    let required = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES").map_err(Fault::refused)?;
+    let local = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES_LOCAL").map_err(Fault::refused)?;
     let mut out: Vec<String> = Vec::new();
     for f in required {
         if !Path::new(&f).is_file() {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "gate_msg_pattern_files: required tracked pattern file missing: {}",
                 f
-            ));
+            )));
         }
         if std::fs::File::open(&f).is_err() {
-            return Err(format!(
+            return Err(Fault::input(format!(
                 "gate_msg_pattern_files: pattern file not readable: {}",
                 f
-            ));
+            )));
         }
         out.push(f);
     }
@@ -73,7 +75,7 @@ pub fn run(args: &[String]) -> i32 {
     };
     if !Path::new(msg).is_file() {
         eprintln!("check-commit-msg: message file not found: {}", msg);
-        return 2;
+        return exit::REFUSED;
     }
 
     let files: Vec<String> = if args.len() > 1 {
@@ -82,9 +84,9 @@ pub fn run(args: &[String]) -> i32 {
         match resolve_files() {
             Ok(f) => f,
             Err(e) => {
-                eprintln!("{}", e);
-                eprintln!("COMMIT-MSG: {}", fresh::fail_closed("pattern-files", Some(2)));
-                return 2;
+                eprintln!("{}", e.message);
+                eprintln!("COMMIT-MSG: {}", fresh::fail_closed("pattern-files", Some(e.status())));
+                return e.status();
             }
         }
     };
@@ -92,9 +94,9 @@ pub fn run(args: &[String]) -> i32 {
     let Some(patterns) = live_patterns(&files) else {
         eprintln!(
             "COMMIT-MSG: {}",
-            fresh::fail_closed("grep-patterns", Some(2))
+            fresh::fail_closed("grep-patterns", Some(exit::INPUT))
         );
-        return 2;
+        return exit::INPUT;
     };
 
     if patterns.is_empty() {
@@ -108,15 +110,15 @@ pub fn run(args: &[String]) -> i32 {
             Ok(e) => compiled.push(e),
             Err(e) => {
                 eprintln!("check-commit-msg: {}: {}", p, e);
-                eprintln!("COMMIT-MSG: {}", fresh::fail_closed("grep", Some(2)));
-                return 2;
+                eprintln!("COMMIT-MSG: {}", fresh::fail_closed("grep", Some(exit::REFUSED)));
+                return exit::REFUSED;
             }
         }
     }
 
     let Ok(bytes) = std::fs::read(msg) else {
-        eprintln!("COMMIT-MSG: {}", fresh::fail_closed("grep", Some(2)));
-        return 2;
+        eprintln!("COMMIT-MSG: {}", fresh::fail_closed("grep", Some(exit::INPUT)));
+        return exit::INPUT;
     };
     let text = String::from_utf8_lossy(&bytes).into_owned();
     // spec: gate-sdk/SPEC.md §check-commit-msg — `grep -EnHf`: one record per *matching line*,

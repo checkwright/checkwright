@@ -7,6 +7,7 @@
 // release, admitting an unserved row as pending while this iteration will release
 use super::install_docs::{self, Member};
 use super::pinned_release;
+use crate::exit::Fault;
 use crate::fresh;
 use crate::registry;
 use std::path::Path;
@@ -34,7 +35,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-install-platforms: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -258,11 +259,11 @@ const PWSH_FALLBACK: Detector = Detector {
 
 // spec: installer/SPEC.md §Platform resolution — a half's emitted set is the union of both its
 // functions' operands, and either extraction degrading refuses the whole half
-fn half_triples(path: &str, functions: &[&Detector]) -> Result<Vec<String>, String> {
+fn half_triples(path: &str, functions: &[&Detector]) -> Result<Vec<String>, Fault> {
     if !Path::new(path).is_file() {
-        return Err(format!("host detector not found: {}", path));
+        return Err(Fault::refused(format!("host detector not found: {}", path)));
     }
-    half_triples_in(&fresh::read_captured(path)?, path, functions)
+    half_triples_in(&fresh::read_captured(path).map_err(Fault::input)?, path, functions).map_err(Fault::input)
 }
 
 fn half_triples_in(text: &str, path: &str, functions: &[&Detector]) -> Result<Vec<String>, String> {
@@ -350,7 +351,7 @@ fn pinned_input(
     args: &[String],
     page_paths: &[String],
     roster: &str,
-) -> Result<Option<(Pinned, String, String)>, String> {
+) -> Result<Option<(Pinned, String, String)>, Fault> {
     if args.len() == 8 {
         let p = Pinned {
             label: args[4].clone(),
@@ -360,7 +361,7 @@ fn pinned_input(
         return Ok(Some((p, args[6].clone(), args[7].clone())));
     }
     if args.len() > 4 {
-        return Err("usage: check-install-platforms [install.md roster sh-bootstrap ps1-bootstrap [pinned-roster pinned-page disposition queue]]".to_string());
+        return Err(Fault::usage("usage: check-install-platforms [install.md roster sh-bootstrap ps1-bootstrap [pinned-roster pinned-page disposition queue]]"));
     }
     let Some(tag) = pinned_release::pinned_tag()? else {
         return Ok(None);
@@ -411,62 +412,62 @@ fn unserved(decls: &[Decl], pinned: &Pinned) -> (Vec<(String, String)>, bool) {
 }
 
 // spec: installer/SPEC.md §The hosted install pin — the one install page carrying the platforms block
-pub(crate) fn platforms_page(pages: &[Member]) -> Result<Option<&Member>, String> {
+pub(crate) fn platforms_page(pages: &[Member]) -> Result<Option<&Member>, Fault> {
     install_docs::carrier(pages, "a platforms block", |t| t.contains(BEGIN))
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let page_paths = install_docs::paths(args, 0)?;
-    let roster = fresh::positional_or_knob(args, 1, ROSTER_KNOB)?;
+    let roster = fresh::positional_or_knob(args, 1, ROSTER_KNOB).map_err(Fault::refused)?;
     // spec: installer/SPEC.md §The gate binary — the two hand-kept host detectors, read as the
     // OWNERS of their triple sets rather than against a roster comment beside them, which would be
     // the second copy this whole binding exists to refuse
-    let bash_path = fresh::positional_or_knob(args, 2, "GATE_LOCAL_BOOTSTRAP_SH")?;
-    let pwsh_path = fresh::positional_or_knob(args, 3, "GATE_LOCAL_BOOTSTRAP_PS1")?;
+    let bash_path = fresh::positional_or_knob(args, 2, "GATE_LOCAL_BOOTSTRAP_SH").map_err(Fault::refused)?;
+    let pwsh_path = fresh::positional_or_knob(args, 3, "GATE_LOCAL_BOOTSTRAP_PS1").map_err(Fault::refused)?;
     let roster = roster.as_str();
     let (bash_path, pwsh_path) = (bash_path.as_str(), pwsh_path.as_str());
     let pinned = pinned_input(args, &page_paths, roster)?;
 
     let pages = install_docs::read(&page_paths, "install page not found")?;
     if !Path::new(roster).is_file() {
-        return Err(format!("target roster not found: {}", roster));
+        return Err(Fault::refused(format!("target roster not found: {}", roster)));
     }
     let Some(platforms) = platforms_page(&pages)? else {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "no platform marker block ({}) in {}",
             BEGIN,
             install_docs::names(&pages)
-        ));
+        )));
     };
     let (install_md, install_text) = (platforms.path.as_str(), platforms.text.as_str());
 
     let decls = declarations(install_text);
     if decls.is_empty() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "marker block present but no '| <system> | <minimum> | `<triple>` | <state> |' rows in {}",
             install_md
-        ));
+        )));
     }
 
     // spec: installer/SPEC.md §Requirements — a missing or empty prerequisites block is a check
     // that could not run, as the platform block's own absence is
     let prereq_page = install_docs::carrier(&pages, "a prerequisites block", |t| t.lines().any(|l| l == PREREQ_BEGIN))?
         .ok_or_else(|| {
-            format!(
+            Fault::input(format!(
                 "no prerequisites marker block ({}) in {}",
                 PREREQ_BEGIN,
                 install_docs::names(&pages)
-            )
+            ))
         })?;
     let prereqs = prerequisites(&prereq_page.text).unwrap_or_default();
     if prereqs.is_empty() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "prerequisites block present but no '| <tool> | <minimum> | <needed for> | <why> |' rows in {}",
             prereq_page.path
-        ));
+        )));
     }
 
-    let roster_text = fresh::read_captured(roster)?;
+    let roster_text = fresh::read_captured(roster).map_err(Fault::input)?;
     let listed = roster_triples(&roster_text);
 
     let detected = [
@@ -742,7 +743,7 @@ mod tests {
     }
 
     // spec: installer/SPEC.md §The gate binary — every one of these is a check that could not
-    // run, reaching exit 2 through `rule`'s error path rather than reporting the agreement an
+    // run, reaching exit 3 through `rule`'s error path rather than reporting the agreement an
     // empty extraction would otherwise look like
     #[test]
     fn a_degraded_extraction_is_a_refusal_and_never_a_pass() {

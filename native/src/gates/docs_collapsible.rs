@@ -1,6 +1,7 @@
 // spec: site-kit/SPEC.md §check-docs-collapsible — every collapsible region on a tracked docs page
 // renders its body as markdown, names what it holds, and hides no heading
 use super::docs_render_fidelity::jekyll_internal;
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -12,23 +13,23 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}: {}", NAME, msg);
-            2
+            msg.status()
         }
     }
 }
 
-fn inner(args: &[String]) -> Result<i32, String> {
-    let docs_knob = walk::knob_scalar("SITE_KIT_DOCS_DIR")?;
+fn inner(args: &[String]) -> Result<i32, Fault> {
+    let docs_knob = walk::knob_scalar("SITE_KIT_DOCS_DIR").map_err(Fault::refused)?;
     let docs = fresh::strip_trailing_slash(fresh::positional(args, 0, &docs_knob)).to_string();
 
-    if walk::toplevel_opt()?.is_none() {
-        return Err("not a git repository — cannot enumerate tracked pages".to_string());
+    if walk::toplevel_opt().map_err(Fault::tool)?.is_none() {
+        return Err(Fault::refused("not a git repository — cannot enumerate tracked pages"));
     }
     if !fresh::is_dir(&docs) {
-        return Err(format!("docs dir not found: {}", docs));
+        return Err(Fault::refused(format!("docs dir not found: {}", docs)));
     }
-    let listing = crate::listing::tracked(None, &[&docs]).map_err(|e| e.text())?;
-    let prune = walk::prune_dirs()?;
+    let listing = crate::listing::tracked(None, &[&docs]).map_err(|e| Fault::tool(e.text()))?;
+    let prune = walk::prune_dirs().map_err(Fault::refused)?;
     let mut pages: Vec<String> = listing
         .into_iter()
         .filter(|p| {
@@ -42,7 +43,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     for page in &pages {
         let text = std::fs::read(page)
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .map_err(|e| format!("cannot read {}: {}", page, e))?;
+            .map_err(|e| Fault::input(format!("cannot read {}: {}", page, e)))?;
         let scan = scan(&text);
         regions += scan.regions;
         findings.extend(scan.findings.into_iter().map(|f| (page.clone(), f)));

@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-action-pinning — every `uses:` ref in a scanned YAML
 // file is immutable: a full 40-hex commit SHA, or a repo-local ./ path git pins at
 // checkout
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -69,14 +70,14 @@ pub fn run(args: &[String]) -> i32 {
     let root = Path::new(scanroot);
     if !root.is_dir() {
         eprintln!("check-action-pinning: scan root not found: {}", scanroot);
-        return 2;
+        return exit::REFUSED;
     }
 
     let files = match walk::find_files(root, &["yml", "yaml"]) {
         Ok(f) => f,
         Err(e) => {
             eprintln!("check-action-pinning: {} — the check could not run; treating as failure (not clean)", e);
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -99,7 +100,7 @@ pub fn run(args: &[String]) -> i32 {
                     f.display(),
                     e
                 );
-                return 2;
+                return exit::INPUT;
             }
         };
         for (n, line) in text.lines().enumerate() {

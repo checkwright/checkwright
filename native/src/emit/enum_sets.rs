@@ -2,6 +2,7 @@
 // vocabulary plus the derived roster families over the kit tree, one `<set-name>`⇥`<member>` line
 // per member, every member read from the tree or from the gate that owns it
 // spec: gate-sdk/SPEC.md §The non-gate arm — a two-kit declared roster
+use crate::exit::Fault;
 use crate::walk;
 
 pub const KNOBS: &[&str] = &["GATE_SDK_KIT_DIRS", "QUEUE_KIT_LESSON_TAGS"];
@@ -57,8 +58,8 @@ fn tracked_under(dir: &str, suffix: &str) -> Result<Vec<String>, String> {
         .collect())
 }
 
-pub fn emit(_args: &[String]) -> Result<String, String> {
-    let lesson_tags = walk::knob_array("QUEUE_KIT_LESSON_TAGS")?;
+pub fn emit(_args: &[String]) -> Result<String, Fault> {
+    let lesson_tags = walk::knob_array("QUEUE_KIT_LESSON_TAGS").map_err(Fault::refused)?;
     let mut lessons: Vec<String> = vec![ATTEND.to_string()];
     lessons.extend(lesson_tags);
 
@@ -78,13 +79,13 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
     // spec: gate-sdk/SPEC.md §Layout and configuration — every use below statts or lists a
     // directory from the cwd, so the root takes the working-directory spelling, while the set name
     // is bound apart from it off the basename, which either spelling yields alike
-    let kits: Vec<String> = walk::kit_roots()?
+    let kits: Vec<String> = walk::kit_roots().map_err(Fault::refused)?
         .into_iter()
         .filter(|k| !k.is_empty())
         .map(|k| k.trim_end_matches('/').to_string())
         .collect();
     if kits.is_empty() {
-        return Err("the kit roots name no kit root".to_string());
+        return Err(Fault::refused("the kit roots name no kit root"));
     }
 
     for kit in &kits {
@@ -94,9 +95,9 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         // silently empty set
         let lib = format!("{}/lib", kit);
         if std::path::Path::new(&lib).is_dir() {
-            let libs = tracked_under(&lib, ".sh")?;
+            let libs = tracked_under(&lib, ".sh").map_err(Fault::input)?;
             if libs.is_empty() {
-                return Err(format!("{}/lib tracks no top-level *.sh", kit));
+                return Err(Fault::input(format!("{}/lib tracks no top-level *.sh", kit)));
             }
             emit_set(&mut out, &format!("{}-lib", name), &libs);
         }
@@ -105,7 +106,7 @@ pub fn emit(_args: &[String]) -> Result<String, String> {
         // broken derivation
         let tests = format!("{}/gate-tests", kit);
         if std::path::Path::new(&tests).is_dir() {
-            let found = tracked_under(&tests, ".test.sh")?;
+            let found = tracked_under(&tests, ".test.sh").map_err(Fault::input)?;
             emit_set(&mut out, &format!("{}-gate-test", name), &found);
         }
     }

@@ -1,5 +1,6 @@
 // spec: docs/install-parity-contracts.md §The install-toolchain parity contract — the two
 // toolchain tables hold whole-element parity with the probe roster, each row on its audience's page
+use crate::exit::Fault;
 use super::install_docs;
 use crate::fresh;
 use crate::toolfloor::{ANCHOR_ARMS_NEEDED, CONTRIBUTOR, DERIVED, KIT_JOIN, REGISTERED};
@@ -26,7 +27,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-install-toolchain: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -151,74 +152,74 @@ fn render(quad: &str) -> String {
 // spec: context-kit/SPEC.md §bin/env-probe — the roster is the crate's own, so the third
 // positional is an *override* rather than the ordinary path to it: a hermetic fixture needs a
 // roster it can author, or the divergence cases are unreachable without editing the kit's own.
-fn elements_of(roster: Option<&String>) -> Result<(Vec<String>, String), String> {
+fn elements_of(roster: Option<&String>) -> Result<(Vec<String>, String), Fault> {
     let Some(path) = roster else {
         return Ok((
             crate::toolfloor::PROBE_SET.iter().map(|e| e.to_string()).collect(),
-            crate::toolfloor::roster()?,
+            crate::toolfloor::roster().map_err(Fault::input)?,
         ));
     };
     if !Path::new(path).is_file() {
-        return Err(format!("roster file not found: {}", path));
+        return Err(Fault::refused(format!("roster file not found: {}", path)));
     }
-    let text = fresh::read_captured(path)?;
+    let text = fresh::read_captured(path).map_err(Fault::input)?;
     let elements = crate::toolfloor::probe_set(&text)
-        .ok_or_else(|| format!("no PROBE_SET=(...) array in {}", path))?;
+        .ok_or_else(|| Fault::input(format!("no PROBE_SET=(...) array in {}", path)))?;
     Ok((elements, path.clone()))
 }
 
-fn page_rows(page: &str) -> Result<Vec<Row>, String> {
+fn page_rows(page: &str) -> Result<Vec<Row>, Fault> {
     if !Path::new(page).is_file() {
-        return Err(format!("toolchain page not found: {}", page));
+        return Err(Fault::refused(format!("toolchain page not found: {}", page)));
     }
-    let text = fresh::read_captured(page)?;
+    let text = fresh::read_captured(page).map_err(Fault::input)?;
     if !text.contains(BEGIN) {
-        return Err(format!("no toolchain marker block ({}) in {}", BEGIN, page));
+        return Err(Fault::input(format!("no toolchain marker block ({}) in {}", BEGIN, page)));
     }
     Ok(listed_rows(&text))
 }
 
 // spec: installer/SPEC.md §The hosted install pin — the install page carrying the toolchain block
 // is the home of every non-contributor row
-fn install_rows(args: &[String]) -> Result<(String, Vec<Row>), String> {
+fn install_rows(args: &[String]) -> Result<(String, Vec<Row>), Fault> {
     let pages = install_docs::read(&install_docs::paths(args, 0)?, "toolchain page not found")?;
     match install_docs::carrier(&pages, "a toolchain block", |t| t.contains(BEGIN))? {
         Some(m) => Ok((m.path.clone(), listed_rows(&m.text))),
-        None => Err(format!(
+        None => Err(Fault::input(format!(
             "no toolchain marker block ({}) in {}",
             BEGIN,
             install_docs::names(&pages)
-        )),
+        ))),
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let (install_md, install_rows) = install_rows(args)?;
-    let contributing_md = fresh::positional_or_knob(args, 1, "GATE_LOCAL_CONTRIBUTING_FILE")?;
+    let contributing_md = fresh::positional_or_knob(args, 1, "GATE_LOCAL_CONTRIBUTING_FILE").map_err(Fault::refused)?;
     let contributing_rows = page_rows(&contributing_md)?;
     let (install_md, contributing_md) = (install_md.as_str(), contributing_md.as_str());
     if install_rows.is_empty() && contributing_rows.is_empty() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "marker blocks present but no '| `tool` | … |' rows in {} or {}",
             install_md, contributing_md
-        ));
+        )));
     }
 
     let (elements, roster) = elements_of(args.get(2))?;
     if elements.is_empty() {
-        return Err(format!("PROBE_SET array is empty in {}", roster));
+        return Err(Fault::input(format!("PROBE_SET array is empty in {}", roster)));
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — bought only where an element asks for it, so a
     // roster carrying no derived audience needs no kit roots and a fixture may author one; a
     // derivation that read no kit root fails closed, where one that found no surface is a list.
     let derived = if elements.iter().any(|e| crate::toolfloor::parse(e).audience == DERIVED) {
-        crate::toolfloor::derived_kit_audience_here()?.ok_or_else(|| {
-            format!(
+        crate::toolfloor::derived_kit_audience_here().map_err(Fault::refused)?.ok_or_else(|| {
+            Fault::refused(format!(
                 "the roster carries a '{}' audience and no kit root was read under this tree — the \
                  page's row cannot be compared against a derivation that did not run",
                 DERIVED
-            )
+            ))
         })?
     } else {
         Vec::new()

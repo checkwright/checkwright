@@ -1,6 +1,7 @@
 // spec: evidence-kit/SPEC.md §check-test-control — (A) the declarations, (B) every new baseline pass
 // row named by a control, (C) on a close cursor every control witnessed red by the current run
 use crate::evidence;
+use crate::exit::Fault;
 use crate::stages;
 use crate::walk;
 use std::path::Path;
@@ -23,7 +24,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-test-control: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -37,18 +38,18 @@ fn report(what: &str, findings: &[String], help: &str) -> i32 {
     1
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let names = walk::knob_array("EVIDENCE_KIT_CONTROLS")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let names = walk::knob_array("EVIDENCE_KIT_CONTROLS").map_err(Fault::refused)?;
     if names.is_empty() {
         println!("TEST-CONTROL: clean (not applicable: EVIDENCE_KIT_CONTROLS is empty)");
         return Ok(0);
     }
-    let family = walk::knob_prefix(evidence::CONTROL_PREFIX)?;
-    let suites = walk::knob_array("EVIDENCE_KIT_SUITES")?;
-    let baseline = knob_or(args, 0, "EVIDENCE_KIT_BASELINE_FILE")?;
-    let manifest = knob_or(args, 2, "EVIDENCE_KIT_MANIFEST_FILE")?;
-    let queue = knob_or(args, 3, "EVIDENCE_KIT_QUEUE_FILE")?;
-    let state = knob_or(args, 4, "EVIDENCE_KIT_STATE_FILE")?;
+    let family = walk::knob_prefix(evidence::CONTROL_PREFIX).map_err(Fault::refused)?;
+    let suites = walk::knob_array("EVIDENCE_KIT_SUITES").map_err(Fault::refused)?;
+    let baseline = knob_or(args, 0, "EVIDENCE_KIT_BASELINE_FILE").map_err(Fault::refused)?;
+    let manifest = knob_or(args, 2, "EVIDENCE_KIT_MANIFEST_FILE").map_err(Fault::refused)?;
+    let queue = knob_or(args, 3, "EVIDENCE_KIT_QUEUE_FILE").map_err(Fault::refused)?;
+    let state = knob_or(args, 4, "EVIDENCE_KIT_STATE_FILE").map_err(Fault::refused)?;
 
     // assertion A: every declaration parses, and no two name one suite and scenario
     let (controls, mut decl) = evidence::controls(&names, &family, &suites);
@@ -92,7 +93,7 @@ fn new_tests(
     state: &str,
     controls: &[evidence::Control],
     findings: &mut Vec<String>,
-) -> Result<String, String> {
+) -> Result<String, Fault> {
     let (since_text, label) = match args.get(1).filter(|a| !a.is_empty()) {
         Some(file) => (read_or_empty(file), format!("the since baseline {}", file)),
         None => {
@@ -100,19 +101,22 @@ fn new_tests(
             let (commit, what) = if !start.is_empty() {
                 (start, "the iteration start")
             } else {
-                let rev = walk::knob_scalar("EVIDENCE_KIT_CONTROL_SINCE")?;
+                let rev = walk::knob_scalar("EVIDENCE_KIT_CONTROL_SINCE").map_err(Fault::refused)?;
                 if rev.is_empty() {
                     return Ok("new-test check off: no iteration-start commit and EVIDENCE_KIT_CONTROL_SINCE is empty".to_string());
                 }
                 if !stages::commit_resolves(&rev) {
-                    return Err(format!(
+                    return Err(Fault::refused(format!(
                         "EVIDENCE_KIT_CONTROL_SINCE '{}' resolves to no commit — the check could not run; treating as failure (not clean)",
                         rev
-                    ));
+                    )));
                 }
                 (rev, "EVIDENCE_KIT_CONTROL_SINCE")
             };
-            (evidence::baseline_at(&commit, what, baseline)?, format!("{} {}", what, commit))
+            (
+                evidence::baseline_at(&commit, what, baseline).map_err(Fault::tool)?,
+                format!("{} {}", what, commit),
+            )
         }
     };
     let held: Vec<(String, String)> = evidence::data_lines(&since_text)

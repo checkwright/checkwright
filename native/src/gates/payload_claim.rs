@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-payload-claim — exactly one governed doc declares what a
 // gate on the vendored payload discloses, and no scanned governed doc asserts a different
 // disclosure class; membership over the whole document rather than position in a section
+use crate::exit::{self, Fault};
 use crate::spec::{self, declared_id};
 use std::path::Path;
 
@@ -9,40 +10,40 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-payload-claim: {}", e);
-            2
+            e.status()
         }
     }
 }
 
 const TAG: &str = "payload-discloses:";
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
 
     // spec: canon-kit/SPEC.md §check-payload-claim — the disclosure vocabulary is consumer
     // config with no kit default, so an empty command is the clean skip for a tree whose
     // payload discloses one thing only
-    if spec::command("CANON_KIT_PAYLOAD_CLAIMS_CMD")?.is_empty() {
+    if spec::command("CANON_KIT_PAYLOAD_CLAIMS_CMD").map_err(Fault::refused)?.is_empty() {
         println!("PAYLOAD-CLAIM: clean (not applicable: no disclosure vocabulary configured — nothing to hold)");
         return Ok(0);
     }
-    let claims = spec::claim_vocabulary("CANON_KIT_PAYLOAD_CLAIMS_CMD")?;
+    let claims = spec::claim_vocabulary("CANON_KIT_PAYLOAD_CLAIMS_CMD").map_err(Fault::refused)?;
     if claims.is_empty() {
         println!("PAYLOAD-CLAIM: clean (not applicable: CANON_KIT_PAYLOAD_CLAIMS_CMD declared no disclosure classes)");
         return Ok(0);
     }
 
-    let files = spec::governed_docs(root, "CANON_KIT_PAYLOAD_CLAIM_EXCLUDE")?;
+    let files = spec::governed_docs(root, "CANON_KIT_PAYLOAD_CLAIM_EXCLUDE").map_err(Fault::refused)?;
     if files.is_empty() {
         println!("PAYLOAD-CLAIM: clean (not applicable: 0 governed doc(s) found)");
         return Ok(0);
     }
 
     // assertion A: exactly one governed doc declares the disclosure class
-    let decls = spec::declarations(&files, TAG)?;
+    let decls = spec::declarations(&files, TAG).map_err(Fault::input)?;
     if decls.is_empty() {
         println!("check-payload-claim: no governed doc declares what the vendored payload discloses:");
         println!(
@@ -81,7 +82,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         for (id, _) in &claims {
             eprintln!("  {}", id);
         }
-        return Ok(2);
+        return Ok(exit::REFUSED);
     }
 
     // assertion B: no scanned line asserts a disclosure class other than the declared one
@@ -91,7 +92,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         claims.iter().filter(|(id, _)| *id != declared).collect();
     let mut findings: Vec<String> = Vec::new();
     for f in &files {
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         for (idx, raw) in text.lines().enumerate() {
             if declared_id(raw, TAG).is_some() {
                 continue;

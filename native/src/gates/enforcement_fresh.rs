@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-enforcement-fresh — the enforcement-map page
 // (GATE_SDK_ENFORCEMENT_FILE) is the byte-fresh projection of the enforcement-map emitter
 use crate::emit;
+use crate::exit::Fault;
 use crate::fresh;
 use std::path::Path;
 
@@ -9,25 +10,25 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-enforcement-fresh: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let projection = fresh::positional_or_knob(args, 0, "GATE_SDK_ENFORCEMENT_FILE")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let projection = fresh::positional_or_knob(args, 0, "GATE_SDK_ENFORCEMENT_FILE").map_err(Fault::refused)?;
     let projection = projection.as_str();
     let emit_src = args.get(1).map(String::as_str).unwrap_or("");
 
     if !Path::new(projection).is_file() {
-        return Err(format!("projection not found: {}", projection));
+        return Err(Fault::refused(format!("projection not found: {}", projection)));
     }
 
     let emitted = if !emit_src.is_empty() {
         if !Path::new(emit_src).is_file() {
-            return Err(format!("emit source not found: {}", emit_src));
+            return Err(Fault::refused(format!("emit source not found: {}", emit_src)));
         }
-        fresh::read_captured(emit_src)?
+        fresh::read_captured(emit_src).map_err(Fault::input)?
     } else {
         // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the
         // emitter is a function call, not a spawn: it ported in the same unit, so there is no
@@ -38,7 +39,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §The consumer remainder cohort — both sides of the shell form's
     // equality were `$(…)`, which strips every trailing newline; the diff's right side is the file
     // itself, so the raw text is kept beside the stripped one
-    let projection_raw = fresh::read_captured(projection)?;
+    let projection_raw = fresh::read_captured(projection).map_err(Fault::input)?;
     if emitted.trim_end_matches('\n') != projection_raw.trim_end_matches('\n') {
         println!(
             "check-enforcement-fresh: {} is stale vs the enforcement-map emitter:",
@@ -48,7 +49,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         fresh::print_capped_diff(&left, &projection_raw);
         println!(
             "  help: regenerate — {} > {}",
-            super::door_command("--emit enforcement-map")?,
+            super::door_command("--emit enforcement-map").map_err(Fault::refused)?,
             projection
         );
         return Ok(1);

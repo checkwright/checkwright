@@ -2,6 +2,7 @@
 // mirrored-page links and rewriting only source/directory links to the self-repo blob/tree
 // grammar. Its source set is derived from the tree, so its one knob is a URL prefix.
 use crate::emit::self_repo_prefix;
+use crate::exit::Fault;
 use crate::fresh;
 use crate::gates::citation_link::links;
 use crate::gates::spec_pointer::{link_path, opens_heading, paragraphs, sites, HeadingCache};
@@ -210,9 +211,9 @@ struct Governed {
     headings: HeadingCache,
 }
 
-fn governed(ctx: &Ctx) -> Result<Governed, String> {
+fn governed(ctx: &Ctx) -> Result<Governed, Fault> {
     let mut files: Vec<String> = Vec::new();
-    for p in spec::manifest_files(&ctx.root)? {
+    for p in spec::manifest_files(&ctx.root).map_err(Fault::input)? {
         let shown = p.display().to_string();
         let rel = spec::strip_dot_slash(walk::rel_under(&ctx.root, &shown).unwrap_or(&shown));
         let key = ctx.under(&rel);
@@ -229,7 +230,7 @@ fn governed(ctx: &Ctx) -> Result<Governed, String> {
 // spec: canon-kit/SPEC.md §The reference-link grammar — each resolvable section citation becomes a
 // link, its own text through the matched heading prefix, targeting the heading's anchor in the cited
 // file; `rewrite_line` then carries the target to its mirrored or blob form
-fn cite_splices(ctx: &Ctx, src: &str, lines: &[&str], gov: &mut Governed) -> Result<Vec<Splice>, String> {
+fn cite_splices(ctx: &Ctx, src: &str, lines: &[&str], gov: &mut Governed) -> Result<Vec<Splice>, Fault> {
     let srcdir = src.rsplit_once('/').map(|(d, _)| d).unwrap_or("");
     let masked = prose_mask(lines);
     let text = masked.join("\n");
@@ -262,7 +263,7 @@ fn cite_splices(ctx: &Ctx, src: &str, lines: &[&str], gov: &mut Governed) -> Res
                 if !Path::new(&file).is_file() {
                     continue;
                 }
-                match gov.headings.resolve(&file, &site.frag)? {
+                match gov.headings.resolve(&file, &site.frag).map_err(Fault::input)? {
                     Some(m) => (if quoted { start - 1 } else { *start }, None, path.clone(), m),
                     None => continue,
                 }
@@ -275,12 +276,12 @@ fn cite_splices(ctx: &Ctx, src: &str, lines: &[&str], gov: &mut Governed) -> Res
                 if !Path::new(&file).is_file() || at_col(*close).0 != at_col(site.at).0 {
                     continue;
                 }
-                match gov.headings.resolve(&file, &site.frag)? {
+                match gov.headings.resolve(&file, &site.frag).map_err(Fault::input)? {
                     Some(m) => (*open, Some(*close), path, m),
                     None => continue,
                 }
             } else if site.bare {
-                match gov.headings.resolve_bare(&citing, &gov.files, &site.frag)? {
+                match gov.headings.resolve_bare(&citing, &gov.files, &site.frag).map_err(Fault::input)? {
                     Some((file, m)) => {
                         let rel = spec::strip_dot_slash(walk::rel_under(&ctx.root, &file).unwrap_or(&file));
                         (site.at, None, rel, m)
@@ -327,7 +328,7 @@ fn apply(lines: &[&str], mut splices: Vec<Splice>) -> Vec<String> {
     out
 }
 
-fn emit_one(ctx: &Ctx, src: &str, gov: &mut Governed) -> Result<String, String> {
+fn emit_one(ctx: &Ctx, src: &str, gov: &mut Governed) -> Result<String, Fault> {
     let (srcdir, base) = match src.rsplit_once('/') {
         Some((d, b)) => (d, b),
         None => ("", src),
@@ -337,15 +338,15 @@ fn emit_one(ctx: &Ctx, src: &str, gov: &mut Governed) -> Result<String, String> 
         "README.md" => "README",
         "SPEC.md" => "SPEC",
         "DOCTRINE.md" => "DOCTRINE",
-        _ => return Err(format!("not a mirrored source: {}", src)),
+        _ => return Err(Fault::refused(format!("not a mirrored source: {}", src))),
     };
 
-    let text = fresh::read_captured(&ctx.under(src))?;
+    let text = fresh::read_captured(&ctx.under(src)).map_err(Fault::input)?;
     if carries_raw_close(&text) {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "{}: carries a Liquid raw-block closing tag, which would end the mirror's raw block early",
             src
-        ));
+        )));
     }
     let mut out = String::new();
     out.push_str("---\n");
@@ -402,9 +403,9 @@ fn carries_raw_close(text: &str) -> bool {
 // spec: canon-kit/SPEC.md §The reference-link grammar — every mirrored source path, repo-relative,
 // in byte order: one directory level down, a SPEC.md and its optional README.md, plus the doctrine
 // deliverable. Derived from the tree, so a new kit joins the mirror by existing.
-fn sources(ctx: &Ctx) -> Result<Vec<String>, String> {
+fn sources(ctx: &Ctx) -> Result<Vec<String>, Fault> {
     let mut dirs: Vec<String> = Vec::new();
-    for (name, is_dir) in walk::list_dir(Path::new(&ctx.root))? {
+    for (name, is_dir) in walk::list_dir(Path::new(&ctx.root)).map_err(Fault::input)? {
         if is_dir && !name.starts_with('.') {
             dirs.push(name);
         }
@@ -426,14 +427,14 @@ fn sources(ctx: &Ctx) -> Result<Vec<String>, String> {
     Ok(out)
 }
 
-fn context(root: &str) -> Result<Ctx, String> {
+fn context(root: &str) -> Result<Ctx, Fault> {
     let root = fresh::strip_trailing_slash(root).to_string();
     if !fresh::is_dir(&root) {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::input(format!("not a directory: {}", root)));
     }
-    let here = walk::cwd()?;
+    let here = walk::cwd().map_err(Fault::tool)?;
     let abs_root = walk::abs_against(&here, &root);
-    let blob = self_repo_prefix(&walk::knob_scalar(BLOB_REF_KNOB)?);
+    let blob = self_repo_prefix(&walk::knob_scalar(BLOB_REF_KNOB).map_err(Fault::refused)?);
     let tree = blob.replace("/blob/", "/tree/");
     Ok(Ctx {
         root,
@@ -446,8 +447,8 @@ fn context(root: &str) -> Result<Ctx, String> {
 // spec: gate-sdk/SPEC.md §The non-gate arm — the three modes ride the arm's own argv tail, so one
 // member serves the freshness comparator (`--list`, `--emit <src>`) and the regen command
 // (`--write`) exactly as the one shell tool did.
-pub fn emit(args: &[String]) -> Result<String, String> {
-    let (mode, root) = parse(args)?;
+pub fn emit(args: &[String]) -> Result<String, Fault> {
+    let (mode, root) = parse(args).map_err(Fault::usage)?;
     let ctx = context(&root)?;
 
     match mode {
@@ -461,26 +462,26 @@ pub fn emit(args: &[String]) -> Result<String, String> {
         }
         Mode::One(src) => {
             if src.is_empty() {
-                return Err(format!("--emit needs a source path\n{}", USAGE));
+                return Err(Fault::usage(format!("--emit needs a source path\n{}", USAGE)));
             }
             if !Path::new(&ctx.under(&src)).is_file() {
-                return Err(format!("source not found: {}", ctx.under(&src)));
+                return Err(Fault::input(format!("source not found: {}", ctx.under(&src))));
             }
             emit_one(&ctx, &src, &mut governed(&ctx)?)
         }
         Mode::Write => {
             let srcs = sources(&ctx)?;
-            let mirror = spec::mirror_root()?;
+            let mirror = spec::mirror_root().map_err(Fault::refused)?;
             let mut gov = governed(&ctx)?;
             for src in &srcs {
                 let dest = ctx.under(&format!("{}/{}", mirror, src));
                 if let Some((dir, _)) = dest.rsplit_once('/') {
                     std::fs::create_dir_all(dir)
-                        .map_err(|e| format!("cannot create {}: {}", dir, e))?;
+                        .map_err(|e| Fault::tool(format!("cannot create {}: {}", dir, e)))?;
                 }
                 let page = emit_one(&ctx, src, &mut gov)?;
                 std::fs::write(&dest, page)
-                    .map_err(|e| format!("cannot write {}: {}", dest, e))?;
+                    .map_err(|e| Fault::tool(format!("cannot write {}: {}", dest, e)))?;
             }
             Ok(format!(
                 "docs-mirror: wrote {} mirror page(s) under {}/{}/\n",

@@ -101,7 +101,7 @@ pub(super) fn user_install(state: &mut Run) -> Step {
     let running = in_consumer_fed(&program, &argv, &set, &free, RUNNING.as_bytes())?;
     let log = user_state.join(format!("{}.log", MEMBER));
     let logged = std::fs::read_to_string(&log).unwrap_or_default();
-    if running.code() != Some(2) || !logged.contains("decision=refuse") {
+    if running.code() != Some(crate::exit::HOOK_BLOCK) || !logged.contains("decision=refuse") {
         return Err(fail(format!(
             "user-install arm: the entry over a running shell task exited {}, or {} logged no refusal",
             running.reported_code(),

@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §check-deferred-board-tags — every top-level deferred entry carries one
 // cost tag and one surface tag on its tag line, and no active-section tag line carries either
+use crate::exit;
 use crate::queue;
 use crate::walk;
 use std::path::Path;
@@ -58,13 +59,13 @@ fn active_findings(line: &str) -> Vec<String> {
 pub fn run(args: &[String]) -> i32 {
     if args.len() > 2 {
         eprintln!("check-deferred-board-tags: unexpected argument: {}", args[2]);
-        return 2;
+        return exit::USAGE;
     }
     let sec = match queue::Sections::active_and_deferred() {
         Ok(s) => s,
         Err(e) => {
             eprintln!("check-deferred-board-tags: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let file = match args.first() {
@@ -73,7 +74,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-deferred-board-tags: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -81,7 +82,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-deferred-board-tags: file not found: {}", file);
-            return 2;
+            return exit::REFUSED;
         }
     };
     // spec: queue-kit/SPEC.md §check-deferred-board-tags — the surface value set is the root's own
@@ -91,7 +92,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v.into_iter().map(|(n, _)| n).collect(),
         Err(e) => {
             eprintln!("check-deferred-board-tags: repository root unreadable: {}", e);
-            return 2;
+            return exit::INPUT;
         }
     };
 

@@ -555,7 +555,7 @@ pub(super) fn selection(state: &mut Run) -> Step {
         let mut argv = vec!["init"];
         argv.extend(refused.iter().map(String::as_str));
         let m = cw(state, &sc, &argv)?;
-        if m.code() != Some(2) {
+        if m.code() != Some(crate::exit::REFUSED) {
             return Err(failed(&m, format!(
                 "selection arm: init {} exited {}, not the refusal's 2",
                 refused.join(" "),

@@ -1,7 +1,8 @@
 // spec: guard-kit/SPEC.md §check-door-binding — no kit-shipped surface outside the fail-open set
 // names a front-end stub as a command to run, and no kit template names a path to the gate binary
 use crate::emit::FAIL_OPEN_ARMS;
-use crate::gates::smoke_entry_guard::{kit_abs, kit_name, scan_root};
+use crate::exit::Fault;
+use crate::gates::smoke_entry_guard::{kit_abs, kit_name, scan_root_or_status};
 use crate::walk;
 use std::path::Path;
 
@@ -236,15 +237,15 @@ fn tracked_under(root: &str, entry: &str) -> Result<Vec<String>, String> {
 // spec: guard-kit/SPEC.md §check-door-binding — assertion C's corpus: each configured entry as
 // (shown, path), a directory yielding its tracked members under A's own prune so a page added
 // under it is swept unedited, and anything else the misconfiguration answer rather than a clean
-fn configured(root: &str) -> Result<Vec<(String, String)>, String> {
-    let mut prune = walk::prune_dirs()?;
+fn configured(root: &str) -> Result<Vec<(String, String)>, Fault> {
+    let mut prune = walk::prune_dirs().map_err(Fault::refused)?;
     prune.push("gate-tests".to_string());
     prune.push("smoke".to_string());
     let base = root.trim_end_matches('/');
     let mut out: Vec<(String, String)> = Vec::new();
-    for entry in walk::knob_array(ROOTS)?.iter().filter(|e| !e.is_empty()) {
+    for entry in walk::knob_array(ROOTS).map_err(Fault::refused)?.iter().filter(|e| !e.is_empty()) {
         let e = entry.trim_end_matches('/');
-        let mut members = tracked_under(base, e)?;
+        let mut members = tracked_under(base, e).map_err(Fault::input)?;
         members.sort();
         if Path::new(&format!("{}/{}", base, e)).is_dir() {
             for m in members {
@@ -256,10 +257,10 @@ fn configured(root: &str) -> Result<Vec<(String, String)>, String> {
         } else if members.len() == 1 && members[0] == e {
             out.push((e.to_string(), format!("{}/{}", base, e)));
         } else {
-            return Err(format!(
+            return Err(Fault::refused(format!(
                 "{} entry '{}' resolves to neither a tracked file nor a directory",
                 ROOTS, e
-            ));
+            )));
         }
     }
     Ok(out)
@@ -268,10 +269,10 @@ fn configured(root: &str) -> Result<Vec<(String, String)>, String> {
 // spec: guard-kit/SPEC.md §check-door-binding — one walk from the root, the corpus a filter over it,
 // so the walked-root set is bounded at one whatever the kit roster holds; the prune composes the
 // configured set with this gate's own
-fn walk_tree(root: &str) -> Result<Vec<String>, String> {
-    let configured = walk::prune_dirs()?;
+fn walk_tree(root: &str) -> Result<Vec<String>, Fault> {
+    let configured = walk::prune_dirs().map_err(Fault::refused)?;
     let prune = |n: &str| n == "gate-tests" || n == "smoke" || configured.iter().any(|d| d == n);
-    Ok(walk::find_with_prune(Path::new(root), &prune)?
+    Ok(walk::find_with_prune(Path::new(root), &prune).map_err(Fault::input)?
         .iter()
         .filter_map(|p| p.to_str().map(String::from))
         .collect())
@@ -306,19 +307,22 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {} — the check could not run; treating as failure (not clean)", NAME, e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let root = scan_root(args, NAME).ok_or_else(|| "no root".to_string())?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let root = match scan_root_or_status(args, NAME) {
+        Ok(r) => r,
+        Err(code) => return Ok(code),
+    };
     if !Path::new(&root).is_dir() {
-        return Err(format!("root not found: {}", root));
+        return Err(Fault::refused(format!("root not found: {}", root)));
     }
-    let kit_roots = walk::kit_roots()?;
+    let kit_roots = walk::kit_roots().map_err(Fault::refused)?;
     if kit_roots.is_empty() {
-        return Err("no kit roots enumerated".to_string());
+        return Err(Fault::refused("no kit roots enumerated"));
     }
 
     // spec: guard-kit/SPEC.md §check-door-binding — the artifact's own basename, the crate's package
@@ -348,7 +352,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             let rel = walk::rel_under(&abs, f).unwrap_or(f);
             let shown = format!("{}/{}", kit, rel);
             let base = Path::new(f).file_name().and_then(|n| n.to_str()).unwrap_or("");
-            let text = read(f)?;
+            let text = read(f).map_err(Fault::input)?;
             swept += 1;
             let in_templates = rel.starts_with("templates/");
             if in_templates {
@@ -375,7 +379,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: guard-kit/SPEC.md §check-door-binding — assertion C over the configured extra corpus,
     // default-deny: every door reds unless its site declares itself contributor-facing
     for (shown, path) in configured(&root)? {
-        let text = read(&path)?;
+        let text = read(&path).map_err(Fault::input)?;
         let base = Path::new(&path).file_name().and_then(|n| n.to_str()).unwrap_or("");
         let rust = shown.ends_with(".rs");
         let lines: Vec<&str> = if rust { rust_region(&text) } else { &text }.lines().collect();

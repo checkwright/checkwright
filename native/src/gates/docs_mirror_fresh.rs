@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §The reference-link grammar — <mirror root>/<kit>/{SPEC,README}.md and
 // <mirror root>/doctrine-kit/DOCTRINE.md are the byte-fresh projection of the docs-mirror arm backing
 // on-site reference reading; a stale, missing, or orphaned mirror page reds
+use crate::exit::Fault;
 use crate::fresh;
 use crate::spec;
 use crate::walk;
@@ -11,7 +12,7 @@ const MIRROR_NAMES: &[&str] = &["SPEC.md", "README.md", "DOCTRINE.md"]; // consu
 // spec: gate-sdk/SPEC.md §The first cohort, and the rule that selects the next — the generator is
 // a function call, not a spawn: it ported in the same unit, so there is no shell left to reach and
 // fresh::emit's bash hop is retired for this member too.
-fn generate(mode: &[&str], root: &str) -> Result<String, String> {
+fn generate(mode: &[&str], root: &str) -> Result<String, Fault> {
     let mut args: Vec<String> = mode.iter().map(|s| s.to_string()).collect();
     args.push("--root".to_string());
     args.push(root.to_string());
@@ -23,18 +24,18 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-docs-mirror-fresh: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = fresh::strip_trailing_slash(fresh::positional(args, 0, "."));
     if !fresh::is_dir(root) {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
     let listed = generate(&["--list"], root)?;
-    let mirror = spec::mirror_root()?;
+    let mirror = spec::mirror_root().map_err(Fault::refused)?;
 
     let mut bad: Vec<String> = Vec::new();
     let mut expected: Vec<String> = Vec::new();
@@ -52,7 +53,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         let emitted = generate(&["--emit", src], root)?;
-        let have = fresh::read_captured(&on_disk)?;
+        let have = fresh::read_captured(&on_disk).map_err(Fault::input)?;
         if emitted.trim_end_matches('\n') != have.trim_end_matches('\n') {
             bad.push(format!("{}: stale vs the docs-mirror arm's emission of {}", dest, src));
         }
@@ -65,7 +66,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // the shell form reached for a bare `find`: a member that never read the prune set neither
     // narrows its corpus by it nor declares it.
     let docs_root = format!("{}/{}", root, mirror);
-    let mut found: Vec<String> = walk::find_with_prune(Path::new(&docs_root), &|_| false)?
+    let mut found: Vec<String> = walk::find_with_prune(Path::new(&docs_root), &|_| false).map_err(Fault::input)?
         .into_iter()
         .filter(|p| {
             p.file_name()
@@ -95,7 +96,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
         println!(
             "  help: regenerate — {} — and stage {}/.",
-            super::door_command("--emit docs-mirror --write")?,
+            super::door_command("--emit docs-mirror --write").map_err(Fault::refused)?,
             mirror
         );
         return Ok(1);

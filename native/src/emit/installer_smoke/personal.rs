@@ -197,7 +197,7 @@ fn plant_prior_hook(c: &str) -> Result<String, Outcome> {
 }
 
 // spec: installer/SPEC.md §The consumer smoke — uninstall over the block with its end marker deleted
-// exits 2 naming it and removes nothing; the end marker is restored for the reversal
+// exits 3 naming it and removes nothing; the end marker is restored for the reversal
 fn uninstall_half_open_refused(state: &Run, c: &str, exclude: &str) -> Step {
     let whole = read(exclude);
     let end = format!("{}\n", crate::installer::PERSONAL_END);
@@ -211,7 +211,7 @@ fn uninstall_half_open_refused(state: &Run, c: &str, exclude: &str) -> Step {
     let m = state.verb(c, &["uninstall"])?;
     let held = porcelain(c)? == porcelain0 && read(&lock) == lock0 && !lock0.is_empty() && read(exclude) == damaged;
     write(exclude, &whole)?;
-    if m.code() != Some(2) || !out(&m).contains("end marker missing") || !held {
+    if m.code() != Some(crate::exit::INPUT) || !out(&m).contains("end marker missing") || !held {
         return Err(failed(
             &m,
             "personal arm: uninstall over a block missing its end marker did not exit 2 naming it with the porcelain, the manifest and the exclude file unchanged",
@@ -229,8 +229,19 @@ enum Plant {
     HalfOpen,
 }
 
-// spec: installer/SPEC.md §The consumer smoke — a refusal in a fresh consumer exits 2, names what it
-// refused, and leaves the tree object, the porcelain and the exclude file as they were
+impl Plant {
+    // spec: installer/SPEC.md §The personal install — the first three refusals are the request's,
+    // and the unpaired exclude block is a file that does not parse
+    fn status(&self) -> i32 {
+        match self {
+            Plant::HalfOpen => crate::exit::INPUT,
+            Plant::Nothing | Plant::Registry => crate::exit::REFUSED,
+        }
+    }
+}
+
+// spec: installer/SPEC.md §The consumer smoke — a refusal in a fresh consumer exits its status,
+// names what it refused, and leaves the tree object, the porcelain and the exclude file as they were
 fn refused(state: &Run, label: &str, args: &[&str], names: &str, plant: Plant) -> Step {
     let c = project(state, &format!("personal-{}", label))?;
     let exclude = exclude_file(&c)?;
@@ -249,7 +260,7 @@ fn refused(state: &Run, label: &str, args: &[&str], names: &str, plant: Plant) -
     }
     let (tree0, porcelain0, exclude0) = (super::consumer::tree(&c)?, porcelain(&c)?, read(&exclude));
     let m = state.verb(&c, args)?;
-    if m.code() != Some(2) || !out(&m).contains(names) {
+    if m.code() != Some(plant.status()) || !out(&m).contains(names) {
         return Err(failed(&m, format!("personal arm: {} exited {} without naming {}", args.join(" "), m.reported_code(), names)));
     }
     if super::consumer::tree(&c)? != tree0 || porcelain(&c)? != porcelain0 || read(&exclude) != exclude0 {

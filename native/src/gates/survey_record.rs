@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-survey-record — every survey block carries its whole
 // witness: the five keys in order, a full-sha rev naming a real commit, a corpus in the grammar
 // whose pathspecs match at that rev, and a non-empty oracle and inferred
+use crate::exit;
 use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
@@ -234,7 +235,7 @@ pub fn run(args: &[String]) -> i32 {
         Some(p) => {
             if !Path::new(p.as_str()).is_file() {
                 eprintln!("check-survey-record: record file not found: {}", p);
-                return 2;
+                return exit::REFUSED;
             }
             (p.clone(), false)
         }
@@ -243,7 +244,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(v) => v,
                 Err(e) => {
                     eprintln!("check-survey-record: {}", e);
-                    return 2;
+                    return exit::REFUSED;
                 }
             };
             // spec: lifecycle-kit/SPEC.md §check-survey-record — an absent record is clean and
@@ -259,7 +260,7 @@ pub fn run(args: &[String]) -> i32 {
                 Ok(t) => (p, t.is_some()),
                 Err(e) => {
                     eprintln!("check-survey-record: {}", e);
-                    return 2;
+                    return exit::TOOL;
                 }
             }
         }
@@ -268,7 +269,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(_) => {
             eprintln!("check-survey-record: record file not readable: {}", record);
-            return 2;
+            return if std::path::Path::new(&record).exists() { exit::INPUT } else { exit::REFUSED };
         }
     };
 
@@ -402,7 +403,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if !findings.is_empty() {
         let Some(door) = super::door_or_report("check-survey-record", "--emit file-survey") else {
-            return 2;
+            return exit::REFUSED;
         };
         println!(
             "check-survey-record: {} malformed survey block(s) in {}:",

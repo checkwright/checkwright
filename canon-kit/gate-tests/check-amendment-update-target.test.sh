@@ -50,7 +50,7 @@ cat >"$SANDBOX/nowhat/SPEC-x.md" <<'EOF'
 
 - **component/SPEC.md** — an update target in an amendment with no deltas.
 EOF
-check_case "updated-without-what-changes-fails-closed" 2 "but no '## What changes'" "$SANDBOX/nowhat"
+check_case "updated-without-what-changes-fails-closed" 3 "but no '## What changes'" "$SANDBOX/nowhat"
 
 # The two permission-shaped refusals. A tree where the sandbox owner can read
 # what it just made unreadable proves nothing, so each is probed before it is
@@ -61,7 +61,7 @@ chmod 000 "$SANDBOX/unread/SPEC-y.md"
 if cat "$SANDBOX/unread/SPEC-y.md" >/dev/null 2>&1; then
     echo "  SKIP [unreadable-amendment-fails-closed]: this user reads a 0000 file"
 else
-    check_case "unreadable-amendment-fails-closed" 2 "cannot read" "$SANDBOX/unread"
+    check_case "unreadable-amendment-fails-closed" 3 "cannot read" "$SANDBOX/unread"
 fi
 
 mkdir -p "$SANDBOX/unwalk/sub"
@@ -71,7 +71,7 @@ if ls "$SANDBOX/unwalk/sub" >/dev/null 2>&1; then
 else
     # The divergence from check-amendment-queue's best-effort finder, executable:
     # an empty amendment set hides every violation here, so the walk refuses.
-    check_case "unwalkable-root-fails-closed" 2 "cannot read directory" "$SANDBOX/unwalk"
+    check_case "unwalkable-root-fails-closed" 3 "cannot read directory" "$SANDBOX/unwalk"
 fi
 
 if [[ "$fails" -gt 0 ]]; then

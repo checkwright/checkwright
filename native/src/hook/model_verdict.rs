@@ -2,7 +2,7 @@
 // and with `--expect <class>` judged against the tier binding: 0 READ/OK, 1 BELOW/UNBOUND, 2 UNKNOWN.
 use crate::emit::stage_economics::{self, Tokens};
 use crate::sessions::{self, Delegation, Inputs};
-use crate::tier;
+use crate::{exit, tier};
 use crate::walk;
 
 pub const KNOBS: &[&str] =
@@ -111,7 +111,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
         Err(e) => {
             eprintln!("{}", e);
             eprintln!("{}", USAGE);
-            return (String::new(), 2);
+            return (String::new(), exit::USAGE);
         }
     };
     let expect = a.expect.as_deref().unwrap_or("-");
@@ -121,7 +121,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
                 "model-verdict: id={} effort=- session={} class=none expect={} -> UNKNOWN ({}) — {}",
                 id, session, expect, why, UNVERIFIED
             ),
-            2,
+            exit::UNKNOWN,
         )
     };
     let tables = walk::knob_array("DELEGATION_KIT_TIER_MODEL")
@@ -133,7 +133,7 @@ pub fn verdict(args: &[String]) -> (String, i32) {
     if let Some(class) = a.expect.as_deref().filter(|c| tier::rank(&roster, c).is_none()) {
         eprintln!("model-verdict: --expect names '{}', not one of {}", class, roster.join(", "));
         eprintln!("{}", USAGE);
-        return (String::new(), 2);
+        return (String::new(), exit::USAGE);
     }
     let i = match inputs() {
         Ok(i) => i,
@@ -176,10 +176,10 @@ fn judge(id: &str, r: &Reading, expect: Option<&str>) -> (String, i32) {
         return (line("READ", ""), 0);
     };
     if binding.is_empty() {
-        return (line("UNKNOWN", &format!(" (the tier binding is empty) — {}", UNVERIFIED)), 2);
+        return (line("UNKNOWN", &format!(" (the tier binding is empty) — {}", UNVERIFIED)), exit::UNKNOWN);
     }
     if tier::bound(binding, want).is_none() {
-        return (line("UNKNOWN", &format!(" (class '{}' is unbound) — {}", want, UNVERIFIED)), 2);
+        return (line("UNKNOWN", &format!(" (class '{}' is unbound) — {}", want, UNVERIFIED)), exit::UNKNOWN);
     }
     let floor = tier::rank(roster, want).unwrap_or(0);
     if classes.iter().any(|c| tier::rank(roster, c).is_some_and(|r| r <= floor)) {

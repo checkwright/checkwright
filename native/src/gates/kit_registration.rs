@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-kit-registration — every gate_kit_roots kit is registered in
 // the human-facing docs: a registry-doc row linking into each root, and a fixture-runner line
 // for each root that ships gate-tests
+use crate::exit;
 use crate::{proc, programs};
 use crate::walk;
 use std::path::Path;
@@ -35,11 +36,11 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
                 "check-kit-registration: not a git repository — cannot test tracked kit files"
                     .to_string(),
             );
-            return 2;
+            return exit::REFUSED;
         }
         Err(e) => {
             stderr.push(format!("check-kit-registration: {}", e));
-            return 2;
+            return exit::TOOL;
         }
     };
 
@@ -57,7 +58,7 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
                 Ok(v) => v,
                 Err(e) => {
                     stderr.push(format!("check-kit-registration: {}", e));
-                    return 2;
+                    return exit::REFUSED;
                 }
             },
         };
@@ -70,14 +71,14 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
             "check-kit-registration: registry doc not found: {}",
             registry_doc
         ));
-        return 2;
+        return exit::REFUSED;
     }
     if !Path::new(&runner_doc).is_file() {
         stderr.push(format!(
             "check-kit-registration: runner doc not found: {}",
             runner_doc
         ));
-        return 2;
+        return exit::REFUSED;
     }
 
     // spec: gate-sdk/SPEC.md §Layout and configuration — both assertions are anchored at the git
@@ -87,12 +88,12 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
         Ok(v) => v,
         Err(e) => {
             stderr.push(format!("check-kit-registration: {}", e));
-            return 2;
+            return exit::REFUSED;
         }
     };
     if kit_roots.is_empty() {
         stderr.push("check-kit-registration: no kit roots enumerated".to_string());
-        return 2;
+        return exit::REFUSED;
     }
 
     let registry_text = match read_doc(&registry_doc) {
@@ -102,7 +103,7 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
                 "check-kit-registration: {} — the check could not run; treating as failure (not clean)",
                 e
             ));
-            return 2;
+            return exit::INPUT;
         }
     };
     let runner_text = match read_doc(&runner_doc) {
@@ -112,7 +113,7 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
                 "check-kit-registration: {} — the check could not run; treating as failure (not clean)",
                 e
             ));
-            return 2;
+            return exit::INPUT;
         }
     };
 
@@ -133,7 +134,7 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
             Ok(c) => c,
             Err(e) => {
                 stderr.push(format!("check-kit-registration: {}", e));
-                return 2;
+                return exit::TOOL;
             }
         };
         let listing = match completed.stdout() {
@@ -145,7 +146,7 @@ fn rule(args: &[String], stdout: &mut Vec<String>, stderr: &mut Vec<String>) -> 
                     "check-kit-registration: git ls-files exited {} — the check could not run; treating as failure (not clean)",
                     completed.code().unwrap_or(-1)
                 ));
-                return 2;
+                return exit::TOOL;
             }
         };
         if !listing.is_empty() {

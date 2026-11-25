@@ -97,7 +97,7 @@ pub(super) fn malformed_operands(w: &Entry) -> String {
 }
 
 // spec: installer/SPEC.md §The consumer smoke — at most three samples, none chosen by arrival: the
-// first disagreeing path, the artifact row, and the exit-2 verdict's witness deduplicated on the
+// first disagreeing path, the artifact row, and the exit-3 verdict's witness deduplicated on the
 // whole tuple, with the coincidence check's three outcomes printed
 #[allow(clippy::too_many_arguments)]
 pub(super) fn manifest_report(
@@ -158,7 +158,7 @@ pub(super) fn manifest_report(
                     w.0
                 );
             }
-            samples.push((w.clone(), " — the witness row the exit-2 verdict below is computed from"));
+            samples.push((w.clone(), " — the witness row the exit-3 verdict below is computed from"));
         }
     }
     for ((p, want, got), role) in &samples {

@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-stage-evidence — stamp grammar + name-axis agreement
 // (staleness) between the header and every stamp; cross-stage session-id distinctness; the
 // stamp-provenance and stamp-commit-purity assertions over the fifth <head> field
+use crate::exit;
 use crate::{proc, programs};
 use crate::stages;
 use crate::walk;
@@ -81,7 +82,7 @@ fn provenance_help(state: &str, door: &str) -> Vec<String> {
 
 // spec: lifecycle-kit/SPEC.md §check-stage-evidence — the stamp-provenance and
 // stamp-commit-purity assertions. `Ok(empty)` is clean AND every inertness condition;
-// `Err` is a spawn failure the caller reports as exit 2 rather than as a clean run.
+// `Err` is a spawn failure the caller reports as exit 3 rather than as a clean run.
 fn provenance(
     state: &str,
     stext: &str,
@@ -230,7 +231,7 @@ pub fn run(args: &[String]) -> i32 {
             .next()
             .unwrap_or_default();
             eprintln!("check-stage-evidence: {}", err);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -263,7 +264,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(e) => {
             eprintln!("check-stage-evidence: cannot read {}: {}", state, e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let stage = stages::current_stage(&stext);
@@ -363,11 +364,11 @@ pub fn run(args: &[String]) -> i32 {
     match provenance(&state, &stext, &first_stage, &queue) {
         Err(e) => {
             eprintln!("check-stage-evidence: {}", e);
-            return 2;
+            return exit::TOOL;
         }
         Ok(v) if !v.is_empty() => {
             let Some(door) = super::door_or_report("check-stage-evidence", "--enter-stage") else {
-                return 2;
+                return exit::REFUSED;
             };
             println!("STAGE-EVIDENCE: {} stamp-provenance issue(s) in {}:", v.len(), state);
             for e in &v {

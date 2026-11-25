@@ -1066,7 +1066,7 @@ fn read_only_arm(h: &crate::guard::host::Host, cw: &str) -> bool {
     };
     let arm_at = match ws.first() {
         Some(&w) if w == h.door || (walk::path_root(&h.door).is_none() && at(w, &h.door)) => 1,
-        Some(&"bash") if ws.get(1).is_some_and(|w| at(w, "gate-sdk/bin/run-gates.sh")) => 2,
+        Some(&"bash") if ws.get(1).is_some_and(|w| at(w, "gate-sdk/bin/run-gates.sh")) => 2, // status-literal-exempt: the argv index of the arm word after `bash <script>`
         _ => return false,
     };
     let arm = match ws.get(arm_at) {

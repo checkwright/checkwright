@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-hook-knobs-fresh — every hook page's block carries the arm's
 // rendering, compared in process, and every tree-free member has a page
 use crate::emit::hook_knobs;
+use crate::exit::Fault;
 use crate::fresh;
 use crate::hook;
 
@@ -9,15 +10,15 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-hook-knobs-fresh: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let dirs: Vec<String> = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => vec![a.clone()],
-        None => crate::walk::knob_words(hook_knobs::PAGES_KNOB)?,
+        None => crate::walk::knob_words(hook_knobs::PAGES_KNOB).map_err(Fault::refused)?,
     };
     if dirs.is_empty() {
         println!("HOOK-KNOBS-FRESH: clean (not applicable: {} is empty — no hook page is governed, 0 checked)", hook_knobs::PAGES_KNOB);
@@ -25,7 +26,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
     let dir = dirs.iter().map(|d| fresh::strip_trailing_slash(d)).collect::<Vec<_>>().join(" ");
     let first = fresh::strip_trailing_slash(&dirs[0]).to_string();
-    let pages = hook_knobs::pages(&dirs)?;
+    let pages = hook_knobs::pages(&dirs).map_err(Fault::refused)?;
     let mut red = 0;
     let mut stale = false;
     for (page, member) in &pages {
@@ -35,7 +36,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             red += 1;
             continue;
         }
-        let text = fresh::read_captured(page).map_err(|e| format!("{}: {}", page, e))?;
+        let text = fresh::read_captured(page).map_err(|e| Fault::input(format!("{}: {}", page, e)))?;
         let blk = match hook_knobs::block(page, &text) {
             Ok(b) => b,
             Err(e) => {
@@ -45,7 +46,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 continue;
             }
         };
-        let want = hook_knobs::render(member)?;
+        let want = hook_knobs::render(member).map_err(Fault::tool)?;
         if blk.actual != want {
             println!("check-hook-knobs-fresh: stale block — {}:{} differs from the table {}'s knobs derive:", page, blk.line, member);
             fresh::print_capped_diff(&blk.actual, &want);
@@ -61,7 +62,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         }
     }
     if stale {
-        println!("  help: regenerate — {}", super::door_command("--emit hook-knobs --write")?);
+        println!("  help: regenerate — {}", super::door_command("--emit hook-knobs --write").map_err(Fault::refused)?);
     }
     if red > 0 {
         return Ok(1);

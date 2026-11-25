@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-measured-claim — a measured count or extent claim that names
 // an oracle agrees with it
+use crate::exit::Fault;
 use crate::spec;
 use crate::spec::MeasuredSpan as Span;
 use crate::walk;
@@ -13,7 +14,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-measured-claim: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -26,24 +27,24 @@ struct Marker {
     claim: Option<String>,
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    if spec::command("CANON_KIT_MEASURED_CLAIMS_CMD")?.is_empty() {
+    if spec::command("CANON_KIT_MEASURED_CLAIMS_CMD").map_err(Fault::refused)?.is_empty() {
         println!("MEASURED-CLAIM: clean (not applicable: CANON_KIT_MEASURED_CLAIMS_CMD unset — no oracle, so no marker has anything to disagree with)");
         return Ok(0);
     }
-    let globs = spec::knob_array_pub("CANON_KIT_MEASURED_SURFACE_GLOBS")?;
+    let globs = spec::knob_array_pub("CANON_KIT_MEASURED_SURFACE_GLOBS").map_err(Fault::refused)?;
     if globs.is_empty() {
         println!("MEASURED-CLAIM: clean (not applicable: CANON_KIT_MEASURED_SURFACE_GLOBS empty — no scanned surface)");
         return Ok(0);
     }
-    let roster = spec::measured_claims()?;
-    let span = spec::measured_span()?;
+    let roster = spec::measured_claims().map_err(Fault::refused)?;
+    let span = spec::measured_span().map_err(Fault::refused)?;
 
-    let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs)?
+    let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs).map_err(Fault::input)?
         .into_iter()
         .filter(|p| p.is_file())
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
@@ -58,7 +59,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut markers: Vec<Marker> = Vec::new();
     let mut errs: Vec<String> = Vec::new();
     for f in &files {
-        collect(f, &spec::read_text(Path::new(f))?, span, &mut markers, &mut errs);
+        collect(f, &spec::read_text(Path::new(f)).map_err(Fault::input)?, span, &mut markers, &mut errs);
     }
 
     let mut out: Vec<String> = Vec::new();
@@ -107,10 +108,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     if !errs.is_empty() {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "a marker could not be resolved against the oracle; treating as failure (not clean):\n{}\n  help: emit the key from CANON_KIT_MEASURED_CLAIMS_CMD, or drop the marker; for an ambiguous claim, split the sentence, or mark the sentence carrying the measurement inline",
             errs.iter().map(|e| format!("  {}", e)).collect::<Vec<_>>().join("\n")
-        ));
+        )));
     }
     if !out.is_empty() {
         println!("check-measured-claim: a measured claim no longer agrees with the oracle it named — the number in the document has gone stale against the tree:");

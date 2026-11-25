@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-commit-subject — the subject line parses as
 // <type>(<scope>)?!?: <summary> with <type> in the shared roster, or matches a git-generated
 // carve-out (the parse guarantee under trajectory.sh's feat/debt column)
+use crate::exit;
 use crate::walk;
 use std::path::Path;
 
@@ -74,14 +75,14 @@ pub fn run(args: &[String]) -> i32 {
     };
     if !Path::new(msg).is_file() {
         eprintln!("check-commit-subject: message file not found: {}", msg);
-        return 2;
+        return exit::REFUSED;
     }
 
     let roster = match walk::knob_scalar("GATE_SDK_COMMIT_TYPES") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-commit-subject: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -92,7 +93,7 @@ pub fn run(args: &[String]) -> i32 {
                 "check-commit-subject: cannot read {} ({}) — the check could not run; treating as failure (not clean)",
                 msg, e
             );
-            return 2;
+            return exit::INPUT;
         }
     };
     let text = String::from_utf8_lossy(&bytes).into_owned();

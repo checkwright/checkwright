@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-kit-enum — a literal hand list of >=2 kit roots sharing a glob
 // must name every kit root with matching tracked files; the fix is the kit:<glob> token
+use crate::exit;
 use crate::fresh;
 use crate::{proc, programs};
 use crate::registry;
@@ -31,25 +32,25 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-kit-enum: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
     let list = format!("{}/gates.list", gates_dir);
     if !Path::new(&list).is_file() {
         eprintln!("check-kit-enum: no registry at {}", list);
-        return 2;
+        return exit::REFUSED;
     }
 
     let repo_root = match walk::toplevel_opt() {
         Ok(Some(r)) => r,
         Ok(None) => {
             eprintln!("check-kit-enum: not a git repository — cannot test tracked kit files");
-            return 2;
+            return exit::REFUSED;
         }
         Err(e) => {
             eprintln!("check-kit-enum: {}", e);
-            return 2;
+            return exit::TOOL;
         }
     };
 
@@ -60,7 +61,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v.into_iter().map(|r| r.trim_end_matches('/').to_string()).collect(),
         Err(e) => {
             eprintln!("check-kit-enum: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     // spec: gate-sdk/SPEC.md §Layout and configuration — index-aligned with the roster above by
@@ -69,23 +70,23 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v.into_iter().map(|r| r.trim_end_matches('/').to_string()).collect(),
         Err(e) => {
             eprintln!("check-kit-enum: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     if kit_roots.is_empty() {
         eprintln!("check-kit-enum: no kit roots enumerated");
-        return 2;
+        return exit::REFUSED;
     }
     if kit_roots.len() != kit_paths.len() {
         eprintln!("check-kit-enum: the two kit-root spellings disagree in length — the check could not run; treating as failure (not clean)");
-        return 2;
+        return exit::TOOL;
     }
     let mut resolve_dirs = vec![gates_dir.clone()];
     match walk::kit_roots_abs() {
         Ok(v) => resolve_dirs.extend(v.into_iter().map(|k| format!("{}/checks", k))),
         Err(e) => {
             eprintln!("check-kit-enum: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     }
 
@@ -93,13 +94,13 @@ pub fn run(args: &[String]) -> i32 {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
         Err(e) => {
             eprintln!("check-kit-enum: cannot read {}: {}", list, e);
-            return 2;
+            return exit::INPUT;
         }
     };
     let members = registry::members(&listing);
     if members.is_empty() {
         eprintln!("check-kit-enum: no members parsed from {}", list);
-        return 2;
+        return exit::INPUT;
     }
 
     let mut violations: Vec<String> = Vec::new();
@@ -114,7 +115,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(t) => t,
             Err(e) => {
                 eprintln!("check-kit-enum: {}", e);
-                return 2;
+                return exit::INPUT;
             }
         };
         // spec: gate-sdk/SPEC.md §check-kit-enum — no manifest is check-graph's finding, not this
@@ -152,7 +153,7 @@ pub fn run(args: &[String]) -> i32 {
                     Ok(c) => c,
                     Err(e) => {
                         eprintln!("check-kit-enum: {}", e);
-                        return 2;
+                        return exit::TOOL;
                     }
                 };
                 let Some(bytes) = out.stdout() else {
@@ -160,7 +161,7 @@ pub fn run(args: &[String]) -> i32 {
                         "check-kit-enum: {}",
                         fresh::fail_closed("git ls-files", out.code())
                     );
-                    return 2;
+                    return exit::TOOL;
                 };
                 if bytes.is_empty() || have.iter().any(|h| h == r) {
                     continue;

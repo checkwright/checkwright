@@ -1,6 +1,7 @@
 // spec: docs/site-architecture.md §Site chrome and the nav contract — every tracked docs page
 // carries a title block and a menu entry of its own (nav slot, derived child, generated-sibling
 // suffix link, nav_suffix pair), or is listed in the off-nav allowlist
+use crate::exit::Fault;
 use crate::fresh;
 use crate::nav::{self, basename, dirname, suffix_target, Fm};
 use crate::walk;
@@ -105,18 +106,18 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-docs-nav-reachable: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let root = fresh::strip_trailing_slash(&fresh::positional_or_knob(args, 0, "SITE_KIT_DOCS_DIR")?).to_string();
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let root = fresh::strip_trailing_slash(&fresh::positional_or_knob(args, 0, "SITE_KIT_DOCS_DIR").map_err(Fault::refused)?).to_string();
     if !fresh::is_dir(&root) {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
 
-    let model = nav::load(&root)?;
+    let model = nav::load(&root).map_err(Fault::input)?;
     let pages = &model.pages;
     if pages.is_empty() {
         println!(
@@ -126,10 +127,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    let allowlist = fresh::positional_or_knob(args, 1, "GATE_LOCAL_OFFNAV_LIST")?;
+    let allowlist = fresh::positional_or_knob(args, 1, "GATE_LOCAL_OFFNAV_LIST").map_err(Fault::refused)?;
     let mut allow: HashSet<String> = HashSet::new();
     if Path::new(&allowlist).is_file() {
-        for line in fresh::read_captured(&allowlist)?.lines() {
+        for line in fresh::read_captured(&allowlist).map_err(Fault::input)?.lines() {
             let cut = line.split('#').next().unwrap_or("");
             let squeezed: String = cut.chars().filter(|c| !c.is_whitespace()).collect();
             if !squeezed.is_empty() {

@@ -2,6 +2,7 @@
 // well-formed and consistent, and the coupling-graph artifact is the faithful projection of those
 // manifests.
 use crate::emit::graph as proj;
+use crate::exit::{self, Fault};
 use crate::registry;
 use crate::walk;
 use std::path::Path;
@@ -11,7 +12,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-graph: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -469,20 +470,20 @@ fn read_stripped(p: &str) -> Result<String, String> {
     std::fs::read_to_string(p).map_err(|e| format!("cannot read {}: {}", p, e))
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let cfg = proj::Config::resolve()?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let cfg = proj::Config::resolve().map_err(Fault::refused)?;
 
     if let Some(what) = retired_theme_seam(&cfg.gates_dir) {
         println!("CHECK-GRAPH: 1 retired-seam violation(s):");
         println!("  RETIRED-SEAM: {}", what);
         println!("{}", MIGRATION);
-        return Ok(2);
+        return Ok(exit::REFUSED);
     }
 
     let mode = args.first().map(String::as_str).unwrap_or("");
 
     if mode == "--amend-only" {
-        let (code, out) = amend_only(args.get(1).map(String::as_str).unwrap_or("."))?;
+        let (code, out) = amend_only(args.get(1).map(String::as_str).unwrap_or(".")).map_err(Fault::input)?;
         for l in &out {
             println!("{}", l);
         }
@@ -490,8 +491,8 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     if mode == "--refs-only" {
-        let allowed = walk::knob_words("GATE_SDK_GRAPH_EXTERNAL_REFS")?;
-        let members = proj::projected_members(&cfg)?;
+        let allowed = walk::knob_words("GATE_SDK_GRAPH_EXTERNAL_REFS").map_err(Fault::refused)?;
+        let members = proj::projected_members(&cfg).map_err(Fault::input)?;
         let emitted = proj::render(&cfg, &members);
         let bad = disallowed_external_refs(&emitted, &allowed);
         if !bad.is_empty() {
@@ -507,7 +508,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     if mode == "--cap-only" {
-        let members = proj::projected_members(&cfg)?;
+        let members = proj::projected_members(&cfg).map_err(Fault::input)?;
         let emitted = proj::render(&cfg, &members);
         let (n, cap) = (edge_count(&emitted), render_cap(&emitted));
         if n as u64 > cap {
@@ -524,17 +525,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let list = cfg.list_path();
     if !Path::new(&list).is_file() {
-        return Err(format!("no registry at {}", list));
+        return Err(Fault::refused(format!("no registry at {}", list)));
     }
-    let checks = registry::members(&read_stripped(&list)?);
+    let checks = registry::members(&read_stripped(&list).map_err(Fault::input)?);
     if checks.is_empty() {
-        return Err(format!("no members parsed from {}", list));
+        return Err(Fault::input(format!("no members parsed from {}", list)));
     }
 
     let vocab = cfg.vocab.vocab.clone();
     let leading = cfg.vocab.leading.clone();
     let lagging = cfg.vocab.lagging.clone();
-    let allowed = walk::knob_words("GATE_SDK_GRAPH_EXTERNAL_REFS")?;
+    let allowed = walk::knob_words("GATE_SDK_GRAPH_EXTERNAL_REFS").map_err(Fault::refused)?;
 
     let mut errors: Vec<String> = Vec::new();
     let mut unresolved = 0usize;
@@ -544,7 +545,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             unresolved += 1;
             continue;
         };
-        let body = read_stripped(&script)?;
+        let body = read_stripped(&script).map_err(Fault::input)?;
         let man = match registry::manifest_line(&body) {
             Some(m) => m.to_string(),
             None => {
@@ -631,9 +632,9 @@ fn rule(args: &[String]) -> Result<i32, String> {
         if unrootable {
             continue;
         }
-        couples = registry::expand_couples(&couples, &cfg.kit_roots_rel)?;
+        couples = registry::expand_couples(&couples, &cfg.kit_roots_rel).map_err(Fault::refused)?;
         if !trigger.is_empty() {
-            trigger = registry::expand_couples(&trigger, &cfg.kit_roots_rel)?;
+            trigger = registry::expand_couples(&trigger, &cfg.kit_roots_rel).map_err(Fault::refused)?;
         }
         if dir != "bi" && dir != "one" {
             errors.push(format!(
@@ -682,7 +683,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
         // spec: gate-sdk/SPEC.md §The `# graph:` manifest — the derived knob and module files join both fields
         // after the vocabulary check, which reads the authored field alone
-        let derived = registry::derived_couples(c, &cfg.resolve_dirs)?;
+        let derived = registry::derived_couples(c, &cfg.resolve_dirs).map_err(Fault::refused)?;
         let append = |field: &str| -> String {
             members(field).chain(derived.iter().map(String::as_str)).collect::<Vec<_>>().join(",")
         };
@@ -727,20 +728,20 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     // assertion E: the coupling-graph artifact matches the emitter
-    let members = proj::projected_members(&cfg)?;
+    let members = proj::projected_members(&cfg).map_err(Fault::input)?;
     let emitted = proj::render(&cfg, &members);
     let artifact = cfg.artifact.clone();
     let artifact_dir = match artifact.rfind('/') {
         Some(at) => artifact[..at].to_string(),
         None => ".".to_string(),
     };
-    let graph_door = super::door_command("--emit graph")?;
+    let graph_door = super::door_command("--emit graph").map_err(Fault::refused)?;
     if !Path::new(&artifact).is_file() {
         errors.push(format!(
             "ARTIFACT: {} does not exist; regenerate: {} > {}",
             artifact, graph_door, artifact
         ));
-    } else if emitted.trim_end_matches('\n') != read_stripped(&artifact)?.trim_end_matches('\n') {
+    } else if emitted.trim_end_matches('\n') != read_stripped(&artifact).map_err(Fault::input)?.trim_end_matches('\n') {
         errors.push(format!(
             "ARTIFACT: {} is stale vs the '# graph:' manifests; regenerate: {} > {}",
             artifact, graph_door, artifact
@@ -769,7 +770,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
     }
 
     // assertion G: every `# graph:` manifest in a SPEC-*.md amendment body is well-formed
-    amendment_findings(".", &mut errors)?;
+    amendment_findings(".", &mut errors).map_err(Fault::input)?;
 
     let skipped = registry::unresolved_skipped(unresolved);
     if !errors.is_empty() {

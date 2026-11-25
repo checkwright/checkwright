@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-docs-page-length — no declared page runs past the configured
 // word bound
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -13,19 +14,20 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-docs-page-length: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let bound = parse_bound(&spec::knob_pub(MAX_KNOB)?)?;
-    let excluded = expand(root, &spec::knob_array_pub(EXCLUDE_KNOB)?)?;
-    let pages: Vec<String> = expand(root, &spec::knob_array_pub(PAGES_KNOB)?)?
+    let bound = parse_bound(&spec::knob_pub(MAX_KNOB).map_err(Fault::refused)?).map_err(Fault::refused)?;
+    let excluded = expand(root, &spec::knob_array_pub(EXCLUDE_KNOB).map_err(Fault::refused)?).map_err(Fault::input)?;
+    let pages: Vec<String> = expand(root, &spec::knob_array_pub(PAGES_KNOB).map_err(Fault::refused)?)
+        .map_err(Fault::input)?
         .into_iter()
         .filter(|p| !excluded.contains(p))
         .collect();
@@ -41,7 +43,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let mut counts: Vec<(String, usize)> = Vec::new();
     for page in pages {
-        let n = page_words(&read_page(&page)?);
+        let n = page_words(&read_page(&page).map_err(Fault::input)?);
         counts.push((page, n));
     }
     let over: Vec<&(String, usize)> = counts.iter().filter(|(_, n)| *n > bound).collect();
@@ -172,8 +174,8 @@ mod tests {
         assert_eq!(page_words(page), 11);
     }
 
-    // spec: canon-kit/SPEC.md §check-docs-page-length — both exit-2 paths, which a `bad/` fixture
-    // held to exit 1 cannot express
+    // spec: canon-kit/SPEC.md §check-docs-page-length — the exit-3 unreadable page and the exit-2 bad
+    // bound, which a `bad/` fixture held to exit 1 cannot express
     #[test]
     fn an_unreadable_page_and_a_bad_bound_are_refusals() {
         assert!(read_page("no/such/page-length.md")

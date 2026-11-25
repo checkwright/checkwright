@@ -1,6 +1,7 @@
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — one read-only audit or mechanical sweep on
 // a consumer's foreign adapter, in a scratch clone of committed `HEAD`: 0 OK, 1 REFUSED, 2 FAILED;
 // a resumable adapter's `OK` opens a session `--foreign-resume` continues and closes.
+use crate::exit::{self, Fault};
 use crate::hook::verdict::{self, KeyedConfig};
 use crate::proc::{self, ChildEnv, Redirect};
 use crate::programs::{self, Program};
@@ -371,7 +372,7 @@ impl Run<'_> {
     }
 
     fn failed(&self, why: &str) -> Verdict {
-        self.line(&format!("FAILED ({})", why), 2)
+        self.line(&format!("FAILED ({})", why), exit::FAILED)
     }
 }
 
@@ -761,7 +762,7 @@ impl Turn<'_> {
     }
 
     fn failed(&self, why: &str) -> Verdict {
-        self.line(&format!("FAILED ({})", why), 2)
+        self.line(&format!("FAILED ({})", why), exit::FAILED)
     }
 }
 
@@ -909,7 +910,7 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
 // keeps every report and the patch
 fn foreign_close(cfg: &Config, key: &str) -> Verdict {
     let dir = PathBuf::from(&cfg.base).join("foreign").join(key);
-    let failed = |why: String| Verdict { line: format!("foreign-resume: key={} -> FAILED ({})", key, why), code: 2 };
+    let failed = |why: String| Verdict { line: format!("foreign-resume: key={} -> FAILED ({})", key, why), code: exit::FAILED };
     if !dir.join("session.txt").is_file() {
         return failed(format!("no open session under {}", dir.display()));
     }
@@ -930,33 +931,36 @@ fn foreign_close(cfg: &Config, key: &str) -> Verdict {
     Verdict { line: format!("foreign-resume: key={} -> CLOSED", key), code: 0 }
 }
 
-fn config() -> Result<Config, String> {
-    let here = walk::cwd()?;
-    let timeout = walk::knob_scalar("DELEGATION_KIT_FOREIGN_TIMEOUT")?;
-    let timeout: u64 = timeout
-        .parse()
-        .map_err(|_| format!("DELEGATION_KIT_FOREIGN_TIMEOUT is not a positive integer: {}", timeout))?;
-    let tmp = walk::knob_scalar("GATE_SDK_TMP_DIR")?;
+fn config() -> Result<Config, Fault> {
+    let here = walk::cwd().map_err(Fault::tool)?;
+    let timeout = walk::knob_scalar("DELEGATION_KIT_FOREIGN_TIMEOUT").map_err(Fault::refused)?;
+    let timeout: u64 = timeout.parse().map_err(|_| {
+        Fault::refused(format!("DELEGATION_KIT_FOREIGN_TIMEOUT is not a positive integer: {}", timeout))
+    })?;
+    let tmp = walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?;
     let base = walk::abs_against(&here, &tmp);
-    walk::make_scratch(&base).map_err(|e| format!("cannot create the scratch dir {}: {}", base, e))?;
-    let repo = walk::toplevel_opt()?.ok_or("not inside a git work tree")?;
+    walk::make_scratch(&base)
+        .map_err(|e| Fault::tool(format!("cannot create the scratch dir {}: {}", base, e)))?;
+    let repo = walk::toplevel_opt()
+        .map_err(Fault::tool)?
+        .ok_or_else(|| Fault::refused("not inside a git work tree"))?;
     let budget = KeyedConfig {
-        usage: walk::knob_array("DELEGATION_KIT_FOREIGN_USAGE")?,
-        producers: walk::knob_array("DELEGATION_KIT_FOREIGN_USAGE_CMD")?,
-        pause: walk::knob_scalar("DELEGATION_KIT_FOREIGN_PAUSE_PCT")?,
-        pause_long: walk::knob_scalar("DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG")?,
-        stale_age: walk::knob_scalar("DELEGATION_KIT_STALE_AGE")?,
+        usage: walk::knob_array("DELEGATION_KIT_FOREIGN_USAGE").map_err(Fault::refused)?,
+        producers: walk::knob_array("DELEGATION_KIT_FOREIGN_USAGE_CMD").map_err(Fault::refused)?,
+        pause: walk::knob_scalar("DELEGATION_KIT_FOREIGN_PAUSE_PCT").map_err(Fault::refused)?,
+        pause_long: walk::knob_scalar("DELEGATION_KIT_FOREIGN_PAUSE_PCT_LONG").map_err(Fault::refused)?,
+        stale_age: walk::knob_scalar("DELEGATION_KIT_STALE_AGE").map_err(Fault::refused)?,
         timeout,
         root: repo.clone(),
     };
     Ok(Config {
-        adapters: walk::knob_array("DELEGATION_KIT_FOREIGN_ADAPTERS")?,
-        resume: walk::knob_array("DELEGATION_KIT_FOREIGN_RESUME")?,
-        sandbox: walk::knob_array("DELEGATION_KIT_FOREIGN_SANDBOX")?,
-        markers: walk::knob_array("DELEGATION_KIT_FOREIGN_SESSION_MARKER")?,
-        harness: walk::knob_array("DELEGATION_KIT_FOREIGN_HARNESS")?,
-        foreign_tiers: walk::knob_array("DELEGATION_KIT_FOREIGN_TIER_MODEL")?,
-        classes: walk::knob_array("DELEGATION_KIT_TIER_CLASSES")?,
+        adapters: walk::knob_array("DELEGATION_KIT_FOREIGN_ADAPTERS").map_err(Fault::refused)?,
+        resume: walk::knob_array("DELEGATION_KIT_FOREIGN_RESUME").map_err(Fault::refused)?,
+        sandbox: walk::knob_array("DELEGATION_KIT_FOREIGN_SANDBOX").map_err(Fault::refused)?,
+        markers: walk::knob_array("DELEGATION_KIT_FOREIGN_SESSION_MARKER").map_err(Fault::refused)?,
+        harness: walk::knob_array("DELEGATION_KIT_FOREIGN_HARNESS").map_err(Fault::refused)?,
+        foreign_tiers: walk::knob_array("DELEGATION_KIT_FOREIGN_TIER_MODEL").map_err(Fault::refused)?,
+        classes: walk::knob_array("DELEGATION_KIT_TIER_CLASSES").map_err(Fault::refused)?,
         timeout,
         repo,
         base,
@@ -971,7 +975,7 @@ pub fn run(argv: &[String]) -> i32 {
         Err(e) => {
             eprintln!("{}", e);
             eprintln!("{}", USAGE);
-            return 2;
+            return exit::USAGE;
         }
     };
     let a = match a {
@@ -983,7 +987,7 @@ pub fn run(argv: &[String]) -> i32 {
             if let Err(e) = class_shape(&cfg, &a) {
                 eprintln!("{}", e);
                 eprintln!("{}", USAGE);
-                return 2;
+                return exit::USAGE;
             }
             foreign_run(&cfg, &a)
         }
@@ -1008,18 +1012,18 @@ pub fn run(argv: &[String]) -> i32 {
 // spec: delegation-kit/SPEC.md §The keyed verdict — the `--budget` form: the adapter's keyed line
 // on stdout at the verdict's own exit, no clone and no adapter; an adapter the knobs do not
 // configure is a shape refusal
-fn budget_form(cfg: &Config, adapter: &str) -> Result<verdict::Keyed, String> {
+fn budget_form(cfg: &Config, adapter: &str) -> Result<verdict::Keyed, Fault> {
     if argv_of(&cfg.adapters, adapter).is_empty() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "foreign-run: no adapter '{}' is configured in DELEGATION_KIT_FOREIGN_ADAPTERS",
             adapter
-        ));
+        )));
     }
     Ok(verdict::keyed(&cfg.budget, adapter))
 }
 
 fn budget(adapter: &str) -> i32 {
-    match config().map_err(|e| format!("foreign-run: config: {}", e)).and_then(|cfg| budget_form(&cfg, adapter)) {
+    match config().map_err(|e| e.prefixed("foreign-run: config")).and_then(|cfg| budget_form(&cfg, adapter)) {
         Ok(k) => {
             println!("{}", k.line);
             k.code
@@ -1027,7 +1031,7 @@ fn budget(adapter: &str) -> i32 {
         Err(e) => {
             eprintln!("{}", e);
             eprintln!("{}", USAGE);
-            2
+            e.status()
         }
     }
 }
@@ -1038,16 +1042,18 @@ pub fn resume(argv: &[String]) -> i32 {
         Err(e) => {
             eprintln!("{}", e);
             eprintln!("{}", RESUME_USAGE);
-            return 2;
+            return exit::USAGE;
         }
     };
     let v = match (config(), &a.prompt) {
         (Ok(cfg), Some(p)) => foreign_resume(&cfg, &a.key, p),
         (Ok(cfg), None) => foreign_close(&cfg, &a.key),
         (Err(e), Some(_)) => {
-            Verdict { line: format!("foreign-resume: key={} budget=- -> FAILED (config: {})", a.key, e), code: 2 }
+            Verdict { line: format!("foreign-resume: key={} budget=- -> FAILED (config: {})", a.key, e), code: exit::FAILED }
         }
-        (Err(e), None) => Verdict { line: format!("foreign-resume: key={} -> FAILED (config: {})", a.key, e), code: 2 },
+        (Err(e), None) => {
+            Verdict { line: format!("foreign-resume: key={} -> FAILED (config: {})", a.key, e), code: exit::FAILED }
+        }
     };
     println!("{}", v.line);
     v.code

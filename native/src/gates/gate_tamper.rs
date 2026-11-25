@@ -1,6 +1,7 @@
 // spec: delegation-kit/SPEC.md §Verify after every agent commit — a gate-weakening commit is
 // blocked by shape (A gate edits stay meta-isolated; B a new path-exemption can't excuse a
 // co-staged file)
+use crate::exit::Fault;
 use crate::{proc, programs, registry};
 use crate::walk;
 use std::path::Path;
@@ -123,7 +124,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-gate-tamper: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -168,26 +169,27 @@ fn derived_gate_files(
     Ok(out)
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let top = walk::toplevel()?;
-    let here = walk::cwd()?;
-    let kit_roots = walk::kit_roots_under(&top)?;
-    let mut globs = walk::knob_array("DELEGATION_KIT_GATE_FILES")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let top = walk::toplevel_fault()?;
+    let here = walk::cwd().map_err(Fault::tool)?;
+    let kit_roots = walk::kit_roots_under(&top).map_err(Fault::refused)?;
+    let mut globs = walk::knob_array("DELEGATION_KIT_GATE_FILES").map_err(Fault::refused)?;
     let kit_roots_abs: Vec<String> = kit_roots.iter().map(|r| walk::abs_against(&top, r)).collect();
     let derived = derived_gate_files(
         &top,
-        &walk::abs_against(&here, &walk::knob_scalar("GATE_SDK_GATES_DIR")?),
+        &walk::abs_against(&here, &walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?),
         &kit_roots_abs,
         &walk::abs_against(&here, &walk::sdk_root()),
         std::env::consts::EXE_SUFFIX,
-    )?;
+    )
+    .map_err(Fault::input)?;
     let declared = globs.join(" ");
     for d in &derived {
         if !globs.contains(d) {
             globs.push(d.clone());
         }
     }
-    let mut meta = walk::knob_array("DELEGATION_KIT_META_PATHS")?;
+    let mut meta = walk::knob_array("DELEGATION_KIT_META_PATHS").map_err(Fault::refused)?;
     // spec: delegation-kit/SPEC.md §Layout and configuration — a vendored kit's edits are meta-layer by
     // definition: every kit root joins as a `<root>/` prefix the resolved value does not already hold
     // spec: gate-sdk/SPEC.md §Layout and configuration — the prefix is matched against the names
@@ -214,10 +216,10 @@ fn rule(args: &[String]) -> Result<i32, String> {
             // `--fixture` names the empty directory and refuses rather than hanging
             "--fixture" => Corpus::Fixture(args.get(i + 1).cloned().unwrap_or_default()),
             "--range" => Corpus::Range(args.get(i + 1).cloned().unwrap_or_default()),
-            other => return Err(format!("unknown argument: {}", other)),
+            other => return Err(Fault::usage(format!("unknown argument: {}", other))),
         };
         if !matches!(corpus, Corpus::Index) {
-            return Err("--range and --fixture each select the corpus: give one, once".to_string());
+            return Err(Fault::usage("--range and --fixture each select the corpus: give one, once"));
         }
         corpus = next;
         i += 2;
@@ -225,21 +227,21 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     let (findings, read) = match corpus {
         Corpus::Index => {
-            let (staged, added) = collect_live(&globs)?;
+            let (staged, added) = collect_live(&globs).map_err(Fault::tool)?;
             (vec![judge(&staged, &added, &globs, &meta, None)], format!("{} staged path(s)", staged.len()))
         }
         Corpus::Fixture(d) => {
-            let (staged, added) = collect_fixture(&d)?;
+            let (staged, added) = collect_fixture(&d).map_err(Fault::refused)?;
             (vec![judge(&staged, &added, &globs, &meta, None)], format!("{} staged path(s)", staged.len()))
         }
         Corpus::Range(r) => {
-            let (base, head) = parse_range(&r)?;
+            let (base, head) = parse_range(&r).map_err(Fault::usage)?;
             let span = format!("{}..{}", commit_id(base)?, commit_id(head)?);
-            let commits = rev_list(&["rev-list", "--reverse", "--no-merges", &span])?;
-            let merges = rev_list(&["rev-list", "--merges", &span])?.len();
+            let commits = rev_list(&["rev-list", "--reverse", "--no-merges", &span]).map_err(Fault::tool)?;
+            let merges = rev_list(&["rev-list", "--merges", &span]).map_err(Fault::tool)?.len();
             let mut findings: Vec<Finding> = Vec::new();
             for c in &commits {
-                let (changed, added) = collect_commit(c, &globs)?;
+                let (changed, added) = collect_commit(c, &globs).map_err(Fault::tool)?;
                 findings.push(judge(&changed, &added, &globs, &meta, Some(c)));
             }
             (findings, format!("{} commit(s) in {}; {} merge(s) not judged", commits.len(), r, merges))
@@ -273,12 +275,13 @@ fn parse_range(r: &str) -> Result<(&str, &str), String> {
 
 // spec: delegation-kit/SPEC.md §Verify after every agent commit — each side resolves to a commit
 // id before any listing reads it, so no caller spelling reaches git as an option
-fn commit_id(rev: &str) -> Result<String, String> {
-    let refuse = || format!("--range: '{}' names no commit", rev);
+fn commit_id(rev: &str) -> Result<String, Fault> {
+    let refuse = || Fault::refused(format!("--range: '{}' names no commit", rev));
     if rev.starts_with('-') {
         return Err(refuse());
     }
-    let c = proc::run(&programs::GIT, &["rev-parse", "--verify", "--quiet", &format!("{}^{{commit}}", rev)])?;
+    let c = proc::run(&programs::GIT, &["rev-parse", "--verify", "--quiet", &format!("{}^{{commit}}", rev)])
+        .map_err(Fault::tool)?;
     let id = c.stdout().map(|o| String::from_utf8_lossy(o).trim().to_string()).unwrap_or_default();
     if id.is_empty() {
         return Err(refuse());

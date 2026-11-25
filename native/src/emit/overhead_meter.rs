@@ -4,6 +4,7 @@
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member and not a hardcoded flag,
 // because the meter reads consumer knobs a hardcoded flag would hide from the knob-file derivation; and
 // `Arm::Emit` rather than `Arm::Run`, because exit is always 0 so no `1` is load-bearing.
+use crate::exit::Fault;
 
 pub const KNOBS: &[&str] = &[
     "DRIFT_KIT_SESSIONS_DIR",
@@ -139,11 +140,11 @@ fn rewrite_keyed(path: &std::path::Path, session8: &str, line: &str) -> std::io:
     f.write_all(kept.as_bytes())
 }
 
-fn inputs() -> Result<crate::sessions::Inputs, String> {
+fn inputs() -> Result<crate::sessions::Inputs, Fault> {
     let var = |n: &str| std::env::var(n).unwrap_or_default();
     let pwd = var("PWD");
     let here = if pwd.is_empty() {
-        crate::walk::cwd()?
+        crate::walk::cwd().map_err(Fault::tool)?
     } else {
         pwd
     };
@@ -151,7 +152,7 @@ fn inputs() -> Result<crate::sessions::Inputs, String> {
         session_id: String::new(),
         harness_id: var(crate::hook::binding::SESSION_ID_VAR),
         child: var(crate::hook::binding::CHILD_SESSION_VAR),
-        sessions_dir: crate::walk::knob_scalar("DRIFT_KIT_SESSIONS_DIR")?,
+        sessions_dir: crate::walk::knob_scalar("DRIFT_KIT_SESSIONS_DIR").map_err(Fault::refused)?,
         config_home: var(crate::hook::binding::CONFIG_DIR_VAR),
         home: var(crate::sessions::HOME_VAR),
         here,
@@ -206,17 +207,17 @@ fn target(given: Option<&str>, i: &crate::sessions::Inputs) -> Target {
     }
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let given = super::file_survey::positionals(args, "transcript")
-        .map_err(|e| format!("{}\n{}", e, USAGE))?;
+        .map_err(|e| Fault::usage(format!("{}\n{}", e, USAGE)))?;
     if given.len() > 1 {
-        return Err(USAGE.to_string());
+        return Err(Fault::usage(USAGE));
     }
-    let log = crate::walk::knob_scalar("DRIFT_KIT_OVERHEAD_LOG")?;
+    let log = crate::walk::knob_scalar("DRIFT_KIT_OVERHEAD_LOG").map_err(Fault::refused)?;
     measure(target(given.first().map(String::as_str), &inputs()?), &log)
 }
 
-fn measure(target: Target, log: &str) -> Result<String, String> {
+fn measure(target: Target, log: &str) -> Result<String, Fault> {
     let (transcript, marker) = match target {
         Target::Measure(path, marker) => (path, marker),
         Target::Delegated => return Ok(DELEGATED.to_string()),
@@ -235,7 +236,7 @@ fn measure(target: Target, log: &str) -> Result<String, String> {
         }
     };
     let body = std::fs::read(&transcript)
-        .map_err(|e| format!("cannot read the transcript {}: {}", transcript, e))?;
+        .map_err(|e| Fault::input(format!("cannot read the transcript {}: {}", transcript, e)))?;
     let c = classify(&body);
     let (gov, task) = (c.gov(), c.task());
     let (p, tp) = (pct(gov, c.total), pct(task, c.total));
@@ -247,7 +248,7 @@ fn measure(target: Target, log: &str) -> Result<String, String> {
         today, session8, c.total, gov, c.gate, p
     );
     rewrite_keyed(std::path::Path::new(&crate::walk::capture_path(log)), &session8, &line)
-        .map_err(|e| format!("cannot write {}: {}", log, e))?;
+        .map_err(|e| Fault::tool(format!("cannot write {}: {}", log, e)))?;
 
     Ok(format!(
         "overhead-meter: {} {}{}\n  total={} bytes\n  governance={} ({}%)  [gate={} hook={} \

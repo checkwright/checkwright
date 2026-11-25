@@ -1,10 +1,11 @@
 // spec: guard-kit/SPEC.md §Testing — the decision-table runner, an `Arm::Run` member:
-// its contract is a three-valued exit — 0 clean, 1 a verdict mismatch, 2 a harness precondition —
-// which `Arm::Emit` collapses to 0-or-2.
+// its contract is a four-valued exit — 0 clean, 1 a verdict mismatch, 2 a harness refusal, 3 an
+// unreadable input or a tool error — which `Arm::Emit` collapses to 0, 2 or 3.
 // spec: gate-sdk/SPEC.md §The non-gate arm — an arm table member rather than a hardcoded
 // top-level flag, because the member is configured: it needs the vendored guard-kit root.
 use super::guard_ps_variants;
 use super::guard_variants::{self, Admit, Held, Ledger, Variant};
+use crate::exit::{self, Fault};
 use crate::hook::binding::{TOOL_BASH, TOOL_POWERSHELL};
 use crate::proc;
 use crate::programs;
@@ -37,18 +38,18 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(e) => {
             eprintln!("{}", e);
-            2
+            e.status()
         }
     }
 }
 
 // spec: guard-kit/SPEC.md §Testing — the PowerShell re-spellings a PowerShell host parses on the
 // x64 Windows leg: every derived row of the two PowerShell tables as `<transform>\t<base>\t<variant>`.
-pub fn emit_ps_variants(_: &[String]) -> Result<String, String> {
+pub fn emit_ps_variants(_: &[String]) -> Result<String, Fault> {
     ps_variant_lines(&kit_root()?)
 }
 
-fn ps_variant_lines(kit: &str) -> Result<String, String> {
+fn ps_variant_lines(kit: &str) -> Result<String, Fault> {
     let mut out = String::new();
     for (table, width) in [("powershell-cases.tsv", 2), ("powershell-background-cases.tsv", 3)] {
         let path = format!("{}/guard-tests/{}", kit, table);
@@ -62,7 +63,7 @@ fn ps_variant_lines(kit: &str) -> Result<String, String> {
     Ok(out)
 }
 
-fn execute(args: &[String]) -> Result<i32, String> {
+fn execute(args: &[String]) -> Result<i32, Fault> {
     let kit = kit_root()?;
     let cases = positional(args, 0, &format!("{}/guard-tests/cases.tsv", kit));
     let bg_cases = positional(args, 1, &format!("{}/guard-tests/background-cases.tsv", kit));
@@ -71,10 +72,11 @@ fn execute(args: &[String]) -> Result<i32, String> {
     let limits = positional(args, 4, &format!("{}/guard-tests/variant-limits.tsv", kit));
     for f in [&cases, &bg_cases, &ps_cases, &ps_bg_cases, &limits] {
         if !Path::new(f).is_file() {
-            return Err(format!("{}: missing {}", NAME, f));
+            return Err(Fault::input(format!("{}: missing {}", NAME, f)));
         }
     }
-    let held = crate::runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR")?)?;
+    let held =
+        crate::runner::run_scratch(&walk::knob_scalar("GATE_SDK_TMP_DIR").map_err(Fault::refused)?).map_err(Fault::tool)?;
     let sandbox = build_sandbox(&held)?;
     let log = format!("{}/friction.log", sandbox.root);
 
@@ -109,10 +111,10 @@ fn execute(args: &[String]) -> Result<i32, String> {
     }
 
     if tally.ran == 0 {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "{}: no cases parsed from {} / {} / {} / {}",
             NAME, cases, bg_cases, ps_cases, ps_bg_cases
-        ));
+        )));
     }
     let kit_ran = tally.ran;
     let tables = [(cases.as_str(), false, TOOL_BASH), (bg_cases.as_str(), true, TOOL_BASH), (ps_cases.as_str(), false, TOOL_POWERSHELL), (ps_bg_cases.as_str(), true, TOOL_POWERSHELL)];
@@ -147,9 +149,9 @@ fn variant_lane(
     log: &str,
     tables: &[(&str, bool, &str)],
     limits: &str,
-) -> Result<(usize, usize), String> {
+) -> Result<(usize, usize), Fault> {
     let mut ledger =
-        Ledger::parse(&rows(limits, 3)?, limits).map_err(|e| format!("{}: {}", NAME, e))?;
+        Ledger::parse(&rows(limits, 3)?, limits).map_err(|e| Fault::input(format!("{}: {}", NAME, e)))?;
     let mut derived = 0;
     for &(table, flagged, tool) in tables {
         let base = sectioned(table, if flagged { 3 } else { 2 })?;
@@ -218,29 +220,29 @@ struct Consumer {
 // spec: guard-kit/SPEC.md §Testing — the consumer lane: the consumer's rows against its own
 // command, spawned directly from the arm's working directory; `None` where no table is named, and
 // the rows' bash re-spellings derived only where the consumer names its limits table.
-fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, String> {
-    let table = crate::walk::knob_scalar(CASES_KNOB)?;
-    let limits = crate::walk::knob_scalar(LIMITS_KNOB)?;
+fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, Fault> {
+    let table = crate::walk::knob_scalar(CASES_KNOB).map_err(Fault::refused)?;
+    let limits = crate::walk::knob_scalar(LIMITS_KNOB).map_err(Fault::refused)?;
     if table.is_empty() && !limits.is_empty() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "{}: {} names {} but {} is empty, so there are no rows to derive",
             NAME, LIMITS_KNOB, limits, CASES_KNOB
-        ));
+        )));
     }
     if table.is_empty() {
         return Ok(None);
     }
-    let argv = crate::guard::host::consumer_cmd()?;
+    let argv = crate::guard::host::consumer_cmd().map_err(Fault::refused)?;
     let Some((head, rest)) = argv.split_first() else {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "{}: {} names {} but GUARD_KIT_CONSUMER_RULES_CMD is empty, so there is no command for its rows to drive",
             NAME, CASES_KNOB, table
-        ));
+        )));
     };
     if !Path::new(&table).is_file() {
-        return Err(format!("{}: {} names {}, which is not a readable file", NAME, CASES_KNOB, table));
+        return Err(Fault::input(format!("{}: {} names {}, which is not a readable file", NAME, CASES_KNOB, table)));
     }
-    let root = walk::cwd().map_err(|e| format!("{}: {}", NAME, e))?;
+    let root = walk::cwd().map_err(|e| Fault::tool(format!("{}: {}", NAME, e)))?;
     let bin = running_binary()?;
     let program = programs::Program::consumer("GUARD_KIT_CONSUMER_RULES_CMD", head.as_str());
     let args: Vec<&str> = rest.iter().map(String::as_str).collect();
@@ -249,13 +251,15 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, String> {
     let mut ledger = None;
     if !limits.is_empty() {
         if !Path::new(&limits).is_file() {
-            return Err(format!("{}: {} names {}, which is not a readable file", NAME, LIMITS_KNOB, limits));
+            return Err(Fault::input(format!("{}: {} names {}, which is not a readable file", NAME, LIMITS_KNOB, limits)));
         }
-        let parsed = Ledger::parse(&rows(&limits, 3)?, &limits).map_err(|e| format!("{}: {}: {}", NAME, LIMITS_KNOB, e))?;
+        let parsed = Ledger::parse(&rows(&limits, 3)?, &limits)
+            .map_err(|e| Fault::input(format!("{}: {}: {}", NAME, LIMITS_KNOB, e)))?;
         ledger = Some(parsed);
     }
-    let ask = |cmd: &str| -> Result<String, String> {
-        let done = proc::run_with_stdin_in(&program, &args, payload(cmd, None, TOOL_BASH).as_bytes(), &env)?;
+    let ask = |cmd: &str| -> Result<String, Fault> {
+        let done = proc::run_with_stdin_in(&program, &args, payload(cmd, None, TOOL_BASH).as_bytes(), &env)
+            .map_err(Fault::tool)?;
         let out = String::from_utf8_lossy(done.streams().0).into_owned();
         Ok(classify(done.reported_code(), out.trim_end_matches('\n')))
     };
@@ -300,9 +304,9 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, String> {
 
 // spec: guard-kit/SPEC.md §Testing — the guard reads its knobs from the binary, and the
 // repo-relative default names nothing from inside the sandbox, so the running binary is exported
-pub(crate) fn running_binary() -> Result<String, String> {
+pub(crate) fn running_binary() -> Result<String, Fault> {
     let bin = crate::proc::self_image()
-        .map_err(|e| format!("{}: cannot name the running binary: {}", NAME, e))?;
+        .map_err(|e| Fault::tool(format!("{}: cannot name the running binary: {}", NAME, e)))?;
     Ok(walk::normalize_abs(&bin.to_string_lossy()))
 }
 
@@ -315,16 +319,17 @@ fn positional(args: &[String], at: usize, default: &str) -> String {
 
 // spec: guard-kit/SPEC.md §Testing — the arm reaches guard-kit through the transported kit roots
 // rather than a path relative to itself: a compiled member has no `BASH_SOURCE` anchor.
-fn kit_root() -> Result<String, String> {
-    walk::kit_roots_abs()?
+fn kit_root() -> Result<String, Fault> {
+    walk::kit_roots_abs()
+        .map_err(Fault::refused)?
         .into_iter()
         .find(|r| r.rsplit('/').next() == Some("guard-kit"))
         .ok_or_else(|| {
-            format!(
+            Fault::refused(format!(
                 "{}: the kit roots name no guard-kit root, so the guard this table drives \
                  and the tables themselves cannot be found",
                 NAME
-            )
+            ))
         })
 }
 
@@ -352,15 +357,15 @@ pub(crate) fn substitute(cmd: &str, root: &str) -> String {
 // spec: guard-kit/SPEC.md §Testing — the table grammar, and the split reproduces bash's
 // `IFS=$'\t' read -r`: tab is an IFS *whitespace* character, so leading and trailing tabs are
 // stripped and a run of them is one delimiter.
-fn rows(path: &str, width: usize) -> Result<Vec<Vec<String>>, String> {
+fn rows(path: &str, width: usize) -> Result<Vec<Vec<String>>, Fault> {
     Ok(sectioned(path, width)?.into_iter().map(|(_, cells)| cells).collect())
 }
 
 // spec: guard-kit/SPEC.md §Testing — each row beside the rule section it sits in, a section
 // opening at a comment line beginning `# rule` and a backticked rule name.
-fn sectioned(path: &str, width: usize) -> Result<Vec<Sectioned>, String> {
+fn sectioned(path: &str, width: usize) -> Result<Vec<Sectioned>, Fault> {
     let body = std::fs::read_to_string(path)
-        .map_err(|e| format!("{}: cannot read {}: {}", NAME, path, e))?;
+        .map_err(|e| Fault::input(format!("{}: cannot read {}: {}", NAME, path, e)))?;
     let mut section: Option<String> = None;
     let mut out = Vec::new();
     for line in body.lines() {
@@ -404,7 +409,7 @@ fn fields(line: &str, width: usize) -> Vec<String> {
 
 // spec: guard-kit/SPEC.md §Testing — one case, spawned from inside the sandbox with the same inputs
 // the harness supplied, driving the `--hook shell-guard` member directly with no front end.
-fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>, tool: &str) -> Result<String, String> {
+fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>, tool: &str) -> Result<String, Fault> {
     let (code, out, _) = ask(&running_binary()?, root, log, &payload(cmd, background, tool))?;
     // spec: guard-kit/SPEC.md §Testing — the shell form captured the guard in `$( … )`, which
     // strips every trailing newline before the ladder's emptiness arm reads it.
@@ -413,7 +418,7 @@ fn decide(root: &str, log: &str, cmd: &str, background: Option<&str>, tool: &str
 
 // spec: guard-kit/SPEC.md §guard-verdict — one ask of a binary's `--hook shell-guard` from inside
 // `root`, shared with the verdict arm
-pub(crate) fn ask(bin: &str, root: &str, log: &str, payload: &str) -> Result<(i32, String, String), String> {
+pub(crate) fn ask(bin: &str, root: &str, log: &str, payload: &str) -> Result<(i32, String, String), Fault> {
     let set = [
         ("GUARD_KIT_LOG".to_string(), log.to_string()),
         ("GATE_SDK_NATIVE_BIN".to_string(), bin.to_string()),
@@ -425,7 +430,8 @@ pub(crate) fn ask(bin: &str, root: &str, log: &str, payload: &str) -> Result<(i3
         &["--hook", "shell-guard"],
         payload.as_bytes(),
         &env,
-    )?;
+    )
+    .map_err(Fault::tool)?;
     let (out, err) = done.streams();
     Ok((
         done.reported_code(),
@@ -457,7 +463,7 @@ pub(crate) fn payload(cmd: &str, background: Option<&str>, tool: &str) -> String
 // spec: guard-kit/SPEC.md §Testing — the five-way ladder in exit-code-then-substring order; the
 // order is load-bearing and the section says why.
 pub(crate) fn classify(rc: i32, out: &str) -> String {
-    if rc == 2 {
+    if rc == exit::HOOK_BLOCK {
         return "block".to_string();
     }
     if rc != 0 {
@@ -482,7 +488,7 @@ pub(crate) fn classify(rc: i32, out: &str) -> String {
 // spec: guard-kit/SPEC.md §Testing — the sandbox's five preconditions, each a case's precondition
 // rather than scenery: the section enumerates them and says what turns green for the wrong reason
 // when a harness builds four.
-pub(crate) fn build_sandbox(base: &Path) -> Result<Sandbox, String> {
+pub(crate) fn build_sandbox(base: &Path) -> Result<Sandbox, Fault> {
     let made = base.join("guard-sandbox");
     let _ = std::fs::remove_dir_all(&made);
     mkdir(&made.display().to_string())?;
@@ -491,7 +497,7 @@ pub(crate) fn build_sandbox(base: &Path) -> Result<Sandbox, String> {
     // compares this producer's answer against its own.
     let root = walk::canonicalize(&made)
         .map(|c| walk::normalize_abs(walk::strip_extended_prefix(&c)))
-        .ok_or_else(|| format!("{}: cannot resolve the sandbox {}", NAME, made.display()))?;
+        .ok_or_else(|| Fault::tool(format!("{}: cannot resolve the sandbox {}", NAME, made.display())))?;
     let sandbox = Sandbox { root };
     let at = |rel: &str| format!("{}/{}", sandbox.root, rel);
 
@@ -522,28 +528,28 @@ pub(crate) fn build_sandbox(base: &Path) -> Result<Sandbox, String> {
     Ok(sandbox)
 }
 
-fn git(root: &str, args: &[&str]) -> Result<(), String> {
+fn git(root: &str, args: &[&str]) -> Result<(), Fault> {
     let mut argv: Vec<&str> = vec!["-C", root];
     argv.extend_from_slice(args);
-    let done = proc::run(&programs::GIT, &argv)?;
+    let done = proc::run(&programs::GIT, &argv).map_err(Fault::tool)?;
     if let Some(report) = done.failure_report() {
-        return Err(format!(
+        return Err(Fault::tool(format!(
             "{}: cannot build the sandbox — git {} failed ({})",
             NAME,
             args.join(" "),
             report
-        ));
+        )));
     }
     Ok(())
 }
 
-fn mkdir(path: &str) -> Result<(), String> {
+fn mkdir(path: &str) -> Result<(), Fault> {
     std::fs::create_dir_all(path)
-        .map_err(|e| format!("{}: cannot create {}: {}", NAME, path, e))
+        .map_err(|e| Fault::tool(format!("{}: cannot create {}: {}", NAME, path, e)))
 }
 
-fn write(path: &str, body: &str) -> Result<(), String> {
-    std::fs::write(path, body).map_err(|e| format!("{}: cannot write {}: {}", NAME, path, e))
+fn write(path: &str, body: &str) -> Result<(), Fault> {
+    std::fs::write(path, body).map_err(|e| Fault::tool(format!("{}: cannot write {}: {}", NAME, path, e)))
 }
 
 #[cfg(test)]

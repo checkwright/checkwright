@@ -86,18 +86,18 @@ check_case() {
     fi
 }
 
-# A — a note under composition missing a roster section: fail-closed (exit 2), for
+# A — a note under composition missing a roster section: fail-closed (exit 3), for
 # the last section and for the derived Platforms one.
 a="$tmp/absent/posts"
 write_note "$a" "0.1.0" "None." "None."
 write_note "$a" "0.2.0" "None." "None."
 edit_note "$a/note-0.2.0.md" "## Behavior changes" "## Something else"
-check_case "absent-behavior-section" "$tmp/absent" 2 "no 'Behavior changes' section"
+check_case "absent-behavior-section" "$tmp/absent" 3 "no 'Behavior changes' section"
 a2="$tmp/absent-platforms/posts"
 write_note "$a2" "0.1.0" "None." "None."
 write_note "$a2" "0.2.0" "None." "None."
 edit_note "$a2/note-0.2.0.md" "## Platforms" "## Something else"
-check_case "absent-platforms-section" "$tmp/absent-platforms" 2 "no 'Platforms' section"
+check_case "absent-platforms-section" "$tmp/absent-platforms" 3 "no 'Platforms' section"
 
 # A' — a former heading does not stand in for a roster heading on a note under
 # composition: the alias reads history, and a note being composed takes the new name.
@@ -105,7 +105,7 @@ a3="$tmp/alias-composing/posts"
 write_note "$a3" "0.1.0" "None." "None."
 write_note "$a3" "0.2.0" "None." "None."
 edit_note "$a3/note-0.2.0.md" "## Knob changes" "## Renamed knobs"
-check_case "alias-under-composition-refused" "$tmp/alias-composing" 2 "no 'Knob changes' section"
+check_case "alias-under-composition-refused" "$tmp/alias-composing" 3 "no 'Knob changes' section"
 
 # --- the summary table, on a note under composition ---------------------------
 t1="$tmp/table-absent/posts"
@@ -227,12 +227,12 @@ check_deferral "outstanding-deferral-minor-clears-floor-clean" "$m" \
 # retro-fabricated sections. The good/bad pair cannot hold either arm: it runs
 # inside this repository, where the fixtures' versions resolve against real tags.
 
-# I — newest note under composition and missing In brief: fail-closed (exit 2).
+# I — newest note under composition and missing In brief: fail-closed (exit 3).
 i="$tmp/inbrief-absent/posts"
 write_note "$i" "0.1.0" "None." "None."
 write_note "$i" "0.2.0" "None." "None."
 edit_note "$i/note-0.2.0.md" "## In brief" "## Opener"
-check_case "inbrief-absent-under-composition" "$tmp/inbrief-absent" 2 "has no 'In brief' section"
+check_case "inbrief-absent-under-composition" "$tmp/inbrief-absent" 3 "has no 'In brief' section"
 
 # J — the same tree with every section present: clean, and the state is reported.
 j="$tmp/inbrief-present/posts"
@@ -309,7 +309,7 @@ check_case "alias-counts-on-tagged-note" "$k2" 1 "1 bullet(s) under 'New and tig
 
 # --- the version comparator's refusal ----------------------------------------
 # Ordering is defined over <major>.<minor>.<patch> and a token outside it is exit
-# 2 naming the token, its source and the grammar. This is the one arm the good/bad
+# 3 naming the token, its source and the grammar. This is the one arm the good/bad
 # pair structurally cannot hold: a rejection case is exit 1 by contract. Both
 # producers are covered, because a refusal that names the wrong file sends its
 # reader hunting (gate-sdk/SPEC.md §The declaration cohort).
@@ -320,10 +320,10 @@ check_case "alias-counts-on-tagged-note" "$k2" 1 "1 bullet(s) under 'New and tig
 n="$tmp/prerelease/posts"
 write_note "$n" "0.1.0" "None." "None."
 write_note "$n" "0.2.0-rc1" "None." "None."
-check_case "prerelease-token-refused" "$tmp/prerelease" 2 "is outside the grammar this gate orders"
-check_case "prerelease-refusal-names-token" "$tmp/prerelease" 2 "'0.2.0-rc1'"
-check_case "prerelease-refusal-names-source" "$tmp/prerelease" 2 "posts/note-0.2.0-rc1.md"
-check_case "prerelease-refusal-names-grammar" "$tmp/prerelease" 2 "<major>.<minor>.<patch>"
+check_case "prerelease-token-refused" "$tmp/prerelease" 3 "is outside the grammar this gate orders"
+check_case "prerelease-refusal-names-token" "$tmp/prerelease" 3 "'0.2.0-rc1'"
+check_case "prerelease-refusal-names-source" "$tmp/prerelease" 3 "posts/note-0.2.0-rc1.md"
+check_case "prerelease-refusal-names-grammar" "$tmp/prerelease" 3 "<major>.<minor>.<patch>"
 
 # M — the other producer: a disposition data line. Its refusal names the line, not
 # a note file, because that is where the reader has to go.
@@ -332,11 +332,11 @@ write_note "$o/posts" "0.1.0" "None." "None."
 write_note "$o/posts" "0.2.0" "None." "None."
 check_deferral "disposition-token-refused" "$o" \
     'alpha release deferred:v0.2 — a two-field token
-' 2 "alpha release deferred:v0.2"
+' 3 "alpha release deferred:v0.2"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-release-bump.test: $fails assertion(s) failed"
     exit 1
 fi
-echo "check-release-bump.test: ok (a note under composition missing any roster section, Platforms included, fails closed and a former heading does not stand in there; its summary table reds when absent, miscounted, misanchored or short a row, printing the rows it derives; an unknown roster role refuses at exit 2; a tagged note's former gates heading still counts toward the floor; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, passes a minor that clears it, and reds a minor bump the numeric floor still sits above; the roster presence assertion arms on a note under composition, reds when the section is absent there, and reports itself dormant once the note's version is tagged; a version token outside the triple refuses at exit 2 naming the token, its source and the grammar, from a note key and from a disposition line alike)"
+echo "check-release-bump.test: ok (a note under composition missing any roster section, Platforms included, fails closed and a former heading does not stand in there; its summary table reds when absent, miscounted, misanchored or short a row, printing the rows it derives; an unknown roster role refuses at exit 2; a tagged note's former gates heading still counts toward the floor; the non-empty section floors a patch red and passes a minor; all-None patch stays clean; an outstanding deferral floors a patch red and a single-note tree too, discharges on a later release line, passes a minor that clears it, and reds a minor bump the numeric floor still sits above; the roster presence assertion arms on a note under composition, reds when the section is absent there, and reports itself dormant once the note's version is tagged; a version token outside the triple refuses at exit 3 naming the token, its source and the grammar, from a note key and from a disposition line alike)"
 exit 0

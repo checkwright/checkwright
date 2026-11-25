@@ -219,7 +219,7 @@ fn stage_running_binary(state: &mut Run, bin_name: &str) -> Step {
 // count is printed and never the matched text, which is the leak itself
 fn banned_matches(image: &str) -> Result<usize, Outcome> {
     let unread = |why: String| refuse(format!("{} — the running binary's builder paths cannot be read", why));
-    let files = crate::gates::commit_msg::resolve_files().map_err(unread)?;
+    let files = crate::gates::commit_msg::resolve_files().map_err(|f| unread(f.message))?;
     let patterns = crate::gates::commit_msg::live_patterns(&files)
         .ok_or_else(|| unread(format!("a banned-pattern file among {} could not be read", files.join(" "))))?;
     let bytes = std::fs::read(image).map_err(|e| unread(format!("cannot read {}: {}", image, e)))?;
@@ -285,7 +285,7 @@ pub(super) fn pack(state: &mut Run) -> Step {
     footprint(state)
 }
 
-// spec: installer/SPEC.md §The consumer smoke — a pack the run installs from: refused at exit 2 when
+// spec: installer/SPEC.md §The consumer smoke — a pack the run installs from: refused at exit 3 when
 // it fails, its `PACK:` line said, and exactly one tarball found in its output directory
 pub(super) fn pack_one(
     state: &Run,

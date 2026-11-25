@@ -116,7 +116,7 @@ check_case "adopter-row-in-contributing" "$tmp/l" 1 "a row on the wrong page: gi
 
 # M — no row on either page is a check that could not run.
 write_case "$tmp/m" '' 'git'
-check_case "no-row-anywhere" "$tmp/m" 2 "no '| \`tool\` | … |' rows"
+check_case "no-row-anywhere" "$tmp/m" 3 "no '| \`tool\` | … |' rows"
 
 # N — a `derived` element whose derivation reaches no kit root fails CLOSED rather
 # than resolving to an empty audience: an empty one would compare equal to a page

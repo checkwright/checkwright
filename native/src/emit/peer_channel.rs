@@ -1,5 +1,6 @@
 // spec: lifecycle-kit/SPEC.md §The peer request channel — the four arms over one channel directory:
 // the peer's filing and ready notice, the receiver's list and reply, one writer per file.
+use crate::exit::Fault;
 use std::path::{Path, PathBuf};
 
 pub const KNOBS: &[&str] = &[KNOB];
@@ -228,12 +229,12 @@ struct Entry {
 
 // spec: lifecycle-kit/SPEC.md §The peer request channel — the channel value is refused when relative,
 // missing, not a directory, or inside a git work tree; unset is `None`
-fn channel() -> Result<Option<PathBuf>, String> {
-    let value = crate::walk::knob_scalar(KNOB)?;
+fn channel() -> Result<Option<PathBuf>, Fault> {
+    let value = crate::walk::knob_scalar(KNOB).map_err(Fault::refused)?;
     if value.is_empty() {
         return Ok(None);
     }
-    let refuse = |why: &str| Err(format!("{} is '{}', which {} — set it to an absolute directory outside every git work tree", KNOB, value, why));
+    let refuse = |why: &str| Err(Fault::refused(format!("{} is '{}', which {} — set it to an absolute directory outside every git work tree", KNOB, value, why)));
     if !crate::walk::host_absolute(&value) {
         return refuse("is relative");
     }
@@ -249,17 +250,18 @@ fn channel() -> Result<Option<PathBuf>, String> {
         Ok(Some(top)) => {
             return refuse(&format!("is inside the git work tree {}, where a commit could publish a request body", top));
         }
-        Err(e) => return refuse(&format!("is in a directory git refuses: {}", e)),
+        Err(e) => return Err(Fault::tool(format!("{} is '{}', a directory git refuses: {}", KNOB, value, e))),
     }
     Ok(Some(path.to_path_buf()))
 }
 
-fn bound() -> Result<PathBuf, String> {
-    channel()?.ok_or_else(|| format!("{} is unset, so there is no channel to write — bind it to an absolute directory outside every git work tree", KNOB))
+fn bound() -> Result<PathBuf, Fault> {
+    channel()?.ok_or_else(|| Fault::refused(format!("{} is unset, so there is no channel to write — bind it to an absolute directory outside every git work tree", KNOB)))
 }
 
-fn entries(dir: &Path) -> Result<Vec<Entry>, String> {
-    let mut ids: Vec<String> = crate::walk::list_dir(dir)?
+fn entries(dir: &Path) -> Result<Vec<Entry>, Fault> {
+    let mut ids: Vec<String> = crate::walk::list_dir(dir)
+        .map_err(Fault::input)?
         .into_iter()
         .filter(|(_, is_dir)| !is_dir)
         .filter_map(|(n, _)| n.strip_suffix(".md").filter(|s| is_id(s)).map(str::to_string))
@@ -268,14 +270,15 @@ fn entries(dir: &Path) -> Result<Vec<Entry>, String> {
     ids.iter()
         .map(|id| {
             let path = dir.join(format!("{}.md", id));
-            let bytes = std::fs::read(&path).map_err(|e| format!("cannot read {}: {}", path.display(), e))?;
-            let request = parse_request(id, &bytes).map_err(|e| format!("{} is malformed: {}", path.display(), e))?;
+            let bytes = std::fs::read(&path).map_err(|e| Fault::input(format!("cannot read {}: {}", path.display(), e)))?;
+            let request =
+                parse_request(id, &bytes).map_err(|e| Fault::input(format!("{} is malformed: {}", path.display(), e)))?;
             let reply = dir.join(format!("{}.reply", id));
             let last = match std::fs::read(&reply) {
                 Ok(b) => parse_reply(&String::from_utf8_lossy(&b))
-                    .map_err(|e| format!("{} is malformed: {}", reply.display(), e))?,
+                    .map_err(|e| Fault::input(format!("{} is malformed: {}", reply.display(), e)))?,
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-                Err(e) => return Err(format!("cannot read {}: {}", reply.display(), e)),
+                Err(e) => return Err(Fault::input(format!("cannot read {}: {}", reply.display(), e))),
             };
             let (date, state) = last.unwrap_or_else(|| (request.filed[..10].to_string(), State::Received));
             Ok(Entry { request, date, state, reply })
@@ -285,17 +288,17 @@ fn entries(dir: &Path) -> Result<Vec<Entry>, String> {
 
 // spec: lifecycle-kit/SPEC.md §The peer request channel — the two peer arms run from any directory:
 // with no repository they raise the tree-free mark, so only an absolute locator configures them
-fn stand_free() -> Result<(), String> {
-    if crate::walk::toplevel_opt()?.is_none() {
+fn stand_free() -> Result<(), Fault> {
+    if crate::walk::toplevel_opt().map_err(Fault::tool)?.is_none() {
         crate::hook::raise_tree_free();
     }
     Ok(())
 }
 
-fn stdin() -> Result<Vec<u8>, String> {
+fn stdin() -> Result<Vec<u8>, Fault> {
     use std::io::Read;
     let mut buf = Vec::new();
-    std::io::stdin().read_to_end(&mut buf).map_err(|e| format!("cannot read standard input: {}", e))?;
+    std::io::stdin().read_to_end(&mut buf).map_err(|e| Fault::input(format!("cannot read standard input: {}", e)))?;
     Ok(buf)
 }
 
@@ -309,37 +312,47 @@ fn request_bytes(peer: &str, filed: &str, id: &str, body: &str) -> Vec<u8> {
     out.into_bytes()
 }
 
-pub fn file(args: &[String]) -> Result<String, String> {
-    let [peer] = args else { return Err(FILE_USAGE.to_string()) };
+pub fn file(args: &[String]) -> Result<String, Fault> {
+    file_with(args, stdin, utc_now)
+}
+
+fn file_with(
+    args: &[String],
+    read: impl FnOnce() -> Result<Vec<u8>, Fault>,
+    now: impl FnOnce() -> String,
+) -> Result<String, Fault> {
+    let [peer] = args else { return Err(Fault::usage(FILE_USAGE)) };
     if !crate::queue::is_slug(peer) {
-        return Err(format!("the peer '{}' is outside [a-z0-9][a-z0-9-]*\n{}", peer, FILE_USAGE));
+        return Err(Fault::usage(format!("the peer '{}' is outside [a-z0-9][a-z0-9-]*\n{}", peer, FILE_USAGE)));
     }
     stand_free()?;
     let dir = bound()?;
-    let raw = stdin()?;
-    let body = std::str::from_utf8(&raw).map_err(|_| "standard input is not UTF-8".to_string())?;
-    sections(&body.lines().collect::<Vec<_>>()).map_err(|e| format!("the request is malformed: {}", e))?;
-    let filed = utc_now();
+    let raw = read()?;
+    let body = std::str::from_utf8(&raw).map_err(|_| Fault::input("standard input is not UTF-8"))?;
+    sections(&body.lines().collect::<Vec<_>>()).map_err(|e| Fault::input(format!("the request is malformed: {}", e)))?;
+    let filed = now();
     let id = id_of(&filed[..10], &request_bytes(peer, &filed, "", body));
     create_exclusive(&dir, &id, &request_bytes(peer, &filed, &id, body))?;
     Ok(format!("{}\n", id))
 }
 
 // spec: lifecycle-kit/SPEC.md §The peer request channel — a linked temporary file, so a collision
-// refuses rather than overwrites
-fn create_exclusive(dir: &Path, id: &str, bytes: &[u8]) -> Result<(), String> {
+// refuses rather than overwrites; the collision is the one refusal that prints, the existing id alone
+fn create_exclusive(dir: &Path, id: &str, bytes: &[u8]) -> Result<(), Fault> {
     let target = dir.join(format!("{}.md", id));
     let tmp = dir.join(format!(".{}.{}.tmp", id, std::process::id()));
-    std::fs::write(&tmp, bytes).map_err(|e| format!("cannot write {}: {}", tmp.display(), e))?;
+    std::fs::write(&tmp, bytes).map_err(|e| Fault::tool(format!("cannot write {}: {}", tmp.display(), e)))?;
     let linked = std::fs::hard_link(&tmp, &target);
     let _ = std::fs::remove_file(&tmp);
     match linked {
         Ok(()) => Ok(()),
-        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => Err(format!(
-            "{} already exists, as the same ask filed in the same second does, so nothing was filed — file again",
-            target.display()
-        )),
-        Err(e) => Err(format!("cannot create {}: {}", target.display(), e)),
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => Err(Fault::refused(format!(
+            "{} already exists, as the same ask filed in the same second does, so the ask is filed already as {}",
+            target.display(),
+            id
+        ))
+        .with_stdout(id)),
+        Err(e) => Err(Fault::tool(format!("cannot create {}: {}", target.display(), e))),
     }
 }
 
@@ -347,12 +360,12 @@ fn row(e: &Entry) -> String {
     format!("{}\t{}\t{}\t{}\t{}\n", e.request.id, e.request.from, e.date, e.state.wire(), e.request.need)
 }
 
-pub fn list(_args: &[String]) -> Result<String, String> {
+pub fn list(_args: &[String]) -> Result<String, Fault> {
     let Some(dir) = channel()? else { return Ok(String::new()) };
     Ok(entries(&dir)?.iter().map(row).collect())
 }
 
-fn append(e: &Entry, to: &State) -> Result<String, String> {
+fn append(e: &Entry, to: &State) -> Result<String, Fault> {
     use std::io::Write;
     let line = format!("{} {}\n", &utc_now()[..10], to.wire());
     let fresh = !e.reply.exists();
@@ -362,18 +375,18 @@ fn append(e: &Entry, to: &State) -> Result<String, String> {
         .append(true)
         .open(&e.reply)
         .and_then(|mut f| f.write_all(text.as_bytes()))
-        .map_err(|err| format!("cannot append to {}: {}", e.reply.display(), err))?;
+        .map_err(|err| Fault::tool(format!("cannot append to {}: {}", e.reply.display(), err)))?;
     Ok(format!("{} {}\n", e.request.id, to.wire()))
 }
 
 // spec: lifecycle-kit/SPEC.md §The peer request channel — a bulk form moves every match from the one
 // state its flag names, and one matching nothing prints nothing
-fn bulk(entries: &[Entry], matches: impl Fn(&State) -> bool, to: &State) -> Result<String, String> {
+fn bulk(entries: &[Entry], matches: impl Fn(&State) -> bool, to: &State) -> Result<String, Fault> {
     entries.iter().filter(|e| matches(&e.state)).map(|e| append(e, to)).collect()
 }
 
-pub fn reply(args: &[String]) -> Result<String, String> {
-    let usage = || REPLY_USAGE.to_string();
+pub fn reply(args: &[String]) -> Result<String, Fault> {
+    let usage = || Fault::usage(REPLY_USAGE);
     let a: Vec<&str> = args.iter().map(String::as_str).collect();
     let single = |id: &str, to: State| (Some(id.to_string()), to);
     let (id, to) = match a.as_slice() {
@@ -381,7 +394,9 @@ pub fn reply(args: &[String]) -> Result<String, String> {
         ["--shipped", tag] if is_tag(tag) => (None, State::Shipped(tag.to_string())),
         [id, "filed", slug] if crate::queue::is_slug(slug) => single(id, State::Filed(slug.to_string())),
         [_, "refused", reason] if reason.contains('\t') => {
-            return Err("the reason holds a tab, which would split peer-list's row — give one line of prose with no tab".to_string());
+            return Err(Fault::usage(
+                "the reason holds a tab, which would split peer-list's row — give one line of prose with no tab",
+            ));
         }
         [id, "refused", reason] if !reason.trim().is_empty() && !reason.contains('\n') => {
             single(id, State::Refused(reason.to_string()))
@@ -406,14 +421,14 @@ pub fn reply(args: &[String]) -> Result<String, String> {
             let e = all
                 .iter()
                 .find(|e| e.request.id == id)
-                .ok_or_else(|| format!("no request {} is in the channel {}", id, dir.display()))?;
+                .ok_or_else(|| Fault::refused(format!("no request {} is in the channel {}", id, dir.display())))?;
             if !legal(&e.state, &to) {
-                return Err(format!(
+                return Err(Fault::refused(format!(
                     "request {} is {}, and the move to {} is not legal",
                     id,
                     e.state.wire(),
                     to.wire()
-                ));
+                )));
             }
             append(e, &to)
         }
@@ -453,10 +468,10 @@ fn notices(entries: &[Entry], peer: &str, stamp: &str) -> String {
         .collect()
 }
 
-pub fn ready(args: &[String]) -> Result<String, String> {
-    let [peer] = args else { return Err(READY_USAGE.to_string()) };
+pub fn ready(args: &[String]) -> Result<String, Fault> {
+    let [peer] = args else { return Err(Fault::usage(READY_USAGE)) };
     if !crate::queue::is_slug(peer) {
-        return Err(format!("the peer '{}' is outside [a-z0-9][a-z0-9-]*\n{}", peer, READY_USAGE));
+        return Err(Fault::usage(format!("the peer '{}' is outside [a-z0-9][a-z0-9-]*\n{}", peer, READY_USAGE)));
     }
     stand_free()?;
     let Some(dir) = channel()? else { return Ok(String::new()) };
@@ -582,7 +597,7 @@ mod tests {
             assert!(ready(&argv(a)).is_err(), "{:?}", a);
         }
         for a in [&[][..], &["r1", "filed"][..], &["r1", "refused", ""][..], &["--landed"][..], &["--shipped", "a b"][..], &["r1", "shipped", "v1"][..]] {
-            assert_eq!(reply(&argv(a)), Err(REPLY_USAGE.to_string()), "{:?}", a);
+            assert_eq!(reply(&argv(a)), Err(Fault::usage(REPLY_USAGE)), "{:?}", a);
         }
     }
 
@@ -628,6 +643,38 @@ mod tests {
         assert!(second.unwrap_err().contains("already exists"));
         assert_eq!(kept.unwrap(), bytes);
         assert_eq!(left.unwrap(), 1, "a temporary file was left behind");
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The peer request channel — a collision is exit 2 with the existing
+    // id alone on stdout, and every other refusal or error of the arm prints nothing there
+    #[test]
+    fn a_collision_is_exit_2_with_the_id_alone_on_stdout() {
+        let env = crate::knobenv::lock();
+        let dir = std::env::temp_dir().join(format!("cw-peer-collide-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        env.set(KNOB, &dir.display().to_string());
+        let at = "2026-11-24T10:20:30Z";
+        let peer = ["peer-a".to_string()];
+        let body = || Ok(BODY.as_bytes().to_vec());
+        let first = file_with(&peer, body, || at.to_string());
+        let again = file_with(&peer, body, || at.to_string());
+        let malformed = file_with(&peer, || Ok(b"no sections\n".to_vec()), || at.to_string());
+        let outside = file_with(&["Bad_Peer".to_string()], body, || at.to_string());
+        let (other_id, _) = filed("peer-a", "2026-11-24T10:20:31Z", BODY);
+        std::fs::create_dir(dir.join(format!(".{}.{}.tmp", other_id, std::process::id()))).unwrap();
+        let unwritable = file_with(&peer, body, || "2026-11-24T10:20:31Z".to_string());
+        env.remove(KNOB);
+        let unbound = file_with(&peer, body, || at.to_string());
+        let _ = std::fs::remove_dir_all(&dir);
+        let id = first.expect("the first filing was refused");
+        let again = again.expect_err("the same ask in the same second filed twice");
+        assert_eq!(again.status(), 2);
+        assert_eq!(again.stdout.as_deref().map(|l| format!("{}\n", l)), Some(id), "stdout is the id and a newline");
+        for (name, r, status) in [("unbound", unbound, 2), ("malformed", malformed, 3), ("outside", outside, 2), ("unwritable", unwritable, 3)] {
+            let f = r.expect_err(name);
+            assert_eq!((f.status(), f.stdout), (status, None), "{}: {}", name, f.message);
+        }
     }
 
     // spec: lifecycle-kit/SPEC.md §The peer request channel — a fence closes only on its own character

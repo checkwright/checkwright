@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: queue-kit/SPEC.md §check-task-conservation — the repository answer no case dir can carry: outside a repository there is no HEAD baseline and the gate is clean, while a repository git refuses, a nested one git skips included, exits 2 rather than reading as none.
+# spec: queue-kit/SPEC.md §check-task-conservation — the repository answer no case dir can carry: outside a repository there is no HEAD baseline and the gate is clean, while a repository git refuses, a nested one git skips included, exits 3 rather than reading as none.
 #
 # Run by the --run-gate-tests arm (any <tests-dir>/*.test.sh; must exit 0).
 set -uo pipefail
@@ -23,16 +23,16 @@ expect no-repository-clean "$SANDBOX/none" 0 "no git repository"
 
 mkdir -p "$SANDBOX/refused"
 printf 'gitdir: %s/absent\n' "$SANDBOX/refused" >"$SANDBOX/refused/.git"
-expect refused-repository-exits-2 "$SANDBOX/refused" 2 "marks a repository"
+expect refused-repository-exits-3 "$SANDBOX/refused" 3 "marks a repository"
 
 git init -q "$SANDBOX/outer"
 mkdir -p "$SANDBOX/outer/inner/.git"
 printf 'garbage\n' >"$SANDBOX/outer/inner/.git/HEAD"
-expect nested-skipped-exits-2 "$SANDBOX/outer/inner" 2 "marks a repository beneath it"
+expect nested-skipped-exits-3 "$SANDBOX/outer/inner" 3 "marks a repository beneath it"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-task-conservation.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-task-conservation.test.sh: clean (no repository clean, a refused and a nested skipped repository exit 2, 3 cases)"
+echo "check-task-conservation.test.sh: clean (no repository clean, a refused and a nested skipped repository exit 3, 3 cases)"
 exit 0

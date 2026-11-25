@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-task-path-claim — every ticked task in a configured task list
 // names only paths that exist
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -12,17 +13,17 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-task-path-claim: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let globs = spec::knob_array_pub(LISTS_KNOB)?;
+    let globs = spec::knob_array_pub(LISTS_KNOB).map_err(Fault::refused)?;
     if globs.is_empty() {
         println!(
             "TASK-PATH-CLAIM: clean (not applicable: no task list is configured: {} is empty)",
@@ -30,12 +31,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
         );
         return Ok(0);
     }
-    let lists = task_lists(root, &globs)?;
+    let lists = task_lists(root, &globs).map_err(Fault::input)?;
 
     let mut findings: Vec<(String, Finding)> = Vec::new();
     let mut tally = Tally::default();
     for list in &lists {
-        let text = spec::read_text(Path::new(list)).map_err(|e| format!("cannot read task list {}: {}", list, e))?;
+        let text = spec::read_text(Path::new(list))
+            .map_err(|e| Fault::input(format!("cannot read task list {}: {}", list, e)))?;
         let scan = scan(&text, &|tok: &str| walk::child(Path::new(root), tok).exists());
         tally.ticked += scan.tally.ticked;
         tally.paths += scan.tally.paths;

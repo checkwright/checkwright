@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §The roadmap arm — the public roadmap projected off the queue's
 // [roadmap:] tags. The arm ships the projection *grammar* only; every lane name is a knob
 // (§The tag algebra), so not one enters here.
+use crate::exit::Fault;
 use crate::marker;
 use crate::queue::{self, RoadmapEntry, Sections};
 
@@ -15,7 +16,7 @@ enum Mode {
     Write,
 }
 
-fn parse(args: &[String]) -> Result<(Mode, String), String> {
+fn parse(args: &[String]) -> Result<(Mode, String), Fault> {
     let mut mode = Mode::Emit;
     let mut file = String::new();
     for a in args {
@@ -23,7 +24,7 @@ fn parse(args: &[String]) -> Result<(Mode, String), String> {
             "--emit" => mode = Mode::Emit,
             "--write" => mode = Mode::Write,
             other if other.starts_with('-') => {
-                return Err(format!("unknown option: {}\n{}", other, USAGE))
+                return Err(Fault::usage(format!("unknown option: {}\n{}", other, USAGE)))
             }
             other => file = other.to_string(),
         }
@@ -84,23 +85,23 @@ fn body(entries: &[RoadmapEntry], horizons: &[String], base: &str) -> String {
     out
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let (mode, file) = parse(args)?;
     let file = if file.is_empty() {
-        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?
+        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?
     } else {
         file
     };
     let text = std::fs::read_to_string(&file)
-        .map_err(|_| format!("queue file not found: {}", file))?;
-    let horizons = queue::knob_array("QUEUE_KIT_HORIZONS")?;
+        .map_err(|_| Fault::input(format!("queue file not found: {}", file)))?;
+    let horizons = queue::knob_array("QUEUE_KIT_HORIZONS").map_err(Fault::refused)?;
     if horizons.is_empty() {
-        return Err(
-            "QUEUE_KIT_HORIZONS is empty — no roadmap vocabulary is configured".to_string(),
-        );
+        return Err(Fault::refused(
+            "QUEUE_KIT_HORIZONS is empty — no roadmap vocabulary is configured",
+        ));
     }
-    let sec = Sections::active_and_deferred()?;
-    let page = queue::knob_scalar("QUEUE_KIT_ROADMAP_FILE")?;
+    let sec = Sections::active_and_deferred().map_err(Fault::refused)?;
+    let page = queue::knob_scalar("QUEUE_KIT_ROADMAP_FILE").map_err(Fault::refused)?;
     let text = body(&queue::roadmap_entries(&text, &sec), &horizons, &link_base(&page, &file));
 
     if let Mode::Emit = mode {
@@ -108,16 +109,15 @@ pub fn emit(args: &[String]) -> Result<String, String> {
     }
 
     if page.is_empty() {
-        return Err(
-            "--write needs QUEUE_KIT_ROADMAP_FILE; it is empty (no projection page configured)"
-                .to_string(),
-        );
+        return Err(Fault::refused(
+            "--write needs QUEUE_KIT_ROADMAP_FILE; it is empty (no projection page configured)",
+        ));
     }
     if !std::path::Path::new(&page).is_file() {
-        return Err(format!("projection page not found: {}", page));
+        return Err(Fault::input(format!("projection page not found: {}", page)));
     }
-    let name = queue::knob_scalar("QUEUE_KIT_ROADMAP_MARKER")?;
-    marker::write_block(&page, &begin(&name), &end(&name), &text)?;
+    let name = queue::knob_scalar("QUEUE_KIT_ROADMAP_MARKER").map_err(Fault::refused)?;
+    marker::write_block(&page, &begin(&name), &end(&name), &text).map_err(Fault::input)?;
     Ok(format!("roadmap: replaced the {} block in {}\n", name, page))
 }
 

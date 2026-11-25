@@ -1,6 +1,7 @@
 // spec: queue-kit/SPEC.md §The queue-index arm — the compact queue surface for task selection.
 // Three modes on one arm, selected from the arm's own argv tail rather than from three arms:
 // the emitter type is defined over an argv slice precisely so a mode rides as a flag.
+use crate::exit::Fault;
 use crate::gates::queue_entry_budget;
 use crate::queue::{self, is_top_level_bullet, Sections};
 
@@ -36,7 +37,7 @@ struct Args {
 // spec: queue-kit/SPEC.md §The queue-index arm — the shell tool's own option loop: a mode and the
 // collapse flag are set independently, so `--collapse-deferred` alongside a non-index mode is
 // accepted and ignored exactly as it was.
-fn parse(args: &[String]) -> Result<Args, String> {
+fn parse(args: &[String]) -> Result<Args, Fault> {
     let mut a = Args {
         mode: Mode::Index,
         collapse: false,
@@ -60,7 +61,7 @@ fn parse(args: &[String]) -> Result<Args, String> {
                 i += 1;
             }
             other if other.starts_with('-') => {
-                return Err(format!("unknown option: {}\n{}", other, USAGE));
+                return Err(Fault::usage(format!("unknown option: {}\n{}", other, USAGE)));
             }
             other => {
                 a.file = other.to_string();
@@ -71,14 +72,14 @@ fn parse(args: &[String]) -> Result<Args, String> {
     Ok(a)
 }
 
-pub fn emit(args: &[String]) -> Result<String, String> {
+pub fn emit(args: &[String]) -> Result<String, Fault> {
     let a = parse(args)?;
     let file = if a.file.is_empty() {
-        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE")?
+        queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?
     } else {
         a.file.clone()
     };
-    let text = std::fs::read_to_string(&file).map_err(|e| format!("file not found: {}: {}", file, e))?;
+    let text = std::fs::read_to_string(&file).map_err(|e| Fault::input(format!("file not found: {}: {}", file, e)))?;
 
     match a.mode {
         Mode::Extent => extent(&text, &a.slug),
@@ -159,12 +160,13 @@ fn blockers(line: &str) -> String {
     queue::blocked_by(line).join(", ")
 }
 
-fn index(text: &str, collapse: bool) -> Result<String, String> {
-    let sec_cfg = Sections::active_and_deferred()?;
-    let cap: usize = queue::knob_scalar("QUEUE_KIT_ATTEND_CAP")?
+fn index(text: &str, collapse: bool) -> Result<String, Fault> {
+    let sec_cfg = Sections::active_and_deferred().map_err(Fault::refused)?;
+    let cap: usize = queue::knob_scalar("QUEUE_KIT_ATTEND_CAP")
+        .map_err(Fault::refused)?
         .trim()
         .parse()
-        .map_err(|_| "QUEUE_KIT_ATTEND_CAP is not a positive integer".to_string())?;
+        .map_err(|_| Fault::refused("QUEUE_KIT_ATTEND_CAP is not a positive integer"))?;
 
     let mut out = String::new();
     if let Some(h) = text.lines().find(|l| l.starts_with("## Iteration:")) {
@@ -259,9 +261,9 @@ fn index(text: &str, collapse: bool) -> Result<String, String> {
     Ok(out)
 }
 
-fn extent(text: &str, slug: &str) -> Result<String, String> {
+fn extent(text: &str, slug: &str) -> Result<String, Fault> {
     if slug.is_empty() {
-        return Err(format!("--extent needs a <slug>\n{}", USAGE));
+        return Err(Fault::usage(format!("--extent needs a <slug>\n{}", USAGE)));
     }
     let lines: Vec<&str> = text.lines().collect();
     for (i, line) in lines.iter().enumerate() {
@@ -271,21 +273,21 @@ fn extent(text: &str, slug: &str) -> Result<String, String> {
             }
         }
     }
-    Err(format!("slug not found: {}", slug))
+    Err(Fault::refused(format!("slug not found: {}", slug)))
 }
 
 // spec: queue-kit/SPEC.md §The queue-index arm — the cutoff is civil-day arithmetic on the
 // operator's today, and an unreadable today refuses rather than guessing a zone
-fn age_cutoff() -> Result<String, String> {
-    let days = queue::knob_scalar("QUEUE_KIT_ICEBOX_AGE_DAYS")?;
+fn age_cutoff() -> Result<String, Fault> {
+    let days = queue::knob_scalar("QUEUE_KIT_ICEBOX_AGE_DAYS").map_err(Fault::refused)?;
     let n: i64 = days.trim().parse().map_err(|_| {
-        format!(
+        Fault::refused(format!(
             "cannot compute the age cutoff (QUEUE_KIT_ICEBOX_AGE_DAYS='{}' is not a day count)",
             days.trim()
-        )
+        ))
     })?;
     super::kpi::days_ago(n)
-        .ok_or_else(|| "cannot compute the age cutoff (the local civil date is unreadable)".to_string())
+        .ok_or_else(|| Fault::tool("cannot compute the age cutoff (the local civil date is unreadable)"))
 }
 
 // spec: queue-kit/SPEC.md §The queue-index arm — the class is the lead line's first `[cost:]` value
@@ -427,11 +429,11 @@ fn cap_chars(t: &str) -> String {
     t.to_string()
 }
 
-fn candidates(text: &str) -> Result<String, String> {
-    let sec_cfg = Sections::active_and_deferred()?;
+fn candidates(text: &str) -> Result<String, Fault> {
+    let sec_cfg = Sections::active_and_deferred().map_err(Fault::refused)?;
     let cutoff = age_cutoff()?;
     let live = queue::live_slugs(text, &sec_cfg);
-    let unit = queue_entry_budget::display_unit(queue_entry_budget::cap()?);
+    let unit = queue_entry_budget::display_unit(queue_entry_budget::cap().map_err(Fault::refused)?);
     let sizes = Sizes {
         unit,
         by_start: queue_entry_budget::walk(text, &sec_cfg)

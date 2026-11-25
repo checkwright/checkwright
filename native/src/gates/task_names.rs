@@ -1,5 +1,6 @@
 // spec: queue-kit/SPEC.md §check-task-names — task entries are headings with a unique kebab slug,
 // done entries are bare slugs, every blocked-by resolves to a live task, references are links
+use crate::exit;
 use crate::queue;
 use std::collections::HashMap;
 
@@ -87,7 +88,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(s) => s,
         Err(e) => {
             eprintln!("check-task-names: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     let file = match args.first() {
@@ -96,7 +97,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-task-names: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         },
     };
@@ -104,14 +105,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-task-names: file not found: {}", file);
-            return 2;
+            return if std::path::Path::new(&file).exists() { exit::INPUT } else { exit::REFUSED };
         }
     };
     let tokens = match queue::knob_array("QUEUE_KIT_PLACEHOLDER_TOKENS") {
         Ok(v) => v,
         Err(e) => {
             eprintln!("check-task-names: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
 
@@ -238,7 +239,7 @@ pub fn run(args: &[String]) -> i32 {
         + held.len();
     if total > 0 {
         let Some(door) = super::door_or_report("check-task-names", "--emit queue-migrate --write <queue-file>.") else {
-            return 2;
+            return exit::REFUSED;
         };
         let migrate = format!("        {}", door);
         let mut sep = false;

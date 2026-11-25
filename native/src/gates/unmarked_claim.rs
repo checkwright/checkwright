@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-unmarked-claim — a paragraph falling in a consumer-declared
 // claim class carries a `measured:` marker: the class is the trigger, the marker one of three
 // remedies, and the gate is indifferent between them
+use crate::exit::Fault;
 use crate::spec;
 use crate::walk;
 use std::path::Path;
@@ -12,25 +13,25 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-unmarked-claim: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
 
     // spec: canon-kit/SPEC.md §check-unmarked-claim — the roster is consumer config with no kit
     // default, so an unset command is the clean skip: a tree that declared no class has no
     // sentence falling in one
-    if spec::command("CANON_KIT_CLAIM_CLASSES_CMD")?.is_empty() {
+    if spec::command("CANON_KIT_CLAIM_CLASSES_CMD").map_err(Fault::refused)?.is_empty() {
         println!("UNMARKED-CLAIM: clean (not applicable: CANON_KIT_CLAIM_CLASSES_CMD unset — no declared claim class, so no sentence falls in one)");
         return Ok(0);
     }
-    let classes = spec::claim_vocabulary("CANON_KIT_CLAIM_CLASSES_CMD")?;
+    let classes = spec::claim_vocabulary("CANON_KIT_CLAIM_CLASSES_CMD").map_err(Fault::tool)?;
     if classes.is_empty() {
         println!("UNMARKED-CLAIM: clean (not applicable: CANON_KIT_CLAIM_CLASSES_CMD declared no claim classes)");
         return Ok(0);
@@ -38,12 +39,13 @@ fn rule(args: &[String]) -> Result<i32, String> {
 
     // spec: canon-kit/SPEC.md §check-unmarked-claim — the scanned surface is
     // check-measured-claim's, shared rather than forked
-    let globs = spec::knob_array_pub("CANON_KIT_MEASURED_SURFACE_GLOBS")?;
+    let globs = spec::knob_array_pub("CANON_KIT_MEASURED_SURFACE_GLOBS").map_err(Fault::refused)?;
     if globs.is_empty() {
         println!("UNMARKED-CLAIM: clean (not applicable: CANON_KIT_MEASURED_SURFACE_GLOBS empty — no scanned surface)");
         return Ok(0);
     }
-    let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs)?
+    let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs)
+        .map_err(Fault::input)?
         .into_iter()
         .filter(|p| p.is_file())
         .map(|p| spec::strip_dot_slash(&p.display().to_string()))
@@ -55,7 +57,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         return Ok(0);
     }
 
-    let span = spec::measured_span()?;
+    let span = spec::measured_span().map_err(Fault::refused)?;
 
     struct Sink<'a> {
         classes: &'a [(String, crate::ere::Ere)],
@@ -107,7 +109,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
         out: Vec::new(),
         paras: 0,
     };
-    spec::walk_prose(&files, EXEMPT, &mut sink)?;
+    spec::walk_prose(&files, EXEMPT, &mut sink).map_err(Fault::input)?;
     let out = sink.out;
 
     if !out.is_empty() {

@@ -1,5 +1,6 @@
 // spec: installer/SPEC.md §The upgrade contract — a note under composition equals its surface in
 // each surface-declared section, and the platforms-table diff in Platforms, both directions
+use crate::exit::{self, Fault};
 use crate::declaration;
 use crate::declaration::{SectionVerdict, TokenRule};
 use crate::gates::install_docs;
@@ -18,7 +19,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("{}: {}", NAME, e);
-            2
+            e.status()
         }
     }
 }
@@ -52,7 +53,7 @@ fn note_tokens(text: &str, file: &str, s: &Section, rule: TokenRule) -> Result<R
             for line in &b {
                 eprintln!("  {}", line);
             }
-            Ok(Err(2))
+            Ok(Err(exit::INPUT))
         }
         SectionVerdict::ExplicitNone => Ok(Ok(Vec::new())),
         SectionVerdict::Tokens(t) => Ok(Ok(t)),
@@ -69,19 +70,19 @@ fn status(s: &State) -> String {
 
 // spec: installer/SPEC.md §The upgrade contract — the previous release is the newest `v*` tag below
 // the note's version, ordered as check-release-bump orders notes
-fn previous_tag(note_v: &str) -> Result<Option<String>, String> {
+fn previous_tag(note_v: &str) -> Result<Option<String>, Fault> {
     let raw = note_v.strip_prefix('v').unwrap_or(note_v);
-    let mine = parse_version(raw, "the note under composition")?;
-    let done = proc::run(&programs::GIT, &["tag", "--list", "v*"])?;
+    let mine = parse_version(raw, "the note under composition").map_err(Fault::input)?;
+    let done = proc::run(&programs::GIT, &["tag", "--list", "v*"]).map_err(Fault::tool)?;
     let out = done.stdout().ok_or_else(|| {
-        format!(
+        Fault::tool(format!(
             "git tag --list failed ({}), so the previous release cannot be resolved; treating as failure (not clean)",
             done.failure_report().unwrap_or_default()
-        )
+        ))
     })?;
     let mut best: Option<(Version, String)> = None;
     for tag in String::from_utf8_lossy(out).lines().map(str::trim).filter(|t| !t.is_empty()) {
-        let v = parse_version(tag.strip_prefix('v').unwrap_or(tag), &format!("tag {}", tag))?;
+        let v = parse_version(tag.strip_prefix('v').unwrap_or(tag), &format!("tag {}", tag)).map_err(Fault::input)?;
         if v < mine && best.as_ref().map(|(b, _)| v > *b).unwrap_or(true) {
             best = Some((v, tag.to_string()));
         }
@@ -112,7 +113,7 @@ fn pages_at(tag: &str, pages: &[String]) -> Result<Vec<install_docs::Member>, St
 
 // spec: installer/SPEC.md §The upgrade contract — the table of the one page carrying the block, and
 // the empty table where none does
-fn table_of(pages: &[install_docs::Member]) -> Result<(Option<String>, String), String> {
+fn table_of(pages: &[install_docs::Member]) -> Result<(Option<String>, String), Fault> {
     Ok(match platforms_page(pages)? {
         Some(m) => (Some(m.path.clone()), m.text.clone()),
         None => (None, String::new()),
@@ -153,26 +154,26 @@ fn changed(before: &[Decl], after: &[Decl]) -> BTreeMap<String, String> {
     out
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let posts = crate::fresh::positional_or_knob(args, 0, "GATE_LOCAL_RELEASE_POSTS_DIR").map_err(Fault::refused)?;
     let posts = posts.as_str();
     let decl_file = match args.get(1).filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
-        None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR")?),
+        None => format!("{}/release-declarations.md", walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?),
     };
     let decl_file = decl_file.as_str();
     if !Path::new(posts).is_dir() {
-        return Err(format!("posts dir not found: {}", posts));
+        return Err(Fault::refused(format!("posts dir not found: {}", posts)));
     }
 
-    let untagged = release_bump::untagged_notes(Path::new(posts))?;
+    let untagged = release_bump::untagged_notes(Path::new(posts)).map_err(Fault::tool)?;
     if untagged.len() > 1 {
         eprintln!("{}: {} carries more than one untagged release note, a state the release choreography does not admit:", NAME, posts);
         for (v, f) in &untagged {
             eprintln!("  {}\t{}", v, f);
         }
         eprintln!("  help: exactly one note is in flight at a time — tag the released one or remove the stray note.");
-        return Ok(2);
+        return Ok(exit::REFUSED);
     }
     if untagged.is_empty() {
         println!("RELEASE-DECLARATION-PARITY: dormant (every release note under {} is tagged, so the surface has been drained by contract and there is nothing to compare)", posts);
@@ -187,17 +188,17 @@ fn rule(args: &[String]) -> Result<i32, String> {
         .map(|b| String::from_utf8_lossy(&b).into_owned())
         .unwrap_or_default();
     if !decl_text.lines().next().unwrap_or("").starts_with("# ") {
-        return Err(format!("{} is missing its required header line, so the declaration surface cannot be established (gate-sdk/SPEC.md §upgrade-smoke owns its contract)", decl_file));
+        return Err(Fault::input(format!("{} is missing its required header line, so the declaration surface cannot be established (gate-sdk/SPEC.md §upgrade-smoke owns its contract)", decl_file)));
     }
 
-    let roster = release_sections::roster()?;
-    let note_text = read_text(note_f)?;
+    let roster = release_sections::roster().map_err(Fault::refused)?;
+    let note_text = read_text(note_f).map_err(Fault::input)?;
     let mut sets: Vec<(&Section, Vec<String>, Vec<String>)> = Vec::new();
     for s in roster.iter().filter(|s| s.role != Role::Platforms) {
         let Some(token_rule) = s.role.token_rule() else {
             continue;
         };
-        let note = match note_tokens(&note_text, note_f, s, token_rule)? {
+        let note = match note_tokens(&note_text, note_f, s, token_rule).map_err(Fault::input)? {
             Ok(t) => t,
             Err(rc) => return Ok(rc),
         };
@@ -210,7 +211,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
                 for line in &b {
                     eprintln!("  {}", line);
                 }
-                return Ok(2);
+                return Ok(exit::INPUT);
             }
             _ => Vec::new(),
         };
@@ -227,14 +228,14 @@ fn rule(args: &[String]) -> Result<i32, String> {
         let (carrier, now) = table_of(&pages)?;
         let page = carrier.unwrap_or_else(|| install_docs::names(&pages));
         let (base_name, base) = match args.get(3).filter(|a| !a.is_empty()) {
-            Some(b) => (b.clone(), read_text(b)?),
+            Some(b) => (b.clone(), read_text(b).map_err(Fault::input)?),
             None => match previous_tag(note_v)? {
-                Some(t) => (t.clone(), table_of(&pages_at(&t, &page_paths)?)?.1),
+                Some(t) => (t.clone(), table_of(&pages_at(&t, &page_paths).map_err(Fault::tool)?)?.1),
                 None => ("no previous release".to_string(), String::new()),
             },
         };
         let diff = changed(&declarations(&base), &declarations(&now));
-        let note = match note_tokens(&note_text, note_f, s, TokenRule::Backticked)? {
+        let note = match note_tokens(&note_text, note_f, s, TokenRule::Backticked).map_err(Fault::input)? {
             Ok(t) => t,
             Err(rc) => return Ok(rc),
         };

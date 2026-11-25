@@ -1,5 +1,6 @@
 // spec: gate-sdk/SPEC.md §check-release-assets — what a Release carries is declared once in
 // §Consumer payload and held at the tag, before the Release exists
+use crate::exit::Fault;
 use crate::{fresh, registry, walk};
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -14,7 +15,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-release-assets: {}", e);
-            2
+            e.status()
         }
     }
 }
@@ -196,19 +197,19 @@ fn read(path: &str, what: &str) -> Result<String, String> {
         .map_err(|e| format!("cannot read {} {}: {}", what, path, e))
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
-    let a = parse(args)?;
-    let doc_text = read(&a.doc, "declaring doc")?;
+fn rule(args: &[String]) -> Result<i32, Fault> {
+    let a = parse(args).map_err(Fault::usage)?;
+    let doc_text = read(&a.doc, "declaring doc").map_err(Fault::input)?;
     let workflows = match &a.workflow {
         Some(w) => vec![w.clone()],
-        None => walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW")?,
+        None => walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW").map_err(Fault::refused)?,
     };
     if workflows.is_empty() {
-        return Err("GATE_SDK_NATIVE_PUBLISH_WORKFLOW names no workflow".to_string());
+        return Err(Fault::refused("GATE_SDK_NATIVE_PUBLISH_WORKFLOW names no workflow"));
     }
     let mut wired = false;
     for w in &workflows {
-        wired |= fresh::file_lines(&read(w, "publish workflow")?)
+        wired |= fresh::file_lines(&read(w, "publish workflow").map_err(Fault::input)?)
             .iter()
             .any(|l| is_call(l));
     }
@@ -225,11 +226,11 @@ fn rule(args: &[String]) -> Result<i32, String> {
     let mut dist_note = String::new();
     if let Some((dir, version)) = &a.dist {
         if let Some(fault) = version_fault(version) {
-            return Err(format!("{}: '{}'", fault, version));
+            return Err(Fault::usage(format!("{}: '{}'", fault, version)));
         }
-        let entries = walk::list_dir(Path::new(dir))?;
-        let roster_path = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE")?;
-        let targets = roster(&read(&roster_path, "target roster")?, &roster_path)?;
+        let entries = walk::list_dir(Path::new(dir)).map_err(Fault::input)?;
+        let roster_path = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE").map_err(Fault::refused)?;
+        let targets = roster(&read(&roster_path, "target roster").map_err(Fault::input)?, &roster_path).map_err(Fault::input)?;
         let declared = expand(&templates, version, &targets);
         publish_half(dir, &declared, &entries, &mut findings);
         dist_note = format!(
@@ -343,12 +344,12 @@ mod tests {
         assert!(!is_call("  bash gate-sdk/bin/run-gates.sh --only check-release-assets"));
     }
 
-    // spec: gate-sdk/SPEC.md §check-release-assets — every exit-2 path
+    // spec: gate-sdk/SPEC.md §check-release-assets — every exit-2 and exit-3 path
     #[test]
-    fn each_refusal_exits_two() {
-        assert_eq!(run(&s(&["no/such/doc.md", "no/such/wf.yml"])), 2);
-        assert_eq!(run(&s(&["Cargo.toml", "no/such/wf.yml"])), 2);
-        assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "no/such/dir", "1.0.0"])), 2);
+    fn each_refusal_exits_two_and_each_unread_input_three() {
+        assert_eq!(run(&s(&["no/such/doc.md", "no/such/wf.yml"])), crate::exit::INPUT);
+        assert_eq!(run(&s(&["Cargo.toml", "no/such/wf.yml"])), crate::exit::INPUT);
+        assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "no/such/dir", "1.0.0"])), crate::exit::INPUT);
         assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "src", ""])), 2);
         assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "src", "1.0 .0"])), 2);
         assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "src", "1/0"])), 2);

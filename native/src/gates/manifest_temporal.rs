@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §check-manifest-temporal — no temporal-narration marker in
 // governed manifest prose outside an exempt site; the marker vocabulary is a consumer ERE
 // array, so it is the engine's first consumer rather than a hand-compiled kit literal
+use crate::exit::Fault;
 use crate::ere::Ere;
 use crate::spec::{self, compile_pattern as compile};
 use crate::walk;
@@ -11,23 +12,23 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-manifest-temporal: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let root = args.first().map(String::as_str).unwrap_or(".");
     if !Path::new(root).is_dir() {
-        return Err(format!("not a directory: {}", root));
+        return Err(Fault::refused(format!("not a directory: {}", root)));
     }
-    let all = spec::manifest_files_sorted_stripped(root)?;
+    let all = spec::manifest_files_sorted_stripped(root).map_err(Fault::refused)?;
     if all.is_empty() {
         println!("MANIFEST-TEMPORAL: clean (not applicable: 0 manifest file(s) found)");
         return Ok(0);
     }
 
-    let valve = TemporalValve::load()?;
+    let valve = TemporalValve::load().map_err(Fault::refused)?;
     let mut exempt_n = 0usize;
     let mut manifests: Vec<String> = Vec::new();
     for m in all {
@@ -48,18 +49,18 @@ fn rule(args: &[String]) -> Result<i32, String> {
     // spec: gate-sdk/SPEC.md §The POSIX ERE matcher — every consumer pattern compiles before
     // the first corpus line is read, so a pattern the substrate cannot honour exits 2 naming
     // the knob rather than scanning clean past what it meant
-    let markers = spec::vocabulary("CANON_KIT_TEMPORAL_MARKERS", "CANON_KIT_TEMPORAL_MARKERS_EXTRA")?;
+    let markers = spec::vocabulary("CANON_KIT_TEMPORAL_MARKERS", "CANON_KIT_TEMPORAL_MARKERS_EXTRA").map_err(Fault::refused)?;
     let mut compiled: Vec<(String, Ere)> = Vec::new();
     for m in &markers {
         if m.is_empty() {
             continue;
         }
-        compiled.push((m.clone(), compile(m, "CANON_KIT_TEMPORAL_MARKERS")?));
+        compiled.push((m.clone(), compile(m, "CANON_KIT_TEMPORAL_MARKERS").map_err(Fault::refused)?));
     }
 
     let mut out: Vec<String> = Vec::new();
     for f in &manifests {
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         for line in valve.lines(&text) {
             if line.kind != LineKind::Prose || line.valved {
                 continue;

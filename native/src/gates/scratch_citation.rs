@@ -1,6 +1,7 @@
 // spec: lifecycle-kit/SPEC.md §check-scratch-citation — no permanent surface carries a
 // retrieval pointer into a boundary-truncated one, because that pointer resolves to nothing
 // at the next iteration boundary
+use crate::exit;
 use crate::spec;
 use crate::stages;
 use crate::walk;
@@ -129,7 +130,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(v) => v,
             Err(e) => {
                 eprintln!("check-scratch-citation: {}", e);
-                return 2;
+                return exit::REFUSED;
             }
         }
     };
@@ -141,14 +142,14 @@ pub fn run(args: &[String]) -> i32 {
         Ok(v) => v.into_iter().filter(|s| !s.is_empty()).collect(),
         Err(e) => {
             eprintln!("check-scratch-citation: {}", e);
-            return 2;
+            return exit::REFUSED;
         }
     };
     targets.sort();
     targets.dedup();
     if targets.is_empty() {
         eprintln!("check-scratch-citation: the derived boundary-truncated set is empty — the state machine names no such surface (a lifecycle always owns at least its state + lesson-evidence files)");
-        return 2;
+        return exit::REFUSED;
     }
     let tchars: Vec<Vec<char>> = targets.iter().map(|t| t.chars().collect()).collect();
 
@@ -159,7 +160,7 @@ pub fn run(args: &[String]) -> i32 {
             .collect(),
         Err(e) => {
             eprintln!("check-scratch-citation: {}", e);
-            return 2;
+            return exit::INPUT;
         }
     };
     if files.is_empty() {
@@ -173,7 +174,7 @@ pub fn run(args: &[String]) -> i32 {
             Ok(b) => String::from_utf8_lossy(&b).into_owned(),
             Err(e) => {
                 eprintln!("check-scratch-citation: cannot read {}: {}", f, e);
-                return 2;
+                return exit::INPUT;
             }
         };
         let lines: Vec<&str> = text.lines().collect();
@@ -213,7 +214,7 @@ pub fn run(args: &[String]) -> i32 {
 
     if !findings.is_empty() {
         let Some(door) = super::door_or_report("check-scratch-citation", "--emit cite-survey") else {
-            return 2;
+            return exit::REFUSED;
         };
         println!("check-scratch-citation: permanent surface(s) point a reader into per-iteration scratch:");
         for f in &findings {

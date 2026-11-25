@@ -5,6 +5,7 @@
 // product is a tarball plus a receipt, so an emitting arm would return a receipt for a side effect
 use super::close_surfaces;
 use crate::ere::Ere;
+use crate::exit;
 use crate::proc::{self, Stderr};
 use crate::programs;
 use crate::walk;
@@ -33,19 +34,38 @@ const NAME: &str = "pack-installer";
 struct Refusal {
     cause: String,
     help: Vec<String>,
+    status: i32,
 }
 
-fn refuse(cause: impl Into<String>) -> Refusal {
+fn refusal(status: i32, cause: impl Into<String>) -> Refusal {
     Refusal {
         cause: cause.into(),
         help: Vec::new(),
+        status,
     }
+}
+
+fn refuse(cause: impl Into<String>) -> Refusal {
+    refusal(exit::REFUSED, cause)
+}
+
+fn usage(cause: impl Into<String>) -> Refusal {
+    refusal(exit::USAGE, cause)
+}
+
+fn unreadable(cause: impl Into<String>) -> Refusal {
+    refusal(exit::INPUT, cause)
+}
+
+fn fail(cause: impl Into<String>) -> Refusal {
+    refusal(exit::TOOL, cause)
 }
 
 fn refuse_help(cause: impl Into<String>, help: &[&str]) -> Refusal {
     Refusal {
         cause: cause.into(),
         help: help.iter().map(|h| (*h).to_string()).collect(),
+        status: exit::REFUSED,
     }
 }
 
@@ -54,7 +74,7 @@ fn report(r: &Refusal) -> i32 {
     for h in &r.help {
         eprintln!("  help: {}", h);
     }
-    2
+    r.status
 }
 
 struct Scratch {
@@ -103,7 +123,7 @@ fn parse(args: &[String]) -> Result<Flags, Refusal> {
             "--out" => f.out = take(i),
             "--artifacts" => f.artifacts = take(i),
             "--root" => f.root = take(i),
-            other => return Err(refuse(format!("unknown argument: {}", other))),
+            other => return Err(usage(format!("unknown argument: {}", other))),
         }
         i += 2;
     }
@@ -116,15 +136,15 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — cwd-write-exempt: the arm's own process enters
     // the tree it packs, and no test reaches `pack()`
     std::env::set_current_dir(&root)
-        .map_err(|e| refuse(format!("cannot enter the work tree at {}: {}", root, e)))?;
-    let root = walk::cwd().map_err(refuse)?;
+        .map_err(|e| fail(format!("cannot enter the work tree at {}: {}", root, e)))?;
+    let root = walk::cwd().map_err(fail)?;
 
     // spec: installer/SPEC.md §The packer — the preflight tool set tracks the spawned set in
     // both directions: `jq` is unreached, so probing it would refuse on a program nothing runs,
     // and `mktemp` is reached, so omitting it reported a generic spawn failure
     for tool in [&programs::NPM, &programs::GIT, &programs::TAR, &programs::MKTEMP] {
         if !proc::on_path(tool) {
-            return Err(refuse(format!(
+            return Err(fail(format!(
                 "{} not found on PATH — the pack step cannot run.",
                 tool
             )));
@@ -135,7 +155,7 @@ fn pack(args: &[String], scratch: &mut Scratch) -> Result<String, Refusal> {
     let installer = installer.trim_end_matches('/');
     let package = format!("{}/package.json", installer);
     if !std::path::Path::new(&package).is_file() {
-        return Err(refuse(format!("{} not found — there is no package to pack.", package)));
+        return Err(unreadable(format!("{} not found — there is no package to pack.", package)));
     }
 
     // spec: installer/SPEC.md §The packer — the refusal asks about the payload's own footprint
@@ -278,13 +298,13 @@ fn resolve_readme_links(into: &str, leaf: &str, packed: &[String], base: &str) -
     let text = match std::fs::read_to_string(&path) {
         Ok(t) => t,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(0),
-        Err(e) => return Err(refuse(format!("cannot read {}: {}", path, e))),
+        Err(e) => return Err(unreadable(format!("cannot read {}: {}", path, e))),
     };
     let (body, count) = resolve_spec_links(&text, leaf, packed, base);
     if count == 0 {
         return Ok(0);
     }
-    std::fs::write(&path, body).map_err(|e| refuse(format!("cannot write {}: {}", path, e)))?;
+    std::fs::write(&path, body).map_err(|e| fail(format!("cannot write {}: {}", path, e)))?;
     Ok(count)
 }
 
@@ -324,10 +344,10 @@ fn tracked_file(repo: &str, commit: &str, path: &str) -> Result<Option<Vec<u8>>,
     if !mode.starts_with("100") {
         return Ok(None);
     }
-    let done = proc::run(&programs::GIT, &["-C", repo, "cat-file", "blob", object]).map_err(refuse)?;
+    let done = proc::run(&programs::GIT, &["-C", repo, "cat-file", "blob", object]).map_err(fail)?;
     match done.stdout() {
         Some(b) => Ok(Some(b.to_vec())),
-        None => Err(refuse(format!(
+        None => Err(fail(format!(
             "git cat-file could not read {} at {} — {}",
             path,
             &commit[..12.min(commit.len())],
@@ -379,7 +399,7 @@ fn write_carry(into: &str, lines: &[String]) -> Result<(), Refusal> {
         body.push('\n');
     }
     let path = format!("{}/{}", into, close_surfaces::CARRIED);
-    std::fs::write(&path, body).map_err(|e| refuse(format!("cannot write {}: {}", path, e)))
+    std::fs::write(&path, body).map_err(|e| fail(format!("cannot write {}: {}", path, e)))
 }
 
 const CARRY_HEADER: &str = "# Generated at pack time from this kit's spec; lifecycle-kit/SPEC.md §The close-surface roster.\n";
@@ -418,7 +438,7 @@ fn place_license(text: Option<&[u8]>, dir: &str) -> Result<(), Refusal> {
         return Ok(());
     };
     let path = format!("{}/LICENSE", dir);
-    std::fs::write(&path, bytes).map_err(|e| refuse(format!("cannot write {}: {}", path, e)))
+    std::fs::write(&path, bytes).map_err(|e| fail(format!("cannot write {}: {}", path, e)))
 }
 
 // spec: gate-sdk/SPEC.md §check-packed-links — the rewrite the gate replays: one function, so the
@@ -492,7 +512,7 @@ fn spec_target<'a>(after: &'a str, leaf: &'a str, packed: &'a [String]) -> Optio
 // second
 fn resolve_root(named: &str) -> Result<String, Refusal> {
     if named.is_empty() {
-        return walk::toplevel_opt().map_err(refuse)?.ok_or_else(|| {
+        return walk::toplevel_opt().map_err(fail)?.ok_or_else(|| {
             refuse("not inside a git work tree — the payload's commit stamp has no source.")
         });
     }
@@ -500,7 +520,7 @@ fn resolve_root(named: &str) -> Result<String, Refusal> {
         return Err(refuse(format!("--root is not a directory: {}", named)));
     }
     let top = walk::toplevel_in_opt(named)
-        .map_err(refuse)?
+        .map_err(fail)?
         .ok_or_else(|| refuse(format!("--root is not inside a git work tree: {}", named)))?;
     let here = walk::canonicalize(named)
         .ok_or_else(|| refuse(format!("--root is not a directory: {}", named)))?;
@@ -526,7 +546,7 @@ fn resolve_version(given: &str) -> Result<String, Refusal> {
         version = version.trim_start_matches('v').to_string();
     }
     let re = Ere::compile("^[0-9]+\\.[0-9]+\\.[0-9]+([-+][0-9A-Za-z.-]+)?$")
-        .map_err(|e| refuse(e.to_string()))?;
+        .map_err(|e| fail(e.to_string()))?;
     if !re.is_match(&version) {
         return Err(refuse_help(
             "no usable version — pass --version, or tag the commit being packed.",
@@ -631,10 +651,10 @@ fn env_or(name: &str) -> Option<String> {
 // bytes ARE its state code, so trimming both ends would re-column the one line the dirty
 // diagnostic prints first, and no other caller here reads a leading blank
 fn git(args: &[&str]) -> Result<String, Refusal> {
-    let done = proc::run(&programs::GIT, args).map_err(refuse)?;
+    let done = proc::run(&programs::GIT, args).map_err(fail)?;
     match done.stdout() {
         Some(o) => Ok(String::from_utf8_lossy(o).trim_end().to_string()),
-        None => Err(refuse(format!(
+        None => Err(fail(format!(
             "git {} failed — {}",
             args.join(" "),
             done.failure_report().unwrap_or_default()
@@ -644,17 +664,17 @@ fn git(args: &[&str]) -> Result<String, Refusal> {
 
 fn mkdir(path: &str) -> Result<(), Refusal> {
     std::fs::create_dir_all(path)
-        .map_err(|e| refuse(format!("cannot create {}: {}", path, e)))
+        .map_err(|e| fail(format!("cannot create {}: {}", path, e)))
 }
 
 fn make_scratch(base: &str, scratch: &mut Scratch) -> Result<String, Refusal> {
     let template = format!("{}/checkwright-pack.XXXXXX", base.trim_end_matches('/'));
-    let made = proc::run(&programs::MKTEMP, &["-d", &template]).map_err(refuse)?;
+    let made = proc::run(&programs::MKTEMP, &["-d", &template]).map_err(fail)?;
     let dir = made
         .stdout()
         .map(|o| String::from_utf8_lossy(o).trim().to_string())
         .filter(|d| !d.is_empty())
-        .ok_or_else(|| refuse(format!("cannot create the assembly scratch under {}", base)))?;
+        .ok_or_else(|| fail(format!("cannot create the assembly scratch under {}", base)))?;
     scratch.dir = dir.clone();
     Ok(dir)
 }
@@ -692,7 +712,7 @@ fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Resu
     // path the payload was never going to carry
     let mut ls: Vec<&str> = vec!["ls-files", "-s", "-z", "--"];
     ls.extend(spec.iter().map(String::as_str));
-    let listing = crate::listing::names(None, &ls).map_err(|e| refuse(e.text_or(|_| format!("git {} failed", ls.join(" ")))))?;
+    let listing = crate::listing::names(None, &ls).map_err(|e| fail(e.text_or(|_| format!("git {} failed", ls.join(" ")))))?;
     let links: Vec<&str> = listing
         .iter()
         .filter(|l| l.starts_with("120000 "))
@@ -716,11 +736,11 @@ fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Resu
     mkdir(dst)?;
     let mut archive_args: Vec<&str> = vec!["archive", commit, "--"];
     archive_args.extend(spec.iter().map(String::as_str));
-    let archive = proc::run(&programs::GIT, &archive_args).map_err(refuse)?;
+    let archive = proc::run(&programs::GIT, &archive_args).map_err(fail)?;
     let bytes = match archive.stdout() {
         Some(b) => b.to_vec(),
         None => {
-            return Err(refuse(format!(
+            return Err(fail(format!(
                 "git archive could not read {} at {} — {}",
                 src,
                 &commit[..12.min(commit.len())],
@@ -730,9 +750,9 @@ fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Resu
     };
     let strip = format!("--strip-components={}", depth);
     let done = proc::run_streamed(&programs::TAR, &["-x", &strip, "-C", dst], &bytes, Stderr::Inherit)
-        .map_err(refuse)?;
+        .map_err(fail)?;
     if done.code() != 0 {
-        return Err(refuse(format!(
+        return Err(fail(format!(
             "tar could not extract {} into {} (exit {})",
             src,
             dst,
@@ -754,13 +774,13 @@ fn pack_artifacts(dir: &str, asm: &str) -> Result<usize, Refusal> {
     }
     let roster = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE").map_err(refuse)?;
     if !std::path::Path::new(&roster).is_file() {
-        return Err(refuse(format!(
+        return Err(unreadable(format!(
             "no target roster at {} — there is no declared platform set to pack artifacts for.",
             roster
         )));
     }
     let text = std::fs::read_to_string(&roster)
-        .map_err(|e| refuse(format!("cannot read the target roster at {}: {}", roster, e)))?;
+        .map_err(|e| unreadable(format!("cannot read the target roster at {}: {}", roster, e)))?;
     let targets = crate::registry::members(&text);
     if targets.is_empty() {
         return Err(refuse(format!(
@@ -773,16 +793,17 @@ fn pack_artifacts(dir: &str, asm: &str) -> Result<usize, Refusal> {
     for target in &targets {
         let src = format!("{}/{}", dir.trim_end_matches('/'), target);
         if !std::path::Path::new(&src).is_dir() {
-            return Err(refuse_help(
-                format!("roster target '{}' has no artifact directory at {}.", target, src),
-                &["every declared target's build leg must have run; a roster target no leg built is a broken payload, not a narrower one."],
-            ));
+            return Err(Refusal {
+                cause: format!("roster target '{}' has no artifact directory at {}.", target, src),
+                help: vec!["every declared target's build leg must have run; a roster target no leg built is a broken payload, not a narrower one.".to_string()],
+                status: exit::INPUT,
+            });
         }
         let binary = artifact_name(&src)?;
         let bin = format!("{}/{}", src, binary);
         let side = format!("{}.sha256", bin);
         if !std::path::Path::new(&bin).is_file() || !std::path::Path::new(&side).is_file() {
-            return Err(refuse(format!(
+            return Err(unreadable(format!(
                 "{} is missing {} or its .sha256 sidecar in {}.",
                 target, binary, src
             )));
@@ -808,7 +829,7 @@ fn pack_artifacts(dir: &str, asm: &str) -> Result<usize, Refusal> {
 // spec: gate-sdk/SPEC.md §Consumer payload — a target's artifact name is discovered, the bootstrap's
 // own selection rule: exactly one regular file not named `*.sha256`, so no reader spells a suffix
 fn artifact_name(src: &str) -> Result<String, Refusal> {
-    let entries = walk::list_dir(std::path::Path::new(src)).map_err(refuse)?;
+    let entries = walk::list_dir(std::path::Path::new(src)).map_err(unreadable)?;
     let names: Vec<String> = entries
         .into_iter()
         .filter(|(n, _)| !n.ends_with(".sha256") && std::path::Path::new(&format!("{}/{}", src, n)).is_file())
@@ -816,7 +837,7 @@ fn artifact_name(src: &str) -> Result<String, Refusal> {
         .collect();
     match names.as_slice() {
         [one] => Ok(one.clone()),
-        _ => Err(refuse(format!(
+        _ => Err(unreadable(format!(
             "{} holds {} artifact(s) beside its sidecars, and a target's directory holds exactly one.",
             src,
             names.len()
@@ -829,32 +850,33 @@ fn artifact_name(src: &str) -> Result<String, Refusal> {
 // with the port
 fn verify_sidecar(bin: &str, side: &str, target: &str, src: &str) -> Result<(), Refusal> {
     let want = std::fs::read_to_string(side)
-        .map_err(|e| refuse(format!("cannot read {}: {}", side, e)))?
+        .map_err(|e| unreadable(format!("cannot read {}: {}", side, e)))?
         .split_whitespace()
         .next()
         .unwrap_or_default()
         .to_ascii_lowercase();
-    let got = crate::sha256::file_hex(std::path::Path::new(bin)).map_err(refuse)?;
+    let got = crate::sha256::file_hex(std::path::Path::new(bin)).map_err(unreadable)?;
     if want == got {
         return Ok(());
     }
-    Err(refuse_help(
-        format!("{}'s sidecar does not match the binary beside it in {}.", target, src),
-        &["the digest is emitted once by the build leg and only ever moved; a mismatch here means the bytes changed after it was written."],
-    ))
+    Err(Refusal {
+        cause: format!("{}'s sidecar does not match the binary beside it in {}.", target, src),
+        help: vec!["the digest is emitted once by the build leg and only ever moved; a mismatch here means the bytes changed after it was written.".to_string()],
+        status: exit::TOOL,
+    })
 }
 
 fn copy(from: &str, to: &str) -> Result<(), Refusal> {
     std::fs::copy(from, to)
         .map(|_| ())
-        .map_err(|e| refuse(format!("cannot copy {} to {}: {}", from, to, e)))
+        .map_err(|e| fail(format!("cannot copy {} to {}: {}", from, to, e)))
 }
 
 #[cfg(unix)]
 fn set_mode_755(path: &str) -> Result<(), Refusal> {
     use std::os::unix::fs::PermissionsExt;
     std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755))
-        .map_err(|e| refuse(format!("cannot set mode 755 on {}: {}", path, e)))
+        .map_err(|e| fail(format!("cannot set mode 755 on {}: {}", path, e)))
 }
 
 // spec: gate-sdk/SPEC.md §Consumer payload — the mode is restored where the platform has one, the
@@ -869,19 +891,19 @@ fn set_mode_755(_path: &str) -> Result<(), Refusal> {
 fn stamp(asm: &str, version: &str, commit: &str, spec_base_url: &str) -> Result<(), Refusal> {
     let path = format!("{}/package.json", asm);
     let text = std::fs::read_to_string(&path)
-        .map_err(|e| refuse(format!("could not read {}: {}", path, e)))?;
+        .map_err(|e| unreadable(format!("could not read {}: {}", path, e)))?;
     let mut doc: serde_json::Value = serde_json::from_str(&text)
-        .map_err(|e| refuse(format!("could not stamp installer/package.json: {}", e)))?;
+        .map_err(|e| unreadable(format!("could not stamp installer/package.json: {}", e)))?;
     let obj = doc
         .as_object_mut()
-        .ok_or_else(|| refuse("could not stamp installer/package.json."))?;
+        .ok_or_else(|| unreadable("could not stamp installer/package.json."))?;
     obj.insert("version".into(), serde_json::Value::String(version.into()));
     let slot = obj
         .entry("checkwright")
         .or_insert_with(|| serde_json::Value::Object(serde_json::Map::new()));
     let slot = slot
         .as_object_mut()
-        .ok_or_else(|| refuse("could not stamp installer/package.json."))?;
+        .ok_or_else(|| unreadable("could not stamp installer/package.json."))?;
     slot.insert("commit".into(), serde_json::Value::String(commit.into()));
     // spec: installer/SPEC.md §The manifest — a stamped value is present exactly when the publisher
     // set one; an empty string written here would be a placeholder standing in for an omission, and
@@ -893,26 +915,26 @@ fn stamp(asm: &str, version: &str, commit: &str, spec_base_url: &str) -> Result<
         );
     }
     let mut body = serde_json::to_string_pretty(&doc)
-        .map_err(|e| refuse(format!("could not stamp installer/package.json: {}", e)))?;
+        .map_err(|e| fail(format!("could not stamp installer/package.json: {}", e)))?;
     body.push('\n');
     std::fs::write(&path, body)
-        .map_err(|e| refuse(format!("could not write {}: {}", path, e)))
+        .map_err(|e| fail(format!("could not write {}: {}", path, e)))
 }
 
 // comment-tier-exempt: `npm pack` stays a spawn deliberately: reproducing the
 // package format in-crate is a second implementation of a format, not a port
 fn npm_pack(asm: &str) -> Result<String, Refusal> {
     let done = proc::run_merged_in(&programs::NPM, &["pack"], &[], Some(std::path::Path::new(asm)))
-        .map_err(refuse)?;
+        .map_err(fail)?;
     if !done.succeeded() {
-        return Err(refuse(format!(
+        return Err(fail(format!(
             "npm pack failed in {}.\n{}",
             asm,
             String::from_utf8_lossy(done.output()).trim()
         )));
     }
     let mut tarballs: Vec<String> = walk::list_dir(std::path::Path::new(asm))
-        .map_err(refuse)?
+        .map_err(fail)?
         .into_iter()
         .filter(|(name, is_dir)| !*is_dir && name.ends_with(".tgz"))
         .map(|(name, _)| name)
@@ -920,7 +942,7 @@ fn npm_pack(asm: &str) -> Result<String, Refusal> {
     tarballs.sort();
     match tarballs.len() {
         1 => Ok(tarballs.remove(0)),
-        n => Err(refuse(format!(
+        n => Err(fail(format!(
             "expected exactly one tarball in {}, found {}.",
             asm, n
         ))),
@@ -936,7 +958,7 @@ fn move_file(from: &str, to: &str) -> Result<(), Refusal> {
     }
     copy(from, to)?;
     std::fs::remove_file(from)
-        .map_err(|e| refuse(format!("cannot remove {} after moving it: {}", from, e)))
+        .map_err(|e| fail(format!("cannot remove {} after moving it: {}", from, e)))
 }
 
 #[cfg(test)]

@@ -372,8 +372,9 @@ pub fn fixture_suites() -> Result<Vec<(String, String, String)>, String> {
 }
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — `--emit fixture-suites`: one tab-separated line per triple
-pub fn emit_fixture_suites(_args: &[String]) -> Result<String, String> {
-    Ok(fixture_suites()?
+pub fn emit_fixture_suites(_args: &[String]) -> Result<String, crate::exit::Fault> {
+    Ok(fixture_suites()
+        .map_err(crate::exit::Fault::refused)?
         .into_iter()
         .map(|(s, t, c)| format!("{}\t{}\t{}\n", s, t, c))
         .collect())
@@ -943,7 +944,7 @@ include!(concat!(env!("OUT_DIR"), "/gate_modules.rs"));
 // spec: gate-sdk/SPEC.md §The non-gate arm — the layers every member reaches, held by
 // §check-crate-arms and the source stamp rather than by any one descriptor
 pub const UNIVERSAL_MODULES: &[&str] =
-    &["walk.rs", "proc.rs", "registry.rs", "gates/mod.rs", "emit/mod.rs", "knobs/mod.rs"];
+    &["walk.rs", "proc.rs", "exit.rs", "registry.rs", "gates/mod.rs", "emit/mod.rs", "knobs/mod.rs"];
 
 // spec: gate-sdk/SPEC.md §The `# graph:` manifest — a member's derived couples: its knob files, then
 // its crate modules

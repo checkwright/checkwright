@@ -1,5 +1,6 @@
 // spec: evidence-kit/SPEC.md §check-battery-roster — the runner doc's battery-roster block holds
 // name-set parity with EVIDENCE_KIT_SUITES, both directions
+use crate::exit::Fault;
 use crate::fresh;
 use crate::walk;
 use std::path::Path;
@@ -77,47 +78,47 @@ pub fn run(args: &[String]) -> i32 {
         Ok(code) => code,
         Err(msg) => {
             eprintln!("{}", msg);
-            2
+            msg.status()
         }
     }
 }
 
-fn inner(args: &[String]) -> Result<i32, String> {
+fn inner(args: &[String]) -> Result<i32, Fault> {
     let doc = match args.first().filter(|a| !a.is_empty()) {
         Some(a) => a.clone(),
         None => {
-            let top = walk::toplevel_opt().map_err(|e| format!("check-battery-roster: {}", e))?;
+            let top = walk::toplevel_opt().map_err(|e| Fault::tool(format!("check-battery-roster: {}", e)))?;
             let Some(top) = top else {
-                return Err(
-                    "check-battery-roster: not a git repository and no runner-doc argument".into(),
-                );
+                return Err(Fault::refused(
+                    "check-battery-roster: not a git repository and no runner-doc argument",
+                ));
             };
             let name = walk::knob_scalar("EVIDENCE_KIT_RUNNER_DOC")
-                .map_err(|e| format!("check-battery-roster: {}", e))?;
+                .map_err(|e| Fault::refused(format!("check-battery-roster: {}", e)))?;
             format!("{}/{}", top, name)
         }
     };
     if !Path::new(&doc).is_file() {
-        return Err(format!("check-battery-roster: runner doc not found: {}", doc));
+        return Err(Fault::refused(format!("check-battery-roster: runner doc not found: {}", doc)));
     }
 
     let suites = walk::knob_array("EVIDENCE_KIT_SUITES")
-        .map_err(|e| format!("check-battery-roster: {}", e))?;
+        .map_err(|e| Fault::refused(format!("check-battery-roster: {}", e)))?;
     if suites.is_empty() {
-        return Err(format!(
+        return Err(Fault::refused(format!(
             "check-battery-roster: EVIDENCE_KIT_SUITES is empty — no suite roster to hold {} against",
             doc
-        ));
+        )));
     }
 
     let text = std::fs::read(&doc)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| format!("check-battery-roster: cannot read {}: {}", doc, e))?;
+        .map_err(|e| Fault::input(format!("check-battery-roster: cannot read {}: {}", doc, e)))?;
     if !text.contains(BEGIN) {
-        return Err(format!(
+        return Err(Fault::input(format!(
             "check-battery-roster: no '{}' marker block in {}",
             BEGIN, doc
-        ));
+        )));
     }
 
     let mut roster: Vec<(String, usize)> = Vec::new();
@@ -143,7 +144,7 @@ fn inner(args: &[String]) -> Result<i32, String> {
     // spec: evidence-kit/SPEC.md §check-battery-roster — a suite with no EVIDENCE_KIT_RUN_<suite>
     // has no documented invocation to compare; --run-validate already refuses it, so reporting it
     // here would send the reader to the doc to fix a config bug
-    let family = walk::knob_prefix("EVIDENCE_KIT_RUN_").map_err(|e| format!("check-battery-roster: {}", e))?;
+    let family = walk::knob_prefix("EVIDENCE_KIT_RUN_").map_err(|e| Fault::refused(format!("check-battery-roster: {}", e)))?;
     let mut suite_of: Vec<(String, String)> = Vec::new();
     for s in &suites {
         let cmd = normalize_invocation(&walk::knob_in_family(&family, s).unwrap_or_default());

@@ -56,7 +56,7 @@ expect 2 "$rc" "a missing message file fails closed"
 (gate_run check-dispatch-entry "$DIR/checks" "$tmp/msg.txt" "$tmp/one.txt" >/dev/null 2>&1); rc=$?
 expect 2 "$rc" "two arguments is a usage error"
 (gate_run check-dispatch-entry "$DIR/checks" "$tmp/msg.txt" "$tmp/nope.txt" "$tmp/head.txt" "$tmp/head.txt" "$tmp/work.txt" >/dev/null 2>&1); rc=$?
-expect 2 "$rc" "an unreadable marker fails closed"
+expect 3 "$rc" "an unreadable marker fails closed"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-dispatch-entry.test: $fails assertion(s) failed"

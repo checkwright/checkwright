@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve end-to-end through a sandboxed enter-stage: an armed line admits the entry past a refusing LIFECYCLE_KIT_ENTRY_PREFLIGHT command and is rewritten to used; an arming for another stage, another iteration, or one already used admits nothing; both malformed ledger shapes are exit 2 with nothing written; a configured-but-absent path is not-armed rather than an error and the refusal names it; and --simulate reports the would-be admission leaving the ledger byte-identical.
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the one-shot pre-flight valve end-to-end through a sandboxed enter-stage: an armed line admits the entry past a refusing LIFECYCLE_KIT_ENTRY_PREFLIGHT command and is rewritten to used; an arming for another stage, another iteration, or one already used admits nothing; both malformed ledger shapes are exit 3 with nothing written; a configured-but-absent path is not-armed rather than an error and the refusal names it; and --simulate reports the would-be admission leaving the ledger byte-identical.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -119,7 +119,7 @@ sh="$(seed short 'demo-iteration build armed
 ')"
 cp "$sh/.workflow/WORKFLOW-STATE.txt" "$sh/s.before"
 out="$(run_enter "$sh" build)"; rc=$?
-[[ "$rc" -eq 2 ]] || note short-rc "a reason-less line must be exit 2, got $rc -- $out"
+[[ "$rc" -eq 3 ]] || note short-rc "a reason-less line must be exit 3, got $rc -- $out"
 grep -qF 'fewer than the four' <<<"$out" || note short-msg "the fail-closed refusal did not name the shape: $out"
 cmp -s "$sh/s.before" "$sh/.workflow/WORKFLOW-STATE.txt" || note short-write "a fail-closed refusal wrote the state file"
 
@@ -127,7 +127,7 @@ cmp -s "$sh/s.before" "$sh/.workflow/WORKFLOW-STATE.txt" || note short-write "a 
 bt="$(seed bad-token 'demo-iteration build pending a token no reader knows
 ')"
 out="$(run_enter "$bt" build)"; rc=$?
-[[ "$rc" -eq 2 ]] || note token-rc "an unknown state token must be exit 2, got $rc -- $out"
+[[ "$rc" -eq 3 ]] || note token-rc "an unknown state token must be exit 3, got $rc -- $out"
 grep -qF 'neither armed nor used' <<<"$out" || note token-msg "the fail-closed refusal did not name the token: $out"
 
 # --- a configured path that does not exist is NOT ARMED, not an error, and the refusal names it ---
@@ -166,5 +166,5 @@ cmp -s "$sm/v.before" "$sm/.workflow/preflight-valve.txt" || note sim-ledger "--
 cmp -s "$sm/s.before" "$sm/.workflow/WORKFLOW-STATE.txt" || note sim-state "--simulate wrote the state file"
 
 [[ "$fails" -eq 0 ]] || { echo "preflight-valve.test: $fails assertion(s) failed"; exit 1; }
-echo "preflight-valve.test: clean (armed admits once and flips to used with the prior-use count printed; another stage, another iteration and a spent line admit nothing; both malformed shapes exit 2 writing nothing; an absent path refuses and is named; --simulate relays the would-be admission and writes nothing)"
+echo "preflight-valve.test: clean (armed admits once and flips to used with the prior-use count printed; another stage, another iteration and a spent line admit nothing; both malformed shapes exit 3 writing nothing; an absent path refuses and is named; --simulate relays the would-be admission and writes nothing)"
 exit 0

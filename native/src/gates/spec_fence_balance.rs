@@ -1,5 +1,6 @@
 // spec: canon-kit/SPEC.md §check-spec-fence-balance — every governed markdown file has an
 // even fence-delimiter count, so the fence-skipping parsers never desync and fail open
+use crate::exit::Fault;
 use crate::spec;
 use std::path::Path;
 
@@ -8,20 +9,21 @@ pub fn run(args: &[String]) -> i32 {
         Ok(rc) => rc,
         Err(e) => {
             eprintln!("check-spec-fence-balance: {}", e);
-            2
+            e.status()
         }
     }
 }
 
-fn rule(args: &[String]) -> Result<i32, String> {
+fn rule(args: &[String]) -> Result<i32, Fault> {
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        let mut v: Vec<String> = spec::manifest_files(".")?
+        let mut v: Vec<String> = spec::manifest_files(".")
+            .map_err(Fault::input)?
             .into_iter()
             .map(|p| p.display().to_string())
             .collect();
-        let queue = crate::walk::knob_scalar("CANON_KIT_QUEUE_FILE")?;
+        let queue = crate::walk::knob_scalar("CANON_KIT_QUEUE_FILE").map_err(Fault::refused)?;
         if Path::new(&queue).is_file() {
             v.push(queue);
         }
@@ -35,7 +37,7 @@ fn rule(args: &[String]) -> Result<i32, String> {
             continue;
         }
         scanned += 1;
-        let text = spec::read_text(Path::new(f))?;
+        let text = spec::read_text(Path::new(f)).map_err(Fault::input)?;
         if let Some(ln) = unclosed(&text) {
             bad.push(format!("{}:{} (the fence opened here is never closed)", f, ln));
         }

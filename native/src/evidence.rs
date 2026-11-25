@@ -575,7 +575,7 @@ pub struct Statement {
 }
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — a Statement or a DSSE envelope around one, judged for
-// shape alone: every refusal here is one the verify arm reports at exit 2
+// shape alone: every refusal here is one the verify arm reports at exit 3
 pub fn read_statement(bytes: &[u8]) -> Result<Statement, String> {
     let v: serde_json::Value =
         serde_json::from_slice(bytes).map_err(|e| format!("the input is not JSON: {}", e))?;

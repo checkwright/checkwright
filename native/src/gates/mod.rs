@@ -1070,7 +1070,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-knob-default-coupling",
         knob_default_coupling::run,
-        &[("?", "", "", "dynamic@src/gates/knob_default_coupling.rs:389")],
+        &[("?", "", "", "dynamic@src/gates/knob_default_coupling.rs:390")],
         &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
@@ -1376,7 +1376,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-door-binding",
         door_binding::run,
-        &[("?", "", "", "dynamic@src/gates/door_binding.rs:274")],
+        &[("?", "", "", "dynamic@src/gates/door_binding.rs:275")],
         &["GATE_SDK_KIT_DIRS", "GUARD_KIT_DOOR_ROOTS"],
         "guard-kit",
         &[("git", "")],
@@ -1387,7 +1387,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-test-hermetic",
         test_hermetic::run,
-        &[("?", "", "", "dynamic@src/gates/test_hermetic.rs:42")],
+        &[("?", "", "", "dynamic@src/gates/test_hermetic.rs:43")],
         &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[],
@@ -1395,7 +1395,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-assertion-strength",
         assertion_strength::run,
-        &[("?", "", "", "dynamic@src/gates/assertion_strength.rs:390")],
+        &[("?", "", "", "dynamic@src/gates/assertion_strength.rs:391")],
         &["GATE_SDK_KIT_DIRS", "GATE_SDK_ASSERTION_STRENGTH_WINDOW"],
         "gate-sdk",
         &[],
@@ -1406,7 +1406,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-template-registry-parity",
         template_registry_parity::run,
-        &[("?", "", "", "dynamic@src/gates/template_registry_parity.rs:88")],
+        &[("?", "", "", "dynamic@src/gates/template_registry_parity.rs:89")],
         &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
@@ -1417,7 +1417,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-stage-skill-coverage",
         stage_skill_coverage::run,
-        &[("?", "", "", "dynamic@src/gates/stage_skill_coverage.rs:95")],
+        &[("?", "", "", "dynamic@src/gates/stage_skill_coverage.rs:96")],
         &["LIFECYCLE_KIT_SKILLS_DIR", "LIFECYCLE_KIT_STAGES", "LIFECYCLE_KIT_STAGE_EXECUTOR"],
         "lifecycle-kit",
         &[],
@@ -1425,7 +1425,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-skill-binding",
         skill_binding::run,
-        &[("?", "", "", "dynamic@src/gates/skill_binding.rs:97")],
+        &[("?", "", "", "dynamic@src/gates/skill_binding.rs:98")],
         &["LIFECYCLE_KIT_SKILLS_DIR"],
         "lifecycle-kit",
         &[],
@@ -1577,7 +1577,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-close-surfaces",
         close_surfaces::run,
-        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:259 via emit::close_surfaces::derive")],
+        &[("?", "", "", "dynamic@src/emit/close_surfaces.rs:260 via emit::close_surfaces::derive_fault")],
         &[
             "GATE_SDK_KIT_DIRS",
             "GATE_SDK_PRUNE_DIRS",
@@ -1652,8 +1652,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-shim-restatement",
         shim_restatement::run,
         &[
-            ("?", "", "", "dynamic@src/gates/shim_restatement.rs:124"),
-            ("?", "", "", "dynamic@src/gates/shim_restatement.rs:163"),
+            ("?", "", "", "dynamic@src/gates/shim_restatement.rs:125"),
+            ("?", "", "", "dynamic@src/gates/shim_restatement.rs:164"),
         ],
         &[
             "GATE_SDK_PRUNE_DIRS",
@@ -1712,7 +1712,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-bump",
         release_bump::run,
-        &[("?", "", "", "dynamic@src/gates/release_bump.rs:158")],
+        &[("?", "", "", "dynamic@src/gates/release_bump.rs:159")],
         &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES"],
         "-",
         &[("git", "")],
@@ -1720,7 +1720,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-tightened-gates-grammar",
         tightened_gates_grammar::run,
-        &[("?", "", "", "dynamic@src/gates/tightened_gates_grammar.rs:51")],
+        &[("?", "", "", "dynamic@src/gates/tightened_gates_grammar.rs:52")],
         &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES"],
         "-",
         &[],
@@ -1728,7 +1728,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-declaration-parity",
         release_declaration_parity::run,
-        &[("?", "", "", "dynamic@src/gates/release_bump.rs:357 via gates::release_bump::untagged_notes")],
+        &[("?", "", "", "dynamic@src/gates/release_bump.rs:358 via gates::release_bump::untagged_notes")],
         &["GATE_LOCAL_RELEASE_POSTS_DIR", "GATE_SDK_RELEASE_SECTIONS", "GATE_SDK_RELEASE_SECTION_ALIASES", "GATE_LOCAL_INSTALL_DOCS"],
         "-",
         &[("git", "")],
@@ -1773,7 +1773,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-kit-parity",
         docs_kit_parity::run,
-        &[("?", "", "", "dynamic@src/gates/docs_kit_parity.rs:72")],
+        &[("?", "", "", "dynamic@src/gates/docs_kit_parity.rs:73")],
         &["GATE_LOCAL_KIT_REGISTRY_PAGE"],
         "-",
         &[],
@@ -1786,7 +1786,7 @@ pub const REGISTRY: &[GateEntry] = &[
         docs_mirror_fresh::run,
         // spec: canon-kit/SPEC.md §The reference-link grammar — beside the orphan sweep's root, the
         // manifest set the mirror's citation renderer resolves a path-less citation into
-        manifest_roots!(("?", "", "", "dynamic@src/gates/docs_mirror_fresh.rs:68")),
+        manifest_roots!(("?", "", "", "dynamic@src/gates/docs_mirror_fresh.rs:69")),
         // spec: gate-sdk/SPEC.md §The non-gate arm — the generator it now calls in-process reads
         // the blob ref and the manifest set, so the comparator declares what its callee reads.
         &[
@@ -1881,7 +1881,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-npm-publish-spec",
         npm_publish_spec::run,
-        &[("?", "", "", "dynamic@src/gates/npm_publish_spec.rs:101")],
+        &[("?", "", "", "dynamic@src/gates/npm_publish_spec.rs:102")],
         &["GATE_LOCAL_WORKFLOWS_DIR"],
         "-",
         &[("git", "")],
@@ -1937,7 +1937,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-plugin-parity",
         plugin_parity::run,
-        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:269")],
+        &[("?", "", "", "dynamic@src/gates/plugin_parity.rs:270")],
         &[
             "LIFECYCLE_KIT_SKILLS_DIR",
             "QUEUE_KIT_QUEUE_FILE",
@@ -1989,8 +1989,8 @@ pub const REGISTRY: &[GateEntry] = &[
         value_rollup_fresh::run,
         &[
             (".", "glob:lit:*/SPEC.md", "", ""),
-            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:368 via emit::value_rollup::emit"),
-            ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::value_rollup::emit"),
+            ("?", "", "", "dynamic@src/emit/enforcement_map.rs:369 via emit::value_rollup::emit"),
+            ("?", "", "", "dynamic@src/emit/footprint.rs:92 via emit::value_rollup::emit"),
         ],
         &[
             "GATE_SDK_GATES_DIR",
@@ -2037,7 +2037,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-release-table-fresh",
         release_table_fresh::run,
-        &[("?", "", "", "dynamic@src/emit/release_table.rs:43 via emit::release_table::render")],
+        &[("?", "", "", "dynamic@src/emit/release_table.rs:44 via emit::release_table::render")],
         &[
             "GATE_SDK_NATIVE_BIN",
             "GATE_LOCAL_RELEASE_POSTS_DIR",
@@ -2065,7 +2065,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-hook-knobs-fresh",
         hook_knobs_fresh::run,
-        &[("?", "", "", "dynamic@src/emit/hook_knobs.rs:61 via emit::hook_knobs::pages")],
+        &[("?", "", "", "dynamic@src/emit/hook_knobs.rs:62 via emit::hook_knobs::pages")],
         &["GATE_SDK_NATIVE_BIN", "GATE_SDK_HOOK_PAGES_DIR"],
         "gate-sdk",
         &[],
@@ -2076,7 +2076,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             (".", "name:knob:GATE_LOCAL_README_FILE", "", ""),
             (".", "name:knob:GATE_LOCAL_LICENSE_MANIFEST_NAMES", "", ""),
-            ("?", "", "", "dynamic@src/gates/license_line.rs:355"),
+            ("?", "", "", "dynamic@src/gates/license_line.rs:356"),
         ],
         &[
             "GATE_SDK_PRUNE_DIRS",
@@ -2096,7 +2096,7 @@ pub const REGISTRY: &[GateEntry] = &[
         footprint_fresh::run,
         &[
             (".", "glob:lit:*/SPEC.md", "", ""),
-            ("?", "", "", "dynamic@src/emit/footprint.rs:90 via emit::footprint::emit"),
+            ("?", "", "", "dynamic@src/emit/footprint.rs:92 via emit::footprint::emit"),
         ],
         &["CONTEXT_KIT_SURFACES", "CONTEXT_KIT_FOOTPRINT_FILE", "GATE_SDK_NATIVE_BIN"],
         "-",
@@ -2107,7 +2107,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-enforcement-fresh",
         enforcement_fresh::run,
-        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:368 via emit::enforcement_map::emit")],
+        &[("?", "", "", "dynamic@src/emit/enforcement_map.rs:369 via emit::enforcement_map::emit")],
         &[
             "GATE_SDK_ENFORCEMENT_FILE",
             "GATE_SDK_GATES_DIR",
@@ -2179,7 +2179,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-agent-tier-explicit",
         agent_tier_explicit::run,
-        &[("?", "", "", "dynamic@src/gates/agent_tier_explicit.rs:62")],
+        &[("?", "", "", "dynamic@src/gates/agent_tier_explicit.rs:63")],
         &[
             "DELEGATION_KIT_AGENT_DIR",
             "DELEGATION_KIT_TIER_MODEL",
@@ -2260,7 +2260,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-readme-roster",
         readme_roster::run,
-        &[("?", "", "", "dynamic@src/gates/readme_roster.rs:101")],
+        &[("?", "", "", "dynamic@src/gates/readme_roster.rs:102")],
         &["GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[],
@@ -2349,8 +2349,8 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-gate-substrate-parity",
         gate_substrate_parity::run,
         &[
-            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:932"),
-            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:957"),
+            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:933"),
+            ("?", "", "", "dynamic@src/gates/gate_substrate_parity.rs:958"),
         ],
         &[
             "GATE_SDK_GATES_DIR",
@@ -2486,7 +2486,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-install-disposition",
         install_disposition::run,
-        &[("?", "", "", "dynamic@src/gates/install_disposition.rs:196")],
+        &[("?", "", "", "dynamic@src/gates/install_disposition.rs:197")],
         &["GATE_SDK_KIT_DIRS", "GATE_SDK_NATIVE_SRC"],
         "gate-sdk",
         &[("git", "")],
@@ -2580,7 +2580,7 @@ pub const REGISTRY: &[GateEntry] = &[
         docs_since::run,
         &[
             (".", "glob:knob:SITE_KIT_SINCE_PAGES", "", ""),
-            ("?", "", "", "dynamic@src/gates/release_bump.rs:357 via emit::docs_since::note"),
+            ("?", "", "", "dynamic@src/gates/release_bump.rs:358 via emit::docs_since::note"),
         ],
         &[
             "SITE_KIT_SINCE_PAGES",
@@ -2645,7 +2645,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-docs-link-convention",
         docs_link_convention::run,
-        &[("?", "", "", "dynamic@src/gates/docs_link_convention.rs:132")],
+        &[("?", "", "", "dynamic@src/gates/docs_link_convention.rs:133")],
         &["CANON_KIT_LINK_ROOT", "CANON_KIT_SPEC_NAME"],
         "canon-kit",
         &[("git", "")],
@@ -2744,7 +2744,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-path-dialect",
         path_dialect::run,
-        &[("?", "", "", "dynamic@src/gates/path_dialect.rs:616")],
+        &[("?", "", "", "dynamic@src/gates/path_dialect.rs:617")],
         &["GATE_SDK_NATIVE_SRC", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("git", "")],
@@ -2845,7 +2845,7 @@ pub fn door_spelling(bin: &str) -> String {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the same door for a gate answering in `i32`: a knob read that
-// fails reports on stderr and yields `None`, and the caller's exit 2, never a remedy without a door
+// fails reports on stderr and yields `None`, and the caller's refusal, never a remedy without a door
 pub fn door_or_report(gate: &str, args: &str) -> Option<String> {
     door_command(args).map_err(|e| eprintln!("{}: {}", gate, e)).ok()
 }
@@ -3189,7 +3189,7 @@ mod tests {
         }
         let line = format!("{}: {}", name, crate_arms::LINKED_WORKTREE);
         assert!(
-            run.rc == 2 && run.output.contains(&line),
+            run.rc == crate::exit::REFUSED && run.output.contains(&line),
             "{} on {} in a linked worktree exited {} without the refusal '{}':\n{}",
             name,
             case.display(),
@@ -3218,8 +3218,8 @@ mod tests {
                 if pinned_refusal(name, &case, &run, linked) {
                     continue;
                 }
-                assert_ne!(
-                    run.rc, 2,
+                assert!(
+                    !matches!(run.rc, 2 | 3),
                     "{} errored on {} — an observation taken from a run that never walked \
                      would pass this test by being empty",
                     name,
@@ -3321,8 +3321,8 @@ mod tests {
                 if pinned_refusal(name, &case, &run, linked) {
                     continue;
                 }
-                assert_ne!(
-                    run.rc, 2,
+                assert!(
+                    !matches!(run.rc, 2 | 3),
                     "{} errored on {} — an observation taken from a run that never spawned \
                      would pass this test by being empty",
                     name,

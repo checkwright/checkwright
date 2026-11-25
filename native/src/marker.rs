@@ -137,7 +137,7 @@ pub fn write_block(path: &str, begin: &str, end: &str, body: &str) -> Result<(),
 // append-on-absent disposition, which is correct for a seeding installer and is exactly what
 // `write_block` above refuses on behalf of a generator. Two writers, two misses, one module.
 // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the action word is the return value
-// because the caller reports it; the begin-without-end refusal is exit 2 at that caller.
+// because the caller reports it; the begin-without-end refusal is exit 3 at that caller.
 pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<String, String> {
     let text = read_bytes(path)?;
     let lines = byte_lines(&text);

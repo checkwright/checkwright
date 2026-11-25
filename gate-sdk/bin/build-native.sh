@@ -30,13 +30,13 @@ source "$SDK/lib/gate.sh"
 # script's own location: a caller running from a scratch tree sets cwd and gets that tree's crate.
 CRATE="$(gate_native_crate)"
 
-# spec: gate-sdk/SPEC.md §Fail-closed contract — an absent toolchain is exit 2 naming the floor,
+# spec: gate-sdk/SPEC.md §Fail-closed contract — an absent toolchain is exit 3 naming the floor,
 # never a bare command-not-found from the shell
 command -v cargo >/dev/null 2>&1 || {
     echo "build-native: cargo is not on PATH, so the gate binary cannot be built." >&2
     echo "  help: cargo is the contributor-side toolchain floor for this tree" >&2
     echo "        (context-kit/SPEC.md §bin/env-probe). Install a Rust toolchain, then re-run." >&2
-    exit 2
+    exit 3
 }
 
 # spec: gate-sdk/SPEC.md §build-native — the message names the consumer case, so a vendored copy
@@ -81,7 +81,7 @@ BN_ART="${BN_ART%.exe}$(gate_exe_suffix "$BN_TARGET")"
     echo "  help: the artifact path is derived from the crate dir, any --target, and the executable" >&2
     echo "        suffix that target implies; if this build emits somewhere else, or under a suffix" >&2
     echo "        gate_exe_suffix does not derive, that derivation is what needs fixing." >&2
-    exit 2
+    exit 3
 }
 
 # spec: gate-sdk/SPEC.md §build-native — the banned set is the consumer's own resolved pattern
@@ -90,9 +90,10 @@ BN_ART="${BN_ART%.exe}$(gate_exe_suffix "$BN_TARGET")"
 # spec: gate-sdk/SPEC.md §Fail-closed contract — the resolver's status is read from the command
 # substitution and not from `mapfile`, whose own status says nothing about the producer's
 BN_PATLIST="$(gate_msg_pattern_files)" || {
+    _bn_rc=$?
     echo "build-native: the banned-pattern set could not be resolved, so the artifact cannot be" >&2
     echo "  verified — treating the build as failed (not clean)." >&2
-    exit 2
+    exit "$_bn_rc"
 }
 BN_PATFILES=()
 while IFS= read -r _bn_f; do [[ -n "$_bn_f" ]] && BN_PATFILES+=("$_bn_f"); done <<<"$BN_PATLIST"
