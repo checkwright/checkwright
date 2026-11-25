@@ -24,6 +24,16 @@
 
 **Cost while deferred:** a handed-back range is checked for tamper only commit by commit at its own pre-commit, which an agent's hook bypass skips. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `gate-tamper`, `range` in this file, the icebox's coverage entry only; owner delegation-kit/SPEC.md §check-gate-tamper.
 
+### foreign-run-verb
+
+[spec: SPEC-foreign-run-sandbox.md] [recurrence: 2026-11-25]
+
+The foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) is a procedure, not a verb: no arm takes a brief path, a vendor and model and a sandbox policy and returns a machine result with a transcript path, so a second-opinion caller builds its own executor.
+
+**Deliverable:** design-pending, a feature: the verb, its result shape and its sandbox policy's vocabulary held in config.
+
+**Cost while deferred:** each outside caller re-builds the run. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `foreign-vendor`, `foreign run` in this file and the disposed-findings record, none open; owner delegation-kit/SPEC.md §The foreign-vendor run.
+
 ## Technical Debt
 
 ### attribution-trailer-ban
@@ -255,16 +265,6 @@ A declared mode where an outside tool renders the queue file and the iteration h
 **Deliverable:** design-pending, a feature, on reopening.
 
 **Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
-
-### foreign-run-verb
-
-[cost: event/low] [surface: delegation-kit] [recurrence: 2026-11-25]
-
-The foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) is a procedure, not a verb: no arm takes a brief path, a vendor and model and a sandbox policy and returns a machine result with a transcript path, so a second-opinion caller builds its own executor.
-
-**Deliverable:** design-pending, a feature: the verb, its result shape and its sandbox policy's vocabulary held in config.
-
-**Cost while deferred:** each outside caller re-builds the run. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `foreign-vendor`, `foreign run` in this file and the disposed-findings record, none open; owner delegation-kit/SPEC.md §The foreign-vendor run.
 
 ### external-kpi-series
 

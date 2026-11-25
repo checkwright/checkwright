@@ -94,7 +94,7 @@
 18425cp docs/posts/2026-11-24-checkwright-v0-37-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
-8555cp docs/requirements.md
+8556cp docs/requirements.md
 7012cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 5463cp docs/spec-toolkits.md
