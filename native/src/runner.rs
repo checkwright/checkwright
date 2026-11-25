@@ -4,6 +4,7 @@
 use crate::exit;
 use crate::gates;
 use crate::proc;
+use crate::provenance::Provenance;
 use crate::registry;
 use crate::sarif;
 use crate::walk;
@@ -45,6 +46,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --diff-baseline <group>...              diff captured logs against the baseline slice
        --verify-gate-run [--json] [<file> | -] judge a gate-run Statement against this tree
        --import-gate-run [<file> | -]          verify a Statement and record its suites
+       --verdict-lookup <tree> <kit-ver> <digest>  the verdict a run stored under that key
        --run -h | --help                      this text, on stdout, exit 0
 
   --run   exits 0 pass, every member green; 1 fail, a member red; 3 error, a
@@ -236,6 +238,12 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           EVIDENCE_KIT_IMPORTED_RUNS is accept. Exit 0 recorded, 1 a
           contradiction with nothing recorded, 2 a refusal, 3 an input or
           tool error; unavailable is 3.
+  --verdict-lookup  answers one key from the GATE_SDK_VERDICT_STORE directory
+          with one JSON object on stdout, its verdict the stored pass or fail,
+          or absent where no run stored that key. Reads no repository. Exit 0
+          an answer, a stored fail included; 2 an operand of the wrong count
+          or shape, or no absolute store set; 3 a record that could not be
+          read or does not answer for its key; unavailable is 3.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -248,7 +256,10 @@ quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
 (default: the machine's parallelism; 1 restores a serial run);
 GATE_SDK_SARIF_FILE names a file the run also writes its verdict to as a SARIF
 2.1.0 log, the exit status unchanged unless that file cannot be written (exit 3);
-GATE_SDK_SARIF_RESULTS selects its results: all (default) or failures.
+GATE_SDK_SARIF_RESULTS selects its results: all (default) or failures;
+GATE_SDK_VERDICT_STORE names an absolute directory a registry run on a clean
+tree keeps its pass or fail verdict in for --verdict-lookup (exit 3 when it
+cannot be written).
 Per-gate timings of an unfiltered run land in $GATE_SDK_TMP_DIR/gate-timings.txt (default .tmp/)."#;
 
 // spec: gate-sdk/SPEC.md §The non-gate arm — the arm's own reads, plus the sentinel standing for
@@ -918,6 +929,13 @@ pub fn run(args: &[String]) -> i32 {
             }
         }
     };
+    let store = match crate::verdict_store::configured() {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("{}: {}", TOOL, e);
+            return e.status();
+        }
+    };
 
     let selected: Vec<Selected> = if !parsed.only.is_empty() {
         match select_only(&members, &list, &resolve_dirs, &parsed.only, parsed.only_args.as_deref()) {
@@ -941,8 +959,8 @@ pub fn run(args: &[String]) -> i32 {
         if s.is_empty() {
             print!("\n===== gates summary =====\nno coupled gate for the given path(s); nothing to run.\n");
             if !sarif_path.is_empty() {
-                let set = set_members(&[], &resolve_dirs);
-                if let Err(e) = write_log(&sarif_path, &list, sarif::Scope::For, selection, &[], &[], set) {
+                let provenance = provenance_of(sarif::Scope::For, &[], &resolve_dirs);
+                if let Err(e) = write_log(&sarif_path, &list, &provenance, sarif::Scope::For, selection, &[], &[]) {
                     eprintln!("{}: {}", TOOL, e);
                     return exit::TOOL;
                 }
@@ -1050,9 +1068,22 @@ pub fn run(args: &[String]) -> i32 {
         );
         verdict_status(&outcomes)
     };
+    let (scope, omissions) = if !parsed.only.is_empty() {
+        (sarif::Scope::Only, Vec::new())
+    } else if !parsed.paths.is_empty() {
+        (sarif::Scope::For, Vec::new())
+    } else {
+        let declared = registry::omissions(&list_text);
+        let omissions = declared
+            .into_iter()
+            .map(|(line, name, reason)| sarif::Omission { line, name, reason })
+            .collect();
+        (sarif::Scope::Registry, omissions)
+    };
+    let provenance = (!sarif_path.is_empty() || store.is_some()).then(|| provenance_of(scope, &selected, &resolve_dirs));
     // spec: gate-sdk/SPEC.md §run-gates — the SARIF log is written once after the verdict lines,
     // and only an unwritable path changes the exit status
-    if !sarif_path.is_empty() {
+    if let Some(provenance) = provenance.as_ref().filter(|_| !sarif_path.is_empty()) {
         let lines = registry::member_lines(&list_text);
         let members: Vec<sarif::Member> = selected
             .iter()
@@ -1067,22 +1098,18 @@ pub fn run(args: &[String]) -> i32 {
                 kit: member_kit(&s.name, &resolve_dirs, &kit_roots),
             })
             .collect();
-        let (scope, omissions) = if !parsed.only.is_empty() {
-            (sarif::Scope::Only, Vec::new())
-        } else if !parsed.paths.is_empty() {
-            (sarif::Scope::For, Vec::new())
-        } else {
-            let declared = registry::omissions(&list_text);
-            let omissions = declared
-                .into_iter()
-                .map(|(line, name, reason)| sarif::Omission { line, name, reason })
-                .collect();
-            (sarif::Scope::Registry, omissions)
-        };
-        let set = set_members(&selected, &resolve_dirs);
-        if let Err(e) = write_log(&sarif_path, &list, scope, selection, &members, &omissions, set) {
+        if let Err(e) = write_log(&sarif_path, &list, provenance, scope, selection, &members, &omissions) {
             eprintln!("{}: {}", TOOL, e);
             return exit::TOOL;
+        }
+    }
+    // spec: gate-sdk/SPEC.md §run-gates — the store follows the log, keeping a judged registry run
+    if let (Some(dir), Some(provenance)) = (&store, &provenance) {
+        if let Some((name, body)) = crate::verdict_store::entry(scope, code, provenance) {
+            if let Err(e) = crate::verdict_store::write(dir, &name, &body) {
+                eprintln!("{}: {}", TOOL, e);
+                return exit::TOOL;
+            }
         }
     }
     code
@@ -1120,21 +1147,26 @@ fn set_members(selected: &[Selected], resolve_dirs: &[String]) -> Option<Vec<cra
         .collect()
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — the block collected once per run, for the log and the store
+fn provenance_of(scope: sarif::Scope, selected: &[Selected], resolve_dirs: &[String]) -> Provenance {
+    let set = set_members(selected, resolve_dirs);
+    // spec: gate-sdk/SPEC.md §run-gates — the block's kit roots in their repo-relative spelling
+    let roots_here = walk::kit_roots().unwrap_or_default();
+    crate::provenance::collect(&roots_here, set.as_deref().map(|m| (scope.word(), m)))
+}
+
 fn write_log(
     path: &str,
     list: &str,
+    provenance: &Provenance,
     scope: sarif::Scope,
     selection: sarif::Selection,
     members: &[sarif::Member],
     omissions: &[sarif::Omission],
-    set: Option<Vec<crate::provenance::SetMember>>,
 ) -> Result<(), String> {
-    // spec: gate-sdk/SPEC.md §run-gates — the block's kit roots in their repo-relative spelling
-    let roots_here = walk::kit_roots().unwrap_or_default();
-    let provenance = crate::provenance::collect(&roots_here, set.as_deref().map(|m| (scope.word(), m)));
     let run = sarif::Run {
         registry: list,
-        provenance: &provenance,
+        provenance,
         scope,
         selection,
     };

@@ -853,6 +853,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
     // spec: gate-sdk/SPEC.md §run-gates — the battery runner: the class's first member
     // that returns a verdict rather than a document, and the reason the table is keyed by flag
     ("--run", Arm::Run(crate::runner::run), crate::runner::KNOBS),
+    // spec: gate-sdk/SPEC.md §run-gates — an `Arm::Run` because a stored verdict is an answer at 0,
+    // a malformed or unconfigured request 2 and an unreadable record 3, a split the collapse erases
+    (
+        "--verdict-lookup",
+        Arm::Run(crate::verdict_store::lookup),
+        crate::verdict_store::KNOBS,
+    ),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the one dispatching harness-integration arm; its
     // roster is a sentinel because the answer is one member's knobs, scoped by its own argv
     (

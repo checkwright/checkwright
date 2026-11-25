@@ -24,16 +24,6 @@ The orchestrator adopter calls checkwright as a verdict-returning step, and name
 
 **Cost while deferred:** the adopter reads a battery's verdict from the SARIF log or from prose, with no document on stdout. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `--json`, `enter-stage` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
 
-### verdict-lookup
-
-[spec: gate-sdk/SPEC-verdict-lookup.md]
-
-Ask B of the orchestrator adopter's pairing asks: a verdict keyed by tree, kit version and gate-set digest, and a lookup answering whether a verdict exists for a key and what it is. Nothing keeps one so: the evidence manifest keys suites by run and commit (evidence-kit/SPEC.md §Evidence manifest), and the SARIF log goes to a caller's path and is kept by nobody.
-
-**Deliverable:** design-pending, a feature: the key, built from verdict-identity-fields' fields and landing after it; where a verdict is kept and by whom; and the lookup arm. **Home (lead decision 2026-11-25):** gate-sdk, since its `--run` arm is the writer and a base kit reading a dependent kit's knob would invert the kit dependency; `--run` writes to `GATE_SDK_VERDICT_STORE`, off when empty, and `--verdict-lookup` sits beside it. An unset store at lookup is settled in the amendment under the exit-code-tool-error cut. The adopter's contract for the arm (adopter input 2026-11-25): a command, not a file, `<bin> --verdict-lookup <tree> <kit-ver> <digest>`, JSON on stdout. A found verdict exits 0 with the verdict in the document, a failing verdict included; an absent one exits 0 with `"verdict":"absent"`; a bad key or usage exits 2; an unreadable store exits 3, so it lands after exit-code-tool-error; exit 1 is never used.
-
-**Cost while deferred:** the adopter re-runs the battery on a tree already judged under the same gates. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `lookup`, `verdict key` in this file, none; owner gate-sdk/SPEC.md §run-gates.
-
 ## Technical Debt
 
 ### foreign-run-sandbox-record
@@ -1054,4 +1044,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - verdict-identity-fields
 - exit-code-tool-error
+- verdict-lookup
 

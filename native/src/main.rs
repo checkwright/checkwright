@@ -67,6 +67,7 @@ mod tier;
 mod toolfloor;
 #[cfg(test)]
 mod usage_tests;
+mod verdict_store;
 mod walk;
 mod walkthrough;
 

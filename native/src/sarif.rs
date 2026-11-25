@@ -299,7 +299,7 @@ pub fn write(path: &str, body: &str) -> Result<(), String> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
     use crate::provenance::Kit;
 
@@ -343,7 +343,7 @@ mod tests {
 
     // spec: gate-sdk/SPEC.md §run-gates — the fixed provenance the goldens render, so they carry no
     // live stamp
-    fn fixed() -> Provenance {
+    pub(crate) fn fixed() -> Provenance {
         Provenance {
             tool_version: Some("1.0.0".into()),
             exact: true,
