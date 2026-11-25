@@ -14,6 +14,16 @@
 
 ## New Features
 
+### verdict-identity-fields
+
+[spec: SPEC-verdict-identity.md]
+
+Asks A and C of the orchestrator adopter's pairing asks: a verdict an outside work engine keys and diffs. The battery's SARIF log (gate-sdk/SPEC.md §run-gates) carries the verdict, `commit` and `worktree`, each kit's version, one rule per member and finding-line locations under `verdictContract` 1.0.0. It carries no tree object id, no digest of the gate set that judged, no per-result identity stable across reruns of one tree (`native/src/sarif.rs` writes no fingerprint), and no rule id beneath a member with several rule classes.
+
+**Deliverable:** design-pending, a feature: those fields under the verdict contract's minor rule, the goldens moved with them, and the gate-run predicate taking them through its embedded provenance block. The ask's `--json` on every arm is answered by gate-sdk/SPEC.md §The non-gate arm: the battery's machine form is this log, and an arm gains `--json` with its named caller (orchestrator-arm-json).
+
+**Cost while deferred:** the adopter cannot tell a rerun's failures from new ones, nor key a verdict to the content and gates that produced it. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `fingerprint`, `gate set`, `tree sha` in this file, none; owner gate-sdk/SPEC.md §run-gates.
+
 ## Technical Debt
 
 ### foreign-run-sandbox-record
@@ -273,16 +283,6 @@ The front-door package route's readiness poll (`npm view <package>@<version> ver
 **Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers. The observe half reads the next release's `publish` run.
 
 **Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner installer/SPEC.md and scripts/ci-front-door.sh.
-
-### verdict-identity-fields
-
-[cost: event/low] [surface: gate-sdk]
-
-Asks A and C of the orchestrator adopter's pairing asks: a verdict an outside work engine keys and diffs. The battery's SARIF log (gate-sdk/SPEC.md §run-gates) carries the verdict, `commit` and `worktree`, each kit's version, one rule per member and finding-line locations under `verdictContract` 1.0.0. It carries no tree object id, no digest of the gate set that judged, no per-result identity stable across reruns of one tree (`native/src/sarif.rs` writes no fingerprint), and no rule id beneath a member with several rule classes.
-
-**Deliverable:** design-pending, a feature: those fields under the verdict contract's minor rule, the goldens moved with them, and the gate-run predicate taking them through its embedded provenance block. The ask's `--json` on every arm is answered by gate-sdk/SPEC.md §The non-gate arm: the battery's machine form is this log, and an arm gains `--json` with its named caller (orchestrator-arm-json).
-
-**Cost while deferred:** the adopter cannot tell a rerun's failures from new ones, nor key a verdict to the content and gates that produced it. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `fingerprint`, `gate set`, `tree sha` in this file, none; owner gate-sdk/SPEC.md §run-gates.
 
 ### verdict-lookup
 
