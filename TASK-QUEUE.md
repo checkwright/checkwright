@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: adopter-followthrough-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, over scope's narrower recommendation):** eleven units completing the asks adopting projects still hold open. `attribution-trailer-ban` leads, the set's iteration-class high row, with `knobs-lock-test-race` beside it. Debt: `amendment-queue-dangling-link` built before `absent-queue-liveness-gates`, whose absent-queue call that direction settled on the entry; `observe-plain-text-context`; `install-size-contract-drift`. Five features for spec to author and pair: `tree-free-hook-roster-widening`, `brief-authority-lint`, and the three asks thawed from the icebox, `gate-tamper-range-arm`, `foreign-run-verb` and `external-kpi-series`. The icebox's `co-authored-by-trailer-attribution` is retired to Done as mooted by `attribution-trailer-ban`. Composition: bundled — delegation-kit carries three features, gate-sdk two units, canon-kit two; drain 11 against inflow 3.8.
-
-  **The release (2026-11-25, operator direction, lead-relayed, not a ruling):** this iteration's close tags v0.38.0 at the closing push, the publish run included, since adopters take landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push carrying the tag, and the mid-iteration push `tree-free-hook-roster-widening` may owe.
-
-  **The history rewrite (2026-11-25, operator direction, lead-relayed, not a ruling):** three unpushed commits carry the barred attribution trailer, so the unpushed range is rewritten to drop it before the closing push. Only that range moves, the pushed head stays an ancestor, and every tree is unchanged apart from the commit bindings: each stamp head is remapped to its rewritten commit, the validate evidence is re-produced by a fresh `--run-validate` rather than re-labelled, and the always-loaded baseline is re-measured. The battery passes at the new head before the push and tag sequence runs, under the same grant.
 
 ---
 

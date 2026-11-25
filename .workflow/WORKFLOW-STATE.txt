@@ -4,14 +4,4 @@
 
 ---
 
-adopter-followthrough-pass scope af3e3157 2026-11-25 574231cf9
-adopter-followthrough-pass spec aa464151 2026-11-25 50f974b5e
-adopter-followthrough-pass align a66d93a7 2026-11-25 c1dfa6055
-adopter-followthrough-pass build a628a191 2026-11-25 cfbf6bc6c
-adopter-followthrough-pass build a0f1c8e1 2026-11-25 8bd0e4a2b
-adopter-followthrough-pass build a7e8fee9 2026-11-25 ba59a2456
-adopter-followthrough-pass build a4a68547 2026-11-25 c2ec8dc38
-adopter-followthrough-pass build aa34c148 2026-11-25 db50a95ed
-adopter-followthrough-pass build a63bc322 2026-11-25 7619d2dc6
-adopter-followthrough-pass validate a006517f 2026-11-25 1f4855893
-adopter-followthrough-pass close a692286d 2026-11-25 2fb1955dc
+— scope a8c46c2a 2026-11-25 2d9e24622
