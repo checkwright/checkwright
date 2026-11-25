@@ -15,10 +15,10 @@ pub fn run(payload: Option<&Value>) -> i32 {
     match record_target() {
         Ok(log) => {
             append_attempt(&log, payload);
-            hook::block(NAME, DENIAL)
+            hook::block(NAME, &denial(None))
         }
-        Err(fault) if hook::tree_free() => hook::block(NAME, &unlogged(&fault)),
-        Err(_) => hook::block(NAME, DENIAL),
+        Err(fault) if hook::tree_free() => hook::block(NAME, &denial(Some(&fault))),
+        Err(_) => hook::block(NAME, &denial(None)),
     }
 }
 
@@ -33,10 +33,17 @@ pub(crate) fn record_target() -> Result<String, String> {
     Ok(walk::capture_path(&log))
 }
 
-// spec: guard-kit/SPEC.md §wakeup-guard — the denial's one added sentence, so a lost record is never
-// silent
-fn unlogged(fault: &str) -> String {
-    format!("{} This attempt went unlogged: {}.", DENIAL, fault)
+// spec: guard-kit/SPEC.md §wakeup-guard — with no repository the denial names neither a repository
+// nor close's triage, and a lost record's fault replaces the logged sentence, so it is never silent
+fn denial(unlogged: Option<&str>) -> String {
+    let tree_free = hook::tree_free();
+    let place = if tree_free { "" } else { " in this repo" };
+    let tail = match unlogged {
+        Some(fault) => format!("This attempt went unlogged: {}.", fault),
+        None if tree_free => "Attempt logged.".to_string(),
+        None => "Attempt logged (triaged at close alongside the friction log).".to_string(),
+    };
+    format!("ScheduleWakeup/CronCreate is blocked{} — {} {}", place, WHY, tail)
 }
 
 // spec: guard-kit/SPEC.md §wakeup-guard — the attempt record: a local-zone stamp, then the three
@@ -123,9 +130,9 @@ fn summary(payload: Option<&Value>) -> String {
     format!("{{{},{},{}}}", at(SESSION_ID), at(TOOL_NAME), at(TOOL_INPUT))
 }
 
-// spec: guard-kit/SPEC.md §wakeup-guard — the denial text, carried verbatim off the shell member:
-// it names why a self-scheduled wakeup is refused and where the attempt is triaged.
-const DENIAL: &str = "ScheduleWakeup/CronCreate is blocked in this repo — a self-scheduled wakeup re-fires its stored prompt in a later session as if the user typed it, long after its premises are stale, and the scheduling call is invisible at the moment it matters. Surface the intent to the user and let them re-invoke instead. Attempt logged (triaged at close alongside the friction log).";
+// spec: guard-kit/SPEC.md §wakeup-guard — why a self-scheduled wakeup is refused, carried off the
+// shell member
+const WHY: &str = "a self-scheduled wakeup re-fires its stored prompt in a later session as if the user typed it, long after its premises are stale, and the scheduling call is invisible at the moment it matters. Surface the intent to the user and let them re-invoke instead.";
 
 #[cfg(test)]
 mod tests {
@@ -156,9 +163,20 @@ mod tests {
         let carried = record_target().expect_err("the carried fault comes first");
         assert!(carried.starts_with("--knobs") && carried.contains("rel.knobs"), "{}", carried);
         assert_eq!(run(None), 2);
+        let text = denial(Some(&carried));
+        assert!(text.contains(WHY) && text.ends_with("takes an absolute file only."), "{}", text);
+        for held in [denial(Some(&carried)), denial(None)] {
+            assert!(!held.contains("in this repo") && !held.contains("triaged at close"), "{}", held);
+        }
         drop(m);
-        let text = unlogged(&carried);
-        assert!(text.starts_with(DENIAL) && text.ends_with("takes an absolute file only."), "{}", text);
+    }
+
+    // spec: guard-kit/SPEC.md §wakeup-guard — in a repository the denial keeps its repository and
+    // triage wording
+    #[test]
+    fn in_a_repository_the_denial_names_the_repo_and_the_triage() {
+        let text = denial(None);
+        assert!(text.contains("blocked in this repo") && text.ends_with("alongside the friction log)."), "{}", text);
     }
 
     // spec: guard-kit/SPEC.md §wakeup-guard — an absolute log under the mark is the record's target
