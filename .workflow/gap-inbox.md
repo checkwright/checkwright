@@ -1,1 +1,2 @@
 # contract: lifecycle-kit/SPEC.md §The committed gap inbox — append-only mid-iteration gap capture, close-drained; one `- <YYYY-MM-DD> — <gap>` bullet per gap below (filed via run-gates.sh --emit file-gap).
+- 2026-11-25 — deny-term-names leaves a manifest's package and binary names out of check-path-names' corpus (the adopter called them welcome, not required); DISTINCT from that entry, a widening it leaves out: a manifest-name arm reading Cargo.toml and package.json name fields against the deny-term list; cost event/low, owner gate-sdk/SPEC.md §check-path-names once merged
