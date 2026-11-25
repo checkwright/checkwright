@@ -2,7 +2,7 @@
 
 Pairs `verdict-identity-fields`. The battery's SARIF log is the verdict an outside work engine reads, and the engine needs to key it and diff it. To key it, the engine needs the content that was judged and the gates that judged it. To diff it, each failure needs an identity that survives a rerun. This amendment adds a tree object id and a gate-set digest to the provenance block, so the gate-run Statement takes both through its embedded block. It also adds a fingerprint to each fail result. The verdict contract and the gate-run predicate each take a minor bump.
 
-The ask's fourth field, a rule id beneath a member with several rule classes, is held out of this amendment and escalated to the lead. No member in the tree prints a class token on its finding lines today, so the field has no producer, and the adopter has not named a member that needs one. A delta lands here, or the field moves to its own entry, once that question is answered.
+The ask's fourth field, a rule id beneath a member with several rule classes, is not in this amendment. No member in the tree prints a class token on its finding lines today, so the field would have no producer, and the adopter needs no in-tree rule id. It rides the per-pattern rule ids of the adopter-content-checks entry, their first producer.
 
 **What the tree does today**, each bullet with the probe that settled it:
 
