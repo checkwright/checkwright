@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-machine-verdict-pass release deferred:v0.39.0 — minor by the declarations (the verdict identity fields and gate-run predicate at 1.1.0, the exit 3 tool-error split, the --verdict-lookup arm and GATE_SDK_VERDICT_STORE, --run --json, the payload's amendment withhold, the lone-dash refusals), no decommission; no cut granted, operator direction 2026-11-25, lead-relayed

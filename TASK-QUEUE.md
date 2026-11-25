@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: machine-verdict-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, on scope's recommendation):** the machine-verdict set answering the orchestrator adopter's pairing asks, in the adopter's priority order. Features for spec to author: `verdict-identity-fields` leads, `verdict-lookup` lands after it and after `exit-code-tool-error`, whose exit 3 its contract uses, then `orchestrator-arm-json`. Debt on the surfaces they touch: `foreign-run-sandbox-record`, `lead-journal-session-id`, `knobs-lock-catcher`, `payload-amendment-withhold`. `external-state-owner-mode` stays deferred by a later direction of the same date, recorded on its entry. `adopter-content-checks` leads a later iteration, its rule list arriving with the ask. Ask E, the four peer-channel defects, is met: the peer-channel fix of 2026-11-24 settled each, and v0.38.0 shipped it.
-
-  **The release and pushes (2026-11-25, operator direction, lead-relayed, not a ruling):** no release cut is granted. Push need 2 against 2, inside the budget: the closing push, and the mid-iteration push `exit-code-tool-error` owes.
 
 ---
 
