@@ -5,3 +5,4 @@
 ---
 
 machine-verdict-pass scope a8c46c2a 2026-11-25 2d9e24622
+machine-verdict-pass spec abbc1a45 2026-11-25 f8668954c
