@@ -16,18 +16,6 @@
 
 ## New Features
 
-### binary-strings-scan
-
-[spec: gate-sdk/SPEC-binary-strings.md]
-
-The strings family of `adopter-content-checks`: built binaries against the shared deny terms and a set of leak shapes, run on every gate run.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** read printable ASCII runs of 4+ in build-output files the consumer names explicitly, no discovery, and in a 64-bit little-endian ELF only the file-backed sections holding no code. Hit a home-shaped path (`/home/`, `/root/`, `/Users/`), a cargo-registry path, any `<scheme>://` URL, and a token equal to a consumer deny term, case-insensitive, tokens split outside `[A-Za-z0-9._-]`. A finding carries a location and a rule id, never the term or the string.
-
-**Deliverable:** check-binary-strings, born native with its pair, an ELF section reader, and a starter shapes list as consumer-selectable config.
-
-**Cost while deferred:** a home path or a private name compiled into a shipped binary ships unseen, this repo's build-time check covering only its own artifact. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `ELF`, `printable` in this file, none; owner gate-sdk/SPEC.md §build-native.
-
 ### deny-term-names
 
 [spec: gate-sdk/SPEC-deny-terms.md]
@@ -1102,4 +1090,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - content-rule-class
 - exit-status-site-unification
 - adopter-content-checks
+- binary-strings-scan
 

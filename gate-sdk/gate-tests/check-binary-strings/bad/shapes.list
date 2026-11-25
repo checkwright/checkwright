@@ -1,0 +1,2 @@
+# rule: HOME-PATH
+/(home|root|Users)/

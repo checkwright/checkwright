@@ -428,7 +428,7 @@ fn absolutized(here: &str, roots: &[Root]) -> Vec<String> {
 // spec: gate-sdk/SPEC.md §check-tree-terms — the self-exempt paths of a pattern gate: each pattern
 // file it resolved and each kit root's starter roster `<kit root>/templates/<starter>`, spelled as
 // `git ls-files` prints a tracked path from the working directory, for a lexical comparison
-pub fn self_exempt_paths(resolved: &[String], starter: &str) -> Result<Vec<String>, String> {
+pub fn self_exempt_paths(resolved: &[String], starters: &[&str]) -> Result<Vec<String>, String> {
     let here = cwd()?;
     let spell = |p: &str| -> String {
         let abs = abs_against(&here, p);
@@ -441,7 +441,9 @@ pub fn self_exempt_paths(resolved: &[String], starter: &str) -> Result<Vec<Strin
     for r in kit_roots()? {
         let r = r.trim_end_matches('/');
         let base = if r.is_empty() { "." } else { r };
-        out.push(spell(&format!("{}/templates/{}", base, starter)));
+        for starter in starters {
+            out.push(spell(&format!("{}/templates/{}", base, starter)));
+        }
     }
     out.sort();
     out.dedup();

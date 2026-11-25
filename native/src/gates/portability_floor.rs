@@ -91,7 +91,7 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
     let (patterns, files_present) = resolve_patterns(&files).map_err(Fault::input)?;
     // spec: gate-sdk/SPEC.md §check-portability-floor — a pattern file this gate resolved, or the
     // kit's own starter roster, is self-exempt
-    let exempt = walk::self_exempt_paths(&files, PORTABILITY_PATTERN_FILE)
+    let exempt = walk::self_exempt_paths(&files, &[PORTABILITY_PATTERN_FILE])
         .map_err(|e| Fault::refused(format!("check-portability-floor: {}", e)))?;
 
     // spec: gate-sdk/SPEC.md §check-portability-floor — a clean verdict that says *nothing is

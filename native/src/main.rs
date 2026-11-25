@@ -28,6 +28,7 @@ mod declaration;
 mod deny_terms;
 mod diff;
 mod doctrine;
+mod elf;
 mod emit;
 mod ere;
 mod evidence;

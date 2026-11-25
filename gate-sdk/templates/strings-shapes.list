@@ -1,0 +1,15 @@
+# strings-shapes.list — starter leak-shape roster for check-binary-strings.
+# gate-sdk/SPEC.md §check-binary-strings. One POSIX ERE per line, matched against
+# each printable string a named build output ships; '#' comments and blank lines
+# are ignored, and a '# rule: <ID>' line names the rule id of every shape after it.
+# Copy to your gates dir as strings-shapes.list and name your shipped outputs in
+# GATE_SDK_STRINGS_FILES; delete a shape your binaries carry by design.
+
+# rule: HOME-PATH
+/(home|root|Users)/
+
+# rule: REGISTRY-PATH
+\.cargo/registry/
+
+# rule: URL
+[A-Za-z][A-Za-z0-9+.-]*://

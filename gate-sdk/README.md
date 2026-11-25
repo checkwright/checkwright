@@ -99,6 +99,7 @@ check-action-job-ref
 check-commit-msg
 check-commit-subject
 check-tree-terms
+check-binary-strings
 check-portability-floor
 check-projection-roster
 check-template-copy-parity

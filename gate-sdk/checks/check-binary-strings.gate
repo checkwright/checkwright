@@ -1,0 +1,4 @@
+# graph: couples=knob:GATE_SDK_GATES_DIR/strings-shapes.list dir=one valve=none tier=precommit trigger=*
+# install: on-surface
+# armed-by: GATE_SDK_STRINGS_FILES
+# spec: gate-sdk/SPEC.md §check-binary-strings — no named build output carries a deny term or a configured leak shape in a string it would ship (the record names an offset, a rule id and the entry's position, never the string)

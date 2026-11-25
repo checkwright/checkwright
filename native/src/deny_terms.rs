@@ -61,17 +61,17 @@ pub fn malformed(file: &str, line: usize) -> Fault {
 
 // spec: gate-sdk/SPEC.md §Output contract — an optional configured file: nothing at the path
 // contributes nothing, and anything there that is not a readable regular file is input
-fn read_optional(file: &str) -> Result<Option<String>, Fault> {
+fn read_optional(file: &str, noun: &str) -> Result<Option<String>, Fault> {
     let p = Path::new(file);
     if std::fs::symlink_metadata(p).is_err() {
         return Ok(None);
     }
     if !p.is_file() {
-        return Err(Fault::input(format!("deny-term list is not a regular file: {}", file)));
+        return Err(Fault::input(format!("{} is not a regular file: {}", noun, file)));
     }
     std::fs::read_to_string(p)
         .map(Some)
-        .map_err(|e| Fault::input(format!("cannot read the deny-term list {}: {}", file, e)))
+        .map_err(|e| Fault::input(format!("cannot read the {} {}: {}", noun, file, e)))
 }
 
 // spec: gate-sdk/SPEC.md §The deny-term list — the files the knob names, each optional
@@ -81,9 +81,15 @@ pub fn files() -> Result<Vec<String>, Fault> {
 
 // spec: gate-sdk/SPEC.md §The deny-term list — every live term of the lists, in knob order
 pub fn read(files: &[String]) -> Result<Vec<Entry>, Fault> {
+    read_lists(files, "deny-term list")
+}
+
+// spec: gate-sdk/SPEC.md §check-binary-strings — a shape list shares the deny-term list's
+// grammar, positions and optional-file split, its entries being EREs
+pub fn read_lists(files: &[String], noun: &str) -> Result<Vec<Entry>, Fault> {
     let mut out: Vec<Entry> = Vec::new();
     for f in files {
-        let Some(text) = read_optional(f)? else {
+        let Some(text) = read_optional(f, noun)? else {
             continue;
         };
         for (text, id) in parse(&text).map_err(|line| malformed(f, line))? {

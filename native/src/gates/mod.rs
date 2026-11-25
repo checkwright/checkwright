@@ -13,6 +13,7 @@ pub mod amendment_update_target;
 pub mod agent_tier_explicit;
 pub mod assertion_strength;
 pub mod audit_roster;
+pub mod binary_strings;
 pub mod brevity;
 pub mod brief_authority;
 pub mod citation_link;
@@ -2667,6 +2668,16 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "gate-sdk",
         &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-binary-strings — no walk root: the corpus is the outputs a
+    // knob names exactly, never a tree
+    (
+        "check-binary-strings",
+        binary_strings::run,
+        &[],
+        &["GATE_SDK_STRINGS_FILES", "GATE_SDK_STRINGS_SHAPES", "GATE_SDK_DENY_TERMS"],
+        "gate-sdk",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-portability-floor — no walk root: the corpus is
     // `git ls-files` over the configured pathspecs, which §check-reads-couples rules outside the

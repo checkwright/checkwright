@@ -68,6 +68,14 @@ fn deny_terms(resolve: Resolve) -> Result<Value, String> {
     in_gates_dir(resolve, "deny-terms.local.list")
 }
 
+// spec: gate-sdk/SPEC.md §check-binary-strings — the default shapes list's basename, which the
+// kit's own starter roster under `templates/` also carries
+pub const STRINGS_SHAPES_FILE: &str = "strings-shapes.list";
+
+fn strings_shapes(resolve: Resolve) -> Result<Value, String> {
+    in_gates_dir(resolve, STRINGS_SHAPES_FILE)
+}
+
 // spec: gate-sdk/SPEC.md §check-portability-floor — the default roster's basename, which a kit's
 // own starter roster under `templates/` also carries
 pub const PORTABILITY_PATTERN_FILE: &str = "portability-patterns.list";
@@ -199,6 +207,8 @@ pub const KIT: Kit = Kit {
         Row::derived("GATE_SDK_MSG_PATTERN_FILES_LOCAL", Shape::Scalar, msg_pattern_files_local, GATES)
             .empty_takes_default().words(),
         Row::derived("GATE_SDK_DENY_TERMS", Shape::Scalar, deny_terms, GATES).empty_takes_default().words(),
+        Row::scalar("GATE_SDK_STRINGS_FILES", "").empty_takes_default().words(),
+        Row::derived("GATE_SDK_STRINGS_SHAPES", Shape::Scalar, strings_shapes, GATES).empty_takes_default().words(),
         Row::derived("GATE_SDK_PORTABILITY_PATTERNS", Shape::Scalar, portability_patterns, GATES).empty_takes_default().words(),
         Row::scalar("GATE_SDK_PORTABILITY_PATHS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_HARNESS_LITERALS", "").empty_takes_default().words(),

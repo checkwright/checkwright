@@ -1,0 +1,3 @@
+GATE_SDK_STRINGS_FILES = out/app.elf out/notes.bin
+GATE_SDK_STRINGS_SHAPES = shapes.list
+GATE_SDK_DENY_TERMS = terms.list

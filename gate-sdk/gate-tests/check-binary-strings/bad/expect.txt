@@ -1,0 +1,4 @@
+carry a deny term or a leak shape
+out/app.elf@83: [HOME-PATH] shape 1
+out/app.elf@115: [CODENAME] term 1
+out/notes.bin@11: [CODENAME] term 1

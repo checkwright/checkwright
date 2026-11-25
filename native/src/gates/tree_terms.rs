@@ -5,7 +5,7 @@ use crate::exit::{self, Fault};
 use crate::fresh;
 use crate::deny_terms::{self, Entry};
 use crate::gates::commit_msg::resolve_files;
-use crate::knobs::gate_sdk::MSG_PATTERN_FILE;
+use crate::knobs::gate_sdk::{MSG_PATTERN_FILE, STRINGS_SHAPES_FILE};
 use crate::walk;
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -140,7 +140,7 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
         n
     };
     named.extend(term_files);
-    let exempt = walk::self_exempt_paths(&named, MSG_PATTERN_FILE)
+    let exempt = walk::self_exempt_paths(&named, &[MSG_PATTERN_FILE, STRINGS_SHAPES_FILE])
         .map_err(|e| Fault::refused(format!("check-tree-terms: {}", e)))?;
 
     let prune = walk::prune_dirs().map_err(|e| Fault::refused(format!("check-tree-terms: {}", e)))?;
