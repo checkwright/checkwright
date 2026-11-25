@@ -8,3 +8,4 @@ adopter-followthrough-pass scope af3e3157 2026-11-25 574231cf9
 adopter-followthrough-pass spec aa464151 2026-11-25 50f974b5e
 adopter-followthrough-pass align a66d93a7 2026-11-25 c1dfa6055
 adopter-followthrough-pass build a628a191 2026-11-25 cfbf6bc6c
+adopter-followthrough-pass build a0f1c8e1 2026-11-25 8bd0e4a2b
