@@ -22,7 +22,7 @@
 29066cp companion/SPEC.md
 119197cp context-kit/SPEC.md
 2351cp context-kit/templates/close-brevity.md
-281157cp delegation-kit/SPEC.md
+285777cp delegation-kit/SPEC.md
 40657cp delegation-kit/templates/agent-execution.md
 3397cp delegation-kit/templates/dispatch-checklists.md
 3468cp docs/agent-index.md
@@ -98,7 +98,7 @@
 18425cp docs/posts/2026-11-24-checkwright-v0-37-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
-8556cp docs/requirements.md
+8555cp docs/requirements.md
 7012cp docs/site-architecture.md
 2412cp docs/site-kit/index.md
 5463cp docs/spec-toolkits.md

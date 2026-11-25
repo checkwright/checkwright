@@ -86,7 +86,7 @@ A repository install commits the profile's kit files, the gate binary and a hand
 | --- | --- | --- | --- |
 | canon-kit | 430 | 390 | 230 kB |
 | context-kit | 69 | 47 | 48 kB |
-| delegation-kit | 47 | 35 | 110 kB |
+| delegation-kit | 46 | 35 | 92 kB |
 | doctrine-kit | 12 | 9 | 64 kB |
 | drift-kit | 7 | 0 | 35 kB |
 | evidence-kit | 69 | 62 | 94 kB |

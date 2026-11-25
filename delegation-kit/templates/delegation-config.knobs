@@ -14,6 +14,9 @@
 # DELEGATION_KIT_FOREIGN_TIER_MODEL[] = <harness>/<class>=<model>,<effort>
 # DELEGATION_KIT_FOREIGN_HARNESS[] = <adapter>=<harness>
 
+# spec: delegation-kit/SPEC.md §The foreign-vendor run — the word `@SANDBOX@` becomes for an adapter under a policy (the mode word where a run names none); the kit ships none (each names a vendor's option), so set them beside the adapters; default empty
+# DELEGATION_KIT_FOREIGN_SANDBOX[] = <adapter>/<policy>=<word>
+
 # spec: delegation-kit/SPEC.md §The foreign-vendor run — one `<adapter>=<word>` element per argv word, in order; the kit ships no adapter (each names a vendor's program), so set one in the gitignored `.local` overlay; default empty
 # DELEGATION_KIT_FOREIGN_ADAPTERS[] = <adapter>=<program>
 # DELEGATION_KIT_FOREIGN_ADAPTERS[] = <adapter>=@PROMPT_FILE@

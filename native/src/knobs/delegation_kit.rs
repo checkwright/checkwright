@@ -81,6 +81,7 @@ pub const KIT: Kit = Kit {
         Row::indexed("DELEGATION_KIT_FOREIGN_ADAPTERS", &[]),
         Row::scalar("DELEGATION_KIT_FOREIGN_TIMEOUT", "1800"),
         Row::indexed("DELEGATION_KIT_FOREIGN_RESUME", &[]),
+        Row::indexed("DELEGATION_KIT_FOREIGN_SANDBOX", &[]),
         Row::indexed("DELEGATION_KIT_FOREIGN_SESSION_MARKER", &[]),
         Row::indexed("DELEGATION_KIT_FOREIGN_USAGE", &[]),
         Row::indexed("DELEGATION_KIT_FOREIGN_USAGE_CMD", &[]),
@@ -174,6 +175,7 @@ fn validate(v: &Values) -> Vec<String> {
         }
     }
     errs.extend(foreign_refusals(v));
+    errs.extend(sandbox_refusals(v));
     // spec: delegation-kit/SPEC.md §The tier binding — the refusals are the matcher module's, so
     // the validator and every reader share one reading of an element
     let default: Vec<String> = crate::tier::DEFAULT_CLASSES.iter().map(|c| c.to_string()).collect();
@@ -298,6 +300,89 @@ fn foreign_refusals(v: &Values) -> Vec<String> {
                 ));
             }
         }
+    }
+    errs
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — DELEGATION_KIT_FOREIGN_SANDBOX's
+// element refusals and the three facts it holds with the adapter forms
+fn sandbox_refusals(v: &Values) -> Vec<String> {
+    const KNOB: &str = "DELEGATION_KIT_FOREIGN_SANDBOX";
+    let token = crate::emit::foreign_run::SANDBOX_TOKEN;
+    let form = |knob: &str| -> Vec<(String, String)> {
+        indexed(v, knob)
+            .unwrap_or(&[])
+            .iter()
+            .filter_map(|e| e.split_once('='))
+            .map(|(a, w)| (a.to_string(), w.to_string()))
+            .collect()
+    };
+    let adapters = form("DELEGATION_KIT_FOREIGN_ADAPTERS");
+    let resume = form("DELEGATION_KIT_FOREIGN_RESUME");
+    let carries = |table: &[(String, String)], a: &str| table.iter().any(|(t, w)| t == a && w.contains(token));
+    let mut errs: Vec<String> = Vec::new();
+    let mut seen: Vec<&str> = Vec::new();
+    let mut bound: Vec<&str> = Vec::new();
+    for e in indexed(v, KNOB).unwrap_or(&[]) {
+        let Some((key, word)) = e.split_once('=') else {
+            errs.push(format!("{} element '{}' is not '<adapter>/<policy>=<word>'", KNOB, e));
+            continue;
+        };
+        let Some((adapter, _)) = key.split_once('/').filter(|(a, p)| adapter_name(a) && crate::tier::name(p)) else {
+            errs.push(format!(
+                "{} element '{}' keys '{}', not '<adapter>/<policy>' with both names in [a-z0-9-]",
+                KNOB, e, key
+            ));
+            continue;
+        };
+        if word.is_empty() {
+            errs.push(format!("{} element '{}' has an empty word", KNOB, e));
+        } else if word.chars().any(char::is_whitespace) {
+            errs.push(format!("{} element '{}' carries whitespace in its word", KNOB, e));
+        } else if word == "-" {
+            errs.push(format!("{} element '{}' binds the word '-', which a session record reads as absent", KNOB, e));
+        }
+        if seen.contains(&key) {
+            errs.push(format!("{} binds '{}' twice", KNOB, key));
+            continue;
+        }
+        seen.push(key);
+        if bound.contains(&adapter) {
+            continue;
+        }
+        bound.push(adapter);
+        if !adapters.iter().any(|(c, _)| c == adapter) {
+            errs.push(format!(
+                "{} names adapter '{}', which DELEGATION_KIT_FOREIGN_ADAPTERS does not configure",
+                KNOB, adapter
+            ));
+        } else if !carries(&adapters, adapter) {
+            errs.push(format!(
+                "{} binds adapter '{}', whose DELEGATION_KIT_FOREIGN_ADAPTERS form carries no {}",
+                KNOB, adapter, token
+            ));
+        }
+    }
+    let mut told: Vec<&str> = Vec::new();
+    for (knob, table) in [("DELEGATION_KIT_FOREIGN_ADAPTERS", &adapters), ("DELEGATION_KIT_FOREIGN_RESUME", &resume)] {
+        for (a, _) in table.iter() {
+            if told.contains(&a.as_str()) || bound.contains(&a.as_str()) || !carries(table, a) {
+                continue;
+            }
+            told.push(a);
+            errs.push(format!("{}'s form for adapter '{}' carries {} but {} binds it no policy", knob, a, token, KNOB));
+        }
+    }
+    for (a, _) in adapters.iter() {
+        let has_resume = resume.iter().any(|(r, _)| r == a);
+        if told.contains(&a.as_str()) || !carries(&adapters, a) || !has_resume || carries(&resume, a) {
+            continue;
+        }
+        told.push(a);
+        errs.push(format!(
+            "DELEGATION_KIT_FOREIGN_ADAPTERS's form for adapter '{}' carries {} but its DELEGATION_KIT_FOREIGN_RESUME form does not",
+            a, token
+        ));
     }
     errs
 }
@@ -494,6 +579,48 @@ mod tests {
         assert!(errs.len() == 1 && errs[0].contains("not one of expert, trivial"), "{:?}", errs);
         let errs = run(&[], &[], &[], &[], Some(&["judgment", "judgment"]));
         assert!(errs.len() == 1 && errs[0].contains("names class 'judgment' twice"), "{:?}", errs);
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — the sandbox table's refusals and the
+    // three facts it holds together with the adapter forms, each beside a passing table
+    #[test]
+    fn the_sandbox_table_and_the_sandbox_token_are_held_together() {
+        let run = |adapters: &[&str], resume: &[&str], sandbox: &[&str]| {
+            let mut v: Values = Values::new();
+            let mut put = |k: &'static str, e: &[&str]| {
+                v.insert(k, (Value::Indexed(e.iter().map(|s| s.to_string()).collect()), Origin::Tracked));
+            };
+            put("DELEGATION_KIT_FOREIGN_ADAPTERS", adapters);
+            put("DELEGATION_KIT_FOREIGN_RESUME", resume);
+            put("DELEGATION_KIT_FOREIGN_SANDBOX", sandbox);
+            validate(&v)
+        };
+        let open: &[&str] = &["ad=prog", "ad=--sandbox", "ad=@SANDBOX@", "plain=prog", "plain=read-only"];
+        let back: &[&str] = &["ad=prog", "ad=mode=@SANDBOX@"];
+        let table: &[&str] = &["ad/audit=read-only", "ad/sweep=workspace-write", "ad/wide=a=b"];
+        assert!(run(open, back, table).is_empty());
+        assert!(run(open, &[], table).is_empty(), "a one-shot adapter has no resume form to hold");
+        assert!(run(&["plain=prog"], &["plain=prog"], &[]).is_empty(), "no element, no token");
+        type Table<'a> = &'a [&'a str];
+        let cases: &[(&str, Table, Table, Table)] = &[
+            ("is not '<adapter>/<policy>=<word>'", open, back, &["ad/audit=x", "ad/sweep=y", "noequals"]),
+            ("keys 'ad', not '<adapter>/<policy>'", open, back, &["ad/audit=x", "ad=y"]),
+            ("keys 'ad/Wide', not '<adapter>/<policy>'", open, back, &["ad/audit=x", "ad/Wide=y"]),
+            ("has an empty word", open, back, &["ad/audit="]),
+            ("carries whitespace in its word", open, back, &["ad/audit=read only"]),
+            ("binds the word '-'", open, back, &["ad/audit=-"]),
+            ("binds 'ad/audit' twice", open, back, &["ad/audit=x", "ad/audit=y"]),
+            ("names adapter 'other', which DELEGATION_KIT_FOREIGN_ADAPTERS does not configure", open, back, &["ad/audit=x", "other/audit=y"]),
+            ("binds adapter 'plain', whose DELEGATION_KIT_FOREIGN_ADAPTERS form carries no @SANDBOX@", open, back, &["ad/audit=x", "plain/audit=y"]),
+            ("DELEGATION_KIT_FOREIGN_ADAPTERS's form for adapter 'ad' carries @SANDBOX@ but DELEGATION_KIT_FOREIGN_SANDBOX binds it no policy", open, back, &[]),
+            ("DELEGATION_KIT_FOREIGN_RESUME's form for adapter 'plain' carries @SANDBOX@ but", open, &["ad=mode=@SANDBOX@", "plain=@SANDBOX@"], table),
+            ("form for adapter 'ad' carries @SANDBOX@ but its DELEGATION_KIT_FOREIGN_RESUME form does not", open, &["ad=prog", "ad=--sandbox=read-only"], table),
+        ];
+        for (want, adapters, resume, sandbox) in cases {
+            let errs = run(adapters, resume, sandbox);
+            assert_eq!(errs.len(), 1, "{}: {:?}", want, errs);
+            assert!(errs[0].contains(want), "did not refuse with '{}': {:?}", want, errs);
+        }
     }
 
     // spec: delegation-kit/SPEC.md §Layout and configuration — a binding refusing on several findings

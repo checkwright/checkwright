@@ -28,7 +28,7 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
        --usage-poll                            refresh the usage snapshot from its source
        --usage-verdict [paths]                 budget verdict: 0 OK/RESET-OK, 1 PAUSE, 2 STALE
        --model-verdict [--expect <class>] [transcript]  running-model verdict: 0 READ/OK, 1 BELOW/UNBOUND, 2 UNKNOWN
-       --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--class <class>] [--key <key>]  one unit on a foreign adapter: 0 OK, 1 REFUSED, 2 FAILED
+       --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--class <class>] [--sandbox <policy>] [--key <key>]  one unit on a foreign adapter: 0 OK, 1 REFUSED, 2 FAILED
        --foreign-run <adapter> --budget        the adapter's budget verdict, no spawn: 0 OK/RESET-OK, 1 PAUSE, 2 STALE/OFF
        --foreign-resume <key> <prompt-file> | <key> --close  the next turn of a foreign session, or its end: 0 OK/CLOSED, 1 REFUSED, 2 FAILED
        --lesson-sink <tag>                     route a lesson body on stdin to its sink
@@ -103,7 +103,11 @@ pub const USAGE: &str = r#"usage: --run [gates-dir]                       run ev
           names requires --class and runs the model and effort its harness
           binds to that class in DELEGATION_KIT_FOREIGN_TIER_MODEL; any other
           adapter reads nothing of a class, and the line's class= says which
-          happened. The adapter's budget is read before the
+          happened. An adapter whose form carries @SANDBOX@ runs the word
+          DELEGATION_KIT_FOREIGN_SANDBOX binds to the --sandbox policy, the
+          mode word where none is named; any other adapter pins its
+          confinement and refuses a named policy, and the line's sandbox=
+          says which. The adapter's budget is read before the
           spawn, and a paused window spawns nothing: FAILED (budget: ...).
           With --budget it prints that budget verdict alone and spawns no
           adapter: exit 0 OK / RESET-OK, 1 PAUSE, 2 STALE or OFF

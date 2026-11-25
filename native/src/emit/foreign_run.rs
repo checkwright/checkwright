@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 pub const KNOBS: &[&str] = &[
     "DELEGATION_KIT_FOREIGN_ADAPTERS",
     "DELEGATION_KIT_FOREIGN_RESUME",
+    "DELEGATION_KIT_FOREIGN_SANDBOX",
     "DELEGATION_KIT_FOREIGN_SESSION_MARKER",
     "DELEGATION_KIT_FOREIGN_HARNESS",
     "DELEGATION_KIT_FOREIGN_TIER_MODEL",
@@ -23,7 +24,7 @@ pub const KNOBS: &[&str] = &[
     "GATE_SDK_TMP_DIR",
 ];
 
-const USAGE: &str = "usage: --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--class <class>] [--key <key>] [--]\n       --foreign-run <adapter> --budget\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem. An adapter DELEGATION_KIT_FOREIGN_HARNESS names requires --class, a class of DELEGATION_KIT_TIER_CLASSES, and runs the model and effort its harness binds to it. With --budget it prints the adapter's keyed budget verdict and spawns no adapter";
+const USAGE: &str = "usage: --foreign-run <adapter> <prompt-file> [--mode audit|sweep] [--class <class>] [--sandbox <policy>] [--key <key>] [--]\n       --foreign-run <adapter> --budget\n  runs one unit on the adapter DELEGATION_KIT_FOREIGN_ADAPTERS configures, in a scratch clone of committed HEAD; the key names the run's directory and defaults to the prompt file's stem. An adapter DELEGATION_KIT_FOREIGN_HARNESS names requires --class, a class of DELEGATION_KIT_TIER_CLASSES, and runs the model and effort its harness binds to it. An adapter whose form carries @SANDBOX@ runs the word DELEGATION_KIT_FOREIGN_SANDBOX binds to the --sandbox policy, the mode word where none is named; any other adapter refuses a named policy. With --budget it prints the adapter's keyed budget verdict and spawns no adapter";
 
 const RESUME_USAGE: &str = "usage: --foreign-resume <key> <prompt-file> [--]\n       --foreign-resume <key> --close\n  runs the next turn of the session a resumable adapter opened under the key, or ends it";
 
@@ -34,6 +35,8 @@ pub const SESSION_TOKEN: &str = "@SESSION_ID@";
 pub const MODEL_TOKEN: &str = "@MODEL@";
 
 const EFFORT_TOKEN: &str = "@EFFORT@";
+
+pub const SANDBOX_TOKEN: &str = "@SANDBOX@";
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — the two tokens only a class-taking
 // adapter's forms may carry
@@ -49,6 +52,7 @@ struct Args {
     prompt: String,
     sweep: bool,
     class: Option<String>,
+    sandbox: Option<String>,
     key: String,
 }
 
@@ -76,6 +80,7 @@ fn parse(args: &[String]) -> Result<Form, String> {
     let mut budget = false;
     let mut key: Option<String> = None;
     let mut class: Option<String> = None;
+    let mut sandbox: Option<String> = None;
     let mut literal = false;
     let mut i = 0;
     while i < args.len() {
@@ -87,6 +92,13 @@ fn parse(args: &[String]) -> Result<Form, String> {
         } else if a == "--class" {
             let c = args.get(i + 1).ok_or("foreign-run: --class needs a class")?;
             class = Some(c.clone());
+            i += 1;
+        } else if a == "--sandbox" {
+            let p = args.get(i + 1).ok_or("foreign-run: --sandbox needs a policy")?;
+            if !crate::tier::name(p) {
+                return Err(format!("foreign-run: --sandbox names '{}', not a policy name in [a-z0-9-]", p));
+            }
+            sandbox = Some(p.clone());
             i += 1;
         } else if a == "--mode" {
             match args.get(i + 1).map(String::as_str) {
@@ -114,8 +126,8 @@ fn parse(args: &[String]) -> Result<Form, String> {
     }
     // spec: delegation-kit/SPEC.md §The keyed verdict — the `--budget` form takes the adapter alone
     if budget {
-        if mode || key.is_some() || class.is_some() {
-            return Err("foreign-run: --budget takes none of --mode, --class and --key".to_string());
+        if mode || key.is_some() || class.is_some() || sandbox.is_some() {
+            return Err("foreign-run: --budget takes none of --mode, --class, --sandbox and --key".to_string());
         }
         let [adapter] = rest[..] else {
             return Err(format!("foreign-run: --budget takes an adapter alone (got {} operand(s))", rest.len()));
@@ -129,7 +141,7 @@ fn parse(args: &[String]) -> Result<Form, String> {
         Path::new(prompt).file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default()
     });
     one_component("foreign-run", &key)?;
-    Ok(Form::Run(Args { adapter: adapter.to_string(), prompt: prompt.to_string(), sweep, class, key }))
+    Ok(Form::Run(Args { adapter: adapter.to_string(), prompt: prompt.to_string(), sweep, class, sandbox, key }))
 }
 
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — the shape a class-taking adapter holds its
@@ -186,6 +198,45 @@ fn resolve(cfg: &Config, a: &Args) -> Result<Pair, String> {
         model: Some(model.to_string()),
         effort: effort.map(str::to_string),
     })
+}
+
+// spec: delegation-kit/SPEC.md §The foreign-vendor run — the confinement a run's policy resolves
+// to: none on an adapter pinning its confinement as a literal, else the word its policy binds,
+// refused where a literal adapter is named a policy or the policy is unbound
+#[derive(Debug, PartialEq, Clone, Default)]
+struct Confine {
+    policy: Option<String>,
+    word: Option<String>,
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — the word `<adapter>/<policy>=<word>`
+// binds, split at its first `=`
+fn sandbox_word<'a>(table: &'a [String], adapter: &str, policy: &str) -> Option<&'a str> {
+    table
+        .iter()
+        .filter_map(|e| e.split_once('='))
+        .find(|(k, _)| k.split_once('/') == Some((adapter, policy)))
+        .map(|(_, w)| w)
+}
+
+fn confine(cfg: &Config, a: &Args) -> Result<Confine, String> {
+    if !argv_of(&cfg.adapters, &a.adapter).iter().any(|w| w.contains(SANDBOX_TOKEN)) {
+        return match &a.sandbox {
+            Some(p) => Err(format!(
+                "adapter '{}' pins its confinement as a literal (its form carries no {}), so the policy '{}' cannot be applied",
+                a.adapter, SANDBOX_TOKEN, p
+            )),
+            None => Ok(Confine::default()),
+        };
+    }
+    let policy = a.sandbox.clone().unwrap_or_else(|| mode_name(a.sweep).to_string());
+    let Some(word) = sandbox_word(&cfg.sandbox, &a.adapter, &policy) else {
+        return Err(format!(
+            "adapter '{}' binds no '{}' policy in DELEGATION_KIT_FOREIGN_SANDBOX",
+            a.adapter, policy
+        ));
+    };
+    Ok(Confine { policy: Some(policy), word: Some(word.to_string()) })
 }
 
 fn dash(v: &Option<String>) -> &str {
@@ -259,6 +310,7 @@ fn session_id(marker: &str, streams: &[&Path]) -> Option<String> {
 pub struct Config {
     pub adapters: Vec<String>,
     pub resume: Vec<String>,
+    pub sandbox: Vec<String>,
     pub markers: Vec<String>,
     pub harness: Vec<String>,
     pub foreign_tiers: Vec<String>,
@@ -278,6 +330,7 @@ struct Verdict {
 struct Run<'a> {
     args: &'a Args,
     class: Option<String>,
+    sandbox: Option<String>,
     dir: PathBuf,
     budget: &'static str,
     exit: String,
@@ -301,10 +354,11 @@ impl Run<'_> {
     fn line(&self, verdict: &str, code: i32) -> Verdict {
         Verdict {
             line: format!(
-                "foreign-run: adapter={} mode={} class={} key={} budget={} exit={} report={} patch={} -> {}",
+                "foreign-run: adapter={} mode={} class={} sandbox={} key={} budget={} exit={} report={} patch={} -> {}",
                 self.args.adapter,
                 mode_name(self.args.sweep),
                 dash(&self.class),
+                dash(&self.sandbox),
                 self.args.key,
                 self.budget,
                 self.exit,
@@ -425,11 +479,12 @@ fn outcome(status: Option<i32>, timeout: u64) -> Result<(), String> {
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — every token substitutes inside a word,
 // and one the turn holds no value for is left as written
-fn substitute(words: &[String], prompt: &str, id: Option<&str>, pair: &Pair) -> Vec<String> {
+fn substitute(words: &[String], prompt: &str, id: Option<&str>, pair: &Pair, confine: &Confine) -> Vec<String> {
     let held = [
         (SESSION_TOKEN, id),
         (MODEL_TOKEN, pair.model.as_deref()),
         (EFFORT_TOKEN, pair.effort.as_deref()),
+        (SANDBOX_TOKEN, confine.word.as_deref()),
     ];
     words
         .iter()
@@ -447,13 +502,14 @@ fn resume_clause(key: &str) -> String {
 }
 
 // spec: delegation-kit/SPEC.md §The foreign-vendor run — `session.txt`, the binding a resume reads:
-// one line of `adapter= mode= class= model= effort= base= turn= id=` fields, `-` for a field the
-// open held no value for, and an absent pair field reads as `-`
+// one line of `adapter= mode= class= model= effort= sandbox= confine= base= turn= id=` fields, `-`
+// for a field the open held no value for, and an absent pair or confinement field reads as `-`
 #[derive(Debug, PartialEq)]
 struct Session {
     adapter: String,
     sweep: bool,
     pair: Pair,
+    confine: Confine,
     base: String,
     turn: u32,
     id: Option<String>,
@@ -462,12 +518,14 @@ struct Session {
 impl Session {
     fn render(&self) -> String {
         format!(
-            "adapter={} mode={} class={} model={} effort={} base={} turn={} id={}\n",
+            "adapter={} mode={} class={} model={} effort={} sandbox={} confine={} base={} turn={} id={}\n",
             self.adapter,
             mode_name(self.sweep),
             dash(&self.pair.class),
             dash(&self.pair.model),
             dash(&self.pair.effort),
+            dash(&self.confine.policy),
+            dash(&self.confine.word),
             self.base,
             self.turn,
             self.id.as_deref().unwrap_or("-")
@@ -492,6 +550,7 @@ impl Session {
             adapter: field("adapter")?.to_string(),
             sweep,
             pair: Pair { class: held("class"), model: held("model"), effort: held("effort") },
+            confine: Confine { policy: held("sandbox"), word: held("confine") },
             base: field("base")?.to_string(),
             turn: turn.parse().map_err(|_| format!("turn '{}' is not a count", turn))?,
             id: Some(field("id")?).filter(|i| *i != "-").map(str::to_string),
@@ -536,7 +595,8 @@ fn after_failed_turn(cfg: &KeyedConfig, adapter: &str, dir: &Path, exit: &str) {
 
 fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
     let dir = PathBuf::from(&cfg.base).join("foreign").join(&a.key);
-    let mut run = Run { args: a, class: None, dir, budget: "-", exit: "-".to_string(), report: None, patch: None };
+    let mut run =
+        Run { args: a, class: None, sandbox: None, dir, budget: "-", exit: "-".to_string(), report: None, patch: None };
     let argv = argv_of(&cfg.adapters, &a.adapter);
     if argv.is_empty() {
         return run.failed(&format!("no adapter '{}' is configured in DELEGATION_KIT_FOREIGN_ADAPTERS", a.adapter));
@@ -546,6 +606,11 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
         Err(why) => return run.failed(&format!("class: {}", why)),
     };
     run.class = pair.class.clone();
+    let confine = match confine(cfg, a) {
+        Ok(c) => c,
+        Err(why) => return run.failed(&format!("sandbox: {}", why)),
+    };
+    run.sandbox = confine.policy.clone();
     let prompt = PathBuf::from(walk::abs_against(&cfg.here, &a.prompt));
     if std::fs::File::open(&prompt).is_err() || !prompt.is_file() {
         return run.failed(&format!("cannot read the prompt file {}", prompt.display()));
@@ -597,7 +662,7 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
         }
     };
     let prompt_abs = prompt.display().to_string();
-    let mut words = substitute(&argv, &prompt_abs, None, &pair);
+    let mut words = substitute(&argv, &prompt_abs, None, &pair, &confine);
     let s = Spawn {
         program: Program::consumer("DELEGATION_KIT_FOREIGN_ADAPTERS", words.remove(0)),
         words,
@@ -651,7 +716,7 @@ fn foreign_run(cfg: &Config, a: &Args) -> Verdict {
             marker.unwrap_or_default()
         ));
     }
-    let binding = Session { adapter: a.adapter.clone(), sweep: a.sweep, pair, base, turn: 1, id };
+    let binding = Session { adapter: a.adapter.clone(), sweep: a.sweep, pair, confine, base, turn: 1, id };
     let recorded = std::fs::write(run.dir.join("refs.txt"), &before)
         .and_then(|()| std::fs::write(&session, binding.render()));
     if let Err(e) = recorded {
@@ -666,6 +731,7 @@ struct Turn<'a> {
     adapter: String,
     mode: &'static str,
     class: String,
+    sandbox: String,
     turn: String,
     budget: &'static str,
     exit: String,
@@ -677,10 +743,11 @@ impl Turn<'_> {
     fn line(&self, verdict: &str, code: i32) -> Verdict {
         Verdict {
             line: format!(
-                "foreign-resume: adapter={} mode={} class={} key={} turn={} budget={} exit={} report={} patch={} -> {}",
+                "foreign-resume: adapter={} mode={} class={} sandbox={} key={} turn={} budget={} exit={} report={} patch={} -> {}",
                 self.adapter,
                 self.mode,
                 self.class,
+                self.sandbox,
                 self.key,
                 self.turn,
                 self.budget,
@@ -708,6 +775,7 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
         adapter: "-".to_string(),
         mode: "-",
         class: "-".to_string(),
+        sandbox: "-".to_string(),
         turn: "-".to_string(),
         budget: "-",
         exit: "-".to_string(),
@@ -724,6 +792,7 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
     t.adapter = s.adapter.clone();
     t.mode = mode_name(s.sweep);
     t.class = dash(&s.pair.class).to_string();
+    t.sandbox = dash(&s.confine.policy).to_string();
     t.turn = s.turn.to_string();
     let prompt = PathBuf::from(walk::abs_against(&cfg.here, prompt));
     if std::fs::File::open(&prompt).is_err() || !prompt.is_file() {
@@ -748,6 +817,14 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
                 token, s.adapter
             ));
         }
+    }
+    // spec: delegation-kit/SPEC.md §Resuming a session — the turn runs under the confinement word the
+    // open recorded, so a form asking for one the session holds none of fails before the spawn
+    if s.confine.word.is_none() && form.iter().any(|w| w.contains(SANDBOX_TOKEN)) {
+        return t.failed(&format!(
+            "sandbox: the session recorded no confinement word for {}, which adapter '{}' resumes with",
+            SANDBOX_TOKEN, s.adapter
+        ));
     }
     let tree = dir.join("tree");
     if !tree.is_dir() {
@@ -782,7 +859,7 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
         t.failed(why)
     };
     let prompt_abs = prompt.display().to_string();
-    let mut words = substitute(&form, &prompt_abs, next.id.as_deref(), &next.pair);
+    let mut words = substitute(&form, &prompt_abs, next.id.as_deref(), &next.pair, &next.confine);
     let sp = Spawn {
         program: Program::consumer("DELEGATION_KIT_FOREIGN_RESUME", words.remove(0)),
         words,
@@ -875,6 +952,7 @@ fn config() -> Result<Config, String> {
     Ok(Config {
         adapters: walk::knob_array("DELEGATION_KIT_FOREIGN_ADAPTERS")?,
         resume: walk::knob_array("DELEGATION_KIT_FOREIGN_RESUME")?,
+        sandbox: walk::knob_array("DELEGATION_KIT_FOREIGN_SANDBOX")?,
         markers: walk::knob_array("DELEGATION_KIT_FOREIGN_SESSION_MARKER")?,
         harness: walk::knob_array("DELEGATION_KIT_FOREIGN_HARNESS")?,
         foreign_tiers: walk::knob_array("DELEGATION_KIT_FOREIGN_TIER_MODEL")?,
@@ -910,8 +988,17 @@ pub fn run(argv: &[String]) -> i32 {
             foreign_run(&cfg, &a)
         }
         Err(e) => {
-            Run { args: &a, class: None, dir: PathBuf::new(), budget: "-", exit: "-".to_string(), report: None, patch: None }
-                .failed(&format!("config: {}", e))
+            Run {
+                args: &a,
+                class: None,
+                sandbox: None,
+                dir: PathBuf::new(),
+                budget: "-",
+                exit: "-".to_string(),
+                report: None,
+                patch: None,
+            }
+            .failed(&format!("config: {}", e))
         }
     };
     println!("{}", v.line);
@@ -1007,6 +1094,7 @@ mod tests {
             Config {
                 adapters: strings(adapters),
                 resume: strings(resume),
+                sandbox: Vec::new(),
                 markers: strings(markers),
                 harness: Vec::new(),
                 foreign_tiers: Vec::new(),
@@ -1052,6 +1140,7 @@ mod tests {
                 prompt: "prompt.md".to_string(),
                 sweep,
                 class: None,
+                sandbox: None,
                 key: "prompt".to_string(),
             }
         }
@@ -1069,6 +1158,20 @@ mod tests {
             cfg.harness = strings(&["c=vend"]);
             cfg.foreign_tiers = strings(rows);
             cfg
+        }
+
+        // spec: delegation-kit/SPEC.md §Testing — a policy-taking stub that echoes its argv: adapter
+        // `p`, the token inside a word of both forms, three policies bound
+        fn sandbox_cfg(&self, table: &[&str]) -> Config {
+            let open = ["p=bash", "p=-c", "p=echo \"session id: p1 $0\"", "p=--sandbox=@SANDBOX@"];
+            let resume = ["p=bash", "p=-c", "p=echo \"$0\"", "p=mode=@SANDBOX@/@SESSION_ID@"];
+            let mut cfg = self.session_cfg(&open, &resume, &["p=session id:"], 60);
+            cfg.sandbox = strings(table);
+            cfg
+        }
+
+        fn policed(&self, adapter: &str, sweep: bool, policy: &str) -> Args {
+            Args { sandbox: Some(policy.to_string()), ..self.args(adapter, sweep) }
         }
 
         fn run_dir(&self) -> PathBuf {
@@ -1113,7 +1216,7 @@ mod tests {
         let r = Repo::new("audit-ok");
         let v = foreign_run(&r.cfg(&["ro=git", "ro=hash-object", "ro=--stdin"], 60), &r.args("ro", false));
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.contains("mode=audit class=- key=prompt budget=OFF exit=0 report="), "{}", v.line);
+        assert!(v.line.contains("mode=audit class=- sandbox=- key=prompt budget=OFF exit=0 report="), "{}", v.line);
         assert!(v.line.ends_with("patch=none -> OK"), "{}", v.line);
         let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
         assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, b"audit the tree\n"), "stdin carries the prompt");
@@ -1136,7 +1239,7 @@ mod tests {
             std::fs::write(r.root.join("prompt.md"), &doc).expect("the prompt file");
             let v = foreign_run(&r.cfg(RO, 60), &r.args("ro", false));
             assert_eq!(v.code, 0, "{}: {}", stage, v.line);
-            assert!(v.line.contains("mode=audit class=- key=prompt") && v.line.ends_with("patch=none -> OK"), "{}", v.line);
+            assert!(v.line.contains("mode=audit class=- sandbox=- key=prompt") && v.line.ends_with("patch=none -> OK"), "{}", v.line);
             let report = std::fs::read(r.run_dir().join("report.txt")).expect("the report");
             assert_eq!(String::from_utf8_lossy(&report), hash_of(&r, doc.as_bytes()), "{}", stage);
         }
@@ -1160,7 +1263,7 @@ mod tests {
             let v = foreign_run(&r.cfg(&writes, 60), &r.args("sw", true));
             assert_eq!(v.code, 0, "{}: {}", stage, v.line);
             let patch = r.run_dir().join("change.patch");
-            assert!(v.line.contains("mode=sweep class=- key=prompt") && v.line.ends_with(&format!("patch={} -> OK", patch.display())), "{}", v.line);
+            assert!(v.line.contains("mode=sweep class=- sandbox=- key=prompt") && v.line.ends_with(&format!("patch={} -> OK", patch.display())), "{}", v.line);
             let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("the patch")).into_owned();
             let hash = hash_of(&r, doc.as_bytes());
             assert!(body.contains("contract.hash") && body.contains(hash.trim()), "{}: {}", stage, body);
@@ -1289,12 +1392,19 @@ mod tests {
             Form::Budget(_) => panic!("{:?} is no budget form", argv),
         };
         let a = run(&["ad", "dir/unit.prompt.md"], "two operands");
-        assert_eq!(a, Args { adapter: "ad".into(), prompt: "dir/unit.prompt.md".into(), sweep: false, class: None, key: "unit.prompt".into() });
+        assert_eq!(a, Args { adapter: "ad".into(), prompt: "dir/unit.prompt.md".into(), sweep: false, class: None, sandbox: None, key: "unit.prompt".into() });
         let a = run(&["--mode", "sweep", "--key", "k1", "ad", "p.md"], "options first");
         assert!(a.sweep && a.key == "k1" && a.class.is_none());
         let a = run(&["ad", "p.md", "--class", "judgment"], "a class");
         assert_eq!(a.class.as_deref(), Some("judgment"));
         assert!(parse(&strings(&["ad", "p.md", "--class"])).is_err(), "--class needs a value");
+        let a = run(&["ad", "p.md", "--sandbox", "wide-1"], "a policy");
+        assert_eq!(a.sandbox.as_deref(), Some("wide-1"));
+        assert!(parse(&strings(&["ad", "p.md", "--sandbox"])).is_err(), "--sandbox needs a policy");
+        for bad in ["Wide", "a/b", "", "x y"] {
+            let e = parse(&strings(&["ad", "p.md", "--sandbox", bad])).expect_err("a policy outside [a-z0-9-]");
+            assert!(e.contains("not a policy name in [a-z0-9-]"), "{}: {}", bad, e);
+        }
         let a = run(&["ad", "--", "-p.md"], "the escape");
         assert_eq!(a.prompt, "-p.md");
         for bad in [&["ad"][..], &["ad", "p", "q"], &["--help"], &["--mode", "write", "ad", "p"], &["--key", "a/b", "ad", "p"], &["--key", "..", "ad", "p"]] {
@@ -1308,7 +1418,7 @@ mod tests {
     fn the_budget_form_takes_the_adapter_alone() {
         assert_eq!(parse(&strings(&["ad", "--budget"])), Ok(Form::Budget("ad".into())));
         assert_eq!(parse(&strings(&["--budget", "ad"])), Ok(Form::Budget("ad".into())));
-        for bad in [&["--budget"][..], &["ad", "p.md", "--budget"], &["--budget", "--mode", "audit", "ad"], &["--budget", "--key", "k", "ad"], &["--budget", "--class", "judgment", "ad"]] {
+        for bad in [&["--budget"][..], &["ad", "p.md", "--budget"], &["--budget", "--mode", "audit", "ad"], &["--budget", "--key", "k", "ad"], &["--budget", "--class", "judgment", "ad"], &["--budget", "--sandbox", "audit", "ad"]] {
             assert!(parse(&strings(bad)).is_err(), "{:?} must refuse", bad);
         }
     }
@@ -1506,7 +1616,7 @@ mod tests {
         let paused = r.budgeted(r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), "s", "90", 0);
         let v = foreign_resume(&paused, "prompt", "answer.md");
         assert_eq!(v.code, 2, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit class=- key=prompt turn=1 budget=PAUSE exit=- report=none patch=none -> FAILED (budget: used=90% "), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit class=- sandbox=- key=prompt turn=1 budget=PAUSE exit=- report=none patch=none -> FAILED (budget: used=90% "), "{}", v.line);
         assert!(r.read("session.txt").contains(" turn=1 "), "{}", r.read("session.txt"));
         assert!(r.run_dir().join("report.txt").is_file() && !r.run_dir().join("report.1.txt").exists(), "nothing is rotated");
         let v = foreign_resume(&r.budgeted(r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), "s", "10", 0), "prompt", "answer.md");
@@ -1559,7 +1669,7 @@ mod tests {
             assert_eq!(v.code, 0, "{}", v.line);
             assert!(v.line.ends_with("-> OK — resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
             assert!(r.tree_kept(), "an open session keeps its clone");
-            assert_eq!(r.read("session.txt"), format!("adapter=s mode=audit class=- model=- effort=- base={} turn=1 id={}\n", r.head(), id));
+            assert_eq!(r.read("session.txt"), format!("adapter=s mode=audit class=- model=- effort=- sandbox=- confine=- base={} turn=1 id={}\n", r.head(), id));
             assert!(r.read("refs.txt").starts_with(&r.head()), "{}", r.read("refs.txt"));
             let again = foreign_run(&r.session_cfg(open, RESUME_ECHO, MARKER, 60), &r.args("s", false));
             assert_eq!(again.code, 2, "{}", again.line);
@@ -1592,7 +1702,7 @@ mod tests {
         assert_eq!(foreign_run(&cfg, &r.args("s", false)).code, 0);
         let v = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit class=- key=prompt turn=2 budget=OFF exit=0 report="), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=s mode=audit class=- sandbox=- key=prompt turn=2 budget=OFF exit=0 report="), "{}", v.line);
         assert!(v.line.ends_with("patch=none -> OK — resumable: --foreign-resume prompt <prompt-file>"), "{}", v.line);
         // comment-tier-exempt: a Windows bash stub prints the substituted path with forward slashes
         let answer = r.root.join("answer.md").display().to_string().replace('\\', "/");
@@ -1624,11 +1734,11 @@ mod tests {
         let cfg = r.session_cfg(&open, RESUME_ECHO, MARKER, 60);
         let v = foreign_run(&cfg, &r.args("s", false));
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.contains("mode=audit class=- key=prompt") && v.line.contains("patch=none -> OK — resumable"), "{}", v.line);
+        assert!(v.line.contains("mode=audit class=- sandbox=- key=prompt") && v.line.contains("patch=none -> OK — resumable"), "{}", v.line);
         assert_eq!(r.read("report.txt"), format!("session id: abc-1.x\n{}", hash_of(&r, &frame)), "stdin carries the frame");
         let q = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(q.code, 0, "{}", q.line);
-        assert!(q.line.contains("mode=audit class=- key=prompt turn=2") && q.line.contains("-> OK"), "{}", q.line);
+        assert!(q.line.contains("mode=audit class=- sandbox=- key=prompt turn=2") && q.line.contains("-> OK"), "{}", q.line);
         assert!(r.read("report.txt").ends_with("the answer\n"), "{}", r.read("report.txt"));
         assert!(r.read("report.1.txt").starts_with("session id: abc-1.x\n"), "the critique's report is rotated, not lost");
         assert_eq!(foreign_close(&cfg, "prompt").code, 0);
@@ -1647,7 +1757,7 @@ mod tests {
         let v = foreign_resume(&cfg, "prompt", "answer.md");
         assert_eq!(v.code, 0, "{}", v.line);
         let patch = r.run_dir().join("change.patch");
-        assert!(v.line.contains(&format!("mode=sweep class=- key=prompt turn=2 budget=OFF exit=0 report={} patch={} -> OK", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
+        assert!(v.line.contains(&format!("mode=sweep class=- sandbox=- key=prompt turn=2 budget=OFF exit=0 report={} patch={} -> OK", r.run_dir().join("report.txt").display(), patch.display())), "{}", v.line);
         let body = String::from_utf8_lossy(&std::fs::read(&patch).expect("the patch")).into_owned();
         assert!(body.contains("tracked.cfg") && body.contains("new.cfg"), "{}", body);
         git(&r.root.join("src"), &["apply", "--check", patch.to_str().unwrap_or_default()]).expect("the patch applies cleanly");
@@ -1693,7 +1803,7 @@ mod tests {
         assert!(r.run_dir().join("report.2.txt").is_file(), "the failed turn's report was rotated");
         let v = foreign_resume(&cfg, "nope", "answer.md");
         assert_eq!(v.code, 2, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=- mode=- class=- key=nope turn=- budget=- exit=- report=none"), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=- mode=- class=- sandbox=- key=nope turn=- budget=- exit=- report=none"), "{}", v.line);
         assert!(v.line.contains("FAILED (no open session under"), "{}", v.line);
     }
 
@@ -1705,11 +1815,11 @@ mod tests {
         let cfg = r.class_cfg(&["vend/judgment=g-9,deep", "vend/mechanical=g-1,low", "other/judgment=x,y"]);
         let v = foreign_run(&cfg, &r.classed("c", "judgment"));
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.starts_with("foreign-run: adapter=c mode=audit class=judgment key=prompt budget=OFF exit=0 "), "{}", v.line);
+        assert!(v.line.starts_with("foreign-run: adapter=c mode=audit class=judgment sandbox=- key=prompt budget=OFF exit=0 "), "{}", v.line);
         assert_eq!(r.read("report.txt"), "session id: c1 m=g-9/e=deep\n");
         assert_eq!(
             r.read("session.txt"),
-            format!("adapter=c mode=audit class=judgment model=g-9 effort=deep base={} turn=1 id=c1\n", r.head())
+            format!("adapter=c mode=audit class=judgment model=g-9 effort=deep sandbox=- confine=- base={} turn=1 id=c1\n", r.head())
         );
     }
 
@@ -1722,7 +1832,7 @@ mod tests {
         let edited = r.class_cfg(&["vend/judgment=g-10,shallow"]);
         let v = foreign_resume(&edited, "prompt", "answer.md");
         assert_eq!(v.code, 0, "{}", v.line);
-        assert!(v.line.starts_with("foreign-resume: adapter=c mode=audit class=judgment key=prompt turn=2 "), "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=c mode=audit class=judgment sandbox=- key=prompt turn=2 "), "{}", v.line);
         assert_eq!(r.read("report.txt"), "m=g-9/e=deep/c1\n");
         assert!(r.read("session.txt").contains(" class=judgment model=g-9 effort=deep "), "{}", r.read("session.txt"));
         assert_eq!(foreign_close(&edited, "prompt").code, 0);
@@ -1744,7 +1854,7 @@ mod tests {
             let cfg = r.budgeted(r.class_cfg(rows), "c", "90", 0);
             let v = foreign_run(&cfg, &r.classed("c", "judgment"));
             assert_eq!(v.code, 2, "{}", v.line);
-            assert!(v.line.contains(&format!("class=- key=prompt budget=- exit=- report=none patch=none -> FAILED (class: {})", why)), "{}", v.line);
+            assert!(v.line.contains(&format!("class=- sandbox=- key=prompt budget=- exit=- report=none patch=none -> FAILED (class: {})", why)), "{}", v.line);
             assert!(!r.run_dir().exists(), "nothing is cloned");
         }
         let cfg = r.class_cfg(&["vend/judgment=g,deep"]);
@@ -1765,7 +1875,7 @@ mod tests {
             assert_eq!(class_shape(&cfg, &r.classed("ro", class)), Ok(()));
             let v = foreign_run(&cfg, &r.classed("ro", class));
             assert_eq!(v.code, 0, "{}", v.line);
-            assert!(v.line.contains("adapter=ro mode=audit class=- key=prompt"), "{}", v.line);
+            assert!(v.line.contains("adapter=ro mode=audit class=- sandbox=- key=prompt"), "{}", v.line);
         }
     }
 
@@ -1797,15 +1907,95 @@ mod tests {
     // and a line missing a field is refused
     #[test]
     fn the_session_record_round_trips() {
-        let s = Session { adapter: "a".into(), sweep: true, pair: Pair::default(), base: "abc".into(), turn: 4, id: None };
+        let s = Session { adapter: "a".into(), sweep: true, pair: Pair::default(), confine: Confine::default(), base: "abc".into(), turn: 4, id: None };
         assert_eq!(Session::parse(&s.render()), Ok(s));
         let pair = Pair { class: Some("judgment".into()), model: Some("g-9".into()), effort: None };
-        let s = Session { adapter: "a".into(), sweep: false, pair, base: "abc".into(), turn: 1, id: Some("i".into()) };
-        assert_eq!(s.render(), "adapter=a mode=audit class=judgment model=g-9 effort=- base=abc turn=1 id=i\n");
+        let s = Session { adapter: "a".into(), sweep: false, pair, confine: Confine::default(), base: "abc".into(), turn: 1, id: Some("i".into()) };
+        assert_eq!(s.render(), "adapter=a mode=audit class=judgment model=g-9 effort=- sandbox=- confine=- base=abc turn=1 id=i\n");
         assert_eq!(Session::parse(&s.render()), Ok(s));
         let before = Session::parse("adapter=a mode=audit base=b turn=1 id=-\n").expect("a line without the pair");
         assert_eq!(before.pair, Pair::default());
+        let confine = Confine { policy: Some("audit".into()), word: Some("read-only".into()) };
+        let s = Session { adapter: "a".into(), sweep: false, pair: Pair::default(), confine, base: "abc".into(), turn: 2, id: None };
+        assert_eq!(s.render(), "adapter=a mode=audit class=- model=- effort=- sandbox=audit confine=read-only base=abc turn=2 id=-\n");
+        assert_eq!(Session::parse(&s.render()), Ok(s));
+        let before = Session::parse("adapter=a mode=audit class=- model=- effort=- base=b turn=1 id=-\n").expect("a line without the confinement");
+        assert_eq!(before.confine, Confine::default());
         assert!(Session::parse("adapter=a mode=audit turn=1 id=-\n").is_err());
         assert!(Session::parse("adapter=a mode=write base=b turn=1 id=-\n").is_err());
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a policy-taking adapter runs the word its policy binds,
+    // the mode word naming the policy where the run names none, and the line and the session name it
+    #[test]
+    fn a_run_resolves_its_policy_into_the_adapters_argv() {
+        let r = Repo::new("sandbox-ok");
+        let table = ["p/audit=ro-word", "p/sweep=ws-word", "p/wide=full-word"];
+        let cfg = r.sandbox_cfg(&table);
+        let v = foreign_run(&cfg, &r.args("p", false));
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.starts_with("foreign-run: adapter=p mode=audit class=- sandbox=audit key=prompt budget=OFF exit=0 "), "{}", v.line);
+        assert_eq!(r.read("report.txt"), "session id: p1 --sandbox=ro-word\n");
+        assert_eq!(
+            r.read("session.txt"),
+            format!("adapter=p mode=audit class=- model=- effort=- sandbox=audit confine=ro-word base={} turn=1 id=p1\n", r.head())
+        );
+        assert_eq!(foreign_close(&cfg, "prompt").code, 0);
+        let v = foreign_run(&cfg, &r.policed("p", false, "wide"));
+        assert!(v.code == 0 && v.line.contains(" sandbox=wide key=prompt "), "{}", v.line);
+        assert_eq!(r.read("report.txt"), "session id: p1 --sandbox=full-word\n");
+        assert_eq!(foreign_close(&cfg, "prompt").code, 0);
+        let v = foreign_run(&cfg, &r.args("p", true));
+        assert!(v.code == 0 && v.line.contains("mode=sweep class=- sandbox=sweep key=prompt "), "{}", v.line);
+        assert_eq!(r.read("report.txt"), "session id: p1 --sandbox=ws-word\n");
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — a resumed turn runs under the word its session opened
+    // with after the binding changed, and its line names the recorded policy
+    #[test]
+    fn a_resumed_turn_keeps_the_confinement_its_session_opened_with() {
+        let r = Repo::new("sandbox-resume");
+        assert_eq!(foreign_run(&r.sandbox_cfg(&["p/audit=ro-word"]), &r.args("p", false)).code, 0);
+        let edited = r.sandbox_cfg(&["p/audit=wider-word"]);
+        let v = foreign_resume(&edited, "prompt", "answer.md");
+        assert_eq!(v.code, 0, "{}", v.line);
+        assert!(v.line.starts_with("foreign-resume: adapter=p mode=audit class=- sandbox=audit key=prompt turn=2 "), "{}", v.line);
+        assert_eq!(r.read("report.txt"), "mode=ro-word/p1\n");
+        assert!(r.read("session.txt").contains(" sandbox=audit confine=ro-word "), "{}", r.read("session.txt"));
+    }
+
+    // spec: delegation-kit/SPEC.md §Testing — an unbound policy and a policy named to an adapter
+    // pinning its confinement as a literal fail before the budget read and clone nothing; a literal
+    // adapter named no policy proceeds with `sandbox=-`
+    #[test]
+    fn a_policy_that_cannot_be_applied_fails_before_any_clone() {
+        let r = Repo::new("sandbox-failed");
+        let cases = [
+            (r.sandbox_cfg(&["p/sweep=ws-word"]), r.args("p", false), "adapter 'p' binds no 'audit' policy in DELEGATION_KIT_FOREIGN_SANDBOX"),
+            (r.sandbox_cfg(&["p/audit=ro-word"]), r.policed("p", false, "wide"), "adapter 'p' binds no 'wide' policy in DELEGATION_KIT_FOREIGN_SANDBOX"),
+            (r.cfg(RO, 60), r.policed("ro", false, "audit"), "adapter 'ro' pins its confinement as a literal (its form carries no @SANDBOX@), so the policy 'audit' cannot be applied"),
+        ];
+        for (cfg, args, why) in cases {
+            let cfg = r.budgeted(cfg, &args.adapter, "90", 0);
+            let v = foreign_run(&cfg, &args);
+            assert_eq!(v.code, 2, "{}", v.line);
+            assert!(v.line.contains(&format!("sandbox=- key=prompt budget=- exit=- report=none patch=none -> FAILED (sandbox: {})", why)), "{}", v.line);
+            assert!(!r.run_dir().exists(), "nothing is cloned");
+        }
+        let v = foreign_run(&r.cfg(RO, 60), &r.args("ro", false));
+        assert!(v.code == 0 && v.line.contains("class=- sandbox=- key=prompt"), "{}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Resuming a session — a session opened with no confinement word
+    // holds none, so a resume form later given the token fails before the spawn
+    #[test]
+    fn a_resume_form_asking_for_a_confinement_the_session_lacks_fails() {
+        let r = Repo::new("sandbox-resume-none");
+        assert_eq!(foreign_run(&r.session_cfg(OPEN_STDOUT, RESUME_ECHO, MARKER, 60), &r.args("s", false)).code, 0);
+        let asking = ["s=bash", "s=-c", "s=echo \"$0\"", "s=@SANDBOX@"];
+        let v = foreign_resume(&r.session_cfg(OPEN_STDOUT, &asking, MARKER, 60), "prompt", "answer.md");
+        assert_eq!(v.code, 2, "{}", v.line);
+        assert!(v.line.contains("sandbox=- key=prompt turn=1 budget=- exit=- report=none"), "{}", v.line);
+        assert!(v.line.contains("FAILED (sandbox: the session recorded no confinement word for @SANDBOX@"), "{}", v.line);
     }
 }

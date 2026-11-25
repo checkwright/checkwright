@@ -14,16 +14,6 @@
 
 ## New Features
 
-### foreign-run-verb
-
-[spec: SPEC-foreign-run-sandbox.md] [recurrence: 2026-11-25]
-
-The foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) is a procedure, not a verb: no arm takes a brief path, a vendor and model and a sandbox policy and returns a machine result with a transcript path, so a second-opinion caller builds its own executor.
-
-**Deliverable:** design-pending, a feature: the verb, its result shape and its sandbox policy's vocabulary held in config.
-
-**Cost while deferred:** each outside caller re-builds the run. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `foreign-vendor`, `foreign run` in this file and the disposed-findings record, none open; owner delegation-kit/SPEC.md §The foreign-vendor run.
-
 ### external-kpi-series
 
 [spec: SPEC-external-series.md] [recurrence: 2026-11-25]
@@ -998,4 +988,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - observe-plain-text-context
 - gate-tamper-range-arm
 - brief-authority-lint
+- foreign-run-verb
 
