@@ -96,8 +96,8 @@ fn parse(args: &[String]) -> Result<Form, String> {
             i += 1;
         } else if a == "--sandbox" {
             let p = args.get(i + 1).ok_or("foreign-run: --sandbox needs a policy")?;
-            if !crate::tier::name(p) {
-                return Err(format!("foreign-run: --sandbox names '{}', not a policy name in [a-z0-9-]", p));
+            if !policy_name(p) {
+                return Err(format!("foreign-run: --sandbox names '{}', not a policy name: one in [a-z0-9-] other than a lone '-'", p));
             }
             sandbox = Some(p.clone());
             i += 1;
@@ -208,6 +208,12 @@ fn resolve(cfg: &Config, a: &Args) -> Result<Pair, String> {
 struct Confine {
     policy: Option<String>,
     word: Option<String>,
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — a policy is a name in `[a-z0-9-]` other
+// than a lone `-`, which the session record reads as absent
+pub(crate) fn policy_name(p: &str) -> bool {
+    crate::tier::name(p) && p != "-"
 }
 
 // spec: delegation-kit/SPEC.md §Layout and configuration — the word `<adapter>/<policy>=<word>`
@@ -827,6 +833,14 @@ fn foreign_resume(cfg: &Config, key: &str, prompt: &str) -> Verdict {
             SANDBOX_TOKEN, s.adapter
         ));
     }
+    // spec: delegation-kit/SPEC.md §Resuming a session — a form carrying no token under a recorded
+    // policy runs a literal the line would not name, so it fails before the spawn
+    if let (Some(p), false) = (&s.confine.policy, form.iter().any(|w| w.contains(SANDBOX_TOKEN))) {
+        return t.failed(&format!(
+            "sandbox: the session recorded the policy '{}', and adapter '{}' resumes with a form carrying no {}",
+            p, s.adapter, SANDBOX_TOKEN
+        ));
+    }
     let tree = dir.join("tree");
     if !tree.is_dir() {
         return t.failed(&format!("the session's clone {} is missing", tree.display()));
@@ -1407,9 +1421,9 @@ mod tests {
         let a = run(&["ad", "p.md", "--sandbox", "wide-1"], "a policy");
         assert_eq!(a.sandbox.as_deref(), Some("wide-1"));
         assert!(parse(&strings(&["ad", "p.md", "--sandbox"])).is_err(), "--sandbox needs a policy");
-        for bad in ["Wide", "a/b", "", "x y"] {
-            let e = parse(&strings(&["ad", "p.md", "--sandbox", bad])).expect_err("a policy outside [a-z0-9-]");
-            assert!(e.contains("not a policy name in [a-z0-9-]"), "{}: {}", bad, e);
+        for bad in ["Wide", "a/b", "", "x y", "-"] {
+            let e = parse(&strings(&["ad", "p.md", "--sandbox", bad])).expect_err("a policy outside [a-z0-9-], or a lone '-'");
+            assert!(e.contains("not a policy name: one in [a-z0-9-] other than a lone '-'"), "{}: {}", bad, e);
         }
         let a = run(&["ad", "--", "-p.md"], "the escape");
         assert_eq!(a.prompt, "-p.md");
@@ -2003,5 +2017,25 @@ mod tests {
         assert_eq!(v.code, 2, "{}", v.line);
         assert!(v.line.contains("sandbox=- key=prompt turn=1 budget=- exit=- report=none"), "{}", v.line);
         assert!(v.line.contains("FAILED (sandbox: the session recorded no confinement word for @SANDBOX@"), "{}", v.line);
+    }
+
+    // spec: delegation-kit/SPEC.md §Resuming a session — a session opened under a policy holds its
+    // word, so a resume form later stripped of the token fails before the spawn rather than run a
+    // literal the line would not name
+    #[test]
+    fn a_resume_form_dropping_the_token_under_a_recorded_policy_fails() {
+        let r = Repo::new("sandbox-resume-literal");
+        assert_eq!(foreign_run(&r.sandbox_cfg(&["p/audit=ro-word"]), &r.args("p", false)).code, 0);
+        let mut literal = r.sandbox_cfg(&["p/audit=ro-word"]);
+        literal.resume = strings(&["p=bash", "p=-c", "p=echo \"$0\"", "p=mode=full-access/@SESSION_ID@"]);
+        let v = foreign_resume(&literal, "prompt", "answer.md");
+        assert_eq!(v.code, 2, "{}", v.line);
+        assert!(v.line.contains("sandbox=audit key=prompt turn=1 budget=- exit=- report=none"), "{}", v.line);
+        assert!(
+            v.line.contains("FAILED (sandbox: the session recorded the policy 'audit', and adapter 'p' resumes with a form carrying no @SANDBOX@)"),
+            "{}",
+            v.line
+        );
+        assert!(r.read("session.txt").contains(" turn=1 "), "the session holds its turn");
     }
 }

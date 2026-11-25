@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### foreign-run-sandbox-record
-
-Two holes in the foreign-vendor run's confinement record. `--foreign-resume` reports the recorded `sandbox=` policy while running a resume form edited mid-session to drop `@SANDBOX@` for a literal confinement, since the pre-spawn check in `native/src/emit/foreign_run.rs` refuses only a held `none` word under a token-bearing form, so the verdict line names a confinement the turn did not run under. And `--sandbox -` is accepted (`tier::name` admits a lone `-`) as is a `<adapter>/-=<word>` table element, while `session.txt` reads `-` as absent, so a resume drops the policy from its record and verdict line.
-
-**Deliverable:** debt: a lone `-` refused as a policy name in both readers, as the knob already refuses it as a word, and a resume whose form lost `@SANDBOX@` under a recorded policy refused or reported as the literal it runs, each with a case.
-
-**Cost while deferred:** a verdict line can name a confinement the turn did not run under, which a caller acting on foreign-run verdicts takes as fact. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: `tier::name` admits `-`. Owner lookup: `sandbox`, `foreign-resume` in this file, none; owner delegation-kit/SPEC.md §The foreign-vendor run.
-
 ### lead-journal-session-id
 
 The lead-journal arm (`--enter-stage --open-lead-journal`), re-run by a resumed lead after a mid-iteration re-login, wrote a build stage session's id rather than the lead's to the session-role marker. Re-verified 2026-11-25: `role_marker` (native/src/emit/enter_stage.rs) takes the id from `--emit-session-id`, the newest transcript, which a stage child's newer transcript outranks; the segment heading names the cursor's last stamp by design.
@@ -1036,4 +1028,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - exit-code-tool-error
 - verdict-lookup
 - orchestrator-arm-json
+- foreign-run-sandbox-record
 

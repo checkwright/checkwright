@@ -328,9 +328,9 @@ fn sandbox_refusals(v: &Values) -> Vec<String> {
             errs.push(format!("{} element '{}' is not '<adapter>/<policy>=<word>'", KNOB, e));
             continue;
         };
-        let Some((adapter, _)) = key.split_once('/').filter(|(a, p)| adapter_name(a) && crate::tier::name(p)) else {
+        let Some((adapter, _)) = key.split_once('/').filter(|(a, p)| adapter_name(a) && crate::emit::foreign_run::policy_name(p)) else {
             errs.push(format!(
-                "{} element '{}' keys '{}', not '<adapter>/<policy>' with both names in [a-z0-9-]",
+                "{} element '{}' keys '{}', not '<adapter>/<policy>' with both names in [a-z0-9-] and the policy other than a lone '-'",
                 KNOB, e, key
             ));
             continue;
@@ -606,6 +606,7 @@ mod tests {
             ("is not '<adapter>/<policy>=<word>'", open, back, &["ad/audit=x", "ad/sweep=y", "noequals"]),
             ("keys 'ad', not '<adapter>/<policy>'", open, back, &["ad/audit=x", "ad=y"]),
             ("keys 'ad/Wide', not '<adapter>/<policy>'", open, back, &["ad/audit=x", "ad/Wide=y"]),
+            ("keys 'ad/-', not '<adapter>/<policy>'", open, back, &["ad/audit=x", "ad/-=y"]),
             ("has an empty word", open, back, &["ad/audit="]),
             ("carries whitespace in its word", open, back, &["ad/audit=read only"]),
             ("binds the word '-'", open, back, &["ad/audit=-"]),
