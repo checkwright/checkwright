@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --open-lead-journal end-to-end through a sandboxed enter-stage: the heading keyed on fields 2 through the last of the last stamp, creation with its directory, append after an undisposed segment, a disposed segment dropped, the idempotent no-op, --simulate writing nothing, the surplus refusal, the none key on a stampless state file, the session-role marker (written, rewritten on the journal no-op, left alone when held, skipped where the id does not derive, simulated unwritten, never written on a refusal), and no stamp ever appended
+# spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — --open-lead-journal end-to-end through a sandboxed enter-stage: the heading keyed on fields 2 through the last of the last stamp, creation with its directory, append after an undisposed segment, a disposed segment dropped, the idempotent no-op, --simulate writing nothing, the surplus refusal, the none key on a stampless state file, the session-role marker (written, naming a resumed lead beside a newer stage child, rewritten on the journal no-op, left alone when held, skipped where the id does not derive, simulated unwritten, never written on a refusal), and no stamp ever appended
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -83,6 +83,22 @@ out="$( cd "$sk" && unset LIFECYCLE_KIT_SESSION_ID CLAUDE_CODE_SESSION_ID CLAUDE
 [[ -e "$sk/scratch/session-role" ]] && note marker-skip-file "an underived id wrote a marker"
 grep -qF 'skipped the session-role marker' <<<"$out" || note marker-skip-report "the skip is not named: $out"
 
+# --- a resumed lead: the harness's child flag set beside the lead's own uuid, a stage child's
+#     transcript newer than the lead's, and the marker still names the lead ---
+rl="$SANDBOX/resumed-lead"
+seed "$rl" stamps
+lead_uuid=11112222-3333-4444-5555-666677778888
+mkdir -p "$rl/sessions/$lead_uuid/subagents"
+touch -t 202001010000 "$rl/sessions/$lead_uuid.jsonl"
+touch -t 202001010001 "$rl/sessions/$lead_uuid/subagents/agent-aaaabbbb0000.jsonl"
+out="$( cd "$rl" && unset LIFECYCLE_KIT_SESSION_ID \
+    && gate_env GATE_SDK_TMP_DIR="$rl/scratch" LIFECYCLE_KIT_SESSIONS_DIR="$rl/sessions" \
+        CLAUDE_CODE_SESSION_ID="$lead_uuid" CLAUDE_CODE_CHILD_SESSION=1 \
+    && gate_arm_run --enter-stage --open-lead-journal 2>&1 )"; rc=$?
+[[ "$rc" -eq 0 ]] || note marker-resumed-lead "want exit 0, got $rc -- $out"
+[[ "$(cat "$rl/scratch/session-role" 2>/dev/null)" == "lead 11112222" ]] \
+    || note marker-resumed-lead-id "the marker does not name the lead: $(cat "$rl/scratch/session-role" 2>/dev/null)"
+
 # --- --simulate relays the marker line and path under its prefix and writes no marker ---
 ms="$SANDBOX/marker-simulate"
 seed "$ms" stamps
@@ -156,5 +172,5 @@ out="$(run_open "$no" --open-lead-journal)"; rc=$?
     || note none-heading "a stampless state file did not key on none: $(cat "$no/scratch/lead-journal.md" 2>/dev/null)"
 
 [[ "$fails" -eq 0 ]] || { echo "lead-journal-open.test: $fails assertion(s) failed"; exit 1; }
-echo "lead-journal-open.test: clean (--open-lead-journal creates its keyed heading, appends after an undisposed segment, drops a disposed one, no-ops at the same cursor, simulates read-only under its prefix, refuses a surplus argument with nothing written, keys on none without a stamp, writes the session-role marker, rewrites it on the no-op, leaves a held one alone, skips it at exit 0 where the id does not derive, simulates it unwritten, and never stamps)"
+echo "lead-journal-open.test: clean (--open-lead-journal creates its keyed heading, appends after an undisposed segment, drops a disposed one, no-ops at the same cursor, simulates read-only under its prefix, refuses a surplus argument with nothing written, keys on none without a stamp, writes the session-role marker, names a resumed lead in it beside a newer stage child, rewrites it on the no-op, leaves a held one alone, skips it at exit 0 where the id does not derive, simulates it unwritten, and never stamps)"
 exit 0

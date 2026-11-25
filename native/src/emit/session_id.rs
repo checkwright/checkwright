@@ -20,6 +20,15 @@ pub fn derive(i: &Inputs) -> Result<String, String> {
     Ok(key(&resolve(i)?))
 }
 
+// spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the lead-journal opener's id: the override,
+// else the harness uuid whatever the child flag says, else the derivation
+pub fn lead(i: &Inputs) -> Result<String, String> {
+    if i.session_id.is_empty() && !i.harness_id.is_empty() {
+        return Ok(key(&i.harness_id));
+    }
+    derive(i)
+}
+
 // spec: lifecycle-kit/SPEC.md §bin/session-id.sh — the process cwd is an *input* to source 3's
 // default. bash's `pwd` prints the logical path it carries in `PWD` where `current_dir()` returns
 // the physical one, so `PWD` is read where set and the crate's crosser answers otherwise.
@@ -132,6 +141,27 @@ mod tests {
              falling through to source 3's widened glob, which the seeded top-level transcript \
              would have answered"
         );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — a resumed lead flagged as a child beside a
+    // newer stage child's transcript: the derivation names the child, the opener the lead; the
+    // override outranks it, and with no uuid the opener's id is the derivation's
+    #[test]
+    fn the_lead_id_is_the_harness_uuid_where_a_dispatched_childs_transcript_is_newer() {
+        let dir = scratch("lead");
+        let lead_uuid = "11112222-3333-4444-5555-666677778888";
+        transcript(&format!("{}/{}.jsonl", dir, lead_uuid), 1_000);
+        transcript(&format!("{}/{}/subagents/agent-aaaabbbb0000.jsonl", dir, lead_uuid), 2_000);
+        let mut i = inputs(&dir);
+        i.harness_id = lead_uuid.to_string();
+        i.child = "1".to_string();
+        assert_eq!(derive(&i).expect("the narrowed scan refused"), "aaaabbbb");
+        assert_eq!(lead(&i).expect("the lead id refused"), "11112222");
+        i.session_id = "agent-deadbeefcafe0000".to_string();
+        assert_eq!(lead(&i).expect("the override refused"), "deadbeef");
+        let i = inputs(&dir);
+        assert_eq!(lead(&i).expect("the widened scan refused"), derive(&i).expect("the widened scan refused"));
         let _ = std::fs::remove_dir_all(&dir);
     }
 

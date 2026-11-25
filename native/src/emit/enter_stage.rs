@@ -458,12 +458,11 @@ fn open_lead_journal(c: &Cfg, say: &Say, rest: &[String]) -> Result<i32, Fault> 
 }
 
 // spec: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the opener writes the session-role marker: the
-// id derived in process as the stamp derives it, a held line left alone, an underived id a skip at
-// exit 0, an unwritable marker exit 3
+// lead's id, a held line left alone, an underived id a skip at exit 0, an unwritable marker exit 3
 fn role_marker(c: &Cfg, say: &Say) -> Result<(), Fault> {
     let path = &c.role_file;
-    let id = match crate::emit::session_id::emit(&[]) {
-        Ok(id) => id.trim().to_string(),
+    let id = match crate::emit::session_id::inputs().and_then(|i| crate::emit::session_id::lead(&i)) {
+        Ok(id) => id,
         Err(e) => {
             let skip = format!(
                 "the session-role marker {} — the session id did not derive ({}); the journal is \

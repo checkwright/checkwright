@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### lead-journal-session-id
-
-The lead-journal arm (`--enter-stage --open-lead-journal`), re-run by a resumed lead after a mid-iteration re-login, wrote a build stage session's id rather than the lead's to the session-role marker. Re-verified 2026-11-25: `role_marker` (native/src/emit/enter_stage.rs) takes the id from `--emit-session-id`, the newest transcript, which a stage child's newer transcript outranks; the segment heading names the cursor's last stamp by design.
-
-**Deliverable:** debt: the arm resolves the invoking session's id, with a case for a resumed lead.
-
-**Cost while deferred:** the session-context hook suppresses executor steps for the wrong session. Filed 2026-11-24 by adopter-asks-pass' lead. Owner lookup: `lead-journal`, `session-role` in this file, none; owner lifecycle-kit/SPEC.md §bin/enter-stage.sh and context-kit/SPEC.md §The session-context hook.
-
 ### knobs-lock-catcher
 
 The knob lock (`knobenv::lock`) reached the source-walking tests with no catcher, and the other `prune_dirs` readers (`walk::glob_corpus`, `walk::tracked_shell_tree`, `walk::find_named_pruning`) were not swept.
@@ -1029,4 +1021,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - verdict-lookup
 - orchestrator-arm-json
 - foreign-run-sandbox-record
+- lead-journal-session-id
 
