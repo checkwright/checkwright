@@ -6,7 +6,7 @@
 
   **Set record**
 
-  **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, on scope's recommendation widened by one):** the machine-verdict set answering the orchestrator adopter's pairing asks, in the adopter's priority order. Features for spec to author: `verdict-identity-fields` leads, `verdict-lookup` lands after it, `exit-code-tool-error`, `orchestrator-arm-json`, and `external-state-owner-mode`, reopened by the same direction and riding `orchestrator-arm-json`'s form. Debt on the surfaces they touch: `foreign-run-sandbox-record`, `lead-journal-session-id`, `knobs-lock-catcher`, `payload-amendment-withhold`. `adopter-content-checks` leads the next iteration once the adopter glosses `script`; the adopter refiles its four peer-channel defects through the peer channel, where each takes an id.
+  **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, on scope's recommendation):** the machine-verdict set answering the orchestrator adopter's pairing asks, in the adopter's priority order. Features for spec to author: `verdict-identity-fields` leads, `verdict-lookup` lands after it and after `exit-code-tool-error`, whose exit 3 its contract uses, then `orchestrator-arm-json`. Debt on the surfaces they touch: `foreign-run-sandbox-record`, `lead-journal-session-id`, `knobs-lock-catcher`, `payload-amendment-withhold`. `external-state-owner-mode` stays deferred by a later direction of the same date, recorded on its entry. `adopter-content-checks` leads a later iteration, its rule list arriving with the ask. Ask E, the four peer-channel defects, is met: the peer-channel fix of 2026-11-24 settled each, and v0.38.0 shipped it.
 
   **The release and pushes (2026-11-25, operator direction, lead-relayed, not a ruling):** no release cut is granted. Push need 2 against 2, inside the budget: the closing push, and the mid-iteration push `exit-code-tool-error` owes.
 
@@ -204,13 +204,13 @@ Only TRAJECTORY.md holds rulings (operator direction, 2026-10-25), yet tracked p
 
 ### external-state-owner-mode
 
-[cost: event/low] [surface: lifecycle-kit] [not-icebox-eligible: 2026-11-25 reopened by operator direction into this iteration's set, for spec to author]
+[cost: event/low] [surface: lifecycle-kit] [not-icebox-eligible: 2026-11-25 carries the operator direction of that date keeping the entry deferred, held only in this entry]
 
 A declared mode where an outside tool renders the queue file and the iteration header: the gates check consistency and a provenance stamp (generator, version, content hash) instead of hand transitions, a corrective message names the owner's command from config, and stage transitions get verbs with JSON results.
 
-**Conflict, settled:** the lead decision of 2026-11-14 (operator-delegated) served an adopter running its own work engine the checks and the session hooks only, on the ground that a stamp is worth its being committed and naming HEAD, and the operator's direction of 2026-11-15 kept it. **Reopened 2026-11-25, operator direction, lead-relayed, not a ruling:** checkwright and the orchestrator are to be one coherent offering, contract changes being cheap, which supersedes the 2026-11-15 direction. The orchestrator adopter's boundary: where present it owns work state, invokes stages as verdict-returning steps, and neither tool keeps a copy of the other's state; standalone use is unchanged.
+**Conflict, standing:** the lead decision of 2026-11-14 (operator-delegated) serves an adopter running its own work engine the checks and the session hooks only, with no lifecycle or queue read adapter, on the refusal's ground that a stamp is worth its being committed and naming HEAD. Operator direction 2026-11-15, lead-relayed, not a ruling: that decision stands. **Kept deferred 2026-11-25, operator direction, lead-relayed, not a ruling,** reversing a same-day reopen: the orchestrator adopter, asked, needs none of it, keeping its own lifecycle and queue gates over its own state and calling checkwright only as a verdict-returning step. **Reopens** when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
 
-**Deliverable:** design-pending, a feature: the declared mode, the consistency and provenance-stamp checks, the corrective message, and stage verbs whose JSON results take [orchestrator-arm-json](#orchestrator-arm-json)'s form, which lands first. The ask names no gate to read over the engine's state, so spec settles which gates the mode reads and escalates what only the adopter can answer.
+**Deliverable:** design-pending, a feature, on reopening.
 
 **Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
 
@@ -290,7 +290,7 @@ Asks A and C of the orchestrator adopter's pairing asks: a verdict an outside wo
 
 Ask B of the orchestrator adopter's pairing asks: a verdict keyed by tree, kit version and gate-set digest, and a lookup answering whether a verdict exists for a key and what it is. Nothing keeps one so: the evidence manifest keys suites by run and commit (evidence-kit/SPEC.md §Evidence manifest), and the SARIF log goes to a caller's path and is kept by nobody.
 
-**Deliverable:** design-pending, a feature: the key, built from verdict-identity-fields' fields and landing after it; where a verdict is kept and by whom; and the lookup arm. The lead advises evidence-kit as its home.
+**Deliverable:** design-pending, a feature: the key, built from verdict-identity-fields' fields and landing after it; where a verdict is kept and by whom; and the lookup arm. The lead advises evidence-kit as its home. The adopter's contract for the arm (adopter input 2026-11-25): a command, not a file, `<bin> --verdict-lookup <tree> <kit-ver> <digest>`, JSON on stdout. A found verdict exits 0 with the verdict in the document, a failing verdict included; an absent one exits 0 with `"verdict":"absent"`; a bad key or usage exits 2; an unreadable store exits 3, so it lands after exit-code-tool-error; exit 1 is never used.
 
 **Cost while deferred:** the adopter re-runs the battery on a tree already judged under the same gates. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `lookup`, `verdict key` in this file, none; owner evidence-kit/SPEC.md §Evidence manifest.
 
@@ -300,21 +300,21 @@ Ask B of the orchestrator adopter's pairing asks: a verdict keyed by tree, kit v
 
 The orchestrator adopter asks for exit 2 on a usage error or refusal, a new 3 on a tool or input error, and an error-kind field in the machine form. gate-sdk/SPEC.md §Output contract holds 0, 1 and 2, grounded against a fourth code by the churn every caller branching on the status pays; the operator's direction of 2026-11-25, lead-relayed (not a ruling), weighs that ground down, every adopter being in-house.
 
-**Deliverable:** design-pending, a feature: exit 2 for a usage error or refusal, 3 for a tool or input error, and an error-kind field in `--json`, as the adopter asked (operator direction 2026-11-25, lead-relayed, not a ruling), across members and arms, hook arms not exempted; the front ends and CI templates that branch on status follow. **Tension for spec, not reconciled here:** a harness hook blocks on exit 2 alone (gate-sdk/SPEC.md §The hook contract), so a hook arm's tool or input error moved to 3 stops blocking; spec escalates it if it bites.
+**Deliverable:** design-pending, a feature, implemented as the adopter asked (operator direction 2026-11-25, lead-relayed, not a ruling): exit 2 for a usage error or refusal, 3 for a tool or input error, and an error-kind field in `--json`, across members and the non-hook arms; the front ends and CI templates that branch on status follow. The adopter has since narrowed the ask to the non-hook arms (adopter input 2026-11-25): a hook arm keeps exit 2 for refusals and tool errors alike, carrying an error kind, since failing closed matters more than the split and only the harness invokes `--hook` (gate-sdk/SPEC.md §The hook contract blocks on 2 alone). **One error-kind value for spec to weigh (lead decision 2026-11-25, provided it adds no push):** `peer-file` refusing a same-second identical filing as a collision carries its own kind and prints the id it collided with, so the caller takes the ask as already filed; distinct sub-second filings are not wanted. If it does not fit here, spec files it as its own Deferred entry.
 
-**Push need (2026-11-25, inside the budget):** one mid-iteration push, since the split reaches gate-sdk/bin/run-gates.ps1, which only the Windows legs execute.
+**Push need (2026-11-25, inside the budget):** one mid-iteration push, since the split reaches gate-sdk/bin/run-gates.ps1, which only the Windows legs execute: its refusal of an unavailable binary exits 2 today and is a tool error under the split.
 
 **Cost while deferred:** a caller tells a refused input from a crashed tool only by parsing stderr. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `exit 3`, `fourth code` in this file, none; owner gate-sdk/SPEC.md §Output contract.
 
 ### orchestrator-arm-json
 
-[cost: event/low] [surface: lifecycle-kit]
+[cost: event/low] [surface: gate-sdk]
 
-Where present, the orchestrator adopter invokes lifecycle stages and foreign runs as verdict-returning steps. `--enter-stage` (lifecycle-kit/SPEC.md §bin/enter-stage.sh) and `--foreign-run` and `--foreign-resume` (delegation-kit/SPEC.md §The foreign-vendor run) print for a person; `--verify-gate-run` alone has a `--json` form, and gate-sdk/SPEC.md §The non-gate arm mints one per arm with its named caller, which the adopter now is for these three.
+The orchestrator adopter calls checkwright as a verdict-returning step, and names two arms it reads by machine (adopter input 2026-11-25): `--run` and the verdict lookup. `--verify-gate-run` alone has a `--json` form today, and gate-sdk/SPEC.md §The non-gate arm mints one per arm with its named caller. The adopter calls `--enter-stage`, `--foreign-run` and `--foreign-resume` not yet, so they take none.
 
-**Deliverable:** design-pending, a feature: a `--json` form on each, keys its caller reads, goldens in each arm's unit test, and whether a refused stage entry prints a document. A further arm takes one when the adopter names it.
+**Deliverable:** design-pending, a feature: a `--json` form on `--run`, its keys reconciled with the battery's SARIF log, and a golden in its unit test; the lookup's document is verdict-lookup's. A further arm takes one when the adopter names it.
 
-**Cost while deferred:** the adopter scrapes prose for a stage entry's or a foreign run's verdict. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `--json`, `enter-stage` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
+**Cost while deferred:** the adopter reads a battery's verdict from the SARIF log or from prose, with no document on stdout. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `--json`, `enter-stage` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
 
 ### adopter-content-checks
 
@@ -322,9 +322,9 @@ Where present, the orchestrator adopter invokes lifecycle stages and foreign run
 
 Ask D of the orchestrator adopter's pairing asks: its content checks as config-driven gates. pipefail (with fix and baseline), script, names (deny stems), strings (built binaries against deny terms and home paths), text (tracked text against an untracked deny list), ghpin (CI action pins against a sites file), literals (unconstrained string literals since a base ref), migrations (additive-only SQL since a base ref) and exec-write (writes of executables outside named helpers, `fs::copy` and libc, nix or rustix chmod and children included). For text and strings a finding carries path:line and a rule id, never a deny term or the deny file's contents.
 
-**Covered today, in part:** text is check-tree-terms over `GATE_SDK_MSG_PATTERN_FILES_LOCAL`, whose record prints the matched line (gate-sdk/SPEC.md §check-tree-terms); ghpin is check-action-pinning, with no sites file. No content gate reads a since-base-ref corpus; check-gate-tamper's `--range` is the precedent. `script` is unglossed in the ask.
+**Covered today, in part:** text is check-tree-terms over `GATE_SDK_MSG_PATTERN_FILES_LOCAL`, whose record prints the matched line (gate-sdk/SPEC.md §check-tree-terms); ghpin is check-action-pinning, with no sites file. No content gate reads a since-base-ref corpus; check-gate-tamper's `--range` is the precedent. `script`, glossed by the adopter (adopter input 2026-11-25): the preflight a batch-job wrapper runs over each shell script it ships, refusing `pkill`, `mount` and their family with a rule id each (PKILL-REFUSED, MOUNT-REFUSED), and holding every invoked command to its declared form `<cmd> [--flag N]... --config $VAR`; the full rule list arrives with the ask.
 
-**Deliverable:** design-pending, features split at spec: the redacted record and a per-pattern rule id first, then each new gate born native with its pair and knob, reusing check-commit-msg and check-tree-terms where they cover. **Owed first (2026-11-25, operator direction, lead-relayed, not a ruling):** the adopter glosses `script` before this is taken up.
+**Deliverable:** design-pending, features split at spec: the redacted record and a per-pattern rule id first, then each new gate born native with its pair and knob, reusing check-commit-msg and check-tree-terms where they cover.
 
 **Cost while deferred:** the adopter keeps nine checks of its own beside the battery, two overlapping ours under another output contract. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `deny`, `base ref` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
 
