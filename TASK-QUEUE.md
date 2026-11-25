@@ -1010,12 +1010,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- verdict-identity-fields
-- exit-code-tool-error
-- verdict-lookup
-- orchestrator-arm-json
-- foreign-run-sandbox-record
-- lead-journal-session-id
-- knobs-lock-catcher
-- payload-amendment-withhold
-

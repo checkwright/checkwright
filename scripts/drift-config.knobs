@@ -27,6 +27,7 @@ DRIFT_KIT_MANUAL_OPS_IGNORE[] = ./native/target/release/checkwright-gates
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = native/target/release/checkwright-gates
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = bash gate-sdk/bin/build-native.sh
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = cargo test
+DRIFT_KIT_MANUAL_OPS_IGNORE[] = cargo check
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = bash gate-sdk/bin/run-gates.sh >
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = ./native/target/release/checkwright-gates >
 DRIFT_KIT_MANUAL_OPS_IGNORE[] = sed
