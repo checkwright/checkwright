@@ -16,18 +16,6 @@
 
 ## New Features
 
-### content-rule-class
-
-[spec: gate-sdk/SPEC-rule-class.md]
-
-The finding-line rule class of [adopter-content-checks](#adopter-content-checks): verdict-identity-fields' ask C, a class token `[<CLASS>]` on a finding line surfacing as the SARIF result's rule class, with the two placed shapes the content families print, a path alone and a byte offset.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** ask C as filed on verdict-identity-fields. A located finding may read `<path>@<byte-offset>: [<RULE-ID>]` with a SARIF byte-offset region; the offset and the term are never part of identity, which it would take as partialFingerprints from path, rule id and the term's list position. Answered on spec's choice of `fingerprints` alone (2026-11-25, peer channel, lead-relayed): accepted, nothing of the adopter's reading `partialFingerprints`, on the condition of a test that the fingerprint stays equal when only the byte offset moves.
-
-**Deliverable:** the class token's grammar in the output contract, `properties.ruleClass` on a SARIF result, the path-only and byte-offset placements, and the verdict contract's minor version with its goldens.
-
-**Cost while deferred:** a content gate's path-only or byte-offset record lands at its registry line in the SARIF log, and the adopter's engine keys results on free text. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `ruleClass`, `byteOffset` in this file, none; owner gate-sdk/SPEC.md §run-gates.
-
 ### adopter-content-checks
 
 [spec: gate-sdk/SPEC-deny-terms.md]
@@ -42,7 +30,7 @@ Ask D of the orchestrator adopter's pairing asks: its nine content checks as con
 
 **Cost while deferred:** the adopter keeps nine checks of its own beside the battery, two overlapping ours under another output contract. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `deny`, `base ref` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
 
-The finding-line rule class and its placements: [content-rule-class](#content-rule-class).
+The finding-line rule class and its placements: `content-rule-class`.
 
 Strings: [binary-strings-scan](#binary-strings-scan).
 
@@ -1151,4 +1139,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - verdict-key-before-dispatch
+- content-rule-class
 

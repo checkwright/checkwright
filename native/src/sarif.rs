@@ -9,7 +9,7 @@ pub const KNOB: &str = "GATE_SDK_SARIF_FILE";
 pub const RESULTS_KNOB: &str = "GATE_SDK_SARIF_RESULTS";
 
 // spec: gate-sdk/SPEC.md §run-gates — the verdict contract's version, raised by its migration rule
-pub const CONTRACT: &str = "1.1.0";
+pub const CONTRACT: &str = "1.2.0";
 
 // spec: gate-sdk/SPEC.md §run-gates — the fail result's fingerprint key, versioned with its recipe
 pub const FINGERPRINT: &str = "checkwright/v1";
@@ -95,32 +95,70 @@ pub struct Run<'a> {
     pub selection: Selection,
 }
 
-// spec: gate-sdk/SPEC.md §run-gates — a finding line opening `<path>:<line>:` or
-// `<path>:<line>:<col>:`, the path repo-relative and naming a regular file, with the text after
-// that prefix
-fn location(line: &str, is_file: &dyn Fn(&str) -> bool) -> Option<(String, u64, Option<u64>, String)> {
-    let mut parts = line.splitn(4, ':');
-    let path = parts.next()?;
-    let row: u64 = digits(parts.next()?)?;
-    let rest = parts.next()?;
-    let (col, text) = match parts.next() {
-        Some(tail) => match digits(rest) {
-            Some(c) => (Some(c), tail.to_string()),
-            None => (None, format!("{}:{}", rest, tail)),
-        },
-        None => (None, rest.to_string()),
-    };
-    if path.is_empty() || row == 0 || path.trim() != path {
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Artifact {
+    File,
+    Directory,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Region {
+    Whole,
+    Line(u64, Option<u64>),
+    Offset(u64),
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct Placed {
+    path: String,
+    region: Region,
+    text: String,
+}
+
+fn relative(path: &str) -> bool {
+    !path.is_empty()
+        && path.trim() == path
+        && crate::walk::path_root(path).is_none()
+        && !path.split(['/', '\\']).any(|s| s == "..")
+}
+
+// spec: gate-sdk/SPEC.md §Output contract — a finding text opening `[<CLASS>]`, the class
+// `[A-Z][A-Z0-9_-]*` followed by a space or the text's end
+fn class(text: &str) -> Option<&str> {
+    let (token, after) = text.strip_prefix('[')?.split_once(']')?;
+    let mut bytes = token.bytes();
+    let head = bytes.next().is_some_and(|b| b.is_ascii_uppercase());
+    let tail = bytes.all(|b| b.is_ascii_uppercase() || b.is_ascii_digit() || b == b'_' || b == b'-');
+    (head && tail && (after.is_empty() || after.starts_with(' '))).then_some(token)
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a finding line in one of the three shapes, its path
+// repo-relative, with the text after the location prefix
+fn location(line: &str, artifact: &dyn Fn(&str) -> Option<Artifact>) -> Option<Placed> {
+    let trim = |t: &str| t.trim_start_matches(|c: char| c.is_ascii_whitespace()).to_string();
+    let (head, rest) = line.split_once(':')?;
+    if !relative(head) {
         return None;
     }
-    if crate::walk::path_root(path).is_some() || path.split(['/', '\\']).any(|s| s == "..") {
-        return None;
+    if let Some((row, tail)) = rest.split_once(':').and_then(|(r, t)| Some((digits(r)?, t))) {
+        if row == 0 || artifact(head) != Some(Artifact::File) {
+            return None;
+        }
+        let (col, text) = match tail.split_once(':').and_then(|(c, t)| Some((digits(c)?, t))) {
+            Some((c, t)) => (Some(c).filter(|c| *c > 0), t),
+            None => (None, tail),
+        };
+        return Some(Placed { path: head.replace('\\', "/"), region: Region::Line(row, col), text: trim(text) });
     }
-    if !is_file(path) {
-        return None;
+    let text = trim(rest);
+    class(&text)?;
+    if let Some((file, offset)) = head.rsplit_once('@').and_then(|(f, n)| Some((f, digits(n)?))) {
+        if relative(file) && artifact(file) == Some(Artifact::File) {
+            return Some(Placed { path: file.replace('\\', "/"), region: Region::Offset(offset), text });
+        }
     }
-    let text = text.trim_start_matches(|c: char| c.is_ascii_whitespace()).to_string();
-    Some((path.replace('\\', "/"), row, col.filter(|c| *c > 0), text))
+    artifact(head)?;
+    Some(Placed { path: head.replace('\\', "/"), region: Region::Whole, text })
 }
 
 type Seen = std::collections::HashMap<(String, String, String), usize>;
@@ -142,16 +180,24 @@ fn digits(s: &str) -> Option<u64> {
     s.parse().ok()
 }
 
-fn at(uri: &str, row: Option<u64>, col: Option<u64>) -> Value {
+fn at(uri: &str, region: &Region) -> Value {
     let mut physical = json!({ "artifactLocation": { "uri": uri } });
-    if let Some(r) = row {
-        let mut region = json!({ "startLine": r });
-        if let Some(c) = col {
-            region["startColumn"] = json!(c);
+    match *region {
+        Region::Whole => {}
+        Region::Line(r, col) => {
+            let mut lines = json!({ "startLine": r });
+            if let Some(c) = col {
+                lines["startColumn"] = json!(c);
+            }
+            physical["region"] = lines;
         }
-        physical["region"] = region;
+        Region::Offset(o) => physical["region"] = json!({ "byteOffset": o }),
     }
     json!([{ "physicalLocation": physical }])
+}
+
+fn registry_at(uri: &str, row: Option<u64>) -> Value {
+    at(uri, &row.map_or(Region::Whole, |r| Region::Line(r, None)))
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — SARIF holds `level` at `none` for every kind but `fail`
@@ -217,7 +263,7 @@ fn extensions(p: &Provenance) -> Value {
     json!(kits)
 }
 
-pub fn render(run: &Run, members: &[Member], omissions: &[Omission], is_file: &dyn Fn(&str) -> bool) -> String {
+pub fn render(run: &Run, members: &[Member], omissions: &[Omission], artifact: &dyn Fn(&str) -> Option<Artifact>) -> String {
     let registry = run.registry.replace('\\', "/");
     let all = run.selection == Selection::All;
     let mut rules: Vec<Value> = Vec::new();
@@ -228,7 +274,7 @@ pub fn render(run: &Run, members: &[Member], omissions: &[Omission], is_file: &d
         if all {
             let idx = rules.len();
             rules.push(rule(o.name, None, None));
-            let loc = at(&registry, Some(o.line as u64), None);
+            let loc = registry_at(&registry, Some(o.line as u64));
             results.push(result(idx, o.name, "notApplicable", o.reason, loc));
         }
     };
@@ -245,15 +291,18 @@ pub fn render(run: &Run, members: &[Member], omissions: &[Omission], is_file: &d
         let row = m.registry_line.map(|n| n as u64);
         if !m.failed {
             let (kind, message) = green(m.output, m.tail);
-            results.push(result(idx, m.name, kind, &message, at(&registry, row, None)));
+            results.push(result(idx, m.name, kind, &message, registry_at(&registry, row)));
             continue;
         }
         let text = String::from_utf8_lossy(m.output);
         let mut found = false;
         for line in text.lines() {
-            if let Some((path, r, col, finding)) = location(line, is_file) {
-                let mut fail = result(idx, m.name, "fail", line, at(&path, Some(r), col));
-                fail["fingerprints"] = fingerprint(&mut seen, m.name, &path, &finding);
+            if let Some(p) = location(line, artifact) {
+                let mut fail = result(idx, m.name, "fail", line, at(&p.path, &p.region));
+                fail["fingerprints"] = fingerprint(&mut seen, m.name, &p.path, &p.text);
+                if let Some(c) = class(&p.text) {
+                    fail["properties"] = json!({ "ruleClass": c });
+                }
                 results.push(fail);
                 found = true;
             }
@@ -261,7 +310,7 @@ pub fn render(run: &Run, members: &[Member], omissions: &[Omission], is_file: &d
         if !found {
             let block = text.trim_end_matches('\n');
             let message = if block.trim().is_empty() { m.tail.trim() } else { block };
-            let mut fail = result(idx, m.name, "fail", message, at(&registry, row, None));
+            let mut fail = result(idx, m.name, "fail", message, registry_at(&registry, row));
             fail["fingerprints"] = fingerprint(&mut seen, m.name, &registry, "");
             results.push(fail);
         }
@@ -303,8 +352,16 @@ pub(crate) mod tests {
     use super::*;
     use crate::provenance::Kit;
 
-    fn files(p: &str) -> bool {
-        matches!(p, "a/b.md" | "c.rs")
+    fn files(p: &str) -> Option<Artifact> {
+        match p {
+            "a/b.md" | "c.rs" | "bin/tool" => Some(Artifact::File),
+            "a" => Some(Artifact::Directory),
+            _ => None,
+        }
+    }
+
+    fn placed(path: &str, region: Region, text: &str) -> Option<Placed> {
+        Some(Placed { path: path.into(), region, text: text.into() })
     }
 
     fn member<'a>(name: &'a str, line: Option<usize>, failed: bool, out: &'a [u8]) -> Member<'a> {
@@ -386,23 +443,57 @@ pub(crate) mod tests {
         parse(&rendered(&bare(), Scope::Registry, Selection::All, members, &[]))
     }
 
-    // spec: gate-sdk/SPEC.md §run-gates — both finding shapes place a result at their region, and a
-    // path naming no regular file, an absolute path and a path with no line place none
+    // spec: gate-sdk/SPEC.md §run-gates — the three finding shapes place a result at their region,
+    // the two classed shapes only with their token; a path naming no artifact, an absolute path and
+    // a classless path with no line place none
     #[test]
-    fn the_location_reader_takes_both_shapes_and_only_a_repo_relative_file() {
-        assert_eq!(location("a/b.md:12: bad", &files), Some(("a/b.md".into(), 12, None, "bad".into())));
-        assert_eq!(location("c.rs:3:7: bad", &files), Some(("c.rs".into(), 3, Some(7), "bad".into())));
-        assert_eq!(location("c.rs:3:", &files), Some(("c.rs".into(), 3, None, "".into())));
-        assert_eq!(location("c.rs:3: a: b", &files), Some(("c.rs".into(), 3, None, "a: b".into())));
-        assert_eq!(location("c.rs:3:\t x:", &files), Some(("c.rs".into(), 3, None, "x:".into())));
+    fn the_location_reader_takes_the_three_shapes_and_only_a_repo_relative_artifact() {
+        assert_eq!(location("a/b.md:12: bad", &files), placed("a/b.md", Region::Line(12, None), "bad"));
+        assert_eq!(location("c.rs:3:7: bad", &files), placed("c.rs", Region::Line(3, Some(7)), "bad"));
+        assert_eq!(location("c.rs:3:", &files), placed("c.rs", Region::Line(3, None), ""));
+        assert_eq!(location("c.rs:3: a: b", &files), placed("c.rs", Region::Line(3, None), "a: b"));
+        assert_eq!(location("c.rs:3:\t x:", &files), placed("c.rs", Region::Line(3, None), "x:"));
+        assert_eq!(location("c.rs: [A] bad", &files), placed("c.rs", Region::Whole, "[A] bad"));
+        assert_eq!(location("a: [NAME-2]", &files), placed("a", Region::Whole, "[NAME-2]"));
+        assert_eq!(location("bin/tool@4096: [B_1] term 3", &files), placed("bin/tool", Region::Offset(4096), "[B_1] term 3"));
+        assert_eq!(location("a@12: [B] x", &files), None, "an offset names a regular file");
         assert_eq!(location("nope.md:3: bad", &files), None);
+        assert_eq!(location("a:3: bad", &files), None, "a line names a regular file");
         assert_eq!(location("/c.rs:3: bad", &files), None);
         assert_eq!(location("../c.rs:3: bad", &files), None);
         assert_eq!(location("c.rs: bad", &files), None);
+        assert_eq!(location("c.rs: [a] bad", &files), None);
+        assert_eq!(location("c.rs: [blocked-by: x]", &files), None);
+        assert_eq!(location("c.rs: [A]bad", &files), None);
         assert_eq!(location("c.rs:x: bad", &files), None);
         assert_eq!(location("c.rs:0: bad", &files), None);
         assert_eq!(location("  c.rs:3: bad", &files), None);
         assert_eq!(location("help: c.rs", &files), None);
+        assert_eq!(location("error: [A] c.rs", &files), None);
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — a placed result opening a class token carries it as
+    // `properties.ruleClass`; a classless or registry-line result carries no property
+    #[test]
+    fn a_placed_result_carries_its_rule_class() {
+        let log = all(&[red("check-a", Some(1), b"a/b.md:4: [TELL-B] hedged\nc.rs:2: plain\na: [N] denied\n"), red("check-b", Some(2), b"[X] broke\n")]);
+        let results = log["runs"][0]["results"].as_array().unwrap();
+        let classes: Vec<Option<&str>> = results.iter().map(|r| r.pointer("/properties/ruleClass").and_then(|c| c.as_str())).collect();
+        assert_eq!(classes, [Some("TELL-B"), None, Some("N"), None]);
+        assert!(results[2]["locations"][0]["physicalLocation"].get("region").is_none());
+        assert_eq!(results[2]["locations"][0]["physicalLocation"]["artifactLocation"]["uri"], "a");
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — a byte-offset finding's identity excludes its offset, so the
+    // same record shifted by a rebuild keeps its fingerprint
+    #[test]
+    fn a_shifted_byte_offset_keeps_its_fingerprint() {
+        let before = all(&[red("check-strings", Some(1), b"bin/tool@1024: [TERM] list entry 2\n")]);
+        let after = all(&[red("check-strings", Some(1), b"bin/tool@2311: [TERM] list entry 2\n")]);
+        let region = |log: &Value| log["runs"][0]["results"][0]["locations"][0]["physicalLocation"]["region"].clone();
+        assert_eq!((region(&before), region(&after)), (json!({ "byteOffset": 1024 }), json!({ "byteOffset": 2311 })));
+        assert!(prints(&before)[0].is_some());
+        assert_eq!(prints(&before), prints(&after));
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — a red member with finding lines gets one `fail` result per
@@ -612,7 +703,11 @@ pub(crate) mod tests {
     }
 
     fn golden_red() -> [Member<'static>; 3] {
-        let mut a = red("check-findings", Some(1), b"a/b.md:4: the rule is broken here\nhelp: fix it\n");
+        let mut a = red(
+            "check-findings",
+            Some(1),
+            b"a/b.md:4: [A] the rule is broken here\na: [B] a denied name, list entry 1\nbin/tool@1024: [C] a denied string, list entry 2\nhelp: fix it\n",
+        );
         a.invariant = Some(Invariant {
             text: "gate-sdk/SPEC.md \u{a7}Example \u{2014} findings name their line".into(),
             help_uri: None,

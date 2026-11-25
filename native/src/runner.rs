@@ -1295,7 +1295,11 @@ fn write_log(
         scope,
         selection,
     };
-    let body = sarif::render(&run, members, omissions, &|p| Path::new(p).is_file());
+    let body = sarif::render(&run, members, omissions, &|p| match Path::new(p).metadata() {
+        Ok(m) if m.is_file() => Some(sarif::Artifact::File),
+        Ok(m) if m.is_dir() => Some(sarif::Artifact::Directory),
+        _ => None,
+    });
     sarif::write(path, &body)
 }
 

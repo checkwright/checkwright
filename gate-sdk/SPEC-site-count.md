@@ -33,7 +33,7 @@ Pairs `reviewed-site-count`. Some calls are safe only in a reviewed form, and a 
 
 ## Producers and consumers
 
-- **check-site-count.** Producer: the battery, armed where `GATE_SDK_SITE_RULES` holds a block. Deployed: the orchestrator adopter, over its CLI-account sites *(inferred: its configuration is out of tree, lead-relayed)*. This repo binds no rule: reviewing each of its own CLI call sites is a calibration this unit does not make, so the gate is registered and not applicable here, and `doctor` names it disarmed. Consumers: the committing session, and the SARIF log through the path-only placement (gate-sdk/SPEC-rule-class.md delta 2).
+- **check-site-count.** Producer: the battery, armed where `GATE_SDK_SITE_RULES` holds a block. Deployed: the orchestrator adopter, over its CLI-account sites *(inferred: its configuration is out of tree, lead-relayed)*. This repo binds no rule: reviewing each of its own CLI call sites is a calibration this unit does not make, so the gate is registered and not applicable here, and `doctor` names it disarmed. Consumers: the committing session, and the SARIF log through the path-only placement (gate-sdk/SPEC.md §run-gates).
 - **The test-code classifier.** Producer: `walk::test_code` over `GATE_SDK_TEST_GLOBS`. Consumers: check-site-count (delta 1) and the stale-literals arm (gate-sdk/SPEC-since-base.md delta 2).
 - **Roster readers of the new member:** `gates::REGISTRY`, `check-readme-roster` (gate-sdk/README.md's roster block), `check-install-disposition`, `check-gate-substrate-parity`, `scripts/gates.list`, and the knob rows in `native/src/knobs/gate_sdk.rs`.
 

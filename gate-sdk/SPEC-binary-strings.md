@@ -46,7 +46,7 @@ Pairs `binary-strings-scan`. A built artifact carries strings its source never s
 >
 > Its fixture pair carries small constructed files: `bad/` an ELF64 image with a term in a data section, a shape in a read-only section, and a non-ELF file with a term; `good/` the same terms inside a section flagged executable and inside a longer token, and a run of 3 bytes. `check-binary-strings.test.sh` holds the residue: an absent named file at 2, a truncated ELF header at 3, a GNU escape at 2, and the record order.
 
-- **Why the offset.** A binary has no lines, and §run-gates places `<path>@<offset>:` at a byte region (gate-sdk/SPEC-rule-class.md delta 2). The offset sits in the location prefix, so a rebuild that moves it leaves the result's identity alone, and the position after the id tells two terms of one id apart.
+- **Why the offset.** A binary has no lines, and §run-gates places `<path>@<offset>:` at a byte region (gate-sdk/SPEC.md §run-gates). The offset sits in the location prefix, so a rebuild that moves it leaves the result's identity alone, and the position after the id tells two terms of one id apart.
 
 ## Producers and consumers
 
