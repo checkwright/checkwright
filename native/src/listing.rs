@@ -144,6 +144,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a name-listing argv carrying neither the NUL flag nor a probe's flag reds outside the roster
     #[test]
     fn every_name_listing_argv_in_the_crate_is_nul_terminated_or_rostered() {
+        let _knobs = crate::knobenv::lock();
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
         let mut files = vec![root.join("build.rs")];
         files.extend(crate::walk::find_files(&root.join("src"), &["rs"]).expect("the crate source is listable"));
@@ -192,6 +193,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §Fail-closed contract — a NUL split outside the shared decode reds outside the roster
     #[test]
     fn every_nul_listing_in_the_crate_decodes_through_the_shared_reader_or_is_rostered() {
+        let _knobs = crate::knobenv::lock();
         let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
         let mut files = vec![root.join("build.rs")];
         files.extend(crate::walk::find_files(&root.join("src"), &["rs"]).expect("the crate source is listable"));

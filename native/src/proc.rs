@@ -2095,6 +2095,7 @@ pub(crate) mod tests {
     // test scope kept: the code spelling is absent from every crate source but this one
     #[test]
     fn no_crate_source_outside_proc_reads_its_own_path_itself() {
+        let _knobs = crate::knobenv::lock();
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
         assert!(!files.is_empty(), "no module found to scan");
@@ -2190,6 +2191,7 @@ pub(crate) mod tests {
     // the shared module that pins them; the scan is a floor, and a spawn through an alias evades it
     #[test]
     fn no_integration_test_builds_a_child_outside_the_shared_module() {
+        let _knobs = crate::knobenv::lock();
         let tests = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests");
         let shared = tests.join("common");
         let files = walk::find_files(&tests, &["rs"]).expect("cannot enumerate the integration tests");
@@ -2212,6 +2214,7 @@ pub(crate) mod tests {
     // proof: a worktree added through a variable or through `bash -c` evades it.
     #[test]
     fn no_crate_source_adds_a_linked_worktree() {
+        let _knobs = crate::knobenv::lock();
         let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
         let files = walk::find_files(&src, &["rs"]).expect("cannot enumerate the crate modules");
         assert!(!files.is_empty(), "no module found to scan");

@@ -68,14 +68,6 @@ The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (ga
 
 ## Technical Debt
 
-### knobs-lock-test-race
-
-native/src/output.rs's test `no_bundled_clean_line_opens_on_an_empty_corpus_word_unsignalled` walks src/gates through `walk::find_files`, whose `prune_dirs` reads knob state, without taking `knobenv::lock`. A concurrent knobs test holding the lock with a temporary knob dir makes the walk refuse ('GATE_SDK_GATES_DIR is not read from a knob file'), so `native_crate` reds intermittently.
-
-**Deliverable:** debt: the test takes `knobenv::lock`, or the walk it needs reads no knob; a sweep of the other tests walking through knob-reading helpers unlocked.
-
-**Cost while deferred:** a flaky `native_crate` red forces a re-run of an hours-long validate battery. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified at this scope: the test calls `crate::walk::find_files` and takes no lock. Owner lookup: `knobenv`, `find_files` in this file, none; owner native/src/knobenv.rs.
-
 ### amendment-queue-dangling-link
 
 check-amendment-queue tests presence with `Path::try_exists`, which follows links, so a dangling queue symlink takes the not-applicable exit 0 where canon-kit/SPEC.md §check-amendment-queue says a queue path naming anything but a file refuses at exit 2. The bespoke unit test covers an absent path and a directory only.
@@ -1064,4 +1056,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - co-authored-by-trailer-attribution
 - attribution-trailer-ban
+- knobs-lock-test-race
 

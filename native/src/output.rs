@@ -67,6 +67,7 @@ mod tests {
             ("queue_prose_precondition.rs", "no untagged forward precondition"),
             ("queue_wrap.rs", "no line exceeds"),
         ];
+        let _knobs = crate::knobenv::lock();
         let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/gates");
         let mut unsignalled = Vec::new();
         for path in crate::walk::find_files(&dir, &["rs"]).expect("the gates dir walks") {
