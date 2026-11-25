@@ -68,6 +68,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | (consumer) | check-install-size-fresh | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-exec-bit | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-tree-terms | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-path-names | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-binary-strings | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-portability-floor | precommit |
 | (consumer) | check-harness-literal | precommit |

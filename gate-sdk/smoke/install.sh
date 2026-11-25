@@ -27,6 +27,7 @@ check-install-disposition
 check-graph
 check-commit-msg
 check-tree-terms
+check-path-names
 check-binary-strings
 check-portability-floor
 check-projection-roster

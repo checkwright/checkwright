@@ -102,6 +102,7 @@ pub mod measured_claim;
 pub mod memory_off;
 pub mod merge_attrs;
 pub mod path_dialect;
+pub mod path_names;
 pub mod pipe_membership;
 pub mod plugin_parity;
 pub mod packed_links;
@@ -2678,6 +2679,16 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_SDK_STRINGS_FILES", "GATE_SDK_STRINGS_SHAPES", "GATE_SDK_DENY_TERMS"],
         "gate-sdk",
         &[],
+    ),
+    // spec: gate-sdk/SPEC.md §check-path-names — no walk root: the corpus is `git ls-files`,
+    // which §check-reads-couples rules outside the walk class
+    (
+        "check-path-names",
+        path_names::run,
+        &[],
+        &["GATE_SDK_DENY_TERMS", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS", "GATE_SDK_KIT_DIRS"],
+        "gate-sdk",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-portability-floor — no walk root: the corpus is
     // `git ls-files` over the configured pathspecs, which §check-reads-couples rules outside the

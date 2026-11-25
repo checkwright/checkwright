@@ -1,0 +1,4 @@
+# graph: couples=* dir=one valve=none tier=precommit trigger=*
+# install: on-surface
+# armed-by: content GATE_SDK_DENY_TERMS
+# spec: gate-sdk/SPEC.md §check-path-names — no tracked path has a component carrying a deny term as its stem (the record names the shortest hitting prefix and a rule id, never the term)

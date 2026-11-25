@@ -16,18 +16,6 @@
 
 ## New Features
 
-### deny-term-names
-
-[spec: gate-sdk/SPEC-deny-terms.md]
-
-The names family of `adopter-content-checks`: tracked path components against the shared deny-term list.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** the corpus is tracked path components, file and directory names, never identifiers in code; a manifest's package and binary names would be welcome, not required. A term is a literal stem matched case-insensitively, a component hitting when it equals the stem or opens with the stem and `-` or `_` (`foo` hits `foo`, `foo-cli` and `foo_x`, never `food`). Record `<path>: [NAMES-DENIED]`, no waiver, config the shared deny list. Answered on spec's recorded limit (2026-11-25, peer channel, lead-relayed): `.` is a boundary too, so `foo.rs` and `foo.d` hit and `foobar.rs` does not.
-
-**Deliverable:** check-path-names, born native with its pair, reading the deny-term list.
-
-**Cost while deferred:** a private name carried in a tracked path ships unseen, the adopter's own check its only guard. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `path component`, `stem` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
-
 ### reviewed-site-count
 
 [spec: gate-sdk/SPEC-site-count.md]
@@ -1091,4 +1079,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - exit-status-site-unification
 - adopter-content-checks
 - binary-strings-scan
+- deny-term-names
 

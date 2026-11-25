@@ -1,0 +1,6 @@
+carry a deny term as a component's stem
+tree/foo: [NAMES-DENIED]
+tree/foo-cli.sh: [NAMES-DENIED]
+tree/foo_x.txt: [NAMES-DENIED]
+tree/foo.rs: [NAMES-DENIED]
+tree/ZePhYr.md: [CODENAME]

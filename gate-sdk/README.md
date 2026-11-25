@@ -99,6 +99,7 @@ check-action-job-ref
 check-commit-msg
 check-commit-subject
 check-tree-terms
+check-path-names
 check-binary-strings
 check-portability-floor
 check-projection-roster

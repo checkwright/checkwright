@@ -50,6 +50,7 @@ check-exec-bit
 check-commit-msg
 check-commit-subject
 check-tree-terms
+check-path-names
 check-binary-strings
 check-portability-floor
 check-harness-literal
