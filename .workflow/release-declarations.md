@@ -4,6 +4,7 @@
 
 - `check-amendment-queue` — a queue path that is a dangling symlink now refuses at exit 2 (`not a file`), where it read as an absent queue and passed as not applicable. Nothing to do unless a queue link in your tree dangles: repoint it, or remove it to read the queue as absent.
 - `check-brief-authority` — new in delegation-kit: reads the agent briefs named as its operands against the rule files `DELEGATION_KIT_BRIEF_RULES` names, and reds a line granting an authority a `forbid` rule names that no `unless` rule excuses, and a brief no line of which matches a `require` rule. A no-operand run, the battery's, is a clean skip, and an empty knob arms no rule. Nothing to do; to lint a brief before dispatching it, copy `templates/brief-rules.list`, name the copy in the knob, register the gate and run it over the brief.
+- `check-gate-substrate-parity` — reds after upgrading through assertion I, which holds every gate the binary carries for a kit you vendor to be registered in your `gates.list` or declared `# unregistered:` there. If you vendor delegation-kit, the new `check-brief-authority` is such a gate: register it, since its battery run is a clean skip, or declare `# unregistered: check-brief-authority — <reason>`.
 
 ## Knob changes
 
