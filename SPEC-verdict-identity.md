@@ -92,9 +92,9 @@ Roster probe: `git grep -n 'provenance block\|verdictContract\|CONTRACT\|1\.0\.0
 - `native/src/runner.rs`: the gate-set digest computed from the selection and handed to `collect` (delta 2).
 - `native/src/sarif.rs`: the fingerprint on each fail result, `CONTRACT`, and the golden test's fixed block (deltas 3 and 4).
 - `docs/contracts/verdict/v1/green.sarif`, `red.sarif`, `omitted.sarif` and `failures.sarif`: moved with the renderer (delta 4).
-- `evidence-kit/SPEC.md` §The gate-run predicate and §verify-gate-run: the `contract` row, and check 2 (delta 4).
+- `evidence-kit/SPEC.md` §The gate-run predicate and §verify-gate-run: the `contract` row, the sentence "Predicate `1.0.0` (§The gate-run predicate) has no control field", which becomes "The predicate at this major has no control field", and check 2 (delta 4).
 - `native/src/evidence.rs`: `provenance_shape`'s two fields, check 2's tree comparison, and the golden and schema tests (delta 4).
-- `docs/contracts/gate-run/v1/schema.json` and `statement.json`: the two fields' typing, and the moved golden (delta 4).
+- `docs/contracts/gate-run/v1/schema.json` and `statement.json`: the two fields' typing, the `provenance` description's field list "(tool, kits, commit, worktree)", and the moved golden (delta 4).
 - `native/src/emit/verify_gate_run.rs`: check 2's finding for a tree mismatch (delta 4).
 - `docs/gate-sdk/SPEC.md`, `docs/evidence-kit/SPEC.md` and `docs/llms-full.txt`: the generated mirrors (all deltas).
 
