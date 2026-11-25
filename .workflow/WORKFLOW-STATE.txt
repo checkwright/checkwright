@@ -5,3 +5,4 @@
 ---
 
 content-checks-pass scope a96ca4dd 2026-11-25 c1a193879
+content-checks-pass spec ab130636 2026-11-25 9549e6fef
