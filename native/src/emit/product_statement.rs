@@ -282,7 +282,7 @@ fn rewrite(site: &str, text: &str, s: &Statement) -> Result<String, String> {
 // rewrites every site's slot in place, and only after every site has placed its slot
 pub fn emit(args: &[String]) -> Result<String, Fault> {
     let source = crate::walk::knob_scalar(SOURCE_KNOB).map_err(Fault::refused)?;
-    let st = parse(&source, &crate::emit::read_text(&source).map_err(Fault::input)?).map_err(Fault::input)?;
+    let st = parse(&source, &crate::emit::read_text(&source).map_err(|e| Fault::reading(&source, e))?).map_err(Fault::input)?;
     let sites = crate::walk::knob_array(SITES_KNOB).map_err(Fault::refused)?;
     for site in &sites {
         kind_of(site).map_err(Fault::refused)?;
@@ -290,7 +290,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
     if args.iter().any(|a| a == "--write") {
         let mut staged: Vec<(&str, String, bool)> = Vec::new();
         for site in &sites {
-            let text = crate::emit::read_text(site).map_err(Fault::input)?;
+            let text = crate::emit::read_text(site).map_err(|e| Fault::reading(site, e))?;
             let new = rewrite(site, &text, &st).map_err(Fault::input)?;
             let changed = new != text;
             staged.push((site, new, changed));

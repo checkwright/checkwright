@@ -146,16 +146,6 @@ The exec-write family of [adopter-content-checks](#adopter-content-checks): Rust
 
 ## Technical Debt
 
-### exit-status-site-unification
-
-The exit-status cut (usage and refused at 2, input and tool at 3) leaves one case on both readings: a configured file the tool reads that is absent is an operand naming something absent (2), and one present but unreadable is a file it cannot read (3). The crate splits it per site, so one cause carries two statuses across arms and gates: gate_argv at 2 against the battery at 3, docs_since's arm at 3 against its gate at 2, todo_task_liveness at 2 against amendment_queue at 3, and spec::command_lines and finder errors mapped either way by gate. lib/gate.sh's gate_msg_pattern_files and commit_msg::resolve_files already split it as absent at 2 and unreadable at 3. One more site, carried from machine-verdict-pass' close second-vendor review (2026-11-25): native/src/runner.rs's registry read maps every `read_to_string` error to 'no registry at <path>' and refused, so a gates.list present but unreadable or not UTF-8 exits 2 under a message calling it absent; the sweep also gives that message the absent-versus-unreadable split.
-
-**Deliverable:** debt: one owner rule in gate-sdk/SPEC.md §Fail-closed contract, absent-configured refused at 2 and present-unreadable input at 3, then a sweep of every site onto it with its fixture asserts and doc statements.
-
-**The residue split (2026-11-25, lead decision, not a ruling; a later scope may revise it):** this unit closes on the direct sites, the configured reads still mapping absent to 3 among them. The typed-error retype of the knob loader, the corpus finders and the other String funnels is filed as one costed gap for close to drain to Deferred. Grounds: the set record wanted the new gates born on one exit rule, which the owner rule and its helpers already give them, and the retype changes a shared error type rather than a site. The owner rule sits in gate-sdk/SPEC.md §Output contract beside the exit cut it refines.
-
-**Cost while deferred:** an outside engine retries on 3, so a misfiled 3 costs it a futile retry and a misfiled 2 a missed one; no in-tree reader branches 2 against 3 beyond tests. Surfaced 2026-11-25 by machine-verdict-pass' build, filed at its close. Re-verified here: harness_literal maps its tracked-listing error to tool at 3. Re-verified 2026-11-25: the build session's roster of about 45 sites is no count that grep prints, since `grep -rn 'Fault::refused\|Fault::input\|Fault::tool' native/src` returns 1568 lines, every fault construction; the sites carrying the absent-versus-unreadable split are a subset the sweep enumerates at build. Owner lookup: `absent configured`, `present-unreadable`, `exit-status cut`, `per-site`, `unreadable file` in this file, none; owner gate-sdk/SPEC.md §Fail-closed contract.
-
 ### verdict-fix-release-notify
 
 [drain-exempt: notify at the release cut]
@@ -1142,4 +1132,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - verdict-key-before-dispatch
 - content-rule-class
+- exit-status-site-unification
 

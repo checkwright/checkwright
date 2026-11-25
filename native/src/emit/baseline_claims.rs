@@ -11,7 +11,7 @@ pub const KNOBS: &[&str] = &["EVIDENCE_KIT_BASELINE_FILE"];
 
 pub fn emit(_args: &[String]) -> Result<String, Fault> {
     let path = walk::knob_scalar("EVIDENCE_KIT_BASELINE_FILE").map_err(Fault::refused)?;
-    let text = super::read_text(&path).map_err(Fault::input)?;
+    let text = super::read_text(&path).map_err(|e| Fault::reading(&path, e))?;
     lines(&text).map_err(Fault::input)
 }
 

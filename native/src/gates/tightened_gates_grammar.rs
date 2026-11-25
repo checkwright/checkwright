@@ -90,7 +90,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
             walk::knob_scalar("GATE_SDK_WORKFLOW_DIR").map_err(Fault::refused)?
         ),
     };
-    let surface_read = Path::new(&surface).is_file();
+    let surface_read = Path::new(&surface).exists();
     if surface_read {
         let text = read_text(&surface).map_err(Fault::input)?;
         if let SectionVerdict::Unparsed(b) = declaration::section_tokens(&text, &names, TokenRule::GateName) {

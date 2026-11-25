@@ -180,7 +180,7 @@ fn render_fault() -> Result<String, Fault> {
     let withhold: Vec<String> = walk::knob_scalar(WITHHOLD_KNOB).map_err(Fault::refused)?.split_whitespace().map(String::from).collect();
     let installer = walk::knob_scalar(INSTALLER_KNOB).map_err(Fault::refused)?;
     let roster = format!("{}/profiles.list", installer.trim_end_matches('/'));
-    let text = crate::emit::read_text(&roster).map_err(Fault::input)?;
+    let text = crate::emit::read_text(&roster).map_err(|e| Fault::reading(&roster, e))?;
     let roots: Vec<String> = walk::kit_roots().map_err(Fault::refused)?
         .iter()
         .map(|k| k.trim_end_matches('/').to_string())

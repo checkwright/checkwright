@@ -392,7 +392,8 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         Some(t) => t,
         None => walk::cwd().map_err(Fault::tool)?,
     };
-    let text = crate::emit::read_text(&walk::abs_against(&base, &record)).map_err(Fault::input)?;
+    let path = walk::abs_against(&base, &record);
+    let text = crate::emit::read_text(&path).map_err(|e| Fault::reading(&path, e))?;
     let timeout = timeout_secs()?;
 
     let mut out = String::new();

@@ -79,7 +79,7 @@ grep -q 'slow-ruling	dispatch-failure' <<<"$out" \
 checks=$((checks + 1))
 ( cd "$ROOT" && env LIFECYCLE_KIT_RULING_RECORD="$SANDBOX/nope.md" \
     bash "$RUN_GATES" --emit ruling-staleness >/dev/null 2>&1 )
-[[ "$?" -eq 3 ]] || note missing-file "a configured-but-absent record did not exit 3"
+[[ "$?" -eq 2 ]] || note missing-file "a configured-but-absent record did not exit 2"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "ruling-staleness.test.sh: $fails case(s) failed"

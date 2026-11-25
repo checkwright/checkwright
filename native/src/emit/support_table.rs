@@ -182,7 +182,7 @@ fn rewrite(page: &str, text: &str, begin: &str, end: &str, table: &str) -> Resul
 // spec: companion/SPEC.md §The support table — `--write` rewrites the block in place and touches
 // nothing else; `arm` names the table in the report
 pub fn write_marked(arm: &str, page: &str, begin: &str, end: &str, table: &str) -> Result<String, Fault> {
-    let text = crate::emit::read_text(page).map_err(Fault::input)?;
+    let text = crate::emit::read_text(page).map_err(|e| Fault::reading(page, e))?;
     let new = rewrite(page, &text, begin, end, table).map_err(Fault::input)?;
     if new == text {
         return Ok(format!("{}: {} already fresh\n", arm, page));
