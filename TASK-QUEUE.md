@@ -22,7 +22,7 @@
 
 The finding-line rule class of [adopter-content-checks](#adopter-content-checks): verdict-identity-fields' ask C, a class token `[<CLASS>]` on a finding line surfacing as the SARIF result's rule class, with the two placed shapes the content families print, a path alone and a byte offset.
 
-**Adopter input (2026-11-25, peer channel, lead-relayed):** ask C as filed on verdict-identity-fields. A located finding may read `<path>@<byte-offset>: [<RULE-ID>]` with a SARIF byte-offset region; the offset and the term are never part of identity, which it would take as partialFingerprints from path, rule id and the term's list position.
+**Adopter input (2026-11-25, peer channel, lead-relayed):** ask C as filed on verdict-identity-fields. A located finding may read `<path>@<byte-offset>: [<RULE-ID>]` with a SARIF byte-offset region; the offset and the term are never part of identity, which it would take as partialFingerprints from path, rule id and the term's list position. Answered on spec's choice of `fingerprints` alone (2026-11-25, peer channel, lead-relayed): accepted, nothing of the adopter's reading `partialFingerprints`, on the condition of a test that the fingerprint stays equal when only the byte offset moves.
 
 **Deliverable:** the class token's grammar in the output contract, `properties.ruleClass` on a SARIF result, the path-only and byte-offset placements, and the verdict contract's minor version with its goldens.
 

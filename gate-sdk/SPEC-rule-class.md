@@ -39,6 +39,9 @@ The two new shapes require the class token: a line such as `error: …` or `note
 
 **Not yet applied**: §run-gates' bullet on a fail result's identity is rephrased so its text is defined over all three shapes: "A finding-line result's text is its line after the location prefix (`<path>:<line>:[<col>:]`, `<path>:` or `<path>@<offset>:`), with leading ASCII whitespace stripped, so a finding that moves to another line or offset keeps its identity." It gains a sentence: "A member whose record carries a list position puts it after the class token and carries nothing volatile there, so its identity is path, member, class and position."
 
+**Not yet applied**: a unit test in `native/src/sarif.rs` renders one member's byte-offset finding twice, the same record at two offsets as a rebuilt binary shifts it, and asserts the two results' fingerprints equal.
+
+- **Why the offset test is required.** An identity that holds across a shifted offset is the condition on which `fingerprints` stands in for `partialFingerprints`, so the property is asserted, never inferred from the recipe.
 - **Why `fingerprints` and not the `partialFingerprints` the adopter named.** The adopter's need is an identity built from the path, the rule and the term's list position, never the offset and never the term. The recipe above already gives that: the offset sits in the location prefix, which the text excludes, and the term is never printed (the deny-term records, gate-sdk/SPEC-deny-terms.md delta 2 and gate-sdk/SPEC-binary-strings.md delta 3). A second field would hold the same identity under a second recipe. The section's existing ground for `fingerprints` stands: the tool computes the identity whole.
 - **Honest limit.** The ordinal still counts identical texts in one file, so a build that adds an earlier hit of the same term shifts the later ordinals, as §run-gates' limit already states for lines.
 
