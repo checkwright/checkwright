@@ -36,6 +36,26 @@ The orchestrator adopter asks for exit 2 on a usage error or refusal, a new 3 on
 
 **Cost while deferred:** a caller tells a refused input from a crashed tool only by parsing stderr. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `exit 3`, `fourth code` in this file, none; owner gate-sdk/SPEC.md §Output contract.
 
+### orchestrator-arm-json
+
+[spec: gate-sdk/SPEC-run-json.md]
+
+The orchestrator adopter calls checkwright as a verdict-returning step, and names two arms it reads by machine (adopter input 2026-11-25): `--run` and the verdict lookup. `--verify-gate-run` alone has a `--json` form today, and gate-sdk/SPEC.md §The non-gate arm mints one per arm with its named caller. The adopter calls `--enter-stage`, `--foreign-run` and `--foreign-resume` not yet, so they take none.
+
+**Deliverable:** design-pending, a feature: a `--json` form on `--run`, its keys reconciled with the battery's SARIF log, and a golden in its unit test; the lookup's document is verdict-lookup's. A further arm takes one when the adopter names it. **Shape answered (adopter input 2026-11-25):** the document spec proposed, members in gate-set order, and `members.kind` and `omitted.reason` drawn from sets the contract declares; findings stay in the SARIF log.
+
+**Cost while deferred:** the adopter reads a battery's verdict from the SARIF log or from prose, with no document on stdout. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `--json`, `enter-stage` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
+
+### verdict-lookup
+
+[spec: gate-sdk/SPEC-verdict-lookup.md]
+
+Ask B of the orchestrator adopter's pairing asks: a verdict keyed by tree, kit version and gate-set digest, and a lookup answering whether a verdict exists for a key and what it is. Nothing keeps one so: the evidence manifest keys suites by run and commit (evidence-kit/SPEC.md §Evidence manifest), and the SARIF log goes to a caller's path and is kept by nobody.
+
+**Deliverable:** design-pending, a feature: the key, built from verdict-identity-fields' fields and landing after it; where a verdict is kept and by whom; and the lookup arm. **Home (lead decision 2026-11-25):** gate-sdk, since its `--run` arm is the writer and a base kit reading a dependent kit's knob would invert the kit dependency; `--run` writes to `GATE_SDK_VERDICT_STORE`, off when empty, and `--verdict-lookup` sits beside it. An unset store at lookup is settled in the amendment under the exit-code-tool-error cut. The adopter's contract for the arm (adopter input 2026-11-25): a command, not a file, `<bin> --verdict-lookup <tree> <kit-ver> <digest>`, JSON on stdout. A found verdict exits 0 with the verdict in the document, a failing verdict included; an absent one exits 0 with `"verdict":"absent"`; a bad key or usage exits 2; an unreadable store exits 3, so it lands after exit-code-tool-error; exit 1 is never used.
+
+**Cost while deferred:** the adopter re-runs the battery on a tree already judged under the same gates. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `lookup`, `verdict key` in this file, none; owner gate-sdk/SPEC.md §run-gates.
+
 ## Technical Debt
 
 ### foreign-run-sandbox-record
@@ -295,26 +315,6 @@ The front-door package route's readiness poll (`npm view <package>@<version> ver
 **Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers. The observe half reads the next release's `publish` run.
 
 **Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner installer/SPEC.md and scripts/ci-front-door.sh.
-
-### verdict-lookup
-
-[cost: event/low] [surface: gate-sdk]
-
-Ask B of the orchestrator adopter's pairing asks: a verdict keyed by tree, kit version and gate-set digest, and a lookup answering whether a verdict exists for a key and what it is. Nothing keeps one so: the evidence manifest keys suites by run and commit (evidence-kit/SPEC.md §Evidence manifest), and the SARIF log goes to a caller's path and is kept by nobody.
-
-**Deliverable:** design-pending, a feature: the key, built from verdict-identity-fields' fields and landing after it; where a verdict is kept and by whom; and the lookup arm. **Home (lead decision 2026-11-25):** gate-sdk, since its `--run` arm is the writer and a base kit reading a dependent kit's knob would invert the kit dependency; `--run` writes to `GATE_SDK_VERDICT_STORE`, off when empty, and `--verdict-lookup` sits beside it. An unset store at lookup is settled in the amendment under the exit-code-tool-error cut. The adopter's contract for the arm (adopter input 2026-11-25): a command, not a file, `<bin> --verdict-lookup <tree> <kit-ver> <digest>`, JSON on stdout. A found verdict exits 0 with the verdict in the document, a failing verdict included; an absent one exits 0 with `"verdict":"absent"`; a bad key or usage exits 2; an unreadable store exits 3, so it lands after exit-code-tool-error; exit 1 is never used.
-
-**Cost while deferred:** the adopter re-runs the battery on a tree already judged under the same gates. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `lookup`, `verdict key` in this file, none; owner gate-sdk/SPEC.md §run-gates.
-
-### orchestrator-arm-json
-
-[cost: event/low] [surface: gate-sdk]
-
-The orchestrator adopter calls checkwright as a verdict-returning step, and names two arms it reads by machine (adopter input 2026-11-25): `--run` and the verdict lookup. `--verify-gate-run` alone has a `--json` form today, and gate-sdk/SPEC.md §The non-gate arm mints one per arm with its named caller. The adopter calls `--enter-stage`, `--foreign-run` and `--foreign-resume` not yet, so they take none.
-
-**Deliverable:** design-pending, a feature: a `--json` form on `--run`, its keys reconciled with the battery's SARIF log, and a golden in its unit test; the lookup's document is verdict-lookup's. A further arm takes one when the adopter names it. **Shape answered (adopter input 2026-11-25):** the document spec proposed, members in gate-set order, and `members.kind` and `omitted.reason` drawn from sets the contract declares; findings stay in the SARIF log.
-
-**Cost while deferred:** the adopter reads a battery's verdict from the SARIF log or from prose, with no document on stdout. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `--json`, `enter-stage` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
 
 ### adopter-content-checks
 
