@@ -8,6 +8,8 @@
 
   **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, on scope's recommendation widened to the whole ask):** the orchestrator adopter's remaining asks. Debt: `verdict-key-before-dispatch` leads, `exit-status-site-unification` lands before the new gates so they are born on its one exit rule, and `verdict-fix-release-notify` rides to close. Feature for spec to author: `adopter-content-checks`, all nine checks, in the adopter's order: the redacted record with its rule id, then strings and text, names, ghpin, then the rest.
 
+  **The feature split (2026-11-25, lead decision, not a ruling; a later scope or spec may revise it):** `adopter-content-checks` splits at spec into family entries, each paired with one amendment, several entries free to pair one; spec sets the grouping. The adopter answered every open question the same day (peer channel, lead-relayed), each answer carried on the entry it shapes.
+
   **The release and pushes (2026-11-25, operator grant, lead-relayed):** cut v0.39.0 at this iteration's close. **One cut at close (2026-11-25, operator direction, lead-relayed, not a ruling),** carrying the store fix together with the content gates, over the adopter's ask that the fix ship on its own; the release notice says so. Push need 2 against 2, inside the budget: the closing push, and the release tag whose publish run ships the store fix.
 
 ---
@@ -274,15 +276,141 @@ The front-door package route's readiness poll (`npm view <package>@<version> ver
 
 [cost: event/low] [surface: gate-sdk]
 
-Ask D of the orchestrator adopter's pairing asks: its content checks as config-driven gates. pipefail (with fix and baseline), script, names (deny stems), strings (built binaries against deny terms and home paths), text (tracked text against an untracked deny list), ghpin (CI action pins against a sites file), literals (unconstrained string literals since a base ref), migrations (additive-only SQL since a base ref) and exec-write (writes of executables outside named helpers, `fs::copy` and libc, nix or rustix chmod and children included). For text and strings a finding carries path:line and a rule id, never a deny term or the deny file's contents.
+Ask D of the orchestrator adopter's pairing asks: its nine content checks as config-driven gates, a finding carrying a location and a rule id, never a deny term (a name included) or the deny file's contents. This entry keeps text (tracked text against an untracked deny list) and the deny list the families share; each other family is a child entry below.
 
-**Covered today, in part:** text is check-tree-terms over `GATE_SDK_MSG_PATTERN_FILES_LOCAL`, whose record prints the matched line (gate-sdk/SPEC.md §check-tree-terms); ghpin is check-action-pinning, with no sites file. No content gate reads a since-base-ref corpus; check-gate-tamper's `--range` is the precedent.
+**Covered today, in part:** text is check-tree-terms over `GATE_SDK_MSG_PATTERN_FILES_LOCAL`, whose record prints the matched line (gate-sdk/SPEC.md §check-tree-terms).
 
-**Adopter input (2026-11-25, peer channel, lead-relayed):** order the deny-list family first, strings and text (they run on every gate run), then names, then ghpin. `strings` reads printable ASCII runs of 4+ in build-output files the consumer names explicitly, no discovery, and in a 64-bit little-endian ELF only the file-backed sections holding no code; it hits a home-shaped path (`/home/`, `/root/`, `/Users/`), a cargo-registry path, any `<scheme>://` URL, and a token equal to a consumer deny term, case-insensitive, tokens split outside `[A-Za-z0-9._-]`. `script` is a preflight on each shell script a batch-job wrapper ships (0 clean, 1 with one line per refusal, 3 for an unreadable file or a span the shell reader cannot parse), over logical lines joining backslash continuations, every waiver owing a reason of 5+ characters: PKILL-REFUSED for `pkill -f` or an unquoted or variable pattern, allowing `-P "$pid"`, `-x` with a quoted literal, a pkill inside a container namespace (an earlier `docker exec` on the line), `-f` anchored by the run's config path in the form `<cmd> [--flag N]... --config $VAR`, and `# pkill-ok: <reason>`; MOUNT-REFUSED for a code line naming a configured forbidden path token; PIPEFAIL-REFUSED for a pipe into an early-exit reader while pipefail is on, pipefail in force from its `set` to the end of its file, `( )` or `$( )`, a here-doc or quoted script body checked as its own script, waived by `# pipefail-ok:` on the line or `# sigpipe-ok:` on the reader's; OWNER-REFUSED for a configured submit command whose configured flags fail a configured id grammar, a value holding an expansion skipped. Every token list, command, flag and grammar is consumer config, never a kit literal.
+**Adopter input (2026-11-25, peer channel, lead-relayed):** order the record and its rule id first, then strings and text, names, ghpin and the rest. Every check exits 0 clean, 1 on findings, 2 on usage and 3 on a tool error, unparseable input among them; the spec is generic, the adopter's tool, projects, branch, account and terms its config. The deny file holds literal terms, one per line, `#` and blank lines skipped, matched as whole words (no ASCII letter or digit either side), case-insensitive; one owner file feeds text, strings and names. A `# rule: <ID>` line is fine, a term with none taking the check's default id. A located finding may read `<path>@<byte-offset>: [<RULE-ID>]` with a SARIF byte-offset region; identity excludes the offset and the term (partialFingerprints from path, rule id and list position, never the term).
 
-**Deliverable:** design-pending, features split at spec, all nine checks (operator direction 2026-11-25, lead-relayed, not a ruling): the redacted record and a per-pattern rule id first, which also carries verdict-identity-fields' ask C (a finding-line class token surfacing as the SARIF result's rule class, adopter input 2026-11-25), then each new gate born native with its pair and knob, reusing check-commit-msg and check-tree-terms where they cover.
+**Deliverable:** the text family: the literal-term list with its `# rule:` ids, and check-tree-terms' record redacted to a location and a rule id, with a whole-word term arm. All nine checks (operator direction 2026-11-25, lead-relayed, not a ruling), split at spec into family entries (lead decision 2026-11-25, set record), each gate born native with its pair and knobs.
 
 **Cost while deferred:** the adopter keeps nine checks of its own beside the battery, two overlapping ours under another output contract. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `deny`, `base ref` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
+
+The finding-line rule class and its placements: [content-rule-class](#content-rule-class).
+
+Strings: [binary-strings-scan](#binary-strings-scan).
+
+Names: [deny-term-names](#deny-term-names).
+
+Ghpin, generalized: [reviewed-site-count](#reviewed-site-count).
+
+Pipefail: [pipefail-readers](#pipefail-readers).
+
+Script: [script-preflight](#script-preflight).
+
+Literals: [stale-test-literals](#stale-test-literals).
+
+Migrations: [migration-guard](#migration-guard).
+
+Exec-write: [exec-write-guard](#exec-write-guard).
+
+### exec-write-guard
+
+[cost: event/low] [surface: gate-sdk]
+
+The exec-write family of [adopter-content-checks](#adopter-content-checks): Rust writes of executable files outside named helpers.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** the corpus is tracked `.rs`, skipping `target/` and dot directories; `--helper REL`, repo-relative with no `..` and existing (else usage), exempts that file's own content only. In scope, outside strings and comments: `from_mode(M)`, `from_raw_mode(M)`, `.mode(M)`, `Trait::mode(…, M)`, `set_mode(…, M)`, `.set_mode(M)`, and `set_permissions(P, Q)` with none of those in Q. M fails when an integer literal with `M & 0o111 != 0`, or anything non-literal. Gaps to close too: `fs::copy`, `libc::chmod`, `fchmod`, `fchmodat`, nix and rustix chmod and fchmod, `Mode` constants, `libc::open` or `creat` with a mode, and `Command::new("chmod" | "install")`. Record `EXEC-WRITE <file>:<line>: <call>`, no waiver; an unterminated string, comment or call is a tool error.
+
+**Deliverable:** check-exec-write, born native with its pair, on a Rust code reader that blanks strings and comments.
+
+**Cost while deferred:** an executable written from untrusted bytes outside the reviewed helper goes unseen but for the adopter's own check. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `exec-write`, `from_mode` in this file, none; owner gate-sdk/SPEC.md §check-exec-bit.
+
+### migration-guard
+
+[cost: event/low] [surface: gate-sdk]
+
+The migrations family of [adopter-content-checks](#adopter-content-checks): SQL migrations appended in order and never destructive unless declared, since a base ref.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** `--dir DIR` holds `NNNN_<name>.sql`, any other file a tool error. A file added since the merge base with `--base REF` (default the main branch) is numbered above REF's highest, else `[MIGRATION-ORDER] <added> <= <highest>`. A file at the merge base is byte-identical at HEAD, an edit, delete or rename giving `[MIGRATION-EDITED]`. An added file holds no destructive statement, `[MIGRATION-DESTRUCTIVE] <file>:<line>`: by default `DROP TABLE|INDEX|VIEW|TRIGGER`, `ALTER TABLE … DROP` and `ALTER TABLE … RENAME`, case-insensitive with comments and string literals stripped, the list a config key, waived by `-- migration-ok: <reason>` on the statement.
+
+**Deliverable:** check-migration-guard over the shared base resolution, with a starter destructive-statement list.
+
+**Cost while deferred:** an edited or destructive migration reaches a deployed schema with only the adopter's own check between. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `migration`, `additive` in this file, none; owner gate-sdk/SPEC.md §Layout and configuration.
+
+### stale-test-literals
+
+[cost: event/low] [surface: gate-sdk]
+
+The literals family of [adopter-content-checks](#adopter-content-checks): test lines still asserting a string the branch removed from source.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** a list, exit 0 unless a tool error, against `git merge-base REF HEAD` for `--base REF` (default the main branch), working tree included. A changed literal is a string literal on a removed non-test line; an unchanged test line whose literal overlaps it (either contains the other) is listed `LITERAL <test>:<line> (was <src>:<line>)` while no non-test line still holds it. Literals: double-quoted and Rust raw strings (`r#"…"#`, `br#"…"#`) in every language, single-quoted too in shell and Python, comments skipped; split at placeholders (`{…}`, `$x`, `${…}`, `$(`, `%s`) and escapes, a fragment counting at 8+ characters with 4+ letters. Test code: `tests/`, `fixtures/`, `tests.rs`, `*_tests.rs`, `tests_*.rs`, `test_*`, `*_test.*`, and in `.rs` everything from the first inline `#[cfg(test)]` module. A moved, re-wrapped or re-added literal is no change; `assert!`, `.expect(` and `panic!` messages assert nothing; lines the branch added don't count. Optional `--tools DIR`: a test suite outside the repo.
+
+**Deliverable:** a since-base listing arm over a shared base resolution, reading the test-code classifier.
+
+**Cost while deferred:** a test asserting a message the branch rewrote fails late, or passes on a stale copy. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `merge-base`, `stale literal` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
+
+### script-preflight
+
+[cost: event/low] [surface: gate-sdk]
+
+The script family of [adopter-content-checks](#adopter-content-checks): a preflight on each shell script a batch-job wrapper ships, its rules consumer config.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** exit 0 clean, 1 with one line per refusal, 3 for an unreadable file or a span the shell reader cannot parse, over logical lines joining backslash continuations, every waiver owing a reason of 5+ characters. PKILL-REFUSED for `pkill -f` or an unquoted or variable pattern, allowing `-P "$pid"`, `-x` with a quoted literal, a pkill inside a container namespace (an earlier `docker exec` on the line), `-f` anchored by the run's config path in the form `<cmd> [--flag N]... --config $VAR`, and `# pkill-ok: <reason>`. MOUNT-REFUSED for a code line naming a configured forbidden path token. PIPEFAIL-REFUSED for a pipe into an early-exit reader while pipefail is on, in force from its `set` to the end of its file, `( )` or `$( )`, a here-doc or quoted script body checked as its own script, waived by `# pipefail-ok:` on the line or `# sigpipe-ok:` on the reader's. OWNER-REFUSED for a configured submit command whose configured flags fail a configured id grammar, a value holding an expansion skipped. Every token list, command, flag and grammar is consumer config, never a kit literal.
+
+**Deliverable:** check-script-preflight over a consumer rules file of generic rule kinds, on the shell reader the pipefail family shares.
+
+**Cost while deferred:** a script that kills a sibling job by a broad pattern, writes a forbidden mount or submits under a malformed owner is refused only by the adopter's own check. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `preflight`, `pkill` in this file, none; owner gate-sdk/SPEC.md §check-pipe-membership.
+
+### pipefail-readers
+
+[cost: event/low] [surface: gate-sdk]
+
+The pipefail family of [adopter-content-checks](#adopter-content-checks): early-exit readers under `pipefail` across a shell tree, with a fix and a baseline.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** one detector with two entry points, this and the script preflight's pipefail rule. The corpus is given files, or directories searched for `*.sh` skipping `target`, `.git`, `fixtures` and `__pycache__`; a file is linted when it sets `pipefail` or is a library (`*lib.sh`, `*-lib*`), every given file under `--all`. A hit is `PIPEFAIL-EARLY-EXIT <path>:<line>`, a pipeline into `grep -q`, `-m` or `-l`, `head`, `read`, `sed …q`, `awk` with `exit`, or a breaking `while read` loop; a guarded producer `{ p || true; } | …` or `# pipefail-ok: <reason>` on any pipeline line clears it. `--fix` keeps the mode and rewrites `grep -q X` to `grep X >/dev/null`, `grep -m N` to `grep … | sed -n '1,Np'` and `head -n N` to `sed -n '1,Np'`, fixable hits marked `[auto-fix]`. A baseline of `<count><TAB><path>` lines passes at or under a count, fails above it, and reds a count above the hits as `BASELINE-STALE`. An unparseable span is `LINT-PARSE <path>:<line>` and a tool error.
+
+**Deliverable:** a shell reader shared with the script family, check-pipefail-readers, a fix arm, and the count baseline.
+
+**Cost while deferred:** a pipeline that dies of SIGPIPE under `pipefail` fails at random in the adopter's scripts outside the one shape check-pipe-membership holds. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `pipefail`, `early-exit` in this file, none; owner gate-sdk/SPEC.md §check-pipe-membership.
+
+### reviewed-site-count
+
+[cost: event/low] [surface: gate-sdk]
+
+The ghpin family of [adopter-content-checks](#adopter-content-checks), generalized: every site of a configured call pattern per file, held to a count a person reviewed.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** every call of a CLI must carry the project's pinned account. A site is an argv literal naming the command, or a shell-form call at a command start: line start, or after `$(`, `; `, `&& `, `| `, `exec ` or `timeout N `. The corpus is tracked non-test source; test code is skipped. A sites file holds `<count><TAB><path>` lines, `#` and blank lines skipped, anything else a tool error. A file whose count differs reds `<path>: [GHPIN-UNREVIEWED] <found>/<reviewed>`, a removed site too. It suggests a generic reviewed-site-count gate, a configured site pattern and a count baseline in pipefail's format.
+
+**Deliverable:** check-site-count over consumer site patterns and an exact count baseline, and the test-code classifier it shares with the literals family.
+
+**Cost while deferred:** an unpinned CLI call can act under the wrong account, the adopter's own check its only guard. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `site count`, `reviewed` in this file, none; owner gate-sdk/SPEC.md §check-action-pinning.
+
+### deny-term-names
+
+[cost: event/low] [surface: gate-sdk]
+
+The names family of [adopter-content-checks](#adopter-content-checks): tracked path components against the shared deny-term list.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** the corpus is tracked path components, file and directory names, never identifiers in code; a manifest's package and binary names would be welcome, not required. A term is a literal stem matched case-insensitively, a component hitting when it equals the stem or opens with the stem and `-` or `_` (`foo` hits `foo`, `foo-cli` and `foo_x`, never `food`). Record `<path>: [NAMES-DENIED]`, no waiver, config the shared deny list.
+
+**Deliverable:** check-path-names, born native with its pair, reading the deny-term list.
+
+**Cost while deferred:** a private name carried in a tracked path ships unseen, the adopter's own check its only guard. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `path component`, `stem` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
+
+### binary-strings-scan
+
+[cost: event/low] [surface: gate-sdk]
+
+The strings family of [adopter-content-checks](#adopter-content-checks): built binaries against the shared deny terms and a set of leak shapes, run on every gate run.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** read printable ASCII runs of 4+ in build-output files the consumer names explicitly, no discovery, and in a 64-bit little-endian ELF only the file-backed sections holding no code. Hit a home-shaped path (`/home/`, `/root/`, `/Users/`), a cargo-registry path, any `<scheme>://` URL, and a token equal to a consumer deny term, case-insensitive, tokens split outside `[A-Za-z0-9._-]`. A finding carries a location and a rule id, never the term or the string.
+
+**Deliverable:** check-binary-strings, born native with its pair, an ELF section reader, and a starter shapes list as consumer-selectable config.
+
+**Cost while deferred:** a home path or a private name compiled into a shipped binary ships unseen, this repo's build-time check covering only its own artifact. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `ELF`, `printable` in this file, none; owner gate-sdk/SPEC.md §build-native.
+
+### content-rule-class
+
+[cost: event/low] [surface: gate-sdk]
+
+The finding-line rule class of [adopter-content-checks](#adopter-content-checks): verdict-identity-fields' ask C, a class token `[<CLASS>]` on a finding line surfacing as the SARIF result's rule class, with the two placed shapes the content families print, a path alone and a byte offset.
+
+**Adopter input (2026-11-25, peer channel, lead-relayed):** ask C as filed on verdict-identity-fields. A located finding may read `<path>@<byte-offset>: [<RULE-ID>]` with a SARIF byte-offset region; the offset and the term are never part of identity, which it would take as partialFingerprints from path, rule id and the term's list position.
+
+**Deliverable:** the class token's grammar in the output contract, `properties.ruleClass` on a SARIF result, the path-only and byte-offset placements, and the verdict contract's minor version with its goldens.
+
+**Cost while deferred:** a content gate's path-only or byte-offset record lands at its registry line in the SARIF log, and the adopter's engine keys results on free text. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `ruleClass`, `byteOffset` in this file, none; owner gate-sdk/SPEC.md §run-gates.
 
 ## Icebox
 
