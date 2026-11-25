@@ -2359,6 +2359,7 @@ mod tests {
     // in one and stats a path that exists
     #[test]
     fn a_trailing_backslash_is_a_separator_on_windows_alone() {
+        let _knobs = crate::knobenv::lock();
         if cfg!(windows) {
             assert_eq!(child(Path::new("C:\\"), "kit").display().to_string(), "C:\\kit");
             return;

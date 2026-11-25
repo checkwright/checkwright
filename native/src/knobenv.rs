@@ -70,4 +70,94 @@ mod tests {
             offenders
         );
     }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — the walk's own read of the knob set, from which every
+    // reader in walk.rs is derived by closure, so a new reader joins the roster unlisted
+    const KNOB_READ: &str = "prune_dirs";
+
+    fn ident(c: char) -> bool {
+        c.is_ascii_alphanumeric() || c == '_'
+    }
+
+    fn calls(body: &str, name: &str) -> bool {
+        let pat = format!("{}(", name);
+        body.match_indices(&pat).any(|(i, _)| !body[..i].chars().next_back().is_some_and(ident))
+    }
+
+    fn fn_name(line: &str) -> Option<&str> {
+        let rest = line.trim_start().strip_prefix("pub(crate) ").or_else(|| line.trim_start().strip_prefix("pub "));
+        let rest = rest.unwrap_or(line.trim_start()).strip_prefix("fn ")?;
+        let end = rest.find(|c: char| !ident(c))?;
+        Some(&rest[..end])
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a fn runs from its `fn` line to the first `}` line at its
+    // own indent; a fn with no such line is refused rather than read as ending at the file's end
+    fn fns<'a>(text: &'a str, path: &Path, at: impl Fn(&[&str], usize) -> bool) -> Vec<(&'a str, String)> {
+        let lines: Vec<&str> = text.lines().collect();
+        let mut out = Vec::new();
+        for (i, l) in lines.iter().enumerate() {
+            let Some(name) = fn_name(l).filter(|_| at(&lines, i)) else { continue };
+            let indent = &l[..l.len() - l.trim_start().len()];
+            let close = format!("{}}}", indent);
+            let end = (i..lines.len())
+                .find(|&j| lines[j] == close || (j == i && l.trim_end().ends_with('}')))
+                .unwrap_or_else(|| panic!("{}:{}: fn {} has no closing line at its indent", path.display(), i + 1, name));
+            out.push((name, lines[i..=end].join("\n")));
+        }
+        out
+    }
+
+    fn walk_readers(src: &Path) -> Vec<String> {
+        let path = src.join("walk.rs");
+        let text = std::fs::read_to_string(&path).expect("cannot read walk.rs");
+        let top = fns(&text, &path, |lines, i| !lines[i].starts_with(' '))
+            .into_iter()
+            .filter(|(n, _)| *n != KNOB_READ)
+            .collect::<Vec<_>>();
+        let mut readers = vec![KNOB_READ.to_string()];
+        loop {
+            let more: Vec<String> = top
+                .iter()
+                .filter(|(n, b)| !readers.iter().any(|r| r == n) && readers.iter().any(|r| calls(b, r)))
+                .map(|(n, _)| n.to_string())
+                .collect();
+            if more.is_empty() {
+                return readers;
+            }
+            readers.extend(more);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a walk reads the knob set, so a case walking unlocked
+    // reads it mid-write of a sibling's temporary knobs and refuses; every case calling a reader
+    // holds the guard
+    #[test]
+    fn every_case_calling_a_prune_dirs_reader_holds_the_lock() {
+        let _knobs = lock();
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let readers = walk_readers(&src);
+        assert!(readers.iter().any(|r| r == "find_files"), "the closure lost find_files: {:?}", readers);
+        let files = crate::walk::find_files(&src, &["rs"]).expect("cannot enumerate the sources");
+        let mut offenders: Vec<String> = Vec::new();
+        for f in &files {
+            let text = std::fs::read_to_string(f).unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
+            let case = |lines: &[&str], i: usize| {
+                (0..i).rev().map(|j| lines[j].trim()).take_while(|l| l.starts_with("#[")).any(|l| l == "#[test]")
+            };
+            let home = f.file_name().and_then(|n| n.to_str()) == Some("knobenv.rs");
+            for (name, body) in fns(&text, f, case) {
+                let held = body.contains("knobenv::lock()") || (home && body.contains("= lock()"));
+                if let Some(r) = readers.iter().find(|r| calls(&body, r)).filter(|_| !held) {
+                    offenders.push(format!("{}: {} calls {}", f.display(), name, r));
+                }
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "a case calling a prune_dirs reader without the knob lock races a sibling's knob write: \
+             {:?} — take crate::knobenv::lock() for the case's length",
+            offenders
+        );
+    }
 }

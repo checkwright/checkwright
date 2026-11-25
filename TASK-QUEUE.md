@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### knobs-lock-catcher
-
-The knob lock (`knobenv::lock`) reached the source-walking tests with no catcher, and the other `prune_dirs` readers (`walk::glob_corpus`, `walk::tracked_shell_tree`, `walk::find_named_pruning`) were not swept.
-
-**Deliverable:** debt: a roster test in `native/src/knobenv.rs`, in the shape of `no_module_outside_this_one_writes_the_environment`, asserting every test fn calling a `prune_dirs` reader holds the lock, and the sweep it reds.
-
-**Cost while deferred:** a parallel test run can race a knob write against a walk and red `native_crate` at random, as it did in the prior close's validate re-run. Filed 2026-11-25 at adopter-followthrough-pass' close from build's bullet. Re-verified 2026-11-25: `knobenv.rs` names no `prune_dirs` reader, and five call sites in `walk.rs` read it. Owner lookup: `knobenv`, `prune_dirs` in this file, none; owner gate-sdk/SPEC.md §Layout and configuration.
-
 ### payload-amendment-withhold
 
 The packer withholds each kit root's `SPEC.md` and `smoke/` under `GATE_SDK_PAYLOAD_WITHHOLD`'s default, but an open `SPEC-<slug>.md` amendment is packed: the default names `SPEC.md` alone, so an amendment rides the payload while the SPEC it amends is withheld, and every spec-stage amendment commit moves the install-size figure and may re-stamp its surface ceiling.
@@ -1022,4 +1014,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - orchestrator-arm-json
 - foreign-run-sandbox-record
 - lead-journal-session-id
+- knobs-lock-catcher
 
