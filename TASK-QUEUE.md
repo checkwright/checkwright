@@ -1,14 +1,72 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: adopter-followthrough-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, over scope's narrower recommendation):** eleven units completing the asks adopting projects still hold open. `attribution-trailer-ban` leads, the set's iteration-class high row, with `knobs-lock-test-race` beside it. Debt: `amendment-queue-dangling-link` built before `absent-queue-liveness-gates`, whose absent-queue call that direction settled on the entry; `observe-plain-text-context`; `install-size-contract-drift`. Five features for spec to author and pair: `tree-free-hook-roster-widening`, `brief-authority-lint`, and the three asks thawed from the icebox, `gate-tamper-range-arm`, `foreign-run-verb` and `external-kpi-series`. The icebox's `co-authored-by-trailer-attribution` is retired to Done as mooted by `attribution-trailer-ban`. Composition: bundled — delegation-kit carries three features, gate-sdk two units, canon-kit two; drain 11 against inflow 3.8.
+
+  **The release (2026-11-25, operator direction, lead-relayed, not a ruling):** this iteration's close tags v0.38.0 at the closing push, the publish run included, since adopters take landed asks only from a release tag. Push need 2 against 2, inside the budget: the closing push carrying the tag, and the mid-iteration push `tree-free-hook-roster-widening` may owe.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### attribution-trailer-ban
+
+[recurrence: 2026-11-25]
+
+The harness's attribution reminder asks for a `Co-Authored-By` trailer in every session, and CLAUDE.md's prose bar (operator direction 2026-11-24) does not hold against it: 27 of adopter-asks-pass' 30 commits carried it (probed: `git log origin/master..HEAD --format=%B | grep -c '^Co-Authored-By'`), a host pre-push guard refused the closing push, and the operator directed a message rewrite of the unpushed range. Banning the trailer is check-commit-msg's consumer-selectable class (gate-sdk/SPEC.md §check-commit-msg), yet scripts/msg-patterns.list says this repo leaves it unbanned.
+
+**Deliverable:** debt: a trailer-anchored pattern in scripts/msg-patterns.list, its comment corrected. check-tree-terms reads the same list over the tree, so the two good fixtures carrying the trailer at a line start (gate-sdk/gate-tests/check-commit-msg/good/msg.txt, check-commit-subject/good/msg.txt) are reworded or the pattern scoped to keep them green. README.md's attribution paragraph, which says most commits carry the trailer, is corrected to the bar.
+
+**Cost while deferred:** each iteration's close finds its range trailered and pays a refused push and a rewrite of the unpushed range. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, two bullets: the recurrence and its premise correction. Re-verified at this scope: scripts/msg-patterns.list carries no trailer pattern, and README.md's attribution paragraph states the trailer. Owner lookup: `Co-Authored`, `trailer` in this file — the icebox's co-authored-by-trailer-attribution, a baked trailer misattributing authorship, which this ban moots; owner gate-sdk/SPEC.md §check-commit-msg.
+
+### knobs-lock-test-race
+
+native/src/output.rs's test `no_bundled_clean_line_opens_on_an_empty_corpus_word_unsignalled` walks src/gates through `walk::find_files`, whose `prune_dirs` reads knob state, without taking `knobenv::lock`. A concurrent knobs test holding the lock with a temporary knob dir makes the walk refuse ('GATE_SDK_GATES_DIR is not read from a knob file'), so `native_crate` reds intermittently.
+
+**Deliverable:** debt: the test takes `knobenv::lock`, or the walk it needs reads no knob; a sweep of the other tests walking through knob-reading helpers unlocked.
+
+**Cost while deferred:** a flaky `native_crate` red forces a re-run of an hours-long validate battery. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified at this scope: the test calls `crate::walk::find_files` and takes no lock. Owner lookup: `knobenv`, `find_files` in this file, none; owner native/src/knobenv.rs.
+
+### amendment-queue-dangling-link
+
+check-amendment-queue tests presence with `Path::try_exists`, which follows links, so a dangling queue symlink takes the not-applicable exit 0 where canon-kit/SPEC.md §check-amendment-queue says a queue path naming anything but a file refuses at exit 2. The bespoke unit test covers an absent path and a directory only.
+
+**Deliverable:** debt: probe presence with `symlink_metadata`, so a dangling link refuses, with a case beside the absent and directory ones.
+
+**Cost while deferred:** a broken queue link reads as no queue, and the gate passes an adopter whose queue went missing. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, a second-vendor review bullet. Re-verified at this scope: native/src/gates/amendment_queue.rs calls `try_exists`. Owner lookup: `amendment-queue`, `symlink` in this file; [absent-queue-liveness-gates](#absent-queue-liveness-gates) gives two sibling gates the same absent-subject shape; owner canon-kit/SPEC.md §check-amendment-queue.
+
+### absent-queue-liveness-gates
+
+`check-todo-task-liveness` and `check-deprecation-task` exit 2 'queue file not found' on an absent `CANON_KIT_QUEUE_FILE` before scanning for any marker, the absent-subject shape `check-amendment-queue` now reports as not applicable (canon-kit/SPEC.md §check-amendment-queue).
+
+**Deliverable:** debt: an absent queue reads not applicable whether or not a marker is on the surface, the clean line naming the path, and each SPEC section's honest limit says markers go unresolved there (operator direction 2026-11-25, lead-relayed, not a ruling, settling the open call on check-amendment-queue's absent-subject shape). Both SPEC sections and `check-deprecation-task.test.sh`'s `queue-missing-fail-closed` case assert the refusal today, so the change moves stated contract.
+
+**Cost while deferred:** an adopter tracking work outside the queue grammar leaves both gates unregistered. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified there: both gates return the error before reading the surface. Owner lookup: `todo-task-liveness`, `deprecation-task`, `absent queue` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md §check-todo-task-liveness and §check-deprecation-task.
+
+### observe-plain-text-context
+
+[not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
+
+An observed `session-context` logs `would=error`: the member prints its brief as plain text on stdout (native/src/hook/session_context.rs), and the would-be decision table reads exit 0 with stdout that is not JSON as `error` (gate-sdk/SPEC.md §The harness-integration arm), so a trial of the session-start member never logs the `advise` its enforcing run gives.
+
+**Deliverable:** a table row reading plain-text stdout on a context-taking event as `advise`, reason withheld, which needs the event `classify` does not take today; or the member emits the context envelope under every binding; or the table names the case as a limit.
+
+**Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
+### install-size-contract-drift
+
+Two claims of installer/SPEC.md §The install size miss the arm. Its honest limit says the packer's per-kit additions are each smaller than the rounding, but the packer adds an 11,358-byte LICENSE copy to every kit (native/src/emit/pack_installer.rs), moving drift-kit's packed figure from about 23 to 35 kB and full's from 1.8 to about 1.9 MB. And the bare `--emit install-size` never reads `GATE_LOCAL_INSTALL_SIZE_PAGE`, so 'the arm exits 2 on an unreadable page and on a block absent or twice' holds only for `--write` and the gate.
+
+**Deliverable:** debt: count the license additions in the figure or state their magnitude; read the page in the bare arm or narrow the sentence to `--write`.
+
+**Cost while deferred:** an adopter sizing a small profile reads a figure about a third low, on the measure an external orchestrator asked for. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, two second-vendor review bullets. Re-verified at this scope: native/src/emit/install_size.rs reads the page knob only under `--write`, and the packer places a license per kit. Owner lookup: `install-size`, `LICENSE` in this file, none; owner installer/SPEC.md §The install size.
 
 ## Deferred
 
@@ -172,6 +230,8 @@ The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (ga
 
 **Deliverable:** a feature: each other member weighed, the column widened with its cases or the member's tree-bound reason recorded.
 
+**Push need (2026-11-25, inside the budget):** one mid-iteration push after its batch, should the build add absolute-path handling only CI's Windows legs run; none if spec finds no host-specific code, and the closing push reads it.
+
 **Cost while deferred:** an adopter running outside any repository gets only the turn-end guard. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `tree-free` in this file, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ### external-state-owner-mode
@@ -186,6 +246,36 @@ A declared mode where an outside tool renders the queue file and the iteration h
 
 **Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
 
+### gate-tamper-range-arm
+
+[cost: event/low] [surface: delegation-kit] [recurrence: 2026-11-25]
+
+`check-gate-tamper` reads only the index (delegation-kit/SPEC.md §check-gate-tamper), so a supervisor receiving an agent's commits cannot run it over the range they span.
+
+**Deliverable:** design-pending, a feature: a range form with a machine verdict, its fixture pair, and the index form unchanged.
+
+**Cost while deferred:** a handed-back range is checked for tamper only commit by commit at its own pre-commit, which an agent's hook bypass skips. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `gate-tamper`, `range` in this file, the icebox's coverage entry only; owner delegation-kit/SPEC.md §check-gate-tamper.
+
+### foreign-run-verb
+
+[cost: event/low] [surface: delegation-kit] [recurrence: 2026-11-25]
+
+The foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) is a procedure, not a verb: no arm takes a brief path, a vendor and model and a sandbox policy and returns a machine result with a transcript path, so a second-opinion caller builds its own executor.
+
+**Deliverable:** design-pending, a feature: the verb, its result shape and its sandbox policy's vocabulary held in config.
+
+**Cost while deferred:** each outside caller re-builds the run. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `foreign-vendor`, `foreign run` in this file and the disposed-findings record, none open; owner delegation-kit/SPEC.md §The foreign-vendor run.
+
+### external-kpi-series
+
+[cost: event/low] [surface: drift-kit] [recurrence: 2026-11-25]
+
+drift-kit's trend report covers only what it computes in-tree, so a velocity, lesson or queue-age series an outside tool holds cannot join it.
+
+**Deliverable:** design-pending, a feature: an input form for an outside series, its validation and how the report marks its provenance.
+
+**Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
+
 ### brief-authority-lint
 
 [cost: event/low] [surface: delegation-kit]
@@ -195,16 +285,6 @@ No check reads an agent brief: one that grants authority the agent must not hold
 **Deliverable:** design-pending, a feature: where a brief is read (a dispatch payload or a file), the config grammar, and its honest limit.
 
 **Cost while deferred:** an over-granting or unquoted brief reaches the agent. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `brief`, `forbidden verb` in this file, none; [outbound-public-text-lint](#outbound-public-text-lint) reads posted text, not briefs; owner delegation-kit/SPEC.md.
-
-### observe-plain-text-context
-
-[cost: event/low] [surface: gate-sdk] [not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
-
-An observed `session-context` logs `would=error`: the member prints its brief as plain text on stdout (native/src/hook/session_context.rs), and the would-be decision table reads exit 0 with stdout that is not JSON as `error` (gate-sdk/SPEC.md §The harness-integration arm), so a trial of the session-start member never logs the `advise` its enforcing run gives.
-
-**Deliverable:** a table row reading plain-text stdout on a context-taking event as `advise`, reason withheld, which needs the event `classify` does not take today; or the member emits the context envelope under every binding; or the table names the case as a limit.
-
-**Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ### user-uninstall-containment
 
@@ -235,56 +315,6 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 **Deliverable:** debt: shape checks at both producers, and the composition rule stated or removed.
 
 **Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
-
-### absent-queue-liveness-gates
-
-[cost: event/low] [surface: canon-kit]
-
-`check-todo-task-liveness` and `check-deprecation-task` exit 2 'queue file not found' on an absent `CANON_KIT_QUEUE_FILE` before scanning for any marker, the absent-subject shape `check-amendment-queue` now reports as not applicable (canon-kit/SPEC.md §check-amendment-queue).
-
-**Deliverable:** design-pending, debt: an absent queue with no marker on the surface reads not applicable; whether a marker with no queue to resolve against still refuses is the open call. Both SPEC sections and `check-deprecation-task.test.sh`'s `queue-missing-fail-closed` case assert the refusal today, so the change moves stated contract.
-
-**Cost while deferred:** an adopter tracking work outside the queue grammar leaves both gates unregistered. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified there: both gates return the error before reading the surface. Owner lookup: `todo-task-liveness`, `deprecation-task`, `absent queue` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md §check-todo-task-liveness and §check-deprecation-task.
-
-### attribution-trailer-ban
-
-[cost: iteration/high] [surface: scripts] [recurrence: 2026-11-25]
-
-The harness's attribution reminder asks for a `Co-Authored-By` trailer in every session, and CLAUDE.md's prose bar (operator direction 2026-11-24) does not hold against it: 27 of adopter-asks-pass' 30 commits carried it (probed: `git log origin/master..HEAD --format=%B | grep -c '^Co-Authored-By'`), a host pre-push guard refused the closing push, and the operator directed a message rewrite of the unpushed range. Banning the trailer is check-commit-msg's consumer-selectable class (gate-sdk/SPEC.md §check-commit-msg), yet scripts/msg-patterns.list says this repo leaves it unbanned.
-
-**Deliverable:** debt: a trailer-anchored pattern in scripts/msg-patterns.list, its comment corrected. check-tree-terms reads the same list over the tree, so the two good fixtures carrying the trailer at a line start (gate-sdk/gate-tests/check-commit-msg/good/msg.txt, check-commit-subject/good/msg.txt) are reworded or the pattern scoped to keep them green. README.md's attribution paragraph, which says most commits carry the trailer, is corrected to the bar.
-
-**Cost while deferred:** each iteration's close finds its range trailered and pays a refused push and a rewrite of the unpushed range. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, two bullets: the recurrence and its premise correction. Re-verified at this scope: scripts/msg-patterns.list carries no trailer pattern, and README.md's attribution paragraph states the trailer. Owner lookup: `Co-Authored`, `trailer` in this file — the icebox's co-authored-by-trailer-attribution, a baked trailer misattributing authorship, which this ban moots; owner gate-sdk/SPEC.md §check-commit-msg.
-
-### knobs-lock-test-race
-
-[cost: iteration/low] [surface: native]
-
-native/src/output.rs's test `no_bundled_clean_line_opens_on_an_empty_corpus_word_unsignalled` walks src/gates through `walk::find_files`, whose `prune_dirs` reads knob state, without taking `knobenv::lock`. A concurrent knobs test holding the lock with a temporary knob dir makes the walk refuse ('GATE_SDK_GATES_DIR is not read from a knob file'), so `native_crate` reds intermittently.
-
-**Deliverable:** debt: the test takes `knobenv::lock`, or the walk it needs reads no knob; a sweep of the other tests walking through knob-reading helpers unlocked.
-
-**Cost while deferred:** a flaky `native_crate` red forces a re-run of an hours-long validate battery. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox. Re-verified at this scope: the test calls `crate::walk::find_files` and takes no lock. Owner lookup: `knobenv`, `find_files` in this file, none; owner native/src/knobenv.rs.
-
-### install-size-contract-drift
-
-[cost: event/low] [surface: installer]
-
-Two claims of installer/SPEC.md §The install size miss the arm. Its honest limit says the packer's per-kit additions are each smaller than the rounding, but the packer adds an 11,358-byte LICENSE copy to every kit (native/src/emit/pack_installer.rs), moving drift-kit's packed figure from about 23 to 35 kB and full's from 1.8 to about 1.9 MB. And the bare `--emit install-size` never reads `GATE_LOCAL_INSTALL_SIZE_PAGE`, so 'the arm exits 2 on an unreadable page and on a block absent or twice' holds only for `--write` and the gate.
-
-**Deliverable:** debt: count the license additions in the figure or state their magnitude; read the page in the bare arm or narrow the sentence to `--write`.
-
-**Cost while deferred:** an adopter sizing a small profile reads a figure about a third low, on the measure an external orchestrator asked for. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, two second-vendor review bullets. Re-verified at this scope: native/src/emit/install_size.rs reads the page knob only under `--write`, and the packer places a license per kit. Owner lookup: `install-size`, `LICENSE` in this file, none; owner installer/SPEC.md §The install size.
-
-### amendment-queue-dangling-link
-
-[cost: event/low] [surface: canon-kit]
-
-check-amendment-queue tests presence with `Path::try_exists`, which follows links, so a dangling queue symlink takes the not-applicable exit 0 where canon-kit/SPEC.md §check-amendment-queue says a queue path naming anything but a file refuses at exit 2. The bespoke unit test covers an absent path and a directory only.
-
-**Deliverable:** debt: probe presence with `symlink_metadata`, so a dangling link refuses, with a case beside the absent and directory ones.
-
-**Cost while deferred:** a broken queue link reads as no queue, and the gate passes an adopter whose queue went missing. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, a second-vendor review bullet. Re-verified at this scope: native/src/gates/amendment_queue.rs calls `try_exists`. Owner lookup: `amendment-queue`, `symlink` in this file; [absent-queue-liveness-gates](#absent-queue-liveness-gates) gives two sibling gates the same absent-subject shape; owner canon-kit/SPEC.md §check-amendment-queue.
 
 ### lead-journal-session-id
 
@@ -531,10 +561,6 @@ Only one root-doc roster is enforced.
 ### self-revert-reminder-expectation
 
 Self-revert reminder reads as injection.
-
-### co-authored-by-trailer-attribution
-
-Model trailer is a baked literal.
 
 ### guard-steer-grant-mismatch
 
@@ -1044,17 +1070,7 @@ Tree-bound hook arms have no docs/hooks page.
 
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
-### gate-tamper-range-arm
-
-check-gate-tamper cannot run over a commit range.
-
-### foreign-run-verb
-
-No verb runs the foreign-vendor review and returns a machine result.
-
-### external-kpi-series
-
-The drift trend report cannot take a KPI series held outside the tree.
-
 ## Done
+
+- co-authored-by-trailer-attribution
 
