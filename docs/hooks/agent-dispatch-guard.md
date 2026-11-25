@@ -2,7 +2,7 @@
 title: The dispatch hook
 nav_parent: install
 nav_child_order: 9
-since: unreleased
+since: v0.38.0
 description: The agent-dispatch-guard hook blocks an agent dispatch that forks, escapes its isolation or leaves its model tier unchosen, and installs on its own, for one user, with no repository.
 ---
 

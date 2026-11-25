@@ -2,7 +2,7 @@
 title: The wakeup hook
 nav_parent: install
 nav_child_order: 6
-since: unreleased
+since: v0.38.0
 description: The wakeup-guard hook denies every self-scheduled wakeup a coding agent tries to set and logs the attempt, and installs on its own, for one user, with no repository.
 ---
 

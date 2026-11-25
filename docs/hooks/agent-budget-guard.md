@@ -2,7 +2,7 @@
 title: The budget hook
 nav_parent: install
 nav_child_order: 8
-since: unreleased
+since: v0.38.0
 description: The agent-budget-guard hook blocks an agent dispatch while the usage verdict says pause, advises on every other verdict, and installs on its own, for one user, with no repository.
 ---
 

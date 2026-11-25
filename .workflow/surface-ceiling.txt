@@ -37,13 +37,13 @@
 1285cp docs/drift-kit/index.md
 1344cp docs/evidence-kit/index.md
 1463cp docs/gate-sdk/index.md
-12042cp docs/generated-projections.md
+12013cp docs/generated-projections.md
 1259cp docs/guard-kit/index.md
-4620cp docs/hooks/agent-budget-guard.md
-4539cp docs/hooks/agent-dispatch-guard.md
-3275cp docs/hooks/escalation-guard.md
+4617cp docs/hooks/agent-budget-guard.md
+4536cp docs/hooks/agent-dispatch-guard.md
+3272cp docs/hooks/escalation-guard.md
 7028cp docs/hooks/subagent-stop-liveness.md
-4319cp docs/hooks/wakeup-guard.md
+4316cp docs/hooks/wakeup-guard.md
 5308cp docs/index.md
 9654cp docs/install-block-contracts.md
 8675cp docs/install-parity-contracts.md
@@ -96,6 +96,7 @@
 4894cp docs/posts/2026-10-25-checkwright-v0-35-0.md
 10719cp docs/posts/2026-11-14-checkwright-v0-36-0.md
 18425cp docs/posts/2026-11-24-checkwright-v0-37-0.md
+9182cp docs/posts/2026-11-25-checkwright-v0-38-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 8555cp docs/requirements.md
@@ -111,7 +112,7 @@
 126749cp evidence-kit/SPEC.md
 1103505cp gate-sdk/SPEC.md
 3130cp gate-sdk/templates/adopt.md
-356388cp guard-kit/SPEC.md
+356362cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
 331762cp installer/SPEC.md
 410739cp lifecycle-kit/SPEC.md

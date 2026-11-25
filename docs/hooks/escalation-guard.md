@@ -2,7 +2,7 @@
 title: The escalation hook
 nav_parent: install
 nav_child_order: 7
-since: unreleased
+since: v0.38.0
 description: The escalation-guard hook advises a dispatched session whose message to its lead lacks the decision-shape headers, never blocks, and installs on its own, for one user, with no repository.
 ---
 
