@@ -11,3 +11,4 @@ adopter-followthrough-pass build a628a191 2026-11-25 cfbf6bc6c
 adopter-followthrough-pass build a0f1c8e1 2026-11-25 8bd0e4a2b
 adopter-followthrough-pass build a7e8fee9 2026-11-25 ba59a2456
 adopter-followthrough-pass build a4a68547 2026-11-25 c2ec8dc38
+adopter-followthrough-pass build aa34c148 2026-11-25 db50a95ed
