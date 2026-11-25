@@ -61,23 +61,40 @@ fn iteration_start(fam: &[(String, String)]) -> String {
 }
 
 
-// spec: drift-kit/SPEC.md §The extensibility contract — the three resolution tiers, consumer-first:
-// the adopter's own dirs, each vendored kit's `kpis/`, the built-ins. The first two answer with a
-// path, a `.sh` to execute or a `.ps1` for the PowerShell host; the third with a compiled member.
+// spec: drift-kit/SPEC.md §The extensibility contract — the three tiers, consumer-first: the
+// adopter's dirs and each kit's `kpis/` answer with a path to start or to read, the built-ins with
+// a compiled member.
 enum Resolved {
     Plugin(String),
     PowerShell(String),
+    Series { path: String, name: String },
     Builtin(kpi::Member),
 }
 
-// spec: drift-kit/SPEC.md §The extensibility contract — within one dir the `.sh` file wins
+type Form = fn(String, &str) -> Resolved;
+
+// spec: drift-kit/SPEC.md §The extensibility contract — the in-dir order, first file wins
+const FORMS: &[(&str, Form)] = &[
+    ("sh", |p, _| Resolved::Plugin(p)),
+    ("ps1", |p, _| Resolved::PowerShell(p)),
+    ("series", |path, name| Resolved::Series { path, name: name.to_string() }),
+];
+
+fn hit(base: &str, name: &str) -> Option<(String, Form)> {
+    FORMS.iter().find_map(|(ext, form)| {
+        let p = format!("{}/{}.{}", base, name, ext);
+        Path::new(&p).is_file().then_some((p, *form))
+    })
+}
+
+// spec: gate-sdk/SPEC.md §enforcement-map — the file a registry name resolves to in one dir, the
+// map's attribution read of the same order
+pub fn member_file(base: &str, name: &str) -> Option<String> {
+    hit(base, name).map(|(p, _)| p)
+}
+
 fn in_dir(base: &str, name: &str) -> Option<Resolved> {
-    let sh = format!("{}/{}.sh", base, name);
-    if Path::new(&sh).is_file() {
-        return Some(Resolved::Plugin(sh));
-    }
-    let ps = format!("{}/{}.ps1", base, name);
-    Path::new(&ps).is_file().then_some(Resolved::PowerShell(ps))
+    hit(base, name).map(|(p, form)| form(p, name))
 }
 
 fn resolve(name: &str, kpi_dirs: &[String], kit_roots: &[String]) -> Option<Resolved> {
@@ -135,6 +152,7 @@ fn invoke(r: &Resolved, ctx: &Ctx, trend: bool, env: &[(String, String)], host: 
     let mut args: Vec<String> = Vec::new();
     let plugin = match r {
         Resolved::Builtin(f) => return Ok(f(ctx, trend)),
+        Resolved::Series { path, name } => return Ok(kpi::series::run(path, name, trend)),
         Resolved::Plugin(p) => programs::Program::consumer("DRIFT_KIT_KPIS_FILE", p.as_str()),
         Resolved::PowerShell(p) => {
             if host.is_empty() {
@@ -324,6 +342,7 @@ mod tests {
         match r {
             Some(Resolved::Plugin(p)) => format!("sh {}", p),
             Some(Resolved::PowerShell(p)) => format!("ps1 {}", p),
+            Some(Resolved::Series { path, name }) => format!("series {} as {}", path, name),
             Some(Resolved::Builtin(_)) => "builtin".to_string(),
             None => "none".to_string(),
         }
@@ -354,6 +373,53 @@ mod tests {
                 format!("ps1 {}/one/kpi-task-split.ps1", d),
             ]
         );
+    }
+
+    // spec: drift-kit/SPEC.md §The extensibility contract — a `.series` answers both file tiers and
+    // shadows the built-in, and loses its dir to a sibling `.sh` or `.ps1`
+    #[test]
+    fn a_series_resolves_in_both_file_tiers_behind_a_sibling_plugin() {
+        let dir = fixture(
+            "series",
+            &["one/kpi-a.series", "one/kpi-b.ps1", "one/kpi-b.series", "one/kpi-c.sh", "one/kpi-c.series", "kit/kpis/kpi-d.series", "one/kpi-task-split.series"],
+        );
+        let d = dir.display().to_string();
+        let dirs = vec![format!("{}/one", d)];
+        let kits = vec![format!("{}/kit", d)];
+        let got: Vec<String> = ["kpi-a", "kpi-b", "kpi-c", "kpi-d", "kpi-task-split"]
+            .iter()
+            .map(|n| found(resolve(n, &dirs, &kits)))
+            .collect();
+        let file = member_file(&format!("{}/one", d), "kpi-b");
+        std::fs::remove_dir_all(&dir).ok();
+        assert_eq!(
+            got,
+            [
+                format!("series {}/one/kpi-a.series as kpi-a", d),
+                format!("ps1 {}/one/kpi-b.ps1", d),
+                format!("sh {}/one/kpi-c.sh", d),
+                format!("series {}/kit/kpis/kpi-d.series as kpi-d", d),
+                format!("series {}/one/kpi-task-split.series as kpi-task-split", d),
+            ]
+        );
+        assert_eq!(file, Some(format!("{}/one/kpi-b.ps1", d)));
+    }
+
+    // spec: drift-kit/SPEC.md §The external series form — read, never spawned, in either mode; an
+    // unreadable file is the fail-visible read
+    #[test]
+    fn a_series_is_read_in_both_modes_and_an_unreadable_one_fails_visible() {
+        let dir = fixture("seriesread", &[]);
+        let path = crate::walk::child(&dir, "kpi-v.series");
+        std::fs::write(&path, "label: v\nsection: lag\nsource: tool\ntrend: v\n2026-01-01\t7\n").expect("cannot write the series");
+        let r = Resolved::Series { path: path.display().to_string(), name: "kpi-v".to_string() };
+        let full = invoke(&r, &ctx_for_test(), false, &[], "").expect("a series needs no host");
+        let trend = invoke(&r, &ctx_for_test(), true, &[], "").expect("a series needs no host");
+        std::fs::remove_dir_all(&dir).ok();
+        assert!(full.unwrap_or_default().starts_with("lag\tv\t7 (external: tool, as of 2026-01-01, "));
+        assert_eq!(trend.as_deref(), Some("v 7\n"));
+        let gone = Resolved::Series { path: "/no/such/kpi-v.series".to_string(), name: "kpi-v".to_string() };
+        assert_eq!(invoke(&gone, &ctx_for_test(), false, &[], ""), Ok(None));
     }
 
     // spec: drift-kit/SPEC.md §The extensibility contract — an empty host knob is the host-off row

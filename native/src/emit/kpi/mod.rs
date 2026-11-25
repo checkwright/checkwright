@@ -13,6 +13,7 @@ pub mod overhead;
 pub mod price_table_age;
 pub mod prompt_friction;
 pub mod queue_net_delta;
+pub mod series;
 pub mod settings_local;
 pub mod stage_economics_lag;
 pub mod task_split;

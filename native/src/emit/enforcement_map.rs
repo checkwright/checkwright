@@ -192,20 +192,13 @@ fn kpi_section(gates_dir: &str) -> Result<Option<Section>, String> {
     let mut rows: Vec<Row> = Vec::new();
     for name in registry::members(&read_file(&file)?) {
         let direct = format!("{}/{}.sh", gates_dir, name);
-        let mut src = if Path::new(&direct).is_file() {
-            direct.clone()
-        } else {
-            String::new()
-        };
-        if src.is_empty() {
-            for d in &roots {
-                let p = format!("{}/kpis/{}.sh", d.trim_end_matches('/'), name);
-                if Path::new(&p).is_file() {
-                    src = p;
-                    break;
-                }
-            }
-        }
+        let mut src = crate::emit::drift_report::member_file(gates_dir, &name)
+            .or_else(|| {
+                roots.iter().find_map(|d| {
+                    crate::emit::drift_report::member_file(&format!("{}/kpis", d.trim_end_matches('/')), &name)
+                })
+            })
+            .unwrap_or_default();
         // spec: gate-sdk/SPEC.md §enforcement-map — a natively dispatched member has no source
         // path to attribute by, so it is attributed to the kit that declares the registry; without
         // this arm the fallback below would credit every ported member to the consumer's gates dir

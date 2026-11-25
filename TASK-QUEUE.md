@@ -14,16 +14,6 @@
 
 ## New Features
 
-### external-kpi-series
-
-[spec: SPEC-external-series.md] [recurrence: 2026-11-25]
-
-drift-kit's trend report covers only what it computes in-tree, so a velocity, lesson or queue-age series an outside tool holds cannot join it.
-
-**Deliverable:** design-pending, a feature: an input form for an outside series, its validation and how the report marks its provenance.
-
-**Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
-
 ## Technical Debt
 
 ## Deferred
@@ -989,4 +979,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - gate-tamper-range-arm
 - brief-authority-lint
 - foreign-run-verb
+- external-kpi-series
 

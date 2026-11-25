@@ -162,6 +162,39 @@ grep -q 'n/a (plugin failed)' <<<"$(xp)" \
     || fail "a non-executable consumer plugin ran anyway — the collator is invoking it under an interpreter, so the execute bit no longer governs"
 chmod +x "$work/consumer-kpis/kpi-knowledge-friction.sh"
 
+# spec: drift-kit/SPEC.md §The external series form — a data member through the same consumer dir:
+# its row and provenance mark, its trend fragment, the one-point and malformed reads, and the in-dir
+# order that puts both plugin kinds ahead of it.
+xs() { DRIFT_KIT_KNOB_FILE="$work/consumer-config.knobs" solo "$@"; }
+printf 'label: velocity\nsection: lag\nsource: smoke board\nunit: pts\ntrend: vel\n2026-11-01\t21\n2026-11-15\t18.5\n' \
+    > "$work/consumer-kpis/kpi-smoke-velocity.series"
+sv="$(xs kpi-smoke-velocity)"
+rows Lag <<<"$sv" | grep -qE 'velocity +18\.5 pts \(-2\.5 since 2026-11-01; external: smoke board, as of 2026-11-15, [0-9]+d old\)$' \
+    || fail "a valid series did not render its latest point, delta and provenance mark in its declared section: $sv"
+[[ "$(DRIFT_KIT_KNOB_FILE="$work/consumer-config.knobs" trend_frag kpi-smoke-velocity)" == 'vel 18.5' ]] \
+    || fail "a series' trend: key did not volunteer its '<key> <latest>' fragment"
+printf 'label: lessons\nsection: lead\nsource: retro log\n2026-11-20\t4\n' > "$work/consumer-kpis/kpi-smoke-lessons.series"
+grep -qE 'lessons +4 \(external: retro log, as of 2026-11-20, [0-9]+d old\)$' <<<"$(xs kpi-smoke-lessons)" \
+    || fail "a one-point series rendered a delta or lost its mark: $(xs kpi-smoke-lessons)"
+printf 'label: broken\nsection: lead\nsource: s\n2026-11-01\t1\nunit: pts\n' > "$work/consumer-kpis/kpi-smoke-broken.series"
+set +e
+sb="$(xs kpi-smoke-broken)"; sbrc=$?
+set -e
+[[ "$sbrc" -eq 0 ]] || fail "a malformed series failed the report (exit $sbrc); validation fails visible, never closed"
+rows Lead <<<"$sb" | grep -qE 'kpi-smoke-broken +n/a \(series line 5: header after a point\)$' \
+    || fail "a malformed series did not render its defect row in the lead section: $sb"
+printf 'label: order\nsection: lead\nsource: s\n2026-11-01\t1\n' > "$work/consumer-kpis/kpi-smoke-ps1.series"
+cp "$work/consumer-kpis/kpi-smoke-ps1.series" "$work/consumer-kpis/kpi-smoke-sh.series"
+printf "Write-Output \"lead\`tps1 won\`tyes\"\n" > "$work/consumer-kpis/kpi-smoke-ps1.ps1"
+printf '#!/usr/bin/env bash\nprintf '"'"'lead\\tsh won\\tyes\\n'"'"'\n' > "$work/consumer-kpis/kpi-smoke-sh.sh"
+chmod +x "$work/consumer-kpis/kpi-smoke-sh.sh"
+sp="$(xs kpi-smoke-ps1)"
+grep -qE 'ps1 won|PowerShell plugin' <<<"$sp" && ! grep -q 'external:' <<<"$sp" \
+    || fail "a .series beside a .ps1 of the same name won the resolution: $sp"
+ss="$(xs kpi-smoke-sh)"
+grep -q 'sh won' <<<"$ss" && ! grep -q 'external:' <<<"$ss" \
+    || fail "a .series beside a .sh of the same name won the resolution: $ss"
+
 set +e
 trend="$(DRIFT_KIT_KNOWLEDGE_LOG="$work/kfric-empty.log" report --trend)"; trc=$?
 set -e

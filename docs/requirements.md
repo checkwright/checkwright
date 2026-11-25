@@ -88,7 +88,7 @@ A repository install commits the profile's kit files, the gate binary and a hand
 | context-kit | 69 | 47 | 48 kB |
 | delegation-kit | 46 | 35 | 92 kB |
 | doctrine-kit | 12 | 9 | 64 kB |
-| drift-kit | 7 | 0 | 35 kB |
+| drift-kit | 6 | 0 | 24 kB |
 | evidence-kit | 69 | 62 | 94 kB |
 | gate-sdk | 600 | 550 | 460 kB |
 | guard-kit | 42 | 30 | 220 kB |

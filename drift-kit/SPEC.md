@@ -4,7 +4,7 @@ Gates block what is mechanically decidable per commit; drift is what accumulates
 
 Advisory by construction: the report never fails a session, never joins `gates.list`, and reads *trend, not level* — a KPI's absolute value is noise, its direction across sessions is the signal.
 
-The kit carries the report skeleton, the KPI plugin contract, a bundled set of kit-coupled generic KPIs, and the knowledge-friction loop; a consumer's product- and toolchain-shaped KPIs stay in the consumer repo (§Out of scope).
+The kit carries the report skeleton, the KPI plugin contract and its external series form, a bundled set of kit-coupled generic KPIs, and the knowledge-friction loop; a consumer's product- and toolchain-shaped KPIs stay in the consumer repo (§Out of scope).
 
 ## The report skeleton
 
@@ -31,19 +31,19 @@ Degrade discipline: exit is always 0. A member that fails or produces nothing yi
 
 A registry name resolves through **three tiers, consumer-first**, and the first tier that answers wins:
 
-1. each entry of `DRIFT_KIT_KPI_DIRS` — the adopter's own dirs, default the consumer gates dir — for a file named `<name>.sh`, then `<name>.ps1`;
-2. each vendored kit's `kpis/<name>.sh`, then `kpis/<name>.ps1`;
+1. each entry of `DRIFT_KIT_KPI_DIRS` — the adopter's own dirs, default the consumer gates dir — for a file named `<name>.sh`, then `<name>.ps1`, then `<name>.series`;
+2. each vendored kit's `kpis/<name>.sh`, then `kpis/<name>.ps1`, then `kpis/<name>.series`;
 3. the **built-in members the binary carries** (§Bundled KPIs).
 
-So a consumer file named `kpi-task-split.sh` or `kpi-task-split.ps1` **shadows** the built-in of that name, and within one dir the `.sh` file wins. The port moved the kit's own members into tier 3 and touched nothing about how a consumer's are found.
+So a consumer file named `kpi-task-split.sh`, `kpi-task-split.ps1` or `kpi-task-split.series` **shadows** the built-in of that name, and within one dir the `.sh` file wins and a `.ps1` file wins over a `.series` file. The port moved the kit's own members into tier 3 and touched nothing about how a consumer's are found.
 
-A tier-1 or tier-2 `.sh` hit is **executed directly** (`"$path"`, never `bash "$path"`), so the execute bit still governs and a non-executable plugin degrades to the fail-visible row rather than running anyway. A `.ps1` hit is a **PowerShell plugin**, started by the host `GATE_SDK_POWERSHELL` names with gate-sdk's PowerShell target arguments (gate-sdk/SPEC.md §The gate-authoring surface), so the knob, not an execute bit, is what arms it. With the knob empty its row reads `n/a (PowerShell plugin, GATE_SDK_POWERSHELL is empty)`, which names the knob that arms it, and a host the knob names that does not resolve is the plugin's fail-visible row. A native-Windows host starts no `.sh`, so there a `.sh` plugin's row is its fail-visible read, and a PowerShell plugin is the form that runs. A consumer plugin reads the exported environment of §The KPI plugin contract and a built-in reads the same resolved values in process, so a consumer plugin is no second-class reader of the contract.
+A tier-1 or tier-2 `.sh` hit is **executed directly** (`"$path"`, never `bash "$path"`), so the execute bit still governs and a non-executable plugin degrades to the fail-visible row rather than running anyway. A `.ps1` hit is a **PowerShell plugin**, started by the host `GATE_SDK_POWERSHELL` names with gate-sdk's PowerShell target arguments (gate-sdk/SPEC.md §The gate-authoring surface), so the knob, not an execute bit, is what arms it. With the knob empty its row reads `n/a (PowerShell plugin, GATE_SDK_POWERSHELL is empty)`, which names the knob that arms it, and a host the knob names that does not resolve is the plugin's fail-visible row. A native-Windows host starts no `.sh`, so there a `.sh` plugin's row is its fail-visible read, and a PowerShell plugin is the form that runs. A `.series` hit is read, never started, on every host (§The external series form). A consumer plugin reads the exported environment of §The KPI plugin contract and a built-in reads the same resolved values in process, so a consumer plugin is no second-class reader of the contract.
 
 `DRIFT_KIT_KPI_DIRS` exists for this extension point alone. A consumer-first plugin registry is the `check-graph`/`graph-vocab.knobs` consumer-config pattern, so narrowing it would narrow the provenance seam's own mechanism.
 
 ## The KPI plugin contract
 
-A plugin is `kpi-<name>.sh` or `kpi-<name>.ps1`, resolved through the registry (§The extensibility contract). A `.sh` plugin is invoked directly and must carry the execute bit, or the report degrades that row to its fail-visible read; a `.ps1` plugin is started by the PowerShell host. Two modes:
+A plugin is `kpi-<name>.sh` or `kpi-<name>.ps1`, resolved through the registry (§The extensibility contract); a series file is a data member read under §The external series form, never invoked. A `.sh` plugin is invoked directly and must carry the execute bit, or the report degrades that row to its fail-visible read; a `.ps1` plugin is started by the PowerShell host. Two modes:
 
 - **Full (no args)** — one or more rows on stdout, each `lead|lag<TAB><label><TAB><value>`: the section tag, a short human label, and a freeform value that carries its own caveat parenthetical (reading age, undercount note, pointer to the acting close-stage step). Multiple rows are legitimate for one measurement with two axes.
 - **`--trend`** — at most one compact `<key> <value>` fragment, or nothing (a plugin may opt out of the trend line).
@@ -59,6 +59,47 @@ It also exports `DRIFT_KIT_KIT_ROOTS`, the resolved kit-root set newline-separat
 `DRIFT_KIT_ITERATION_START` is the same class of handoff, reaching every plugin as exported environment and every built-in as the same resolved value. It is an `env_only` name (gate-sdk/SPEC.md §The knob file), so an adopter's docs may cite it though no table row backs it. A plugin reading it gets the empty string when there is no iteration-start commit (lifecycle-kit/SPEC.md §The state machine lists the cases) and degrades to `n/a` on its own rows rather than dying.
 
 Plugins never block and never write outside `$DRIFT_KIT_TMP_DIR` scratch; a measurement needing state (a baseline, a log) reads a file some *other* mechanism owns and stamps its reading-age caveat when the file is a past measurement rather than live state (the gate-runtime pattern below).
+
+## The external series form
+
+A series an outside tool holds joins the report as **data, never code**: a file `kpi-<name>.series`, resolved through the registry like a plugin (§The extensibility contract) and read by the binary. A tool writing it needs no shell, no PowerShell host and no knowledge of the plugin environment, so one file works on every host.
+
+The file is UTF-8 text, one line per entry, `#` comments and blank lines ignored. A line may end in CRLF and the file may open with a byte-order mark, so a file a Windows tool writes reads unchanged. Header lines come first, each `<field>: <value>`, the field a letter then letters, digits, `-` or `_`, and the value read without its surrounding blanks, a tab inside it as a space:
+
+- `label:` — required, the row's label.
+- `section:` — required, `lead` or `lag`, the honesty label the outside tool claims for its series.
+- `source:` — required, the name of the tool or record the series comes from, shown on the row.
+- `unit:` — optional, printed after the row's value; an empty one is absent.
+- `trend:` — optional, a key of letters, digits and `-`. When present the member volunteers the `--trend` fragment `<key> <latest>`.
+
+Then one point per line, `<YYYY-MM-DD><TAB><value>`, the value an optional `-`, digits, and an optional `.` with digits. At least one point is owed, and the dates are strictly increasing.
+
+```
+label: velocity
+section: lead
+source: sprint-board export
+unit: pts
+trend: vel
+2026-11-01	21
+2026-11-15	18.5
+```
+
+**One registry, one line grammar.** A series joins through the plugin resolution, so the registry stays the one place to add or prune a row, and shadowing works as it already does. A knob listing series files would be a second registry read in a second order. The format is line-and-tab, as the plugin row and the price table are (§The stage-economics meter input 3), so any tool writes it without a serializer. The header is versioned by its field names: an unknown field is refused, so a file written for a later grammar fails visibly rather than being misread. The section is the tool's to declare, since whether a series leads or lags is a claim about how it is measured, which only its measurer knows. The row prints that claim beside its source so a reader can weigh it.
+
+**Validation fails visible, never closed.** A file breaking the grammar emits one row in the lead section, labelled with the member's name, valued `n/a (series line <n>: <defect>)`. The defects are:
+
+- a missing required field, or an unknown or repeated one;
+- a `section:` other than `lead` or `lag`, or a `trend:` key outside its alphabet;
+- a header after a point, or a point that is not a date, a tab and a value;
+- dates not strictly increasing, or no point at all.
+
+A required field with an empty value is missing. A defect owed rather than written is reported at the line where it fell due: a missing field at the first point, and no point one past the last line. The report still exits 0, and under `--trend` a malformed series volunteers nothing. A malformed series is refused whole and never partly rendered, since a row built from the points that parsed would show a trend the source does not hold.
+
+**Where the file lives.** The KPI dirs are the consumer's gates dir by default, which is tracked. A series the outside tool rewrites on its own schedule belongs in a dir the consumer gitignores, named in `DRIFT_KIT_KPI_DIRS`, so the tool's writes never dirty the tree.
+
+**The row.** A valid series emits one row in its declared section: its label, and the value `<latest>[ <unit>] (<±delta> since <previous date>; external: <source>, as of <latest date>, <age>d old)`. The latest value prints as written. The delta is exact, printed with the larger fraction precision of its two operands and always signed, a zero reading `+0`. A one-point series has no delta, so its value opens `<latest>[ <unit>] (external: …)`. The age counts whole civil days from the latest date to today, in the operator's civil zone (§Bundled KPIs). A latest date after today reads `0d old`, and where today cannot be read the age reads `?`. The latest point and one delta suffice because the report reads trend, not level: the delta is the series' own slope at its latest point, and a fuller chart is §The statistics view's to add if a consumer needs one.
+
+**The mark is the provenance.** `external: <source>` tells a reader the report did not compute the number and names who did, and `as of <date>, <age>d old` is the reading-age caveat §The KPI plugin contract owes a past measurement. A source that stopped writing shows as a growing age, never as a stale value read as current.
 
 ## Bundled KPIs
 
@@ -643,6 +684,7 @@ The arms and the fixture-stable members, each over purpose-built inputs:
   - **No fixture is conditioned on an interpreter being installed**, since the meter spawns none.
 - **`kpi-price-table-age`** reads two dates out of a file the fixture writes, so the smoke drives it over purpose-built tables: the age row, the `price <N>d` trend fragment, and each header's absence degrading its own row independently. It asserts **the inversion the KPI exists for**: a table whose `priced-as-of:` is *today* and whose `prices-valid-through:` has passed reads a fresh age row and an `EXPIRED` expiry row together. A fixture pinning only the age row has not tested the feature, since the age row is reassuring in exactly that case. The no-table degradation emits its single `n/a (no price table)` row.
 - **`kpi-incident-recurrence`** reads declarations out of a queue file the fixture writes. The smoke asserts the single lag row, the count **summing dates across declarations** rather than counting declarations, the highest-count slug and the `recur <N>` trend fragment. Both degradations, a queue with no declaration and no queue file at all, are asserted, with the trend's silence under the first.
+- **The external series form** runs in the smoke through the consumer KPI dir the extension-point assertions already configure. A valid two-point series renders its row in its declared section with the delta, the `external:` mark and the age, and its `trend:` key's fragment. A one-point series renders no delta. A malformed series renders its `n/a (series line <n>: …)` row in the lead section and the report exits 0. A `.ps1` beside a `.series` of the same name wins the resolution, and a `.sh` beside it wins too. The grammar's defects, each by class, and the delta's precision are unit tests of the series module.
 - **The install-observation pair** is a pure function of the record, so the smoke drives both arms **through the front-end** over a throwaway record named by `DRIFT_KIT_INSTALL_RECORD`.
   - The capture arm: the line grammar of each of the four kinds, and the per-kind key rules, a re-filed `install`, `proof` and `checkin` each replacing and a re-filed `red` appending. The `--author` routing into a throwaway `DRIFT_KIT_AUTHOR_INSTALL_RECORD`, the projection's blindness to it, and a misplaced flag refused. One refusal per class — an unknown kind, the wrong arity, an empty positional, a closed-set field outside its set, and a flag in a positional slot — each leaves the record unchanged. A refusal that wrote is the failure the exit code alone would not show.
   - The projection: each block's denominator over that record, a `proof` whose `<id>` has no install line counted nowhere, the sorted group-by order, the byte-identity of two emissions over one unchanged record, and the `unrostered` classification against a throwaway gates file. The record-absent degradation is asserted to be the counted zero rather than a missing block, the reading the committed page rests on.
