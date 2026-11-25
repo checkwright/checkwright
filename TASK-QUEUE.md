@@ -246,6 +246,88 @@ The knob lock (`knobenv::lock`) reached the source-walking tests with no catcher
 
 **Cost while deferred:** a parallel test run can race a knob write against a walk and red `native_crate` at random, as it did in the prior close's validate re-run. Filed 2026-11-25 at adopter-followthrough-pass' close from build's bullet. Owner lookup: `knobenv`, `prune_dirs` in this file, none; owner gate-sdk/SPEC.md §Layout and configuration.
 
+### foreign-run-sandbox-record
+
+[cost: event/low] [surface: delegation-kit]
+
+Two holes in the foreign-vendor run's confinement record. `--foreign-resume` reports the recorded `sandbox=` policy while running a resume form edited mid-session to drop `@SANDBOX@` for a literal confinement, since the pre-spawn check in `native/src/emit/foreign_run.rs` refuses only a held `none` word under a token-bearing form, so the verdict line names a confinement the turn did not run under. And `--sandbox -` is accepted (`tier::name` admits a lone `-`) as is a `<adapter>/-=<word>` table element, while `session.txt` reads `-` as absent, so a resume drops the policy from its record and verdict line.
+
+**Deliverable:** debt: a lone `-` refused as a policy name in both readers, as the knob already refuses it as a word, and a resume whose form lost `@SANDBOX@` under a recorded policy refused or reported as the literal it runs, each with a case.
+
+**Cost while deferred:** a verdict line can name a confinement the turn did not run under, which a caller acting on foreign-run verdicts takes as fact. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: `tier::name` admits `-`. Owner lookup: `sandbox`, `foreign-resume` in this file, none; owner delegation-kit/SPEC.md §The foreign-vendor run.
+
+### wakeup-log-write-unreported
+
+[cost: event/low] [surface: guard-kit]
+
+wakeup-guard's denial says 'Attempt logged.' when `append_attempt` (native/src/hook/wakeup.rs) cannot open or write the log, since it discards both errors, so a tree-free absolute log under a missing directory loses the record while the denial claims it. guard-kit/SPEC.md §wakeup-guard names only knob and `--knobs` faults as unlogged.
+
+**Deliverable:** debt: the denial's wording follows the append's outcome, with a case for an unwritable log.
+
+**Cost while deferred:** an adopter's attempt log misses denied attempts while the model is told they were logged. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: both results discarded. Owner lookup: `append_attempt`, `Attempt logged` in this file, none; owner guard-kit/SPEC.md §wakeup-guard.
+
+### front-door-registry-readiness
+
+[cost: event/low] [surface: installer] [observed-by: publish]
+
+The front-door package route's readiness poll (`npm view <package>@<version> version` in scripts/ci-front-door.sh and its PowerShell twin) named 0.38.0 at the registry's publish time while the tarball still answered 404, so all seven legs of publish run 45592369014 redded at `npx` init on E404, green on a re-run once the tarball served.
+
+**Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers. The observe half reads the next release's `publish` run.
+
+**Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner installer/SPEC.md and scripts/ci-front-door.sh.
+
+### verdict-identity-fields
+
+[cost: event/low] [surface: gate-sdk]
+
+Asks A and C of the orchestrator adopter's pairing asks: a verdict an outside work engine keys and diffs. The battery's SARIF log (gate-sdk/SPEC.md §run-gates) carries the verdict, `commit` and `worktree`, each kit's version, one rule per member and finding-line locations under `verdictContract` 1.0.0. It carries no tree object id, no digest of the gate set that judged, no per-result identity stable across reruns of one tree (`native/src/sarif.rs` writes no fingerprint), and no rule id beneath a member with several rule classes.
+
+**Deliverable:** design-pending, a feature: those fields under the verdict contract's minor rule, the goldens moved with them, and the gate-run predicate taking them through its embedded provenance block. The ask's `--json` on every arm is answered by gate-sdk/SPEC.md §The non-gate arm: the battery's machine form is this log, and an arm gains `--json` with its named caller (orchestrator-arm-json).
+
+**Cost while deferred:** the adopter cannot tell a rerun's failures from new ones, nor key a verdict to the content and gates that produced it. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `fingerprint`, `gate set`, `tree sha` in this file, none; owner gate-sdk/SPEC.md §run-gates.
+
+### verdict-lookup
+
+[cost: event/low] [surface: evidence-kit]
+
+Ask B of the orchestrator adopter's pairing asks: a verdict keyed by tree, kit version and gate-set digest, and a lookup answering whether a verdict exists for a key and what it is. Nothing keeps one so: the evidence manifest keys suites by run and commit (evidence-kit/SPEC.md §Evidence manifest), and the SARIF log goes to a caller's path and is kept by nobody.
+
+**Deliverable:** design-pending, a feature: the key, built from verdict-identity-fields' fields and landing after it; where a verdict is kept and by whom; and the lookup arm. The lead advises evidence-kit as its home.
+
+**Cost while deferred:** the adopter re-runs the battery on a tree already judged under the same gates. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `lookup`, `verdict key` in this file, none; owner evidence-kit/SPEC.md §Evidence manifest.
+
+### exit-code-tool-error
+
+[cost: event/low] [surface: gate-sdk]
+
+The orchestrator adopter asks for exit 2 on a usage error or refusal, a new 3 on a tool or input error, and an error-kind field in the machine form. gate-sdk/SPEC.md §Output contract holds 0, 1 and 2, grounded against a fourth code by the churn every caller branching on the status pays; the operator's direction of 2026-11-25, lead-relayed (not a ruling), weighs that ground down, every adopter being in-house. Probed: a harness hook blocks on exit 2 alone (gate-sdk/SPEC.md §The hook contract), so a hook arm moving a fail-closed refusal to 3 fails open.
+
+**Deliverable:** design-pending, a feature: which members and arms take 3, the hook arms' exemption, the front ends and CI templates that branch on status, and the error kind's home.
+
+**Cost while deferred:** a caller tells a refused input from a crashed tool only by parsing stderr. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `exit 3`, `fourth code` in this file, none; owner gate-sdk/SPEC.md §Output contract.
+
+### orchestrator-arm-json
+
+[cost: event/low] [surface: lifecycle-kit]
+
+Where present, the orchestrator adopter invokes lifecycle stages and foreign runs as verdict-returning steps. `--enter-stage` (lifecycle-kit/SPEC.md §bin/enter-stage.sh) and `--foreign-run` and `--foreign-resume` (delegation-kit/SPEC.md §The foreign-vendor run) print for a person; `--verify-gate-run` alone has a `--json` form, and gate-sdk/SPEC.md §The non-gate arm mints one per arm with its named caller, which the adopter now is for these three.
+
+**Deliverable:** design-pending, a feature: a `--json` form on each, keys its caller reads, goldens in each arm's unit test, and whether a refused stage entry prints a document. A further arm takes one when the adopter names it.
+
+**Cost while deferred:** the adopter scrapes prose for a stage entry's or a foreign run's verdict. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `--json`, `enter-stage` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
+
+### adopter-content-checks
+
+[cost: event/low] [surface: gate-sdk]
+
+Ask D of the orchestrator adopter's pairing asks: its content checks as config-driven gates. pipefail (with fix and baseline), script, names (deny stems), strings (built binaries against deny terms and home paths), text (tracked text against an untracked deny list), ghpin (CI action pins against a sites file), literals (unconstrained string literals since a base ref), migrations (additive-only SQL since a base ref) and exec-write (writes of executables outside named helpers, `fs::copy` and libc, nix or rustix chmod and children included). For text and strings a finding carries path:line and a rule id, never a deny term or the deny file's contents.
+
+**Covered today, in part:** text is check-tree-terms over `GATE_SDK_MSG_PATTERN_FILES_LOCAL`, whose record prints the matched line (gate-sdk/SPEC.md §check-tree-terms); ghpin is check-action-pinning, with no sites file. No content gate reads a since-base-ref corpus; check-gate-tamper's `--range` is the precedent. `script` is unglossed in the ask.
+
+**Deliverable:** design-pending, features split at spec: the redacted record and a per-pattern rule id first, then each new gate born native with its pair and knob, reusing check-commit-msg and check-tree-terms where they cover.
+
+**Cost while deferred:** the adopter keeps nine checks of its own beside the battery, two overlapping ours under another output contract. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `deny`, `base ref` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).

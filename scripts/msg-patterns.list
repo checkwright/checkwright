@@ -13,8 +13,8 @@ claude\.com/claude-code
 # The Co-Authored-By attribution trailer — the shipped default leaves it
 # unbanned, a consumer-selectable class (gate-sdk/SPEC.md §check-commit-msg);
 # this repo bans it. Anchored at a line start so prose naming the trailer
-# mid-line stays clean.
-^[Cc]o-[Aa]uthored-[Bb]y:
+# mid-line stays clean. Every letter takes both cases, as git's trailer parse does.
+^[Cc][Oo]-[Aa][Uu][Tt][Hh][Oo][Rr][Ee][Dd]-[Bb][Yy]:
 
 # Session-reference class — a harness-injected trailer referencing an internal
 # session, before it lands in public history. The session-share URL host (public
