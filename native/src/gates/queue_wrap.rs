@@ -127,11 +127,11 @@ pub fn run(args: &[String]) -> i32 {
             }
         },
     };
-    let text = match std::fs::read_to_string(&file) {
+    let text = match exit::read_configured(&file, "queue file") {
         Ok(t) => t,
-        Err(_) => {
-            eprintln!("check-queue-wrap: file not found: {}", file);
-            return exit::REFUSED;
+        Err(fault) => {
+            eprintln!("check-queue-wrap: {}", fault);
+            return fault.status();
         }
     };
 

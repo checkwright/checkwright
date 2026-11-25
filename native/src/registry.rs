@@ -224,36 +224,39 @@ pub struct Invocation {
     pub args: Vec<String>,
 }
 
-pub fn invocation(name: &str, decl: &str, self_exe: &str) -> Result<Invocation, String> {
+pub fn invocation(name: &str, decl: &str, self_exe: &str) -> Result<Invocation, crate::exit::Fault> {
     use crate::programs::{self, Program};
     use crate::substrate::TargetClass;
-    let substrate = substrate(decl)?;
+    // spec: gate-sdk/SPEC.md §The gate-authoring surface — a member that cannot start is a tool
+    // error, its declaration unread or malformed is input, and a host knob left unset is refused
+    use crate::exit::Fault;
+    let substrate = substrate(decl).map_err(|e| Fault::reading(decl, e))?;
     let (program, args) = match &substrate {
-        Substrate::Shell => shell_start(decl)?,
+        Substrate::Shell => shell_start(decl).map_err(Fault::tool)?,
         Substrate::Compiled => {
             if crate::gates::declared(name).is_none() {
-                return Err(format!(
+                return Err(Fault::tool(format!(
                     "checkwright-gates: no such gate subcommand: {} — the check could not run; treating as failure (not clean)",
                     name
-                ));
+                )));
             }
             (programs::CHECKWRIGHT_GATES.at(self_exe), vec![name.to_string()])
         }
         Substrate::Exec(value) => {
             let target = exec_target(decl, value);
             let Some(class) = crate::substrate::target_class(&target) else {
-                return Err(format!(
+                return Err(Fault::input(format!(
                     "{}: its `{}` target {} is of no admitted target class (a PowerShell script, .ps1, or an executable, whose name carries no `.`) — gate-sdk/SPEC.md §The gate-authoring surface",
                     decl, EXEC, target
-                ));
+                )));
             };
             if class == TargetClass::Executable {
                 let path = crate::substrate::executable_path(&target);
                 if !crate::proc::is_executable(Path::new(&path)) {
-                    return Err(format!(
+                    return Err(Fault::tool(format!(
                         "{}: its `{}` target {} is not an executable file — your own build places it there, so build the gate before the battery runs; a registered gate that cannot start is not clean",
                         decl, EXEC, path
-                    ));
+                    )));
                 }
                 return Ok(Invocation {
                     program: Program::consumer(programs::GATE_DECLARATION, path),
@@ -262,21 +265,21 @@ pub fn invocation(name: &str, decl: &str, self_exe: &str) -> Result<Invocation, 
                 });
             }
             if !Path::new(&target).is_file() {
-                return Err(format!(
+                return Err(Fault::tool(format!(
                     "{}: its `{}` target {} is not a file — the check could not run; treating as failure (not clean)",
                     decl, EXEC, target
-                ));
+                )));
             }
-            let host = crate::walk::knob_scalar(crate::substrate::KNOB)?;
+            let host = crate::walk::knob_scalar(crate::substrate::KNOB).map_err(Fault::refused)?;
             if host.is_empty() {
-                return Err(format!(
+                return Err(Fault::refused(format!(
                     "{} starts the PowerShell script {}, and {} is empty — set it to pwsh or powershell; a registered gate that cannot start is not clean",
                     name,
                     target,
                     crate::substrate::KNOB
-                ));
+                )));
             }
-            let program = crate::substrate::resolve_host("GATE_SDK_POWERSHELL", &host)?;
+            let program = crate::substrate::resolve_host("GATE_SDK_POWERSHELL", &host).map_err(Fault::tool)?;
             (program, crate::substrate::host_args(&target))
         }
     };

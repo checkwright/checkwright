@@ -73,7 +73,7 @@ pub fn run(args: &[String]) -> i32 {
         Ok(t) => t,
         Err(_) => {
             eprintln!("check-tag-lead-line: file not found: {}", file);
-            return if std::path::Path::new(&file).exists() { exit::INPUT } else { exit::REFUSED };
+            return if std::path::Path::new(&file).is_file() { exit::INPUT } else { exit::REFUSED };
         }
     };
 

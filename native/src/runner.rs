@@ -458,8 +458,8 @@ fn staged_matches(p: &str, globs: &[&str]) -> bool {
 
 // spec: gate-sdk/SPEC.md §Fail-closed contract — a resolved declaration that cannot be read is a
 // refusal, never an empty manifest, which would drop the member from every selection in silence
-pub(crate) fn manifest(src: &str) -> Result<Vec<(String, String)>, String> {
-    let body = std::fs::read(src).map_err(|e| format!("cannot read the declaration {}: {}", src, e))?;
+pub(crate) fn manifest(src: &str) -> Result<Vec<(String, String)>, exit::Fault> {
+    let body = std::fs::read(src).map_err(|e| exit::Fault::reading(src, format!("cannot read the declaration {}: {}", src, e)))?;
     Ok(registry::manifest_line(&String::from_utf8_lossy(&body))
         .map(registry::manifest_fields)
         .unwrap_or_default())
@@ -480,7 +480,7 @@ pub(crate) fn select(
     kit_roots_here: &[String],
     paths: &[String],
     tier: Option<&str>,
-) -> Result<Selection, String> {
+) -> Result<Selection, exit::Fault> {
     let mut covered = vec![false; paths.len()];
     let mut run: Vec<Selected> = Vec::new();
     for name in members {
@@ -494,7 +494,7 @@ pub(crate) fn select(
                 continue;
             }
             (None, None) => {
-                return Err(format!("cannot resolve '{}' in: {}", name, resolve_dirs.join(" ")));
+                return Err(exit::Fault::refused(format!("cannot resolve '{}' in: {}", name, resolve_dirs.join(" "))));
             }
         };
         let f = manifest(&src)?;
@@ -505,10 +505,10 @@ pub(crate) fn select(
         // spec: gate-sdk/SPEC.md §Fail-closed contract — an unresolvable couples token is a refusal at exit 2,
         // never a narrower selection: a silently lost trigger is a gate the selector stops running.
         let trigger = registry::expand_couples(&trigger, kit_roots_here)
-            .map_err(|e| format!("cannot expand {}'s trigger: {}", name, e))?;
+            .map_err(|e| exit::Fault::refused(format!("cannot expand {}'s trigger: {}", name, e)))?;
         let mode = registry::field(&f, "mode");
         let derived = registry::derived_couples(name, resolve_dirs)
-            .map_err(|e| format!("cannot derive {}'s knob files: {}", name, e))?;
+            .map_err(|e| exit::Fault::refused(format!("cannot derive {}'s knob files: {}", name, e)))?;
         let mut globs: Vec<&str> = trigger.split(',').filter(|g| !g.is_empty()).collect();
         globs.extend(derived.iter().map(String::as_str));
         if trigger == "*" {
@@ -565,7 +565,7 @@ fn select_for(
 ) -> Result<Vec<Selected>, exit::Kind> {
     let s = select(members, resolve_dirs, kit_roots_here, paths, None).map_err(|e| {
         eprintln!("{}: --for {}", TOOL, e);
-        exit::Kind::Refused
+        e.kind
     })?;
     for (p, c) in paths.iter().zip(&s.covered) {
         if !c {
@@ -751,7 +751,7 @@ pub(crate) fn dispatch_one(d: &Dispatch, idx: usize, sel: &Selected) -> Outcome 
     };
     let inv = match registry::invocation(&sel.name, &src, d.self_exe) {
         Ok(i) => i,
-        Err(e) => return fail(DISPATCH_TAIL, e, started.elapsed().as_millis()),
+        Err(e) => return fail(DISPATCH_TAIL, e.message, started.elapsed().as_millis()),
     };
     let (program, mut args) = (inv.program, inv.args);
     args.extend(sel.args.iter().cloned());
@@ -951,14 +951,14 @@ fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
     let explicit = gates_dir != configured_dir;
     let list = registry::list_path(&gates_dir);
 
-    let list_text = match std::fs::read_to_string(&list) {
+    let list_text = match exit::read_configured(&list, "registry") {
         Ok(t) => t,
-        Err(_) => {
-            eprintln!("{}: no registry at {}", TOOL, list);
-            if explicit {
+        Err(f) => {
+            eprintln!("{}: {}", TOOL, f);
+            if explicit && f.kind == exit::Kind::Refused {
                 steer(&gates_dir, &configured_dir);
             }
-            return Err(exit::Kind::Refused);
+            return Err(f.kind);
         }
     };
     let members = registry::members(&list_text);

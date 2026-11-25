@@ -125,18 +125,18 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         }
     };
     if !std::path::Path::new(log).is_file() {
-        return Err(Fault::input(format!("log not found: {}", log)));
+        return Err(Fault::refused(format!("log not found: {}", log)));
     }
-    let log_text = super::read_text(log).map_err(Fault::input)?;
+    let log_text = super::read_text(log).map_err(|m| Fault::reading(log, m))?;
     let (arms, marker) = match driver {
         None => roster_from_log(&log_text).map_err(Fault::input)?,
         Some(d) if !std::path::Path::new(d).is_file() => {
-            return Err(Fault::input(format!(
+            return Err(Fault::refused(format!(
                 "smoke driver not found: {} — the arm roster is derived from it",
                 d
             )))
         }
-        Some(d) => roster(&super::read_text(d).map_err(Fault::input)?).map_err(Fault::input)?,
+        Some(d) => roster(&super::read_text(d).map_err(|m| Fault::reading(d, m))?).map_err(Fault::input)?,
     };
     let (seen, clean) = reached(&log_text, &arms, &marker);
     let mut out = String::new();

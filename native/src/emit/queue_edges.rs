@@ -43,7 +43,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         a.file.clone()
     };
     let text = std::fs::read_to_string(&file)
-        .map_err(|e| Fault::input(format!("file not found: {}: {}", file, e)))?;
+        .map_err(|e| Fault::reading(&file, format!("file not found: {}: {}", file, e)))?;
     let sec = Sections::active_and_deferred().map_err(Fault::refused)?;
     let live = queue::live_slugs(&text, &sec);
     let retired = queue::retired_set(&file, &live).map_err(Fault::tool)?;

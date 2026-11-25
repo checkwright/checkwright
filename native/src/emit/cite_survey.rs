@@ -37,9 +37,9 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
     };
     let (record, spelled) = anchored_fault("LIFECYCLE_KIT_SURVEY_RECORD_FILE")?;
     if !std::path::Path::new(&record).is_file() {
-        return Err(Fault::input(format!("no survey record at {} — nothing to cite.", spelled)));
+        return Err(Fault::refused(format!("no survey record at {} — nothing to cite.", spelled)));
     }
-    let text = super::read_text(&record).map_err(Fault::input)?;
+    let text = super::read_text(&record).map_err(|m| Fault::reading(&record, m))?;
     let matched = headings(&text, needle);
 
     // spec: lifecycle-kit/SPEC.md §The survey record — both refusals keep printing what the author

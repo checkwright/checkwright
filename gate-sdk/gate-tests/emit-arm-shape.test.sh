@@ -79,7 +79,7 @@ has unknown err "unknown option: --bogus"
 usage_once unknown
 
 # A runtime refusal is no shape refusal: it names its cause and prints no usage.
-run runtime 3 --emit-md-section "$scratch/absent.md" "Heading"
+run runtime 2 --emit-md-section "$scratch/absent.md" "Heading"
 has runtime err "file not found:"
 grep -q 'usage:' "$scratch/runtime.err" && note runtime "a runtime refusal printed a usage block"
 

@@ -26,7 +26,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        spec::manifest_files(".").map_err(Fault::refused)?
+        spec::manifest_files(".").map_err(Fault::input)?
             .into_iter()
             .map(|p| p.display().to_string())
             .filter(|f| !excluded(&exclude, &spec::strip_dot_slash(f)))

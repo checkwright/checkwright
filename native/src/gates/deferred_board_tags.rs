@@ -78,11 +78,11 @@ pub fn run(args: &[String]) -> i32 {
             }
         },
     };
-    let text = match std::fs::read_to_string(&file) {
+    let text = match exit::read_configured(&file, "queue file") {
         Ok(t) => t,
-        Err(_) => {
-            eprintln!("check-deferred-board-tags: file not found: {}", file);
-            return exit::REFUSED;
+        Err(fault) => {
+            eprintln!("check-deferred-board-tags: {}", fault);
+            return fault.status();
         }
     };
     // spec: queue-kit/SPEC.md §check-deferred-board-tags — the surface value set is the root's own

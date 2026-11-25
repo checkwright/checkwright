@@ -188,18 +188,18 @@ fn publish_half(
     }
 }
 
-fn read(path: &str, what: &str) -> Result<String, String> {
+fn read(path: &str, what: &str) -> Result<String, Fault> {
     if !Path::new(path).is_file() {
-        return Err(format!("{} not found: {}", what, path));
+        return Err(Fault::refused(format!("{} not found: {}", what, path)));
     }
     std::fs::read(path)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| format!("cannot read {} {}: {}", what, path, e))
+        .map_err(|e| Fault::input(format!("cannot read {} {}: {}", what, path, e)))
 }
 
 fn rule(args: &[String]) -> Result<i32, Fault> {
     let a = parse(args).map_err(Fault::usage)?;
-    let doc_text = read(&a.doc, "declaring doc").map_err(Fault::input)?;
+    let doc_text = read(&a.doc, "declaring doc")?;
     let workflows = match &a.workflow {
         Some(w) => vec![w.clone()],
         None => walk::knob_words("GATE_SDK_NATIVE_PUBLISH_WORKFLOW").map_err(Fault::refused)?,
@@ -209,7 +209,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     }
     let mut wired = false;
     for w in &workflows {
-        wired |= fresh::file_lines(&read(w, "publish workflow").map_err(Fault::input)?)
+        wired |= fresh::file_lines(&read(w, "publish workflow")?)
             .iter()
             .any(|l| is_call(l));
     }
@@ -230,7 +230,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         }
         let entries = walk::list_dir(Path::new(dir)).map_err(Fault::input)?;
         let roster_path = walk::knob_scalar("GATE_SDK_NATIVE_TARGETS_FILE").map_err(Fault::refused)?;
-        let targets = roster(&read(&roster_path, "target roster").map_err(Fault::input)?, &roster_path).map_err(Fault::input)?;
+        let targets = roster(&read(&roster_path, "target roster")?, &roster_path).map_err(Fault::input)?;
         let declared = expand(&templates, version, &targets);
         publish_half(dir, &declared, &entries, &mut findings);
         dist_note = format!(
@@ -347,8 +347,8 @@ mod tests {
     // spec: gate-sdk/SPEC.md §check-release-assets — every exit-2 and exit-3 path
     #[test]
     fn each_refusal_exits_two_and_each_unread_input_three() {
-        assert_eq!(run(&s(&["no/such/doc.md", "no/such/wf.yml"])), crate::exit::INPUT);
-        assert_eq!(run(&s(&["Cargo.toml", "no/such/wf.yml"])), crate::exit::INPUT);
+        assert_eq!(run(&s(&["no/such/doc.md", "no/such/wf.yml"])), crate::exit::REFUSED);
+        assert_eq!(run(&s(&["Cargo.toml", "no/such/wf.yml"])), crate::exit::REFUSED);
         assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "no/such/dir", "1.0.0"])), crate::exit::INPUT);
         assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "src", ""])), 2);
         assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "src", "1.0 .0"])), 2);

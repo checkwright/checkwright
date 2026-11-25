@@ -1,6 +1,7 @@
 // spec: gate-sdk/SPEC.md §Output contract — the one module spelling a status other than 0 and 1:
 // the error kinds, their statuses, and the declared verdict-word statuses
 use std::fmt;
+use std::path::Path;
 
 pub const USAGE: i32 = 2;
 pub const REFUSED: i32 = 2;
@@ -97,6 +98,21 @@ impl Fault {
         self.stdout = Some(line.into());
         self
     }
+
+    // spec: gate-sdk/SPEC.md §Output contract — a configured file's read error splits on whether a
+    // regular file stands at the path
+    pub fn reading(path: impl AsRef<Path>, message: impl Into<String>) -> Self {
+        Fault::of(if path.as_ref().is_file() { Kind::Input } else { Kind::Refused }, message)
+    }
+}
+
+// spec: gate-sdk/SPEC.md §Output contract — a configured file read whole: absent refused, unreadable input
+pub fn read_configured(path: impl AsRef<Path>, what: &str) -> Result<String, Fault> {
+    let p = path.as_ref();
+    if !p.is_file() {
+        return Err(Fault::refused(format!("no {} at {}", what, p.display())));
+    }
+    std::fs::read_to_string(p).map_err(|e| Fault::input(format!("cannot read the {} {}: {}", what, p.display(), e)))
 }
 
 impl fmt::Display for Fault {
@@ -131,6 +147,20 @@ mod tests {
         assert_eq!(Fault::input("x").status(), 3);
         assert_eq!(Fault::tool("x").status(), 3);
         assert_eq!(Fault::tool("m").prefixed("--arm").message, "--arm: m");
+    }
+
+    #[test]
+    fn a_configured_file_is_refused_absent_and_input_unreadable() {
+        let dir = std::env::temp_dir().join(format!("exit-configured-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("cannot make the scratch dir");
+        let bad = dir.join("bad.txt");
+        std::fs::write(&bad, [0xffu8, 0xfe]).expect("cannot write the scratch file");
+        assert_eq!(read_configured(dir.join("gone.txt"), "list").unwrap_err().kind, Kind::Refused);
+        assert_eq!(read_configured(&dir, "list").unwrap_err().kind, Kind::Refused);
+        assert_eq!(read_configured(&bad, "list").unwrap_err().kind, Kind::Input);
+        assert_eq!(Fault::reading(dir.join("gone.txt"), "m").kind, Kind::Refused);
+        assert_eq!(Fault::reading(&bad, "m").kind, Kind::Input);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

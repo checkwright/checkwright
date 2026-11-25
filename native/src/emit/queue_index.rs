@@ -79,7 +79,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
     } else {
         a.file.clone()
     };
-    let text = std::fs::read_to_string(&file).map_err(|e| Fault::input(format!("file not found: {}: {}", file, e)))?;
+    let text = std::fs::read_to_string(&file).map_err(|e| Fault::reading(&file, format!("file not found: {}: {}", file, e)))?;
 
     match a.mode {
         Mode::Extent => extent(&text, &a.slug),

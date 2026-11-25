@@ -542,7 +542,7 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, Fault> 
     }
     let listing = std::fs::read(&list)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| Fault::refused(format!("cannot read {}: {}", list, e)))?;
+        .map_err(|e| Fault::input(format!("cannot read {}: {}", list, e)))?;
 
     let mut scanned = 0usize;
     let mut undecidable = 0usize;
@@ -558,12 +558,12 @@ fn registry_arm(mode: Mode, gates_dir: Option<String>) -> Result<String, Fault> 
         })?;
         let text = std::fs::read(Path::new(&decl))
             .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .unwrap_or_default();
+            .map_err(|e| Fault::input(format!("cannot read {}: {}", decl, e)))?;
 
         // spec: gate-sdk/SPEC.md §port-blockers — a ported member leaves the partition entirely
         // rather than printing `?`: the grouping orders the *remaining* corpus, so there is no open
         // question to report. `--group` does not consume the requirement lookup: it has no row to fill.
-        let substrate = registry::substrate(&decl).map_err(Fault::refused)?;
+        let substrate = registry::substrate(&decl).map_err(|e| Fault::reading(&decl, e))?;
         if substrate != registry::Substrate::Shell {
             if mode == Mode::Group {
                 ported += 1;

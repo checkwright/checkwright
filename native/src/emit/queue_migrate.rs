@@ -24,7 +24,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
     }
     let f = files[0];
     let sec = Sections::with_done().map_err(Fault::refused)?;
-    let text = std::fs::read_to_string(f).map_err(|e| Fault::input(format!("queue-migrate: cannot read {}: {}", f, e)))?;
+    let text = std::fs::read_to_string(f).map_err(|e| Fault::reading(f, format!("queue-migrate: cannot read {}: {}", f, e)))?;
     let out = convert(&text, &sec).map_err(|e| Fault::input(format!("queue-migrate: {}: {}", f, e)))?;
     if !write {
         return Ok(out);

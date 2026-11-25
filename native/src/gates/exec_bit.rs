@@ -35,8 +35,9 @@ pub fn run(args: &[String]) -> i32 {
         Some(dump) => match std::fs::read(dump) {
             Ok(b) => fresh::file_lines(&String::from_utf8_lossy(&b)).into_iter().map(String::from).collect(),
             Err(_) => {
-                eprintln!("check-exec-bit: ls-files dump not readable: {}", dump);
-                return exit::INPUT;
+                let fault = exit::Fault::reading(dump, format!("ls-files dump not readable: {}", dump));
+                eprintln!("check-exec-bit: {}", fault);
+                return fault.status();
             }
         },
         None => {

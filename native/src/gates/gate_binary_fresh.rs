@@ -81,9 +81,13 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("  help: pass the gates dir carrying gates.list as the first argument, or set GATE_SDK_GATES_DIR.");
         return exit::REFUSED;
     }
-    let listing = std::fs::read(&list)
-        .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .unwrap_or_default();
+    let listing = match std::fs::read(&list) {
+        Ok(b) => String::from_utf8_lossy(&b).into_owned(),
+        Err(e) => {
+            eprintln!("check-gate-binary-fresh: cannot read the gate registry {}: {} — the check could not run; treating as failure (not clean)", list, e);
+            return exit::INPUT;
+        }
+    };
     // spec: gate-sdk/SPEC.md §check-gate-binary-fresh — the classifier answers which members
     // dispatch: an exec member's spawn runs its host, never a subcommand
     let mut dispatching: Vec<String> = Vec::new();
@@ -147,12 +151,9 @@ pub fn run(args: &[String]) -> i32 {
     }
 
     let (tree, source_desc) = if !stamp_file.is_empty() {
-        if std::fs::File::open(&stamp_file).is_err() {
-            eprintln!(
-                "check-gate-binary-fresh: tree-stamp file not readable: {}",
-                stamp_file
-            );
-            return exit::INPUT;
+        if !Path::new(&stamp_file).is_file() {
+            eprintln!("check-gate-binary-fresh: tree-stamp file not found: {}", stamp_file);
+            return exit::REFUSED;
         }
         let text = match fresh::read_captured(&stamp_file) {
             Ok(t) => t,

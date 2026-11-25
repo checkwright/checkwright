@@ -281,7 +281,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     }
     let conf = parse(
         source,
-        &fresh::read_captured(source).map_err(|e| Fault::input(format!("{}: {}", source, e)))?,
+        &fresh::read_captured(source).map_err(|e| Fault::reading(source, format!("{}: {}", source, e)))?,
     ).map_err(Fault::refused)?;
     let heading = walk::knob_scalar("GATE_LOCAL_LICENSE_HEADING").map_err(Fault::refused)?;
     let heading = heading.as_str();
@@ -291,7 +291,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     let mut findings: Vec<String> = Vec::new();
     for (site, form) in &conf.sites {
         let want = render(&conf, site, form).map_err(Fault::refused)?;
-        let text = fresh::read_captured(&at_root(site)).map_err(|e| Fault::input(format!("{}: {}", site, e)))?;
+        let text = fresh::read_captured(&at_root(site)).map_err(|e| Fault::reading(at_root(site), format!("{}: {}", site, e)))?;
         let got: Vec<&str> = if is_html(site) {
             let lines: Vec<&str> = fresh::file_lines(&text)
                 .into_iter()
@@ -373,7 +373,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     }
 
     let read_manifest = |rel: &str, k: Kind| -> Result<Option<String>, Fault> {
-        let text = fresh::read_captured(&at_root(rel)).map_err(|e| Fault::input(format!("{}: {}", rel, e)))?;
+        let text = fresh::read_captured(&at_root(rel)).map_err(|e| Fault::reading(at_root(rel), format!("{}: {}", rel, e)))?;
         manifest_license(k, &text).map_err(|e| Fault::input(format!("{}: {}", rel, e)))
     };
     for (m, k) in &conf.manifests {

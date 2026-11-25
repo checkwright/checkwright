@@ -465,7 +465,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
                 return Err(Fault::usage(format!("--emit needs a source path\n{}", USAGE)));
             }
             if !Path::new(&ctx.under(&src)).is_file() {
-                return Err(Fault::input(format!("source not found: {}", ctx.under(&src))));
+                return Err(Fault::refused(format!("source not found: {}", ctx.under(&src))));
             }
             emit_one(&ctx, &src, &mut governed(&ctx)?)
         }

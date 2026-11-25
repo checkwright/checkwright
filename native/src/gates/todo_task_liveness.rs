@@ -33,7 +33,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         return Ok(0);
     }
     if !Path::new(&queue).is_file() {
-        return Err(Fault::refused(format!("not a file: {}", queue)));
+        return Err(Fault::input(format!("not a file: {}", queue)));
     }
 
     let slugs = spec::queue_slugs(Path::new(&queue)).map_err(Fault::input)?;

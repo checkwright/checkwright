@@ -55,11 +55,7 @@ pub fn read(text: &str) -> Result<Since, String> {
 
 // spec: site-kit/SPEC.md §check-docs-since — the governed set: the files SITE_KIT_SINCE_PAGES's
 // globs match from the work-tree top, pruned as every corpus glob is
-pub fn pages() -> Result<Vec<String>, String> {
-    pages_fault().map_err(|f| f.message)
-}
-
-fn pages_fault() -> Result<Vec<String>, Fault> {
+pub fn pages() -> Result<Vec<String>, Fault> {
     let globs = spec::knob_array_pub(PAGES_KNOB).map_err(Fault::refused)?;
     if globs.is_empty() {
         return Ok(Vec::new());
@@ -83,18 +79,14 @@ pub enum Note {
 
 // spec: site-kit/SPEC.md §check-docs-since — the note the rule reads: off while the notes knob is
 // empty, and two untagged notes are a state the release choreography does not admit
-pub fn note() -> Result<Note, String> {
-    note_fault().map_err(|f| f.message)
-}
-
-fn note_fault() -> Result<Note, Fault> {
+pub fn note() -> Result<Note, Fault> {
     let dirs = walk::knob_words(NOTES_KNOB).map_err(Fault::refused)?;
     let Some(dir) = dirs.first() else {
         return Ok(Note::Off);
     };
     let dir = dir.trim_end_matches('/').to_string();
     if !Path::new(&dir).is_dir() {
-        return Err(Fault::input(format!("release notes dir not found: {}", dir)));
+        return Err(Fault::refused(format!("release notes dir not found: {}", dir)));
     }
     let mut untagged = untagged_notes(Path::new(&dir)).map_err(Fault::input)?;
     match untagged.len() {
@@ -130,11 +122,11 @@ pub fn rewrite(text: &str, line: usize, version: &str) -> String {
 // `--write` rewrites them; with no untagged note there is no version to write, so it refuses
 pub fn emit(args: &[String]) -> Result<String, Fault> {
     let write = args.iter().any(|a| a == "--write");
-    let pages = pages_fault()?;
+    let pages = pages()?;
     if pages.is_empty() {
         return Ok(format!("docs-since: {} matches no page — no page is governed\n", PAGES_KNOB));
     }
-    apply(&pages, note_fault()?, write)
+    apply(&pages, note()?, write)
 }
 
 fn apply(pages: &[String], note: Note, write: bool) -> Result<String, Fault> {

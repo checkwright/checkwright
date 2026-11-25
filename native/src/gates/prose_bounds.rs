@@ -331,9 +331,13 @@ fn merge_overlaps(keys: &[&String]) -> Vec<String> {
 
 // spec: canon-kit/SPEC.md §check-prose-bounds — the ceiling: a `# contract:` header, then one
 // `<n> <path>` row per governed file with findings; a malformed row or a repeated path refuses
-fn ceiling(path: &str) -> Result<BTreeMap<String, usize>, String> {
-    let text = std::fs::read_to_string(path)
-        .map_err(|e| format!("CANON_KIT_PROSE_BOUND_CEILING_FILE names '{}', which cannot be read: {} — treating as failure (not clean)", path, e))?;
+fn ceiling(path: &str) -> Result<BTreeMap<String, usize>, Fault> {
+    let text = std::fs::read_to_string(path).map_err(|e| {
+        Fault::reading(
+            path,
+            format!("CANON_KIT_PROSE_BOUND_CEILING_FILE names '{}', which cannot be read: {} — treating as failure (not clean)", path, e),
+        )
+    })?;
     let mut rows: BTreeMap<String, usize> = BTreeMap::new();
     for (i, raw) in text.lines().enumerate() {
         let l = raw.trim();
@@ -350,10 +354,10 @@ fn ceiling(path: &str) -> Result<BTreeMap<String, usize>, String> {
             }
         });
         let Some((n, p)) = parsed else {
-            return Err(format!("{}:{}: '{}' is not a '<n> <path>' row with a positive count — treating as failure (not clean)", path, i + 1, l));
+            return Err(Fault::input(format!("{}:{}: '{}' is not a '<n> <path>' row with a positive count — treating as failure (not clean)", path, i + 1, l)));
         };
         if rows.insert(p.clone(), n).is_some() {
-            return Err(format!("{}:{}: a second row for '{}' — treating as failure (not clean)", path, i + 1, p));
+            return Err(Fault::input(format!("{}:{}: a second row for '{}' — treating as failure (not clean)", path, i + 1, p)));
         }
     }
     Ok(rows)
@@ -371,7 +375,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         repeat_min: bound("CANON_KIT_PROSE_BOUND_REPEAT_MIN").map_err(Fault::refused)?.unwrap_or(usize::MAX),
     };
     let ceiling_file = walk::knob_scalar("CANON_KIT_PROSE_BOUND_CEILING_FILE").map_err(Fault::refused)?;
-    let rows = if ceiling_file.is_empty() { None } else { Some(ceiling(&ceiling_file).map_err(Fault::input)?) };
+    let rows = if ceiling_file.is_empty() { None } else { Some(ceiling(&ceiling_file)?) };
 
     let globs: Vec<String> = walk::knob_array("CANON_KIT_PROSE_BOUND_GLOBS").map_err(Fault::refused)?
         .into_iter()

@@ -184,9 +184,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     // spec: gate-sdk/SPEC.md §upgrade-smoke — the surface's required header line, checked before any
     // section is read, so a missing surface refuses here rather than reading as the empty set; a
     // `## ` section heading on the first line is a surface that lost its header, not one carrying it
-    let decl_text = std::fs::read(decl_file)
-        .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .unwrap_or_default();
+    let decl_text = crate::exit::read_configured(decl_file, "declaration surface")?;
     if !decl_text.lines().next().unwrap_or("").starts_with("# ") {
         return Err(Fault::input(format!("{} is missing its required header line, so the declaration surface cannot be established (gate-sdk/SPEC.md §upgrade-smoke owns its contract)", decl_file)));
     }
@@ -228,7 +226,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         let (carrier, now) = table_of(&pages)?;
         let page = carrier.unwrap_or_else(|| install_docs::names(&pages));
         let (base_name, base) = match args.get(3).filter(|a| !a.is_empty()) {
-            Some(b) => (b.clone(), read_text(b).map_err(Fault::input)?),
+            Some(b) => (b.clone(), read_text(b).map_err(|e| Fault::reading(b, e))?),
             None => match previous_tag(note_v)? {
                 Some(t) => (t.clone(), table_of(&pages_at(&t, &page_paths).map_err(Fault::tool)?)?.1),
                 None => ("no previous release".to_string(), String::new()),

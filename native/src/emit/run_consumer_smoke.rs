@@ -440,7 +440,7 @@ fn probe(tree: &str, checks_dir: &str, gate: &str) -> Result<Probe, Outcome> {
     }
     let inv = match registry::invocation(gate, &decl, &path) {
         Ok(i) => i,
-        Err(e) => return Ok(Probe::HarnessError(e)),
+        Err(e) => return Ok(Probe::HarnessError(e.message)),
     };
     let args: Vec<&str> = inv.args.iter().map(String::as_str).collect();
     let mut locator = vec![("GATE_SDK_ROOT".to_string(), format!("{}/gate-sdk", tree))];

@@ -92,7 +92,7 @@ pub fn run(args: &[String]) -> i32 {
                 "check-settings-pins: settings file not readable: {}",
                 settings_file
             );
-            return if std::path::Path::new(&settings_file).exists() { exit::INPUT } else { exit::REFUSED };
+            return if std::path::Path::new(&settings_file).is_file() { exit::INPUT } else { exit::REFUSED };
         }
     };
     let doc: Value = match serde_json::from_str(&settings_text) {

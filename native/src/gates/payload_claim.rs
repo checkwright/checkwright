@@ -30,13 +30,13 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         println!("PAYLOAD-CLAIM: clean (not applicable: no disclosure vocabulary configured — nothing to hold)");
         return Ok(0);
     }
-    let claims = spec::claim_vocabulary("CANON_KIT_PAYLOAD_CLAIMS_CMD").map_err(Fault::refused)?;
+    let claims = spec::claim_vocabulary("CANON_KIT_PAYLOAD_CLAIMS_CMD")?;
     if claims.is_empty() {
         println!("PAYLOAD-CLAIM: clean (not applicable: CANON_KIT_PAYLOAD_CLAIMS_CMD declared no disclosure classes)");
         return Ok(0);
     }
 
-    let files = spec::governed_docs(root, "CANON_KIT_PAYLOAD_CLAIM_EXCLUDE").map_err(Fault::refused)?;
+    let files = spec::governed_docs(root, "CANON_KIT_PAYLOAD_CLAIM_EXCLUDE").map_err(Fault::input)?;
     if files.is_empty() {
         println!("PAYLOAD-CLAIM: clean (not applicable: 0 governed doc(s) found)");
         return Ok(0);

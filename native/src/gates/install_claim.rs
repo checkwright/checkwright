@@ -29,13 +29,13 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         println!("INSTALL-CLAIM: clean (not applicable: no transport vocabulary or install-section regex configured — nothing to hold)");
         return Ok(0);
     }
-    let transports = spec::claim_vocabulary("CANON_KIT_INSTALL_TRANSPORTS_CMD").map_err(Fault::refused)?;
+    let transports = spec::claim_vocabulary("CANON_KIT_INSTALL_TRANSPORTS_CMD")?;
     if transports.is_empty() {
         println!("INSTALL-CLAIM: clean (not applicable: CANON_KIT_INSTALL_TRANSPORTS_CMD declared no transports)");
         return Ok(0);
     }
 
-    let files = governed_docs(root, "CANON_KIT_INSTALL_CLAIM_EXCLUDE").map_err(Fault::refused)?;
+    let files = governed_docs(root, "CANON_KIT_INSTALL_CLAIM_EXCLUDE").map_err(Fault::input)?;
     if files.is_empty() {
         println!("INSTALL-CLAIM: clean (not applicable: 0 governed doc(s) found)");
         return Ok(0);

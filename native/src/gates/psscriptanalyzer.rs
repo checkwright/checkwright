@@ -57,9 +57,10 @@ fn targets(args: &[String]) -> Result<(Vec<String>, Vec<String>), Fault> {
 
 fn exec_targets(gates_dir: &str, kit_roots: &[String]) -> Result<Vec<String>, String> {
     let list = registry::list_path(gates_dir);
-    let Ok(text) = std::fs::read(&list) else {
+    if !std::path::Path::new(&list).exists() {
         return Ok(Vec::new());
-    };
+    }
+    let text = std::fs::read(&list).map_err(|e| format!("cannot read {}: {}", list, e))?;
     let dirs = registry::resolve_dirs(gates_dir, kit_roots);
     let mut out: Vec<String> = Vec::new();
     for m in registry::members(&String::from_utf8_lossy(&text)) {

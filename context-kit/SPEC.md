@@ -32,7 +32,7 @@ A consumer's product-shaped surfaces (proto and diagram indexes, its doc roster,
 
   Matching is **exact on the heading's text**: empty on a near miss, correct on an exact query, a stated limit rather than a defect.
 
-  **Its declared knob roster is empty**, since the arm resolves no knob; it is still an arm-table row, because table membership is what makes `--emit md-section` reach it. Exit `0` prints the section on stdout. Exit **`2`** prints a diagnostic on stderr for a missing argument and a query matching no heading, and exit **`3`** for a file that cannot be read, a missing one included.
+  **Its declared knob roster is empty**, since the arm resolves no knob; it is still an arm-table row, because table membership is what makes `--emit md-section` reach it. Exit `0` prints the section on stdout. Exit **`2`** prints a diagnostic on stderr for a missing argument and a query matching no heading, and exit **`3`** for a file that cannot be read; a missing one exits **`2`** (gate-sdk/SPEC.md §Output contract).
 
 - **`--emit pub-index [paths…]`** — compact public API surface: every public item with kind, name, and line, sorted by kind then name, in a per-file block headed by a count. It is a **dispatcher over per-language extractors** with three jobs. It walks with `md-index`'s walk and `CONTEXT_KIT_PRUNE_DIRS`, sorts by kind then name (bytewise, then the whole row), and formats rows under a `<rel>  (<count>)` block header, which the index-tests goldens assert exactly.
 

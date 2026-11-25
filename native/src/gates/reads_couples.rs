@@ -472,7 +472,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         // call rather than a spawn of the arm, which is what dissolves this member's own `c7`.
         // spec: gate-sdk/SPEC.md §check-reads-couples — an exec member's reads are undecidable to
         // any reader here, so it is counted and skipped, never asked to answer by argv
-        let substrate = crate::registry::substrate(src).map_err(Fault::input)?;
+        let substrate = crate::registry::substrate(src).map_err(|e| Fault::reading(src, e))?;
         if let crate::registry::Substrate::Exec(_) = substrate {
             exec_members += 1;
             continue;
@@ -729,9 +729,9 @@ mod tests {
             let spec = vec!["tools/alpha/SPEC.md".to_string()];
             let alpha = vec!["check-alpha".to_string()];
             let names = |s: Vec<crate::runner::Selected>| -> Vec<String> { s.into_iter().map(|s| s.name).collect() };
-            let hook = names(crate::emit::git_hook::precommit_selection(&alpha, &resolve_dirs, &here, &spec, Path::new(&repo))?);
+            let hook = names(crate::emit::git_hook::precommit_selection(&alpha, &resolve_dirs, &here, &spec, Path::new(&repo)).map_err(|f| f.message)?);
             let select = |roots: &[String]| -> Result<Vec<String>, String> {
-                Ok(names(crate::runner::select(&alpha, &resolve_dirs, roots, &spec, None)?.run))
+                Ok(names(crate::runner::select(&alpha, &resolve_dirs, roots, &spec, None).map_err(|f| f.message)?.run))
             };
             let (selected, selected_parent) = (select(&here)?, select(&parent)?);
             Ok((hook, here, parent, selected, selected_parent))

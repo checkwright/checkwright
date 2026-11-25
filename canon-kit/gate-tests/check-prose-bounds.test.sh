@@ -85,7 +85,7 @@ check_case "duplicate-row" 3 "a second row for 'b.md'" "$out" "$rc"
 
 rm -f "$SANDBOX/ceiling.txt"
 out="$(run)"; rc=$?
-check_case "absent-file" 3 "cannot be read" "$out" "$rc"
+check_case "absent-file" 2 "cannot be read" "$out" "$rc"
 
 out="$(run CANON_KIT_PROSE_BOUND_CEILING_FILE=)"; rc=$?
 check_case "worklist" 1 "3 finding(s) across 2 governed file(s)" "$out" "$rc"

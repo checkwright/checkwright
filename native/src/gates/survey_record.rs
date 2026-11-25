@@ -249,7 +249,7 @@ pub fn run(args: &[String]) -> i32 {
             };
             // spec: lifecycle-kit/SPEC.md §check-survey-record — an absent record is clean and
             // counted inert: the surface is optional
-            if !Path::new(&p).is_file() {
+            if !Path::new(&p).exists() {
                 println!(
                     "SURVEY-RECORD: clean (not applicable: no record at {} — no survey filed this iteration)",
                     p

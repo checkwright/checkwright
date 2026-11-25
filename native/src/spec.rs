@@ -1,6 +1,7 @@
 // spec: canon-kit/SPEC.md §The shared spec adapters — the binary side of the corpus primitive the
 // manifest-narration gate family shares: ported once and proved N times, so a per-gate
 // copy of the derivation has no place to exist
+use crate::exit::Fault;
 use crate::programs;
 use crate::walk;
 use std::path::{Path, PathBuf};
@@ -598,7 +599,7 @@ pub fn command(knob: &str) -> Result<Vec<String>, String> {
 }
 
 type Lines = Vec<(String, String)>;
-type Spawned = Mutex<Vec<((String, Vec<String>), Result<Lines, String>)>>;
+type Spawned = Mutex<Vec<((String, Vec<String>), Result<Lines, Fault>)>>;
 
 fn spawned() -> &'static Spawned {
     static SPAWNED: Spawned = Mutex::new(Vec::new());
@@ -606,32 +607,33 @@ fn spawned() -> &'static Spawned {
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — the argv spawned once per process and read as
-// `<first>⇥<second>` lines under the two validation contracts that section states
-fn command_lines(knob: &'static str, slug_keyed: bool) -> Result<Lines, String> {
-    let argv = command(knob)?;
+// `<first>⇥<second>` lines under the two validation contracts that section states: a malformed
+// knob is refused, a command that cannot run is a tool error and output that does not parse input
+fn command_lines(knob: &'static str, slug_keyed: bool) -> Result<Lines, Fault> {
+    let argv = command(knob).map_err(Fault::refused)?;
     let key = (knob.to_string(), argv.clone());
     if let Some((_, r)) = spawned().lock().unwrap_or_else(|e| e.into_inner()).iter().find(|(k, _)| *k == key) {
         return r.clone();
     }
-    let parse = || -> Result<Lines, String> {
+    let parse = || -> Result<Lines, Fault> {
         let Some((program, rest)) = argv.split_first() else {
             return Ok(Vec::new());
         };
         let args: Vec<&str> = rest.iter().map(String::as_str).collect();
         let program = programs::Program::consumer(knob, program.as_str());
-        let done = crate::proc::run(&program, &args).map_err(|e| format!("{}: {}", knob, e))?;
+        let done = crate::proc::run(&program, &args).map_err(|e| Fault::tool(format!("{}: {}", knob, e)))?;
         let Some(stdout) = done.stdout() else {
-            return Err(format!(
+            return Err(Fault::tool(format!(
                 "{} exited {} — the vocabulary could not be read; treating as failure (not clean) ({})",
                 knob,
                 done.reported_code(),
                 done.failure_report().unwrap_or_default()
-            ));
+            )));
         };
         let text = String::from_utf8_lossy(stdout).into_owned();
         let mut out: Lines = Vec::new();
         let refuse = |what: &str, line: &str| {
-            Err(format!("{}: {}: '{}' — treating as failure (not clean)", knob, what, line))
+            Err(Fault::input(format!("{}: {}: '{}' — treating as failure (not clean)", knob, what, line)))
         };
         for line in text.lines().filter(|l| !l.is_empty()) {
             let Some((first, second)) = line.split_once('\t') else {
@@ -661,21 +663,21 @@ fn command_lines(knob: &'static str, slug_keyed: bool) -> Result<Lines, String> 
 }
 
 // spec: canon-kit/SPEC.md §check-prose-enum — `<set-name>⇥<member>` lines, a set spanning many
-pub fn enum_sets() -> Result<Lines, String> {
+pub fn enum_sets() -> Result<Lines, Fault> {
     command_lines("CANON_KIT_ENUM_SETS_CMD", false)
 }
 
 // spec: canon-kit/SPEC.md §check-measured-claim — `<key>⇥<value>` lines, one per slug-shaped key
-pub fn measured_claims() -> Result<Lines, String> {
+pub fn measured_claims() -> Result<Lines, Fault> {
     command_lines("CANON_KIT_MEASURED_CLAIMS_CMD", true)
 }
 
 // spec: canon-kit/SPEC.md §The shared spec adapters — a claim vocabulary's `<id>⇥<ERE>` lines, every
 // pattern compiled before the first corpus line is read
-pub fn claim_vocabulary(cmd_knob: &'static str) -> Result<Vec<(String, crate::ere::Ere)>, String> {
+pub fn claim_vocabulary(cmd_knob: &'static str) -> Result<Vec<(String, crate::ere::Ere)>, Fault> {
     let mut out: Vec<(String, crate::ere::Ere)> = Vec::new();
     for (id, p) in command_lines(cmd_knob, true)? {
-        let ere = compile_pattern(&p, cmd_knob)?;
+        let ere = compile_pattern(&p, cmd_knob).map_err(Fault::input)?;
         out.push((id, ere));
     }
     Ok(out)

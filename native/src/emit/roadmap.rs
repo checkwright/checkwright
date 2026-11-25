@@ -93,7 +93,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         file
     };
     let text = std::fs::read_to_string(&file)
-        .map_err(|_| Fault::input(format!("queue file not found: {}", file)))?;
+        .map_err(|_| Fault::reading(&file, format!("queue file not found: {}", file)))?;
     let horizons = queue::knob_array("QUEUE_KIT_HORIZONS").map_err(Fault::refused)?;
     if horizons.is_empty() {
         return Err(Fault::refused(
@@ -114,7 +114,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         ));
     }
     if !std::path::Path::new(&page).is_file() {
-        return Err(Fault::input(format!("projection page not found: {}", page)));
+        return Err(Fault::refused(format!("projection page not found: {}", page)));
     }
     let name = queue::knob_scalar("QUEUE_KIT_ROADMAP_MARKER").map_err(Fault::refused)?;
     marker::write_block(&page, &begin(&name), &end(&name), &text).map_err(Fault::input)?;

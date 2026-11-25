@@ -38,7 +38,7 @@ fn findings(pages: &[(String, String)], note: &Note) -> Result<Vec<Finding>, Str
 }
 
 fn rule(_args: &[String]) -> Result<i32, Fault> {
-    let pages = docs_since::pages().map_err(Fault::refused)?;
+    let pages = docs_since::pages()?;
     if pages.is_empty() {
         println!("DOCS-SINCE: clean (not applicable: {} matches no page — no page is governed, 0 checked)", docs_since::PAGES_KNOB);
         return Ok(0);
@@ -50,7 +50,7 @@ fn rule(_args: &[String]) -> Result<i32, Fault> {
             .map_err(|e| Fault::input(format!("cannot read {}: {}", page, e)))?;
         texts.push((page.clone(), text));
     }
-    let note = docs_since::note().map_err(Fault::refused)?;
+    let note = docs_since::note()?;
     let found = findings(&texts, &note).map_err(Fault::input)?;
     if found.is_empty() {
         let rule = match &note {

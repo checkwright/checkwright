@@ -48,8 +48,8 @@ pub fn run(_args: &[String]) -> i32 {
     }
     let listing = match std::fs::read(&list) {
         Ok(b) => String::from_utf8_lossy(&b).into_owned(),
-        Err(_) => {
-            eprintln!("check-gate-fixture-coverage: no members parsed from {}", list);
+        Err(e) => {
+            eprintln!("check-gate-fixture-coverage: cannot read {}: {}", list, e);
             return exit::INPUT;
         }
     };
@@ -69,7 +69,13 @@ pub fn run(_args: &[String]) -> i32 {
         if let Some(src) = registry::resolve(m, &resolve_dirs) {
             match registry::substrate(&src) {
                 Ok(registry::Substrate::Exec(_)) => {
-                    let text = std::fs::read(&src).map(|b| String::from_utf8_lossy(&b).into_owned()).unwrap_or_default();
+                    let text = match std::fs::read(&src) {
+                        Ok(b) => String::from_utf8_lossy(&b).into_owned(),
+                        Err(e) => {
+                            eprintln!("check-gate-fixture-coverage: cannot read {}: {}", src, e);
+                            return exit::INPUT;
+                        }
+                    };
                     if fresh::file_lines(&text).iter().any(|l| l.starts_with("# no-fixture:")) {
                         exec_optout.push(format!("{} ({} carries '# exec:' and '# no-fixture:')", m, src));
                     }
@@ -99,9 +105,13 @@ pub fn run(_args: &[String]) -> i32 {
             continue;
         };
         total += 1;
-        let declared = std::fs::read(&src)
-            .map(|b| String::from_utf8_lossy(&b).into_owned())
-            .unwrap_or_default();
+        let declared = match std::fs::read(&src) {
+            Ok(b) => String::from_utf8_lossy(&b).into_owned(),
+            Err(e) => {
+                eprintln!("check-gate-fixture-coverage: cannot read {}: {}", src, e);
+                return exit::INPUT;
+            }
+        };
         if fresh::file_lines(&declared)
             .iter()
             .any(|l| l.starts_with("# no-fixture:"))

@@ -230,7 +230,7 @@ fn check_operand(
     seen: &[Planned],
 ) -> Result<(String, Vec<u8>), Fault> {
     let path = Path::new(op);
-    let meta = std::fs::symlink_metadata(path).map_err(|_| Fault::input(format!("no such file: {}", op)))?;
+    let meta = std::fs::symlink_metadata(path).map_err(|_| Fault::refused(format!("no such file: {}", op)))?;
     if meta.file_type().is_symlink() {
         return Err(Fault::refused(format!("refusing {} — a symlink", op)));
     }

@@ -18,12 +18,12 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     let page = fresh::positional_or_knob(args, 0, install_size::PAGE_KNOB).map_err(Fault::refused)?;
     let (want, source) = match args.get(1).filter(|a| !a.is_empty()) {
         Some(e) => {
-            let text = fresh::read_captured(e).map_err(|err| Fault::input(format!("{}: {}", e, err)))?;
+            let text = fresh::read_captured(e).map_err(|err| Fault::reading(e, format!("{}: {}", e, err)))?;
             (format!("\n{}\n", text.trim_matches('\n')), e.to_string())
         }
         None => (install_size::render().map_err(Fault::input)?, "the index".to_string()),
     };
-    let text = fresh::read_captured(&page).map_err(|e| Fault::input(format!("{}: {}", page, e)))?;
+    let text = fresh::read_captured(&page).map_err(|e| Fault::reading(&page, format!("{}: {}", page, e)))?;
     let blk = install_size::block(&page, &text).map_err(Fault::input)?;
     if blk.actual != want {
         println!(

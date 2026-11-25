@@ -55,7 +55,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         a.file.clone()
     };
     let text = std::fs::read_to_string(&file)
-        .map_err(|e| Fault::input(format!("file not found: {}: {}", file, e)))?;
+        .map_err(|e| Fault::reading(&file, format!("file not found: {}: {}", file, e)))?;
     let sec = Sections::active_and_deferred().map_err(Fault::refused)?;
     Ok(match &a.by {
         Some(tag) => render_by(&text, &sec, tag),

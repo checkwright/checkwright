@@ -32,7 +32,7 @@ check_case() {  # $1=label  $2=want-rc  $3=want-substring  $4=queue path
 check_case "absent-queue-is-not-applicable" 0 "clean (not applicable: no queue file at" "$SANDBOX/TASK-QUEUE.md"
 
 mkdir -p "$SANDBOX/dirqueue"
-check_case "non-file-queue-fails-closed" 2 "not a file" "$SANDBOX/dirqueue"
+check_case "non-file-queue-fails-closed" 3 "not a file" "$SANDBOX/dirqueue"
 
 if [[ "$fails" -gt 0 ]]; then
     echo "check-todo-task-liveness.test.sh: $fails case(s) failed"

@@ -157,7 +157,7 @@ pub fn run(args: &[String]) -> i32 {
     };
     let path = std::path::Path::new(target);
     if !path.is_file() {
-        return refuse(exit::INPUT, &format!("no such script: {}", target));
+        return refuse(exit::REFUSED, &format!("no such script: {}", target));
     }
     // spec: guard-kit/SPEC.md §scratch-run — the leaf is rejoined after the crossing rather than
     // canonicalized with it, which is the shell's `cd "$(dirname)" && pwd -P` exactly: a symlinked

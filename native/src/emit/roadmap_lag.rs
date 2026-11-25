@@ -122,7 +122,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         }
     }
     let file = if file.is_empty() { queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)? } else { file };
-    let text = std::fs::read_to_string(&file).map_err(|_| Fault::input(format!("queue file not found: {}", file)))?;
+    let text = std::fs::read_to_string(&file).map_err(|_| Fault::reading(&file, format!("queue file not found: {}", file)))?;
     let horizons = queue::knob_array("QUEUE_KIT_HORIZONS").map_err(Fault::refused)?;
     let Some(first) = horizons.first() else {
         return Err(Fault::refused("QUEUE_KIT_HORIZONS is empty — no roadmap vocabulary is configured"));

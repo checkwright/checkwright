@@ -145,11 +145,11 @@ pub fn run(args: &[String]) -> i32 {
         }
     };
 
-    let text = match std::fs::read_to_string(&brevity_file) {
+    let text = match exit::read_configured(&brevity_file, "governed file") {
         Ok(t) => t,
-        Err(_) => {
-            eprintln!("check-brevity: file not found: {}", brevity_file);
-            return exit::REFUSED;
+        Err(fault) => {
+            eprintln!("check-brevity: {}", fault);
+            return fault.status();
         }
     };
 

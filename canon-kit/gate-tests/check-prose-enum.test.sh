@@ -44,14 +44,14 @@ CANON_KIT_ENUM_SETS_CMD[] = bash
 CANON_KIT_ENUM_SETS_CMD[] = -c
 CANON_KIT_ENUM_SETS_CMD[] = echo hi; exit 4
 EOF
-check_case "cmd-error-fail-closed" 2 "" CANON_KIT_KNOB_FILE="$SANDBOX/boom.knobs"
+check_case "cmd-error-fail-closed" 3 "" CANON_KIT_KNOB_FILE="$SANDBOX/boom.knobs"
 
 # Fail-closed: an emitted line with no tab does not parse.
 cat >"$SANDBOX/notab.knobs" <<'EOF'
 CANON_KIT_ENUM_SETS_CMD[] = printf
 CANON_KIT_ENUM_SETS_CMD[] = sig-no-tab-here\n
 EOF
-check_case "cmd-unparsable-fail-closed" 2 "" CANON_KIT_KNOB_FILE="$SANDBOX/notab.knobs"
+check_case "cmd-unparsable-fail-closed" 3 "" CANON_KIT_KNOB_FILE="$SANDBOX/notab.knobs"
 
 # Bracketed matching: the same member reads inside [alpha] tag syntax, so a
 # bracketed hand list that drops gamma trips just as a bare list does — the path

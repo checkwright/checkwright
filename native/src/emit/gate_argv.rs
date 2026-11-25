@@ -8,8 +8,9 @@ pub const KNOBS: &[&str] = &["GATE_SDK_POWERSHELL"];
 
 pub const USAGE: &str = "usage: --emit gate-argv <declaration>
   <declaration> is a resolved <dir>/<name>.sh or <dir>/<name>.gate; prints its invocation argv,
-  one element per line, and refuses at exit 2 where the member cannot start, or fails at exit 3
-  where this binary's own path cannot be resolved.";
+  one element per line; exits 2 where a knob it needs is unset or the declaration is absent, and 3
+  where the member cannot start, its declaration cannot be read or parsed, or this binary's own
+  path cannot be resolved.";
 
 pub fn emit(args: &[String]) -> Result<String, Fault> {
     let [decl] = args else {
@@ -26,10 +27,10 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         .map_err(|e| Fault::tool(format!("cannot resolve this binary's own path: {}", e)))?
         .display()
         .to_string();
-    argv(name, decl, &exe).map_err(Fault::refused)
+    argv(name, decl, &exe)
 }
 
-fn argv(name: &str, decl: &str, exe: &str) -> Result<String, String> {
+fn argv(name: &str, decl: &str, exe: &str) -> Result<String, Fault> {
     let inv = registry::invocation(name, decl, exe)?;
     let mut out = format!("{}\n", inv.program.invocation());
     for a in inv.args {

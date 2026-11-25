@@ -288,9 +288,10 @@ fn publication(
     args: &[String],
     findings: &mut Vec<String>,
 ) -> Result<String, Fault> {
-    let pin = pin_of(install_sh, &fresh::read_captured(install_sh).map_err(Fault::input)?, "pin").map_err(Fault::input)?;
+    let pin = pin_of(install_sh, &fresh::read_captured(install_sh).map_err(|e| Fault::reading(install_sh, e))?, "pin").map_err(Fault::input)?;
     let tag = format!("v{}", pin);
-    let market = json(marketplace)?;
+    let market: Value = serde_json::from_str(&std::fs::read_to_string(marketplace).map_err(|e| Fault::input(format!("cannot read {}: {}", marketplace, e)))?)
+        .map_err(|e| Fault::input(format!("{} is not JSON: {}", marketplace, e)))?;
     let entries = market.get("plugins").and_then(Value::as_array).cloned().unwrap_or_default();
     let slug = portable
         .get("repository")
@@ -499,7 +500,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
 
     // spec: plugin/SPEC.md §check-plugin-parity — the marketplace installs `plugin/` alone, so its
     // license text is a tracked byte copy of the root file (F)
-    let want_license = std::fs::read(&root_license).map_err(|e| Fault::input(format!("cannot read {}: {}", root_license, e)))?;
+    let want_license = std::fs::read(&root_license).map_err(|e| Fault::reading(&root_license, format!("cannot read {}: {}", root_license, e)))?;
     let license_path = format!("{}/{}", plugin, PLUGIN_LICENSE);
     let license_state = match std::fs::read(&license_path) {
         Ok(got) if got == want_license => None,

@@ -25,7 +25,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     let (index, full) = llms::paths(&root);
     let mut stale: Vec<&str> = Vec::new();
     for (path, want) in [(index.as_str(), &r.index), (full.as_str(), &r.full)] {
-        let have = fresh::read_captured(path).map_err(|e| Fault::input(format!("{}: {}", path, e)))?;
+        let have = fresh::read_captured(path).map_err(|e| Fault::reading(path, format!("{}: {}", path, e)))?;
         if &have != want {
             stale.push(path);
         }

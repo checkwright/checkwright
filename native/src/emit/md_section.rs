@@ -62,9 +62,9 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         _ => return Err(Fault::usage(USAGE)),
     };
     if !std::path::Path::new(file).is_file() {
-        return Err(Fault::input(format!("file not found: {}", file)));
+        return Err(Fault::refused(format!("file not found: {}", file)));
     }
-    let text = super::read_text(file).map_err(Fault::input)?;
+    let text = super::read_text(file).map_err(|m| Fault::reading(file, m))?;
     let lines = section::split_lines(&text);
     let (start, end) = locate(&lines, query).ok_or_else(|| Fault::refused(format!("no heading matched: {}", query)))?;
     let mut out = String::new();

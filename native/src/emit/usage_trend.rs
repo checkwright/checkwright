@@ -348,7 +348,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         )));
     }
     let body = std::fs::read_to_string(&history)
-        .map_err(|_| Fault::input(format!("cannot read history {}", history)))?;
+        .map_err(|_| Fault::reading(&history, format!("cannot read history {}", history)))?;
     let pause7 = walk::knob_scalar(PAUSE_KNOB).map_err(Fault::refused)?;
 
     let mut recs = parse(&body);

@@ -19,7 +19,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     let page = fresh::positional_or_knob(args, 1, release_table::PAGE_KNOB).map_err(Fault::refused)?;
     let (posts, page) = (posts.as_str(), page.as_str());
     let want = release_table::render(posts, page).map_err(Fault::input)?;
-    let text = fresh::read_captured(page).map_err(|e| Fault::input(format!("{}: {}", page, e)))?;
+    let text = fresh::read_captured(page).map_err(|e| Fault::reading(page, format!("{}: {}", page, e)))?;
     let blk = release_table::block(page, &text).map_err(Fault::input)?;
     if blk.actual != want {
         println!(

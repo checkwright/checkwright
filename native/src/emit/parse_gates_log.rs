@@ -67,9 +67,9 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         return Err(Fault::usage(format!("needs a <log>\n{}", USAGE)));
     }
     if !std::path::Path::new(log).is_file() {
-        return Err(Fault::input(format!("log not found: {}", log)));
+        return Err(Fault::refused(format!("log not found: {}", log)));
     }
-    let text = super::read_text(log).map_err(Fault::input)?;
+    let text = super::read_text(log).map_err(|m| Fault::reading(log, m))?;
     let mut out = String::new();
     for line in text.lines() {
         if let Some(row) = tail(line) {

@@ -74,7 +74,7 @@ pub(crate) fn precommit_selection(
     kit_roots_here: &[String],
     staged: &[String],
     top: &Path,
-) -> Result<Vec<Selected>, String> {
+) -> Result<Vec<Selected>, Fault> {
     let s = runner::select(members, resolve_dirs, kit_roots_here, staged, Some("precommit"))?;
     let mut out: Vec<Selected> = Vec::new();
     for mut sel in s.run {
@@ -89,7 +89,7 @@ pub(crate) fn precommit_selection(
     Ok(out)
 }
 
-fn commit_msg_selection(members: &[String], resolve_dirs: &[String], file: &str) -> Result<Vec<Selected>, String> {
+fn commit_msg_selection(members: &[String], resolve_dirs: &[String], file: &str) -> Result<Vec<Selected>, Fault> {
     let mut out: Vec<Selected> = Vec::new();
     for m in members {
         let Some(src) = registry::resolve(m, resolve_dirs) else { continue };
@@ -152,8 +152,7 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Fault
     let env = pin().map_err(Fault::tool)?;
     let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
     let list = registry::list_path(&gates_dir);
-    let text = std::fs::read_to_string(&list)
-        .map_err(|e| Fault::input(format!("cannot read the registry {}: {}", list, e)))?;
+    let text = crate::exit::read_configured(&list, "registry")?;
     let members = first_seen(&text);
     let resolve_dirs = registry::resolve_dirs(&gates_dir, &walk::kit_roots_abs().map_err(Fault::refused)?);
     let selected = match hook {
@@ -163,9 +162,8 @@ fn run_over(hook: &Hook, paths: &[String]) -> Result<(i32, String, usize), Fault
             &walk::kit_roots().map_err(Fault::refused)?,
             paths,
             Path::new("."),
-        )
-        .map_err(Fault::input)?,
-        Hook::CommitMsg(file) => commit_msg_selection(&members, &resolve_dirs, file).map_err(Fault::input)?,
+        )?,
+        Hook::CommitMsg(file) => commit_msg_selection(&members, &resolve_dirs, file)?,
     };
     // spec: gate-sdk/SPEC.md §git-hook — a registry with no `tier=commit-msg` member exits 0
     // printing nothing, the summary line included
@@ -441,7 +439,7 @@ mod tests {
         let dirs = vec![checks.display().to_string()];
         let pick = |staged: &[&str]| -> Result<Vec<(String, Vec<String>)>, String> {
             let staged: Vec<String> = staged.iter().map(|s| s.to_string()).collect();
-            Ok(precommit_selection(&members, &dirs, &[], &staged, &base)?
+            Ok(precommit_selection(&members, &dirs, &[], &staged, &base).map_err(|f| f.message)?
                 .into_iter()
                 .map(|s| (s.name, s.args))
                 .collect())
@@ -508,8 +506,8 @@ mod tests {
             crate::knobs::reset(&env);
             let selected = walk::kit_roots_abs().and_then(|roots| {
                 let resolve_dirs = registry::resolve_dirs(&gates_dir, &roots);
-                let pre = precommit_selection(&members, &resolve_dirs, &roots, &staged, &repo)?;
-                Ok(pre.len() + commit_msg_selection(&members, &resolve_dirs, "m")?.len())
+                let pre = precommit_selection(&members, &resolve_dirs, &roots, &staged, &repo).map_err(|f| f.message)?;
+                Ok(pre.len() + commit_msg_selection(&members, &resolve_dirs, "m").map_err(|f| f.message)?.len())
             });
             match selected {
                 Ok(0) => failed.push(format!("{}: nothing selected", name)),

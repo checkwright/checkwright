@@ -111,7 +111,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         Some(a) => a.clone(),
         None => queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)?,
     };
-    let text = std::fs::read_to_string(&file).map_err(|_| Fault::refused(format!("file not found: {}", file)))?;
+    let text = crate::exit::read_configured(&file, "queue file")?;
 
     let mut findings: Vec<(usize, String, String)> = Vec::new();
 

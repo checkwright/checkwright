@@ -45,9 +45,15 @@ fn report() -> Result<String, Fault> {
         .map_err(Fault::refused)?
         .parse()
         .map_err(|_| Fault::refused("DRIFT_KIT_PRICE_COVERAGE_DAYS is not a non-negative integer"))?;
-    let table = std::fs::read(&table_path)
-        .ok()
-        .map(|b| String::from_utf8_lossy(&b).into_owned());
+    let table = if std::path::Path::new(&table_path).exists() {
+        Some(
+            std::fs::read(&table_path)
+                .map(|b| String::from_utf8_lossy(&b).into_owned())
+                .map_err(|e| Fault::input(format!("cannot read the price table {}: {}", table_path, e)))?,
+        )
+    } else {
+        None
+    };
     let prices = table.as_deref().map(Prices::parse);
     let var = |n: &str| std::env::var(n).unwrap_or_default();
     let pwd = var("PWD");

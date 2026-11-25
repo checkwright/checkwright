@@ -22,11 +22,11 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     } else {
         crate::walk::knob_array(ps::SITES_KNOB).map_err(Fault::refused)?
     };
-    let st = ps::parse(source, &fresh::read_captured(source).map_err(|e| Fault::input(format!("{}: {}", source, e)))?).map_err(Fault::input)?;
+    let st = ps::parse(source, &fresh::read_captured(source).map_err(|e| Fault::reading(source, format!("{}: {}", source, e)))?).map_err(Fault::input)?;
 
     let mut findings: Vec<String> = Vec::new();
     for site in &sites {
-        let text = fresh::read_captured(site).map_err(|e| Fault::input(format!("{}: {}", site, e)))?;
+        let text = fresh::read_captured(site).map_err(|e| Fault::reading(site, format!("{}: {}", site, e)))?;
         for (slot, want) in ps::check(site, &text, &st).map_err(Fault::input)? {
             if slot.actual != want {
                 findings.push(format!(

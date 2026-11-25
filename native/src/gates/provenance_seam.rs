@@ -63,7 +63,7 @@ fn rule(_args: &[String]) -> Result<i32, Fault> {
     let queue = spec::knob_pub("CANON_KIT_QUEUE_FILE").map_err(Fault::refused)?;
     let slugs: Option<Vec<String>> = if Path::new(&queue).exists() {
         let text = spec::read_text(Path::new(&queue)).map_err(Fault::input)?;
-        let mechanism = Mechanism::load(&roots).map_err(Fault::refused)?;
+        let mechanism = Mechanism::load(&roots)?;
         let mut v: Vec<String> = lead_slugs(&text)
             .into_iter()
             .filter(|s| s.len() >= floor)
@@ -168,17 +168,19 @@ struct Mechanism {
 }
 
 impl Mechanism {
-    fn load(roots: &[String]) -> Result<Self, String> {
-        let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR")?;
+    fn load(roots: &[String]) -> Result<Self, Fault> {
+        let gates_dir = walk::knob_scalar("GATE_SDK_GATES_DIR").map_err(Fault::refused)?;
         let kits = roots
             .iter()
             .map(|r| r.trim_end_matches('/'))
             .filter_map(|r| r.rsplit('/').next())
             .map(str::to_string)
             .collect();
-        let members = match std::fs::read_to_string(registry::list_path(&gates_dir)) {
-            Ok(text) => registry::members(&text),
-            Err(_) => Vec::new(),
+        let list = registry::list_path(&gates_dir);
+        let members = if Path::new(&list).exists() {
+            registry::members(&std::fs::read_to_string(&list).map_err(|e| Fault::input(format!("cannot read {}: {}", list, e)))?)
+        } else {
+            Vec::new()
         };
         let arms = crate::emit::arms()
             .into_iter()

@@ -170,7 +170,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     let files: Vec<String> = if !args.is_empty() {
         args.to_vec()
     } else {
-        corpus_at(".", &walk::kit_roots().map_err(Fault::refused)?).map_err(Fault::refused)?
+        corpus_at(".", &walk::kit_roots().map_err(Fault::refused)?).map_err(Fault::input)?
     };
     let ctx = Ctx {
         tracked: fch::tracked_files(&top).map_err(Fault::tool)?,

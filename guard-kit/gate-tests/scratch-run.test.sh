@@ -101,7 +101,7 @@ fi
 rm -rf "$scratch/escape"
 
 out="$(GATE_SDK_TMP_DIR="$scratch" bash "$RUN" --scratch-run "$scratch/absent.sh" 2>&1)"; rc=$?
-assert_rc  missing-target "$rc" 3
+assert_rc  missing-target "$rc" 2
 assert_has missing-target "no such script" "$out"
 
 out="$(GATE_SDK_TMP_DIR="$scratch" bash "$RUN" --scratch-run 2>&1)"; rc=$?

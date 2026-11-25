@@ -41,7 +41,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         println!("MEASURED-CLAIM: clean (not applicable: CANON_KIT_MEASURED_SURFACE_GLOBS empty — no scanned surface)");
         return Ok(0);
     }
-    let roster = spec::measured_claims().map_err(Fault::refused)?;
+    let roster = spec::measured_claims()?;
     let span = spec::measured_span().map_err(Fault::refused)?;
 
     let mut files: Vec<String> = walk::glob_corpus(Path::new(root), &globs).map_err(Fault::input)?

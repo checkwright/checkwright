@@ -49,14 +49,14 @@ fn git_ok(args: &[&str]) -> Result<Option<String>, Fault> {
 pub(crate) fn read(path: &str) -> Result<String, Fault> {
     std::fs::read(path)
         .map(|b| String::from_utf8_lossy(&b).into_owned())
-        .map_err(|e| Fault::input(format!("cannot read {}: {}", path, e)))
+        .map_err(|e| Fault::reading(path, format!("cannot read {}: {}", path, e)))
 }
 
 // spec: installer/SPEC.md §The front door's verbs — the tag the hosted pin names, or none where it
 // does not resolve here, as in a shallow checkout
 pub(crate) fn pinned_tag() -> Result<Option<String>, Fault> {
     let install_sh = crate::walk::knob_scalar("GATE_LOCAL_INSTALL_SH").map_err(Fault::refused)?;
-    let pin = pin_of(&install_sh, &fresh::read_captured(&install_sh).map_err(Fault::input)?, "pin").map_err(Fault::input)?;
+    let pin = pin_of(&install_sh, &fresh::read_captured(&install_sh).map_err(|e| Fault::reading(&install_sh, e))?, "pin").map_err(Fault::input)?;
     let tag = format!("v{}", pin);
     Ok(git_ok(&["rev-parse", "--verify", "--quiet", &format!("refs/tags/{}", tag)])?.map(|_| tag))
 }
@@ -89,7 +89,7 @@ pub(crate) fn iteration_disposition(
     let iteration = stages::header(&queue_text)
         .map(stages::header_iter)
         .ok_or_else(|| Fault::input(format!("{} carries no '## Iteration:' header", queue_path)))?;
-    let disp = if Path::new(disposition_path).is_file() {
+    let disp = if Path::new(disposition_path).exists() {
         disposition(disposition_path, &read(disposition_path)?, &iteration).map_err(Fault::input)?
     } else {
         Disposition::Absent

@@ -118,7 +118,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         None => walk::knob_scalar("DOCTRINE_KIT_DOCTRINE_FILE").map_err(Fault::refused)?,
     };
     let text = emit::read_text(&path)
-        .map_err(|_| Fault::input(format!("doctrine file not found: {} — treating as failure", path)))?;
+        .map_err(|_| Fault::reading(&path, format!("doctrine file not found: {} — treating as failure", path)))?;
     Ok(render(&text, &stage, &path))
 }
 

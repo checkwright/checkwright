@@ -72,7 +72,7 @@ fn execute(args: &[String]) -> Result<i32, Fault> {
     let limits = positional(args, 4, &format!("{}/guard-tests/variant-limits.tsv", kit));
     for f in [&cases, &bg_cases, &ps_cases, &ps_bg_cases, &limits] {
         if !Path::new(f).is_file() {
-            return Err(Fault::input(format!("{}: missing {}", NAME, f)));
+            return Err(Fault::refused(format!("{}: missing {}", NAME, f)));
         }
     }
     let held =
@@ -240,7 +240,7 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, Fault> {
         )));
     };
     if !Path::new(&table).is_file() {
-        return Err(Fault::input(format!("{}: {} names {}, which is not a readable file", NAME, CASES_KNOB, table)));
+        return Err(Fault::refused(format!("{}: {} names {}, which is not a readable file", NAME, CASES_KNOB, table)));
     }
     let root = walk::cwd().map_err(|e| Fault::tool(format!("{}: {}", NAME, e)))?;
     let bin = running_binary()?;
@@ -251,7 +251,7 @@ fn consumer_lane(tally: &mut Tally) -> Result<Option<Consumer>, Fault> {
     let mut ledger = None;
     if !limits.is_empty() {
         if !Path::new(&limits).is_file() {
-            return Err(Fault::input(format!("{}: {} names {}, which is not a readable file", NAME, LIMITS_KNOB, limits)));
+            return Err(Fault::refused(format!("{}: {} names {}, which is not a readable file", NAME, LIMITS_KNOB, limits)));
         }
         let parsed = Ledger::parse(&rows(&limits, 3)?, &limits)
             .map_err(|e| Fault::input(format!("{}: {}: {}", NAME, LIMITS_KNOB, e)))?;
@@ -365,7 +365,7 @@ fn rows(path: &str, width: usize) -> Result<Vec<Vec<String>>, Fault> {
 // opening at a comment line beginning `# rule` and a backticked rule name.
 fn sectioned(path: &str, width: usize) -> Result<Vec<Sectioned>, Fault> {
     let body = std::fs::read_to_string(path)
-        .map_err(|e| Fault::input(format!("{}: cannot read {}: {}", NAME, path, e)))?;
+        .map_err(|e| Fault::reading(path, format!("{}: cannot read {}: {}", NAME, path, e)))?;
     let mut section: Option<String> = None;
     let mut out = Vec::new();
     for line in body.lines() {
