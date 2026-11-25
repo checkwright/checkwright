@@ -1,14 +1,48 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: content-checks-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, on scope's recommendation widened to the whole ask):** the orchestrator adopter's remaining asks. Debt: `verdict-key-before-dispatch` leads, `exit-status-site-unification` lands before the new gates so they are born on its one exit rule, and `verdict-fix-release-notify` rides to close. Feature for spec to author: `adopter-content-checks`, all nine checks, in the adopter's order: the redacted record with its rule id, then strings and text, names, ghpin, then the rest.
+
+  **The release and pushes (2026-11-25, operator grant, lead-relayed):** cut v0.39.0 at this iteration's close. Push need 2 against 2, inside the budget: the closing push, and the release tag whose publish run ships the store fix.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### verdict-key-before-dispatch
+
+The verdict store's key can name content the run never judged whole: native/src/runner.rs collects the provenance block, `treeId` and `gateSet` included, after `dispatch_all` returns, so a commit landing in the checkout while members run stores the earlier outcomes under the later clean tree. gate-sdk/SPEC.md §run-gates' key limits name an environment knob and an untracked file only, and the build target is outside the key too, since `gateSet` digests the source stamp, not `tool.target`.
+
+**Deliverable:** debt: read `treeId` and `gateSet` before dispatch and store nothing when the end-of-run reading differs, with a case, plus the limit sentence for the target.
+
+**Cost while deferred:** a lookup may serve a verdict for a tree no run judged, most likely in a checkout shared by concurrent sessions, and the orchestrator adopter keeps the store off until a release ships this fix. Surfaced 2026-11-25 by machine-verdict-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: `dispatch_all` runs before `provenance_of`. Owner lookup: `treeId`, `gateSet`, `dispatch_all`, `verdict store` in this file, none; owner gate-sdk/SPEC.md §run-gates.
+
+### exit-status-site-unification
+
+The exit-status cut (usage and refused at 2, input and tool at 3) leaves one case on both readings: a configured file the tool reads that is absent is an operand naming something absent (2), and one present but unreadable is a file it cannot read (3). The crate splits it per site, so one cause carries two statuses across arms and gates: gate_argv at 2 against the battery at 3, docs_since's arm at 3 against its gate at 2, todo_task_liveness at 2 against amendment_queue at 3, and spec::command_lines and finder errors mapped either way by gate. lib/gate.sh's gate_msg_pattern_files and commit_msg::resolve_files already split it as absent at 2 and unreadable at 3. One more site, carried from machine-verdict-pass' close second-vendor review (2026-11-25): native/src/runner.rs's registry read maps every `read_to_string` error to 'no registry at <path>' and refused, so a gates.list present but unreadable or not UTF-8 exits 2 under a message calling it absent; the sweep also gives that message the absent-versus-unreadable split.
+
+**Deliverable:** debt: one owner rule in gate-sdk/SPEC.md §Fail-closed contract, absent-configured refused at 2 and present-unreadable input at 3, then a sweep of every site onto it with its fixture asserts and doc statements.
+
+**Cost while deferred:** an outside engine retries on 3, so a misfiled 3 costs it a futile retry and a misfiled 2 a missed one; no in-tree reader branches 2 against 3 beyond tests. Surfaced 2026-11-25 by machine-verdict-pass' build, filed at its close. Re-verified here: harness_literal maps its tracked-listing error to tool at 3. Re-verified 2026-11-25: the build session's roster of about 45 sites is no count that grep prints, since `grep -rn 'Fault::refused\|Fault::input\|Fault::tool' native/src` returns 1568 lines, every fault construction; the sites carrying the absent-versus-unreadable split are a subset the sweep enumerates at build. Owner lookup: `absent configured`, `present-unreadable`, `exit-status cut`, `per-site`, `unreadable file` in this file, none; owner gate-sdk/SPEC.md §Fail-closed contract.
+
+### verdict-fix-release-notify
+
+[drain-exempt: notify at the release cut]
+
+The orchestrator adopter aligns with released checkwright only and keeps `GATE_SDK_VERDICT_STORE` off until a release ships [verdict-key-before-dispatch](#verdict-key-before-dispatch); it asked to be told when that release is cut. This entry is the notify obligation on that release, never the defect.
+
+**Deliverable:** at the close whose release carries that fix, the cut and a notice to the adopter naming the tag. The adopter asked (2026-11-25, peer channel, lead-relayed) that the fix ship on its own at this iteration's close, untied to the content-check gates.
+
+**Push need (2026-11-25, inside the budget):** the v0.39.0 tag push at close, whose publish run ships the fix the notice names.
+
+**Cost while deferred:** the adopter's store stays off past the release that would let it on. Surfaced 2026-11-25 by the adopter's ask over the peer session channel, lead-relayed after machine-verdict-pass' close; filed at the next scope. Owner lookup: `notify`, `release is cut` in this file, none; owner RELEASING.md.
 
 ## Deferred
 
@@ -242,41 +276,13 @@ The front-door package route's readiness poll (`npm view <package>@<version> ver
 
 Ask D of the orchestrator adopter's pairing asks: its content checks as config-driven gates. pipefail (with fix and baseline), script, names (deny stems), strings (built binaries against deny terms and home paths), text (tracked text against an untracked deny list), ghpin (CI action pins against a sites file), literals (unconstrained string literals since a base ref), migrations (additive-only SQL since a base ref) and exec-write (writes of executables outside named helpers, `fs::copy` and libc, nix or rustix chmod and children included). For text and strings a finding carries path:line and a rule id, never a deny term or the deny file's contents.
 
-**Covered today, in part:** text is check-tree-terms over `GATE_SDK_MSG_PATTERN_FILES_LOCAL`, whose record prints the matched line (gate-sdk/SPEC.md §check-tree-terms); ghpin is check-action-pinning, with no sites file. No content gate reads a since-base-ref corpus; check-gate-tamper's `--range` is the precedent. `script`, glossed by the adopter (adopter input 2026-11-25): the preflight a batch-job wrapper runs over each shell script it ships, refusing `pkill`, `mount` and their family with a rule id each (PKILL-REFUSED, MOUNT-REFUSED), and holding every invoked command to its declared form `<cmd> [--flag N]... --config $VAR`; the full rule list arrives with the ask.
+**Covered today, in part:** text is check-tree-terms over `GATE_SDK_MSG_PATTERN_FILES_LOCAL`, whose record prints the matched line (gate-sdk/SPEC.md §check-tree-terms); ghpin is check-action-pinning, with no sites file. No content gate reads a since-base-ref corpus; check-gate-tamper's `--range` is the precedent.
 
-**Deliverable:** design-pending, features split at spec: the redacted record and a per-pattern rule id first, which also carries verdict-identity-fields' ask C (a finding-line class token surfacing as the SARIF result's rule class, adopter input 2026-11-25), then each new gate born native with its pair and knob, reusing check-commit-msg and check-tree-terms where they cover.
+**Adopter input (2026-11-25, peer channel, lead-relayed):** order the deny-list family first, strings and text (they run on every gate run), then names, then ghpin. `strings` reads printable ASCII runs of 4+ in build-output files the consumer names explicitly, no discovery, and in a 64-bit little-endian ELF only the file-backed sections holding no code; it hits a home-shaped path (`/home/`, `/root/`, `/Users/`), a cargo-registry path, any `<scheme>://` URL, and a token equal to a consumer deny term, case-insensitive, tokens split outside `[A-Za-z0-9._-]`. `script` is a preflight on each shell script a batch-job wrapper ships (0 clean, 1 with one line per refusal, 3 for an unreadable file or a span the shell reader cannot parse), over logical lines joining backslash continuations, every waiver owing a reason of 5+ characters: PKILL-REFUSED for `pkill -f` or an unquoted or variable pattern, allowing `-P "$pid"`, `-x` with a quoted literal, a pkill inside a container namespace (an earlier `docker exec` on the line), `-f` anchored by the run's config path in the form `<cmd> [--flag N]... --config $VAR`, and `# pkill-ok: <reason>`; MOUNT-REFUSED for a code line naming a configured forbidden path token; PIPEFAIL-REFUSED for a pipe into an early-exit reader while pipefail is on, pipefail in force from its `set` to the end of its file, `( )` or `$( )`, a here-doc or quoted script body checked as its own script, waived by `# pipefail-ok:` on the line or `# sigpipe-ok:` on the reader's; OWNER-REFUSED for a configured submit command whose configured flags fail a configured id grammar, a value holding an expansion skipped. Every token list, command, flag and grammar is consumer config, never a kit literal.
+
+**Deliverable:** design-pending, features split at spec, all nine checks (operator direction 2026-11-25, lead-relayed, not a ruling): the redacted record and a per-pattern rule id first, which also carries verdict-identity-fields' ask C (a finding-line class token surfacing as the SARIF result's rule class, adopter input 2026-11-25), then each new gate born native with its pair and knob, reusing check-commit-msg and check-tree-terms where they cover.
 
 **Cost while deferred:** the adopter keeps nine checks of its own beside the battery, two overlapping ours under another output contract. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `deny`, `base ref` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
-
-### exit-status-site-unification
-
-[cost: event/low] [surface: gate-sdk]
-
-The exit-status cut (usage and refused at 2, input and tool at 3) leaves one case on both readings: a configured file the tool reads that is absent is an operand naming something absent (2), and one present but unreadable is a file it cannot read (3). The crate splits it per site, so one cause carries two statuses across arms and gates: gate_argv at 2 against the battery at 3, docs_since's arm at 3 against its gate at 2, todo_task_liveness at 2 against amendment_queue at 3, and spec::command_lines and finder errors mapped either way by gate. lib/gate.sh's gate_msg_pattern_files and commit_msg::resolve_files already split it as absent at 2 and unreadable at 3. One more site, carried from machine-verdict-pass' close second-vendor review (2026-11-25): native/src/runner.rs's registry read maps every `read_to_string` error to 'no registry at <path>' and refused, so a gates.list present but unreadable or not UTF-8 exits 2 under a message calling it absent; the sweep also gives that message the absent-versus-unreadable split.
-
-**Deliverable:** debt: one owner rule in gate-sdk/SPEC.md §Fail-closed contract, absent-configured refused at 2 and present-unreadable input at 3, then a sweep of every site onto it with its fixture asserts and doc statements.
-
-**Cost while deferred:** an outside engine retries on 3, so a misfiled 3 costs it a futile retry and a misfiled 2 a missed one; no in-tree reader branches 2 against 3 beyond tests. Surfaced 2026-11-25 by machine-verdict-pass' build, filed at its close. Re-verified here: harness_literal maps its tracked-listing error to tool at 3. Re-verified 2026-11-25: the build session's roster of about 45 sites is no count that grep prints, since `grep -rn 'Fault::refused\|Fault::input\|Fault::tool' native/src` returns 1568 lines, every fault construction; the sites carrying the absent-versus-unreadable split are a subset the sweep enumerates at build. Owner lookup: `absent configured`, `present-unreadable`, `exit-status cut`, `per-site`, `unreadable file` in this file, none; owner gate-sdk/SPEC.md §Fail-closed contract.
-
-### verdict-key-before-dispatch
-
-[cost: event/low] [surface: gate-sdk]
-
-The verdict store's key can name content the run never judged whole: native/src/runner.rs collects the provenance block, `treeId` and `gateSet` included, after `dispatch_all` returns, so a commit landing in the checkout while members run stores the earlier outcomes under the later clean tree. gate-sdk/SPEC.md §run-gates' key limits name an environment knob and an untracked file only, and the build target is outside the key too, since `gateSet` digests the source stamp, not `tool.target`.
-
-**Deliverable:** debt: read `treeId` and `gateSet` before dispatch and store nothing when the end-of-run reading differs, with a case, plus the limit sentence for the target.
-
-**Cost while deferred:** a lookup may serve a verdict for a tree no run judged, most likely in a checkout shared by concurrent sessions, and the orchestrator adopter keeps the store off until a release ships this fix. Surfaced 2026-11-25 by machine-verdict-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: `dispatch_all` runs before `provenance_of`. Owner lookup: `treeId`, `gateSet`, `dispatch_all`, `verdict store` in this file, none; owner gate-sdk/SPEC.md §run-gates.
-
-### verdict-fix-release-notify
-
-[cost: event/low] [surface: RELEASING.md]
-
-The orchestrator adopter aligns with released checkwright only and keeps `GATE_SDK_VERDICT_STORE` off until a release ships [verdict-key-before-dispatch](#verdict-key-before-dispatch); it asked to be told when that release is cut. This entry is the notify obligation on that release, never the defect.
-
-**Deliverable:** at the close whose release carries that fix, the cut and a notice to the adopter naming the tag.
-
-**Cost while deferred:** the adopter's store stays off past the release that would let it on. Surfaced 2026-11-25 by the adopter's ask over the peer session channel, lead-relayed after machine-verdict-pass' close; filed at the next scope. Owner lookup: `notify`, `release is cut` in this file, none; owner RELEASING.md.
 
 ## Icebox
 
