@@ -34,6 +34,16 @@ The foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) is a pr
 
 **Cost while deferred:** each outside caller re-builds the run. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `foreign-vendor`, `foreign run` in this file and the disposed-findings record, none open; owner delegation-kit/SPEC.md §The foreign-vendor run.
 
+### brief-authority-lint
+
+[spec: SPEC-brief-authority.md]
+
+No check reads an agent brief: one that grants authority the agent must not hold (push, post, install) or that does not quote the request passes. A generic gate takes its forbidden verbs and required sections from config.
+
+**Deliverable:** design-pending, a feature: where a brief is read (a dispatch payload or a file), the config grammar, and its honest limit.
+
+**Cost while deferred:** an over-granting or unquoted brief reaches the agent. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `brief`, `forbidden verb` in this file, none; [outbound-public-text-lint](#outbound-public-text-lint) reads posted text, not briefs; owner delegation-kit/SPEC.md.
+
 ## Technical Debt
 
 ### attribution-trailer-ban
@@ -275,16 +285,6 @@ drift-kit's trend report covers only what it computes in-tree, so a velocity, le
 **Deliverable:** design-pending, a feature: an input form for an outside series, its validation and how the report marks its provenance.
 
 **Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
-
-### brief-authority-lint
-
-[cost: event/low] [surface: delegation-kit]
-
-No check reads an agent brief: one that grants authority the agent must not hold (push, post, install) or that does not quote the request passes. A generic gate takes its forbidden verbs and required sections from config.
-
-**Deliverable:** design-pending, a feature: where a brief is read (a dispatch payload or a file), the config grammar, and its honest limit.
-
-**Cost while deferred:** an over-granting or unquoted brief reaches the agent. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `brief`, `forbidden verb` in this file, none; [outbound-public-text-lint](#outbound-public-text-lint) reads posted text, not briefs; owner delegation-kit/SPEC.md.
 
 ### user-uninstall-containment
 
