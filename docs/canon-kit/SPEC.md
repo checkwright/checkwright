@@ -283,7 +283,7 @@ Invariant: the bidirectional rule holds.
 
 Calibration: a ref is a bare amendment basename (searched tree-wide) or a repo-relative path (resolved directly — the generalization that lets a consumer point a task at any design artifact, e.g. this repo's kit-SPEC drafts). Sub-bullets and prose notes are outside the entry grammar; `precommit` tier.
 
-**An absent queue file is an absent subject.** Where nothing exists at the queue path, `CANON_KIT_QUEUE_FILE` or the first argument, the gate prints its not-applicable clean line naming the path and exits 0 ([gate-sdk/SPEC.md §Output contract](../gate-sdk/SPEC.md#output-contract)). A consumer tracking work outside the queue grammar can so keep it registered. A queue path naming anything but a file, or one the gate cannot stat, refuses at exit 2. The bespoke unit test holds both, since the pair's `good/` holds a queue and exit 2 has no pair spelling.
+**An absent queue file is an absent subject.** Where nothing exists at the queue path, `CANON_KIT_QUEUE_FILE` or the first argument, the gate prints its not-applicable clean line naming the path and exits 0 ([gate-sdk/SPEC.md §Output contract](../gate-sdk/SPEC.md#output-contract)). A consumer tracking work outside the queue grammar can so keep it registered. A queue path naming anything but a file, a dangling link included, or one the gate cannot stat, refuses at exit 2. The bespoke unit test holds the absent, directory and dangling-link cases, since the pair's `good/` holds a queue and exit 2 has no pair spelling.
 
 Arm (e)'s calibration:
 

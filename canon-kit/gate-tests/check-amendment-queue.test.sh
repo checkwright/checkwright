@@ -31,9 +31,14 @@ check_case "absent-queue-is-not-applicable" 0 "clean (not applicable: no queue f
 mkdir -p "$SANDBOX/dirqueue"
 check_case "non-file-queue-fails-closed" 2 "not a file" "$SANDBOX/dirqueue"
 
+ln -s "$SANDBOX/gone.md" "$SANDBOX/danglingqueue" 2>/dev/null
+if [[ -L "$SANDBOX/danglingqueue" ]]; then
+    check_case "dangling-link-queue-fails-closed" 2 "not a file" "$SANDBOX/danglingqueue"
+fi
+
 if [[ "$fails" -gt 0 ]]; then
     echo "check-amendment-queue.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-amendment-queue.test.sh: clean (an absent queue is not applicable; a queue path naming a directory refuses)"
+echo "check-amendment-queue.test.sh: clean (an absent queue is not applicable; a queue path naming a directory or a dangling link refuses)"
 exit 0

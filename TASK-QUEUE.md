@@ -68,14 +68,6 @@ The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (ga
 
 ## Technical Debt
 
-### amendment-queue-dangling-link
-
-check-amendment-queue tests presence with `Path::try_exists`, which follows links, so a dangling queue symlink takes the not-applicable exit 0 where canon-kit/SPEC.md §check-amendment-queue says a queue path naming anything but a file refuses at exit 2. The bespoke unit test covers an absent path and a directory only.
-
-**Deliverable:** debt: probe presence with `symlink_metadata`, so a dangling link refuses, with a case beside the absent and directory ones.
-
-**Cost while deferred:** a broken queue link reads as no queue, and the gate passes an adopter whose queue went missing. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, a second-vendor review bullet. Re-verified at this scope: native/src/gates/amendment_queue.rs calls `try_exists`. Owner lookup: `amendment-queue`, `symlink` in this file; [absent-queue-liveness-gates](#absent-queue-liveness-gates) gives two sibling gates the same absent-subject shape; owner canon-kit/SPEC.md §check-amendment-queue.
-
 ### absent-queue-liveness-gates
 
 `check-todo-task-liveness` and `check-deprecation-task` exit 2 'queue file not found' on an absent `CANON_KIT_QUEUE_FILE` before scanning for any marker, the absent-subject shape `check-amendment-queue` now reports as not applicable (canon-kit/SPEC.md §check-amendment-queue).
@@ -1057,4 +1049,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - co-authored-by-trailer-attribution
 - attribution-trailer-ban
 - knobs-lock-test-race
+- amendment-queue-dangling-link
 
