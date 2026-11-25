@@ -78,14 +78,6 @@ An observed `session-context` logs `would=error`: the member prints its brief as
 
 **Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
-### install-size-contract-drift
-
-Two claims of installer/SPEC.md §The install size miss the arm. Its honest limit says the packer's per-kit additions are each smaller than the rounding, but the packer adds an 11,358-byte LICENSE copy to every kit (native/src/emit/pack_installer.rs), moving drift-kit's packed figure from about 23 to 35 kB and full's from 1.8 to about 1.9 MB. And the bare `--emit install-size` never reads `GATE_LOCAL_INSTALL_SIZE_PAGE`, so 'the arm exits 2 on an unreadable page and on a block absent or twice' holds only for `--write` and the gate.
-
-**Deliverable:** debt: count the license additions in the figure or state their magnitude; read the page in the bare arm or narrow the sentence to `--write`.
-
-**Cost while deferred:** an adopter sizing a small profile reads a figure about a third low, on the measure an external orchestrator asked for. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, two second-vendor review bullets. Re-verified at this scope: native/src/emit/install_size.rs reads the page knob only under `--write`, and the packer places a license per kit. Owner lookup: `install-size`, `LICENSE` in this file, none; owner installer/SPEC.md §The install size.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1043,4 +1035,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - knobs-lock-test-race
 - amendment-queue-dangling-link
 - absent-queue-liveness-gates
+- install-size-contract-drift
 

@@ -109,7 +109,7 @@
 3130cp gate-sdk/templates/adopt.md
 355765cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
-331064cp installer/SPEC.md
+331343cp installer/SPEC.md
 410739cp lifecycle-kit/SPEC.md
 8150cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
