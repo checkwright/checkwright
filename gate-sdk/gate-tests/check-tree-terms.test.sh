@@ -58,7 +58,7 @@ printf '# only a comment\n\n' > "$SANDBOX/repo/empty.list"
 out="$( cd "$SANDBOX/repo" \
     && gate_env GATE_SDK_MSG_PATTERN_FILES="$SANDBOX/repo/empty.list" \
     && gate_run check-tree-terms "$CHECKS" . 2>&1 )"; rc=$?
-expect empty-pattern-set 0 '0 banned pattern(s) configured; tree unchecked' "$rc" "$out"
+expect empty-pattern-set 0 '0 banned pattern(s) and 0 deny term(s) configured; tree unchecked' "$rc" "$out"
 
 # --- a banned shape inside a tracked binary: a path-only record, and still red.
 # Dead on this tree (no tracked binaries) and live in a consumer's, which is why
@@ -70,7 +70,7 @@ printf 'PNG\x00\x01 clone into /%s/bob/x and more\x00bytes\n' home > "$SANDBOX/r
 printf '/(home|Users)/[A-Za-z0-9._-]+\n' > "$SANDBOX/repo/banned.list"
 git -C "$SANDBOX/repo" add blob.bin
 out="$( cd "$SANDBOX/repo" && gate_run check-tree-terms "$CHECKS" . banned.list 2>&1 )"; rc=$?
-expect binary-record 1 'blob.bin' "$rc" "$out"
+expect binary-record 1 'blob.bin: [TEXT-DENIED]' "$rc" "$out"
 if grep -qE '^blob\.bin:[0-9]+:' <<<"$out"; then
     echo "  FAIL [binary-record]: a binary match must not carry :lineno:line -- $out"
     fails=$((fails + 1))
@@ -101,23 +101,43 @@ else
     echo "  SKIP [dangling-symlink]: ln -s failed — creating a symlink needs a privilege this account may not hold; the arm's precondition is a platform capability, so it declares the skip rather than reporting a failure."
 fi
 
+# --- a '# rule:' line whose id fails the class grammar is refused at 2, naming the
+# file and line; a deny-term list that is there and is no regular file is input at 3.
+printf 'a-pattern\n# rule: not-upper\nb-pattern\n' > "$SANDBOX/repo/badrule.list"
+out="$( cd "$SANDBOX/repo" && gate_run check-tree-terms "$CHECKS" . badrule.list 2>&1 )"; rc=$?
+expect malformed-rule-id 2 'badrule.list:2:' "$rc" "$out"
+if grep -qF 'not-upper' <<<"$out"; then
+    echo "  FAIL [malformed-rule-id]: the refusal must not print the id -- $out"; fails=$((fails + 1))
+fi
+mkdir -p "$SANDBOX/repo/terms-dir.list"
+out="$( cd "$SANDBOX/repo" \
+    && gate_env GATE_SDK_DENY_TERMS="$SANDBOX/repo/terms-dir.list" \
+    && gate_run check-tree-terms "$CHECKS" . empty.list 2>&1 )"; rc=$?
+expect unreadable-term-list 3 'not a regular file' "$rc" "$out"
+
 # --- multi-record order over the tracked bad/ case: path order, then line order,
-# one record per matching *line* however many patterns hit it, and no dedup of
-# two identical lines. Read off the pair so the corpus has one home.
-out="$( cd "$CASES/bad" && gate_run check-tree-terms "$CHECKS" tree patterns.list 2>&1 )"; rc=$?
+# then id order, one record per matching *line* per distinct id however many
+# patterns or terms hit it, and no dedup of two identical lines. Read off the
+# pair so the corpus has one home; the knob files are pinned away here, so the
+# case's term list is handed over by the environment.
+out="$( cd "$CASES/bad" && gate_env GATE_SDK_DENY_TERMS=terms.list \
+    && gate_run check-tree-terms "$CHECKS" tree patterns.list 2>&1 )"; rc=$?
 got="$(grep -E '^tree/' <<<"$out")"
 want="$(printf '%s\n' \
-    'tree/accounts.txt:1:' \
-    'tree/leak.txt:1:' \
-    'tree/msg-patterns.old.list:1:' \
-    'tree/multi.txt:1:' \
-    'tree/multi.txt:3:' \
-    'tree/multi.txt:4:' \
-    'tree/second-leak.txt:2:')"
+    'tree/accounts.txt:1: [TEXT-DENIED]' \
+    'tree/leak.txt:1: [HOME-PATH]' \
+    'tree/msg-patterns.old.list:1: [HOME-PATH]' \
+    'tree/multi.txt:1: [HOME-PATH]' \
+    'tree/multi.txt:3: [HOME-PATH]' \
+    'tree/multi.txt:4: [HOME-PATH]' \
+    'tree/second-leak.txt:2: [TEXT-DENIED]' \
+    'tree/terms.txt:1: [CODENAME]' \
+    'tree/terms.txt:1: [HOME-PATH]' \
+    'tree/terms.txt:2: [TEXT-DENIED]')"
 if [[ "$rc" -ne 1 ]]; then
     echo "  FAIL [record-order]: want exit 1, got $rc -- $out"; fails=$((fails + 1))
-elif [[ "$(sed 's/^\([^:]*:[0-9]*:\).*/\1/' <<<"$got")" != "$want" ]]; then
-    echo "  FAIL [record-order]: record sequence is not path-then-line order:"
+elif [[ "$got" != "$want" ]]; then
+    echo "  FAIL [record-order]: record sequence is not path-then-line-then-id order:"
     printf '    %s\n' "$got"
     fails=$((fails + 1))
 fi
@@ -127,8 +147,8 @@ if [[ "$fails" -gt 0 ]]; then
     exit 1
 fi
 if [[ "$link_arm" == run ]]; then
-    echo "check-tree-terms.test.sh: clean (the arms a case dir cannot reach or may not ship: a non-repository cwd, the env-knob resolution path through a missing required pattern file, an empty pattern set leaving the tree unchecked, a banned shape inside a tracked binary yielding a path-only record, a tracked dangling symlink skipped rather than scanned, and the bad pair's record order — 8 assertions over 6 cases)"
+    echo "check-tree-terms.test.sh: clean (the arms a case dir cannot reach or may not ship: a non-repository cwd, the env-knob resolution path through a missing required pattern file, an empty pattern set leaving the tree unchecked, a banned shape inside a tracked binary yielding a path-only record, a tracked dangling symlink skipped rather than scanned, a malformed rule id refused without printing it, a deny-term list that is no regular file, and the bad pair's record order — 11 assertions over 8 cases)"
 else
-    echo "check-tree-terms.test.sh: clean (the arms a case dir cannot reach: a non-repository cwd, the env-knob resolution path through a missing required pattern file, an empty pattern set leaving the tree unchecked, a banned shape inside a tracked binary yielding a path-only record, and the bad pair's record order — 6 assertions over 5 cases; the dangling-symlink arm declared a skip above, this host refusing ln -s)"
+    echo "check-tree-terms.test.sh: clean (the arms a case dir cannot reach: a non-repository cwd, the env-knob resolution path through a missing required pattern file, an empty pattern set leaving the tree unchecked, a banned shape inside a tracked binary yielding a path-only record, a malformed rule id refused without printing it, a deny-term list that is no regular file, and the bad pair's record order — 9 assertions over 7 cases; the dangling-symlink arm declared a skip above, this host refusing ln -s)"
 fi
 exit 0

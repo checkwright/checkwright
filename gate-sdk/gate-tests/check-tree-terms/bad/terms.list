@@ -1,0 +1,4 @@
+# deny-term fixture: literal terms, one per line
+tolkien-x
+# rule: CODENAME
+zephyr

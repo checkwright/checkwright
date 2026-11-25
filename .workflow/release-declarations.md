@@ -1,6 +1,12 @@
 # contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's declaration-bearing sections in the note's grammar, Platforms excepted since composition derives it, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
 
+## New and tightened gates
+
+- `check-tree-terms` — reads the deny-term lists `GATE_SDK_DENY_TERMS` names beside its pattern files, a literal term hitting a line where it stands as a whole word, ASCII case folded; a `# rule: <ID>` line in a term list or pattern file names the id of the entries after it, and a malformed one refuses at exit 2. Its record is now `<path>:<line>: [<ID>]`, one per matching line per distinct id, `TEXT-DENIED` where no rule line names one, and never the matched line; a binary's is `<path>: [<ID>]`. A consumer binding no term list is unchanged in verdict; a script grepping the old `path:line:text` record reads the id instead.
+
 ## Knob changes
+
+- `GATE_SDK_DENY_TERMS` — new: space-separated literal-term lists, default `<gates-dir>/deny-terms.local.list`, each optional; an absent list contributes nothing and one that is no readable regular file is exit 3. The kit ships no starter list. Read by `check-tree-terms` now; a tracked list is self-exempt from it.
 
 - `GATE_SDK_VERDICT_STORE` — new: an absolute directory `--run` keeps a judged verdict in, environment-only; default unset, which keeps nothing. A registry run on a clean worktree whose verdict is `pass` or `fail`, by a stamped binary, writes one record under a key digesting `treeId`, `tool.version` and `gateSet`, and keeps nothing where that key moved while its members ran. A relative path is refused at exit 2 before the first member runs, and a store that cannot be written is exit 3.
 - `GATE_SDK_PAYLOAD_WITHHOLD` — default `SPEC.md smoke` → `SPEC.md SPEC-*.md smoke`: the payload `--pack-installer` builds no longer carries a kit root's open `SPEC-<slug>.md` amendment, and the install-size figure stops counting one. A member carrying `*`, `?` or `[` is now a glob whose wildcards never cross a `/`, so a same-named file deeper in a kit root still ships, and `check-packed-links` reds a packed README linking a member it matches. Action owed only by a publisher setting the knob: add `SPEC-*.md` to withhold amendments too.

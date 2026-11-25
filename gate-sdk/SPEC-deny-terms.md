@@ -12,11 +12,11 @@ Pairs `adopter-content-checks` (text) and `deny-term-names` (names). A consumer 
 
 ### (1) The deny-term list {design-bearing} {user-facing: the adopter input on `adopter-content-checks` — one owner file feeds text, strings and names}
 
-**Not yet applied**: gate-sdk/SPEC.md §Layout and configuration's rule rosters gain:
+**Applied** (merged into gate-sdk/SPEC.md §Layout and configuration): gate-sdk/SPEC.md §Layout and configuration's rule rosters gain:
 
 > - `GATE_SDK_DENY_TERMS` (default `<gates-dir>/deny-terms.local.list`): space-separated literal-term lists, each **optional**, read by check-tree-terms, check-path-names and check-binary-strings. An absent file contributes nothing; a present unreadable one is exit 3.
 
-**Not yet applied**: a new section, §The deny-term list, after §check-tree-terms:
+**Applied** (merged into gate-sdk/SPEC.md §The deny-term list): a new section, §The deny-term list, after §check-tree-terms:
 
 > **A deny-term list holds literal terms, never patterns.** Each live line is one term, trimmed of surrounding blanks; a blank line or one opening `#` is skipped. A line `# rule: <ID>`, `<ID>` matching the class grammar (§Output contract), names the rule id of every term after it until the next such line; a term before the first takes the reading gate's default id. A malformed `# rule:` line, one whose id fails the grammar, is exit 2, naming the file and line and never the id's neighbours.
 >
@@ -31,7 +31,7 @@ Pairs `adopter-content-checks` (text) and `deny-term-names` (names). A consumer 
 
 ### (2) check-tree-terms' redacted record and term arm {design-bearing} {user-facing: the entry's deliverable — path:line and a rule id, never a term}
 
-**Not yet applied**: §check-tree-terms is rephrased as follows.
+**Applied** (merged into gate-sdk/SPEC.md §check-tree-terms): §check-tree-terms is rephrased as follows.
 
 - Its record becomes `<path>:<line>: [<ID>]`, one per matching line per distinct id, ordered by line then id, and a binary's `<path>: [<ID>]`. The second ruling bullet ("A banned shape inside a tracked binary yields a path-only record") keeps its ground and takes the new shape, which §run-gates now places.
 - `<ID>` is the `# rule:` id in force above the matching pattern or term, else `TEXT-DENIED`. A `# rule:` line in an ERE pattern file follows §The deny-term list's grammar.

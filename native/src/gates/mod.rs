@@ -2660,6 +2660,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[
             "GATE_SDK_MSG_PATTERN_FILES",
             "GATE_SDK_MSG_PATTERN_FILES_LOCAL",
+            "GATE_SDK_DENY_TERMS",
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_KIT_DIRS",

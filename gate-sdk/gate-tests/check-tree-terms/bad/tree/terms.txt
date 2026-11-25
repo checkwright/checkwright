@@ -1,0 +1,2 @@
+the Zephyr build ships from /home/erin/src
+a bare tolkien-x mention, and zephyrine is a longer word

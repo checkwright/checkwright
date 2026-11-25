@@ -1,0 +1,1 @@
+The terms2 table and the determined reader hold it only inside longer words.

@@ -3,9 +3,11 @@
 use crate::ere::Ere;
 use crate::exit::{self, Fault};
 use crate::fresh;
-use crate::gates::commit_msg::{live_patterns, resolve_files};
+use crate::deny_terms::{self, Entry};
+use crate::gates::commit_msg::resolve_files;
 use crate::knobs::gate_sdk::MSG_PATTERN_FILE;
 use crate::walk;
+use std::collections::BTreeSet;
 use std::path::Path;
 
 // spec: gate-sdk/SPEC.md §check-tree-terms — a NUL byte is what makes a file binary, the same
@@ -22,6 +24,55 @@ pub fn run(args: &[String]) -> i32 {
             fault.status()
         }
     }
+}
+
+// spec: gate-sdk/SPEC.md §check-tree-terms — the id a hit takes when no `# rule:` line names one
+const DEFAULT_ID: &str = "TEXT-DENIED";
+
+struct Pattern {
+    re: Ere,
+    id: Option<String>,
+}
+
+// spec: gate-sdk/SPEC.md §The deny-term list — a term hits where it occurs with no ASCII letter or
+// digit on either side, ASCII case folded
+fn word_hit(line: &[u8], term: &[u8]) -> bool {
+    if term.is_empty() || term.len() > line.len() {
+        return false;
+    }
+    (0..=line.len() - term.len()).any(|at| {
+        line[at..at + term.len()].eq_ignore_ascii_case(term)
+            && (at == 0 || !line[at - 1].is_ascii_alphanumeric())
+            && line.get(at + term.len()).map_or(true, |b| !b.is_ascii_alphanumeric())
+    })
+}
+
+// spec: gate-sdk/SPEC.md §check-tree-terms — every distinct id hitting one line, ordered
+fn line_ids<'a>(line: &str, patterns: &'a [Pattern], terms: &'a [Entry]) -> BTreeSet<&'a str> {
+    let mut ids = BTreeSet::new();
+    for p in patterns.iter().filter(|p| p.re.is_match(line)) {
+        ids.insert(p.id.as_deref().unwrap_or(DEFAULT_ID));
+    }
+    for t in terms.iter().filter(|t| word_hit(line.as_bytes(), t.text.as_bytes())) {
+        ids.insert(t.id_or(DEFAULT_ID));
+    }
+    ids
+}
+
+// spec: gate-sdk/SPEC.md §check-tree-terms — each resolved pattern file's live lines with the
+// `# rule:` id in force above each, under §The deny-term list's grammar
+fn read_patterns(files: &[String]) -> Result<Vec<(String, Option<String>)>, Fault> {
+    let mut out = Vec::new();
+    for f in files {
+        let bytes = std::fs::read(f).map_err(|e| {
+            let fault = Fault::reading(f, format!("check-tree-terms: cannot read the pattern file {}: {}", f, e));
+            let closed = fresh::fail_closed("grep-patterns", Some(fault.status()));
+            Fault { message: format!("{}\nTREE-TERMS: {}", fault.message, closed), ..fault }
+        })?;
+        let text = String::from_utf8_lossy(&bytes).into_owned();
+        out.extend(deny_terms::parse(&text).map_err(|line| deny_terms::malformed(f, line).prefixed("check-tree-terms"))?);
+    }
+    Ok(out)
 }
 
 fn inner(args: &[String]) -> Result<i32, Fault> {
@@ -51,24 +102,24 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
         }
     };
 
-    let patterns = live_patterns(&files).ok_or_else(|| {
-        Fault::input(format!("TREE-TERMS: {}", fresh::fail_closed("grep-patterns", Some(exit::INPUT))))
-    })?;
+    let patterns = read_patterns(&files)?;
+    let term_files = deny_terms::files().map_err(|e| e.prefixed("check-tree-terms"))?;
+    let terms = deny_terms::read(&term_files).map_err(|e| e.prefixed("check-tree-terms"))?;
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — an empty set leaves the tree unchecked and
     // clean: the fail-closed obligation is on a missing pattern file, never on an empty one
-    if patterns.is_empty() {
-        println!("TREE-TERMS: clean (not applicable: 0 banned pattern(s) configured; tree unchecked)");
+    if patterns.is_empty() && terms.is_empty() {
+        println!("TREE-TERMS: clean (not applicable: 0 banned pattern(s) and 0 deny term(s) configured; tree unchecked)");
         return Ok(0);
     }
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — the GNU escape set is refused by name at
     // compile, which is exit 2: a pattern the compiled engine cannot honour must not read as a
     // tree with nothing in it
-    let mut compiled: Vec<Ere> = Vec::new();
-    for p in &patterns {
+    let mut compiled: Vec<Pattern> = Vec::new();
+    for (p, id) in &patterns {
         match Ere::compile(p) {
-            Ok(e) => compiled.push(e),
+            Ok(re) => compiled.push(Pattern { re, id: id.clone() }),
             Err(e) => {
                 eprintln!("check-tree-terms: {}: {}", p, e);
                 return Err(Fault::refused(format!(
@@ -80,14 +131,15 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
     }
 
     // spec: gate-sdk/SPEC.md §check-tree-terms — the pattern files the two knobs name, or the
-    // positional list, and each kit's starter roster
-    let named: Vec<String> = if args.len() > 1 {
+    // positional list, the deny-term lists, and each kit's starter rosters
+    let mut named: Vec<String> = if args.len() > 1 {
         args[1..].to_vec()
     } else {
         let mut n = walk::knob_words("GATE_SDK_MSG_PATTERN_FILES").map_err(Fault::refused)?;
         n.extend(walk::knob_words("GATE_SDK_MSG_PATTERN_FILES_LOCAL").map_err(Fault::refused)?);
         n
     };
+    named.extend(term_files);
     let exempt = walk::self_exempt_paths(&named, MSG_PATTERN_FILE)
         .map_err(|e| Fault::refused(format!("check-tree-terms: {}", e)))?;
 
@@ -115,41 +167,41 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
         };
         let text = String::from_utf8_lossy(&bytes).into_owned();
         if binary(&bytes) {
-            // spec: gate-sdk/SPEC.md §check-tree-terms — a binary match is a path-only record and
-            // still reds
-            if fresh::file_lines(&text)
-                .iter()
-                .any(|line| compiled.iter().any(|re| re.is_match(line)))
-            {
-                hits.push((*path).to_string());
+            // spec: gate-sdk/SPEC.md §check-tree-terms — a binary hit is a path-only record per
+            // distinct id, and still reds
+            let mut ids = BTreeSet::new();
+            for line in fresh::file_lines(&text) {
+                ids.extend(line_ids(line, &compiled, &terms));
             }
+            hits.extend(ids.into_iter().map(|id| format!("{}: [{}]", path, id)));
             continue;
         }
-        // spec: gate-sdk/SPEC.md §check-tree-terms — `grep -EnHf`: one record per *matching line*,
-        // filename-prefixed and line-numbered, however many patterns that line matches, and two
-        // identical lines are two records
+        // spec: gate-sdk/SPEC.md §check-tree-terms — one record per matching line per distinct id,
+        // never the line itself, and two identical lines are two records
         for (i, line) in fresh::file_lines(&text).iter().enumerate() {
-            if compiled.iter().any(|re| re.is_match(line)) {
-                hits.push(format!("{}:{}:{}", path, i + 1, line));
+            for id in line_ids(line, &compiled, &terms) {
+                hits.push(format!("{}:{}: [{}]", path, i + 1, id));
             }
         }
     }
 
     if !hits.is_empty() {
-        println!("check-tree-terms: tracked file(s) match a banned pattern (leaked local/private term):");
+        println!("check-tree-terms: tracked file(s) match a banned pattern or deny term (leaked local/private term):");
         for h in &hits {
             println!("{}", h);
         }
-        println!("  help: remove the leaked term from the tracked file; private term lists");
-        println!("        belong in the gitignored local pattern file, never in a tracked one.");
+        println!("  help: remove the leaked term from the line each record names; the record carries");
+        println!("        the rule id, never the term. Private term lists belong in a gitignored");
+        println!("        local file, never in a tracked one.");
         return Ok(1);
     }
 
     println!(
-        "TREE-TERMS: clean ({} tracked file(s) scanned under {}; none match the {} banned pattern(s))",
+        "TREE-TERMS: clean ({} tracked file(s) scanned under {}; none match the {} banned pattern(s) or {} deny term(s))",
         paths.len(),
         scanroot,
-        patterns.len()
+        patterns.len(),
+        terms.len()
     );
     Ok(0)
 }
@@ -205,6 +257,18 @@ mod tests {
             Err(e) => e,
         };
         assert!(format!("{}", err).contains("\\b"));
+    }
+
+    // spec: gate-sdk/SPEC.md §The deny-term list — a term hits as a whole word, case folded, and
+    // never inside a longer word
+    #[test]
+    fn a_term_hits_as_a_whole_word_and_never_inside_a_longer_one() {
+        assert!(word_hit(b"ships the Term today", b"term"));
+        assert!(word_hit(b"term", b"term"));
+        assert!(word_hit(b"(term-x)", b"term"));
+        assert!(!word_hit(b"the terms2 table", b"term"));
+        assert!(!word_hit(b"determine", b"term"));
+        assert!(!word_hit(b"ter", b"term"));
     }
 
     #[test]

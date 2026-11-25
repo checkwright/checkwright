@@ -25,6 +25,7 @@ mod actions;
 mod actions_run;
 mod bashscan;
 mod declaration;
+mod deny_terms;
 mod diff;
 mod doctrine;
 mod emit;

@@ -122,14 +122,19 @@ fn relative(path: &str) -> bool {
         && !path.split(['/', '\\']).any(|s| s == "..")
 }
 
-// spec: gate-sdk/SPEC.md §Output contract — a finding text opening `[<CLASS>]`, the class
-// `[A-Z][A-Z0-9_-]*` followed by a space or the text's end
-fn class(text: &str) -> Option<&str> {
-    let (token, after) = text.strip_prefix('[')?.split_once(']')?;
+// spec: gate-sdk/SPEC.md §Output contract — the class grammar `[A-Z][A-Z0-9_-]*`, which a deny
+// list's `# rule:` id is held to as well
+pub(crate) fn is_class(token: &str) -> bool {
     let mut bytes = token.bytes();
     let head = bytes.next().is_some_and(|b| b.is_ascii_uppercase());
-    let tail = bytes.all(|b| b.is_ascii_uppercase() || b.is_ascii_digit() || b == b'_' || b == b'-');
-    (head && tail && (after.is_empty() || after.starts_with(' '))).then_some(token)
+    head && bytes.all(|b| b.is_ascii_uppercase() || b.is_ascii_digit() || b == b'_' || b == b'-')
+}
+
+// spec: gate-sdk/SPEC.md §Output contract — a finding text opening `[<CLASS>]`, followed by a space
+// or the text's end
+fn class(text: &str) -> Option<&str> {
+    let (token, after) = text.strip_prefix('[')?.split_once(']')?;
+    (is_class(token) && (after.is_empty() || after.starts_with(' '))).then_some(token)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a finding line in one of the three shapes, its path

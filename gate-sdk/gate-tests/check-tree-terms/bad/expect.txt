@@ -1,8 +1,11 @@
-match a banned pattern
-tree/leak.txt:1:Install notes: clone into /home/bob/projects and run the setup script.
-tree/multi.txt:1:two leaks on one line: /home/alice/one and /home/bob/two
-tree/multi.txt:3:one leak on its own line: /home/carol/three
-tree/multi.txt:4:one leak on its own line: /home/carol/three
-tree/second-leak.txt:2:a single line: the promo URL claude.com/claude-code is banned here too.
-tree/accounts.txt:1:The forge accounts were `fixture-acct-0` and `fixture-acct-1`, one per machine.
-tree/msg-patterns.old.list:1:a stale roster no knob names: /home/dave/old
+match a banned pattern or deny term
+tree/leak.txt:1: [HOME-PATH]
+tree/multi.txt:1: [HOME-PATH]
+tree/multi.txt:3: [HOME-PATH]
+tree/multi.txt:4: [HOME-PATH]
+tree/second-leak.txt:2: [TEXT-DENIED]
+tree/accounts.txt:1: [TEXT-DENIED]
+tree/msg-patterns.old.list:1: [HOME-PATH]
+tree/terms.txt:1: [CODENAME]
+tree/terms.txt:1: [HOME-PATH]
+tree/terms.txt:2: [TEXT-DENIED]

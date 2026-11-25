@@ -1,1 +1,2 @@
 GATE_SDK_KIT_DIRS = tree/demo-kit
+GATE_SDK_DENY_TERMS = tree/rosters/terms.list
