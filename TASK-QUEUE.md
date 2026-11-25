@@ -4,11 +4,49 @@
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
 
+  **Set record**
+
+  **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, on scope's recommendation widened by one):** the machine-verdict set answering the orchestrator adopter's pairing asks, in the adopter's priority order. Features for spec to author: `verdict-identity-fields` leads, `verdict-lookup` lands after it, `exit-code-tool-error`, `orchestrator-arm-json`, and `external-state-owner-mode`, reopened by the same direction and riding `orchestrator-arm-json`'s form. Debt on the surfaces they touch: `foreign-run-sandbox-record`, `lead-journal-session-id`, `knobs-lock-catcher`, `payload-amendment-withhold`. `adopter-content-checks` leads the next iteration once the adopter glosses `script`; the adopter refiles its four peer-channel defects through the peer channel, where each takes an id.
+
+  **The release and pushes (2026-11-25, operator direction, lead-relayed, not a ruling):** no release cut is granted. Push need 2 against 2, inside the budget: the closing push, and the mid-iteration push `exit-code-tool-error` owes.
+
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### foreign-run-sandbox-record
+
+Two holes in the foreign-vendor run's confinement record. `--foreign-resume` reports the recorded `sandbox=` policy while running a resume form edited mid-session to drop `@SANDBOX@` for a literal confinement, since the pre-spawn check in `native/src/emit/foreign_run.rs` refuses only a held `none` word under a token-bearing form, so the verdict line names a confinement the turn did not run under. And `--sandbox -` is accepted (`tier::name` admits a lone `-`) as is a `<adapter>/-=<word>` table element, while `session.txt` reads `-` as absent, so a resume drops the policy from its record and verdict line.
+
+**Deliverable:** debt: a lone `-` refused as a policy name in both readers, as the knob already refuses it as a word, and a resume whose form lost `@SANDBOX@` under a recorded policy refused or reported as the literal it runs, each with a case.
+
+**Cost while deferred:** a verdict line can name a confinement the turn did not run under, which a caller acting on foreign-run verdicts takes as fact. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: `tier::name` admits `-`. Owner lookup: `sandbox`, `foreign-resume` in this file, none; owner delegation-kit/SPEC.md §The foreign-vendor run.
+
+### lead-journal-session-id
+
+The lead-journal arm (`--enter-stage --open-lead-journal`), re-run by a resumed lead after a mid-iteration re-login, wrote a build stage session's id rather than the lead's to the session-role marker. Re-verified 2026-11-25: `role_marker` (native/src/emit/enter_stage.rs) takes the id from `--emit-session-id`, the newest transcript, which a stage child's newer transcript outranks; the segment heading names the cursor's last stamp by design.
+
+**Deliverable:** debt: the arm resolves the invoking session's id, with a case for a resumed lead.
+
+**Cost while deferred:** the session-context hook suppresses executor steps for the wrong session. Filed 2026-11-24 by adopter-asks-pass' lead. Owner lookup: `lead-journal`, `session-role` in this file, none; owner lifecycle-kit/SPEC.md §bin/enter-stage.sh and context-kit/SPEC.md §The session-context hook.
+
+### knobs-lock-catcher
+
+The knob lock (`knobenv::lock`) reached the source-walking tests with no catcher, and the other `prune_dirs` readers (`walk::glob_corpus`, `walk::tracked_shell_tree`, `walk::find_named_pruning`) were not swept.
+
+**Deliverable:** debt: a roster test in `native/src/knobenv.rs`, in the shape of `no_module_outside_this_one_writes_the_environment`, asserting every test fn calling a `prune_dirs` reader holds the lock, and the sweep it reds.
+
+**Cost while deferred:** a parallel test run can race a knob write against a walk and red `native_crate` at random, as it did in the prior close's validate re-run. Filed 2026-11-25 at adopter-followthrough-pass' close from build's bullet. Re-verified 2026-11-25: `knobenv.rs` names no `prune_dirs` reader, and five call sites in `walk.rs` read it. Owner lookup: `knobenv`, `prune_dirs` in this file, none; owner gate-sdk/SPEC.md §Layout and configuration.
+
+### payload-amendment-withhold
+
+The packer withholds each kit root's `SPEC.md` and `smoke/` under `GATE_SDK_PAYLOAD_WITHHOLD`'s default, but an open `SPEC-<slug>.md` amendment is packed: the default names `SPEC.md` alone, so an amendment rides the payload while the SPEC it amends is withheld, and every spec-stage amendment commit moves the install-size figure and may re-stamp its surface ceiling.
+
+**Deliverable:** debt: amendments withheld by the default shape, with gate-sdk/SPEC.md §Consumer payload stating the glob member and `check-packed-links` assertion A matching it, and the install-size figure counting the same set.
+
+**Cost while deferred:** install-size churns at every spec stage, and a release cut with an amendment open ships it; a close-time cut ships none, since build retires every amendment. Filed 2026-11-25 at adopter-followthrough-pass' close from the spec session's bullet. Re-verified 2026-11-25: the default reads `SPEC.md smoke` (gate-sdk/SPEC.md §Layout and configuration). Owner lookup: `withhold`, `SPEC-*` in this file, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The install size.
 
 ## Deferred
 
@@ -166,13 +204,13 @@ Only TRAJECTORY.md holds rulings (operator direction, 2026-10-25), yet tracked p
 
 ### external-state-owner-mode
 
-[cost: event/low] [surface: lifecycle-kit] [not-icebox-eligible: 2026-11-24 carries the operator direction of 2026-11-15 that the lead decision stands, held only in this entry]
+[cost: event/low] [surface: lifecycle-kit] [not-icebox-eligible: 2026-11-25 reopened by operator direction into this iteration's set, for spec to author]
 
 A declared mode where an outside tool renders the queue file and the iteration header: the gates check consistency and a provenance stamp (generator, version, content hash) instead of hand transitions, a corrective message names the owner's command from config, and stage transitions get verbs with JSON results.
 
-**Conflict, standing:** the lead decision of 2026-11-14 (operator-delegated) serves an adopter running its own work engine the checks and the session hooks only, with no lifecycle or queue read adapter, on the refusal's ground that a stamp is worth its being committed and naming HEAD. Operator direction 2026-11-15, lead-relayed, not a ruling: that decision stands. **Reopens** when an adopter names a lifecycle or queue gate it wants read over its own engine's state.
+**Conflict, settled:** the lead decision of 2026-11-14 (operator-delegated) served an adopter running its own work engine the checks and the session hooks only, on the ground that a stamp is worth its being committed and naming HEAD, and the operator's direction of 2026-11-15 kept it. **Reopened 2026-11-25, operator direction, lead-relayed, not a ruling:** checkwright and the orchestrator are to be one coherent offering, contract changes being cheap, which supersedes the 2026-11-15 direction. The orchestrator adopter's boundary: where present it owns work state, invokes stages as verdict-returning steps, and neither tool keeps a copy of the other's state; standalone use is unchanged.
 
-**Deliverable:** design-pending, a feature, on reopening.
+**Deliverable:** design-pending, a feature: the declared mode, the consistency and provenance-stamp checks, the corrective message, and stage verbs whose JSON results take [orchestrator-arm-json](#orchestrator-arm-json)'s form, which lands first. The ask names no gate to read over the engine's state, so spec settles which gates the mode reads and escalates what only the adopter can answer.
 
 **Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
 
@@ -206,16 +244,6 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 
 **Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
 
-### lead-journal-session-id
-
-[cost: event/low] [surface: lifecycle-kit]
-
-The lead-journal arm (`--enter-stage --open-lead-journal`), re-run by a resumed lead after a mid-iteration re-login, wrote a build stage session's id rather than the lead's to the session-role marker and to the journal segment's heading. The cause is inferred, not probed: the arm reads the id from a source a resumed or re-authenticated lead does not refresh, or from the last stamp.
-
-**Deliverable:** debt: the arm resolves the invoking session's id, with a case for a resumed lead.
-
-**Cost while deferred:** the session-context hook suppresses executor steps for the wrong session. Filed 2026-11-24 by adopter-asks-pass' lead. Owner lookup: `lead-journal`, `session-role` in this file, none; owner lifecycle-kit/SPEC.md §bin/enter-stage.sh and context-kit/SPEC.md §The session-context hook.
-
 ### brief-payload-reader
 
 [cost: event/high] [surface: delegation-kit]
@@ -225,36 +253,6 @@ The lead-journal arm (`--enter-stage --open-lead-journal`), re-run by a resumed 
 **Deliverable:** feature: a rule on `agent-dispatch-guard` reading the dispatch prompt through the same `DELEGATION_KIT_BRIEF_RULES` grammar and matcher, with its own decision class (advise or deny) and its own resolution of the rule file where the hook runs with no repository.
 
 **Cost while deferred:** every inline dispatch, the common form and this repo's stage dispatches included, is linted only if the dispatcher writes it out and runs the gate first. Filed 2026-11-25 at adopter-followthrough-pass' close from two inbox bullets, the spec session's and build batch 4's. Owner lookup: `payload`, `inline`, `agent-dispatch-guard` in this file, none; owner delegation-kit/SPEC.md §check-brief-authority and §The delegation model.
-
-### payload-amendment-withhold
-
-[cost: event/low] [surface: gate-sdk]
-
-The packer withholds each kit root's `SPEC.md` and `smoke/` under `GATE_SDK_PAYLOAD_WITHHOLD`'s default, but an open `SPEC-<slug>.md` amendment is packed: the default names `SPEC.md` alone, so an amendment rides the payload while the SPEC it amends is withheld, and every spec-stage amendment commit moves the install-size figure and may re-stamp its surface ceiling.
-
-**Deliverable:** debt: amendments withheld by the default shape, with gate-sdk/SPEC.md §Consumer payload stating the glob member and `check-packed-links` assertion A matching it, and the install-size figure counting the same set.
-
-**Cost while deferred:** install-size churns at every spec stage, and a release cut with an amendment open ships it; a close-time cut ships none, since build retires every amendment. Filed 2026-11-25 at adopter-followthrough-pass' close from the spec session's bullet. Owner lookup: `withhold`, `SPEC-*` in this file, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The install size.
-
-### knobs-lock-catcher
-
-[cost: event/low] [surface: gate-sdk]
-
-The knob lock (`knobenv::lock`) reached the source-walking tests with no catcher, and the other `prune_dirs` readers (`walk::glob_corpus`, `walk::tracked_shell_tree`, `walk::find_named_pruning`) were not swept.
-
-**Deliverable:** debt: a roster test in `native/src/knobenv.rs`, in the shape of `no_module_outside_this_one_writes_the_environment`, asserting every test fn calling a `prune_dirs` reader holds the lock, and the sweep it reds.
-
-**Cost while deferred:** a parallel test run can race a knob write against a walk and red `native_crate` at random, as it did in the prior close's validate re-run. Filed 2026-11-25 at adopter-followthrough-pass' close from build's bullet. Owner lookup: `knobenv`, `prune_dirs` in this file, none; owner gate-sdk/SPEC.md §Layout and configuration.
-
-### foreign-run-sandbox-record
-
-[cost: event/low] [surface: delegation-kit]
-
-Two holes in the foreign-vendor run's confinement record. `--foreign-resume` reports the recorded `sandbox=` policy while running a resume form edited mid-session to drop `@SANDBOX@` for a literal confinement, since the pre-spawn check in `native/src/emit/foreign_run.rs` refuses only a held `none` word under a token-bearing form, so the verdict line names a confinement the turn did not run under. And `--sandbox -` is accepted (`tier::name` admits a lone `-`) as is a `<adapter>/-=<word>` table element, while `session.txt` reads `-` as absent, so a resume drops the policy from its record and verdict line.
-
-**Deliverable:** debt: a lone `-` refused as a policy name in both readers, as the knob already refuses it as a word, and a resume whose form lost `@SANDBOX@` under a recorded policy refused or reported as the literal it runs, each with a case.
-
-**Cost while deferred:** a verdict line can name a confinement the turn did not run under, which a caller acting on foreign-run verdicts takes as fact. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: `tier::name` admits `-`. Owner lookup: `sandbox`, `foreign-resume` in this file, none; owner delegation-kit/SPEC.md §The foreign-vendor run.
 
 ### wakeup-log-write-unreported
 
@@ -300,9 +298,11 @@ Ask B of the orchestrator adopter's pairing asks: a verdict keyed by tree, kit v
 
 [cost: event/low] [surface: gate-sdk]
 
-The orchestrator adopter asks for exit 2 on a usage error or refusal, a new 3 on a tool or input error, and an error-kind field in the machine form. gate-sdk/SPEC.md §Output contract holds 0, 1 and 2, grounded against a fourth code by the churn every caller branching on the status pays; the operator's direction of 2026-11-25, lead-relayed (not a ruling), weighs that ground down, every adopter being in-house. Probed: a harness hook blocks on exit 2 alone (gate-sdk/SPEC.md §The hook contract), so a hook arm moving a fail-closed refusal to 3 fails open.
+The orchestrator adopter asks for exit 2 on a usage error or refusal, a new 3 on a tool or input error, and an error-kind field in the machine form. gate-sdk/SPEC.md §Output contract holds 0, 1 and 2, grounded against a fourth code by the churn every caller branching on the status pays; the operator's direction of 2026-11-25, lead-relayed (not a ruling), weighs that ground down, every adopter being in-house.
 
-**Deliverable:** design-pending, a feature: which members and arms take 3, the hook arms' exemption, the front ends and CI templates that branch on status, and the error kind's home.
+**Deliverable:** design-pending, a feature: exit 2 for a usage error or refusal, 3 for a tool or input error, and an error-kind field in `--json`, as the adopter asked (operator direction 2026-11-25, lead-relayed, not a ruling), across members and arms, hook arms not exempted; the front ends and CI templates that branch on status follow. **Tension for spec, not reconciled here:** a harness hook blocks on exit 2 alone (gate-sdk/SPEC.md §The hook contract), so a hook arm's tool or input error moved to 3 stops blocking; spec escalates it if it bites.
+
+**Push need (2026-11-25, inside the budget):** one mid-iteration push, since the split reaches gate-sdk/bin/run-gates.ps1, which only the Windows legs execute.
 
 **Cost while deferred:** a caller tells a refused input from a crashed tool only by parsing stderr. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `exit 3`, `fourth code` in this file, none; owner gate-sdk/SPEC.md §Output contract.
 
@@ -324,7 +324,7 @@ Ask D of the orchestrator adopter's pairing asks: its content checks as config-d
 
 **Covered today, in part:** text is check-tree-terms over `GATE_SDK_MSG_PATTERN_FILES_LOCAL`, whose record prints the matched line (gate-sdk/SPEC.md §check-tree-terms); ghpin is check-action-pinning, with no sites file. No content gate reads a since-base-ref corpus; check-gate-tamper's `--range` is the precedent. `script` is unglossed in the ask.
 
-**Deliverable:** design-pending, features split at spec: the redacted record and a per-pattern rule id first, then each new gate born native with its pair and knob, reusing check-commit-msg and check-tree-terms where they cover.
+**Deliverable:** design-pending, features split at spec: the redacted record and a per-pattern rule id first, then each new gate born native with its pair and knob, reusing check-commit-msg and check-tree-terms where they cover. **Owed first (2026-11-25, operator direction, lead-relayed, not a ruling):** the adopter glosses `script` before this is taken up.
 
 **Cost while deferred:** the adopter keeps nine checks of its own beside the battery, two overlapping ours under another output contract. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `deny`, `base ref` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
 
