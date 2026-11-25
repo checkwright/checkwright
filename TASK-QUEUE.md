@@ -246,7 +246,7 @@ The packer withholds each kit root's `SPEC.md` and `smoke/` under `GATE_SDK_PAYL
 
 [cost: event/low] [surface: gate-sdk]
 
-The knob lock (`knobenv::lock`) reached six source-walking tests with no catcher, and the other `prune_dirs` readers (`walk::glob_corpus`, `walk::tracked_shell_tree`, `walk::find_named_pruning`) were not swept; 55 call sites reach the four readers.
+The knob lock (`knobenv::lock`) reached the source-walking tests with no catcher, and the other `prune_dirs` readers (`walk::glob_corpus`, `walk::tracked_shell_tree`, `walk::find_named_pruning`) were not swept.
 
 **Deliverable:** debt: a roster test in `native/src/knobenv.rs`, in the shape of `no_module_outside_this_one_writes_the_environment`, asserting every test fn calling a `prune_dirs` reader holds the lock, and the sweep it reds.
 
