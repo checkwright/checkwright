@@ -222,6 +222,36 @@ The lead-journal arm (`--enter-stage --open-lead-journal`), re-run by a resumed 
 
 **Cost while deferred:** the session-context hook suppresses executor steps for the wrong session. Filed 2026-11-24 by adopter-asks-pass' lead. Owner lookup: `lead-journal`, `session-role` in this file, none; owner lifecycle-kit/SPEC.md §bin/enter-stage.sh and context-kit/SPEC.md §The session-context hook.
 
+### brief-payload-reader
+
+[cost: event/high] [surface: delegation-kit]
+
+`check-brief-authority` reads a brief only as a file operand, so a brief passed inline to the harness's `Agent` tool reaches the agent unread (delegation-kit/SPEC.md §check-brief-authority, its honest limit *A dispatch payload is not read*); `native/src/hook/dispatch.rs` reads no brief.
+
+**Deliverable:** feature: a rule on `agent-dispatch-guard` reading the dispatch prompt through the same `DELEGATION_KIT_BRIEF_RULES` grammar and matcher, with its own decision class (advise or deny) and its own resolution of the rule file where the hook runs with no repository.
+
+**Cost while deferred:** every inline dispatch, the common form and this repo's stage dispatches included, is linted only if the dispatcher writes it out and runs the gate first. Filed 2026-11-25 at adopter-followthrough-pass' close from two inbox bullets, the spec session's and build batch 4's. Owner lookup: `payload`, `inline`, `agent-dispatch-guard` in this file, none; owner delegation-kit/SPEC.md §check-brief-authority and §The delegation model.
+
+### payload-amendment-withhold
+
+[cost: event/low] [surface: gate-sdk]
+
+The packer withholds each kit root's `SPEC.md` and `smoke/` under `GATE_SDK_PAYLOAD_WITHHOLD`'s default, but an open `SPEC-<slug>.md` amendment is packed: the default names `SPEC.md` alone, so an amendment rides the payload while the SPEC it amends is withheld, and every spec-stage amendment commit moves the install-size figure and may re-stamp its surface ceiling.
+
+**Deliverable:** debt: amendments withheld by the default shape, with gate-sdk/SPEC.md §Consumer payload stating the glob member and `check-packed-links` assertion A matching it, and the install-size figure counting the same set.
+
+**Cost while deferred:** install-size churns at every spec stage, and a release cut with an amendment open ships it; a close-time cut ships none, since build retires every amendment. Filed 2026-11-25 at adopter-followthrough-pass' close from the spec session's bullet. Owner lookup: `withhold`, `SPEC-*` in this file, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The install size.
+
+### knobs-lock-catcher
+
+[cost: event/low] [surface: gate-sdk]
+
+`knobs-lock-test-race` put `knobenv::lock` in six source-walking tests and landed no catcher, and the other `prune_dirs` readers (`walk::glob_corpus`, `walk::tracked_shell_tree`, `walk::find_named_pruning`) were not swept; 55 call sites reach the four readers.
+
+**Deliverable:** debt: a roster test in `native/src/knobenv.rs`, in the shape of `no_module_outside_this_one_writes_the_environment`, asserting every test fn calling a `prune_dirs` reader holds the lock, and the sweep it reds.
+
+**Cost while deferred:** a parallel test run can race a knob write against a walk and red `native_crate` at random, as it did in the prior close's validate re-run. Filed 2026-11-25 at adopter-followthrough-pass' close from build's bullet. Owner lookup: `knobenv`, `prune_dirs` in this file, none; owner gate-sdk/SPEC.md §Layout and configuration.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
