@@ -8,9 +8,13 @@
 /(home|Users)/[A-Za-z0-9._-]+
 
 # The Claude Code promo URL — the marketing link that ends a generated PR body.
-# The shipped default leaves the Co-Authored-By trailer unbanned; this repo
-# does not ban it either (gate-sdk/SPEC.md §check-commit-msg).
 claude\.com/claude-code
+
+# The Co-Authored-By attribution trailer — the shipped default leaves it
+# unbanned, a consumer-selectable class (gate-sdk/SPEC.md §check-commit-msg);
+# this repo bans it. Anchored at a line start so prose naming the trailer
+# mid-line stays clean.
+^[Cc]o-[Aa]uthored-[Bb]y:
 
 # Session-reference class — a harness-injected trailer referencing an internal
 # session, before it lands in public history. The session-share URL host (public

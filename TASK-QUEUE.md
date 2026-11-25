@@ -68,16 +68,6 @@ The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (ga
 
 ## Technical Debt
 
-### attribution-trailer-ban
-
-[recurrence: 2026-11-25]
-
-The harness's attribution reminder asks for a `Co-Authored-By` trailer in every session, and CLAUDE.md's prose bar (operator direction 2026-11-24) does not hold against it: 27 of adopter-asks-pass' 30 commits carried it (probed: `git log origin/master..HEAD --format=%B | grep -c '^Co-Authored-By'`), a host pre-push guard refused the closing push, and the operator directed a message rewrite of the unpushed range. Banning the trailer is check-commit-msg's consumer-selectable class (gate-sdk/SPEC.md §check-commit-msg), yet scripts/msg-patterns.list says this repo leaves it unbanned.
-
-**Deliverable:** debt: a trailer-anchored pattern in scripts/msg-patterns.list, its comment corrected. check-tree-terms reads the same list over the tree, so the two good fixtures carrying the trailer at a line start (gate-sdk/gate-tests/check-commit-msg/good/msg.txt, check-commit-subject/good/msg.txt) are reworded or the pattern scoped to keep them green. README.md's attribution paragraph, which says most commits carry the trailer, is corrected to the bar.
-
-**Cost while deferred:** each iteration's close finds its range trailered and pays a refused push and a rewrite of the unpushed range. Filed 2026-11-24 by adopter-asks-pass' close from its gap inbox, two bullets: the recurrence and its premise correction. Re-verified at this scope: scripts/msg-patterns.list carries no trailer pattern, and README.md's attribution paragraph states the trailer. Owner lookup: `Co-Authored`, `trailer` in this file — the icebox's co-authored-by-trailer-attribution, a baked trailer misattributing authorship, which this ban moots; owner gate-sdk/SPEC.md §check-commit-msg.
-
 ### knobs-lock-test-race
 
 native/src/output.rs's test `no_bundled_clean_line_opens_on_an_empty_corpus_word_unsignalled` walks src/gates through `walk::find_files`, whose `prune_dirs` reads knob state, without taking `knobenv::lock`. A concurrent knobs test holding the lock with a temporary knob dir makes the walk refuse ('GATE_SDK_GATES_DIR is not read from a knob file'), so `native_crate` reds intermittently.
@@ -1073,4 +1063,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - co-authored-by-trailer-attribution
+- attribution-trailer-ban
 
