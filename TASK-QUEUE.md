@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### payload-amendment-withhold
-
-The packer withholds each kit root's `SPEC.md` and `smoke/` under `GATE_SDK_PAYLOAD_WITHHOLD`'s default, but an open `SPEC-<slug>.md` amendment is packed: the default names `SPEC.md` alone, so an amendment rides the payload while the SPEC it amends is withheld, and every spec-stage amendment commit moves the install-size figure and may re-stamp its surface ceiling.
-
-**Deliverable:** debt: amendments withheld by the default shape, with gate-sdk/SPEC.md §Consumer payload stating the glob member and `check-packed-links` assertion A matching it, and the install-size figure counting the same set.
-
-**Cost while deferred:** install-size churns at every spec stage, and a release cut with an amendment open ships it; a close-time cut ships none, since build retires every amendment. Filed 2026-11-25 at adopter-followthrough-pass' close from the spec session's bullet. Re-verified 2026-11-25: the default reads `SPEC.md smoke` (gate-sdk/SPEC.md §Layout and configuration). Owner lookup: `withhold`, `SPEC-*` in this file, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The install size.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1015,4 +1007,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - foreign-run-sandbox-record
 - lead-journal-session-id
 - knobs-lock-catcher
+- payload-amendment-withhold
 

@@ -3,6 +3,7 @@
 ## Knob changes
 
 - `GATE_SDK_VERDICT_STORE` — new: an absolute directory `--run` keeps a judged verdict in, environment-only; default unset, which keeps nothing. A registry run on a clean worktree whose verdict is `pass` or `fail`, by a stamped binary, writes one record under a key digesting `treeId`, `tool.version` and `gateSet`. A relative path is refused at exit 2 before the first member runs, and a store that cannot be written is exit 3.
+- `GATE_SDK_PAYLOAD_WITHHOLD` — default `SPEC.md smoke` → `SPEC.md SPEC-*.md smoke`: the payload `--pack-installer` builds no longer carries a kit root's open `SPEC-<slug>.md` amendment, and the install-size figure stops counting one. A member carrying `*`, `?` or `[` is now a glob whose wildcards never cross a `/`, so a same-named file deeper in a kit root still ships, and `check-packed-links` reds a packed README linking a member it matches. Action owed only by a publisher setting the knob: add `SPEC-*.md` to withhold amendments too.
 
 ## Behavior changes
 

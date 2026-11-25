@@ -376,7 +376,7 @@ fn carry_declarations(repo: &str, commit: &str, kit: &str, into: &str, withhold:
     let mut lines: Vec<String> = Vec::new();
     for member in withhold {
         let member = member.trim_matches('/');
-        if member.is_empty() {
+        if member.is_empty() || glob_member(member) {
             continue;
         }
         let path = format!("{}/{}", kit.trim_end_matches('/'), member);
@@ -693,12 +693,37 @@ pub(crate) fn pathspec(src: &str, withhold: &[String]) -> Vec<String> {
             continue;
         }
         let path = format!("{}/{}", src, member);
+        if glob_member(member) {
+            spec.push(format!(":(exclude,glob){}", path));
+            spec.push(format!(":(exclude,glob){}/**", path));
+            continue;
+        }
         spec.push(format!(":(exclude){}", path));
         if std::path::Path::new(&path).is_dir() {
             spec.push(format!(":(exclude){}/*", path));
         }
     }
     spec
+}
+
+// spec: gate-sdk/SPEC.md §Consumer payload — a member carrying `*`, `?` or `[` is a glob, matched
+// component-wise, so a root's amendment pattern never reaches a same-named file deeper in the root
+pub(crate) fn glob_member(member: &str) -> bool {
+    member.contains(['*', '?', '['])
+}
+
+// spec: gate-sdk/SPEC.md §Consumer payload — whether a member withholds a root-relative path: a
+// literal member the path or an ancestor, a glob member a leading run of its components
+pub(crate) fn withholds(member: &str, rest: &str) -> bool {
+    let m = member.trim_matches('/');
+    if m.is_empty() {
+        return false;
+    }
+    if !glob_member(m) {
+        return walk::at_or_under(m, rest);
+    }
+    let comps: Vec<&str> = rest.split('/').filter(|c| !c.is_empty()).collect();
+    (1..=comps.len()).any(|k| walk::dir_glob_match(m, &comps[..k].join("/")))
 }
 
 fn pack_tracked(commit: &str, src: &str, dst: &str, withhold: &[String]) -> Result<(), Refusal> {
@@ -1079,6 +1104,14 @@ mod tests {
                 format!(":(exclude){}/smoke/*", root),
             ]
         );
+        assert_eq!(
+            pathspec(&root, &["SPEC-*.md".to_string()]),
+            vec![
+                root.clone(),
+                format!(":(exclude,glob){}/SPEC-*.md", root),
+                format!(":(exclude,glob){}/SPEC-*.md/**", root),
+            ]
+        );
         // comment-tier-exempt: a blank member is a local property of a whitespace-split value, and
         // the assertion is that it contributes nothing rather than excluding the root itself
         assert_eq!(
@@ -1086,6 +1119,36 @@ mod tests {
             vec![root.clone()]
         );
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §Consumer payload — git selects through the glob member what the shared
+    // matcher withholds: a root's amendment out, a deeper namesake and a path the wildcard would
+    // reach only across a `/` kept
+    #[test]
+    fn a_glob_member_withholds_the_roots_amendments_and_no_deeper_namesake() {
+        let dir = std::env::temp_dir().join(format!("pack-installer-glob-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let files = ["kit/README.md", "kit/SPEC.md", "kit/SPEC-open.md", "kit/gate-tests/c/good/SPEC-x.md", "kit/SPEC-n/x.md", "kit/smoke/s.sh"];
+        for f in files {
+            std::fs::create_dir_all(dir.join(f).parent().expect("parent")).expect("mk");
+            std::fs::write(dir.join(f), "x\n").expect("w");
+        }
+        let repo = dir.display().to_string();
+        let git_in = |a: &[&str]| proc::run(&programs::GIT, &[&["-C", repo.as_str()], a].concat()).expect("git");
+        assert!(git_in(&["init", "-q"]).stdout().is_some() && git_in(&["add", "kit"]).stdout().is_some());
+        let withhold: Vec<String> = ["SPEC.md", "SPEC-*.md", "smoke"].iter().map(|s| s.to_string()).collect();
+        let mut ls = vec!["ls-files".to_string(), "-z".to_string(), "--".to_string()];
+        ls.extend(pathspec(&dir.join("kit").display().to_string(), &withhold));
+        let ls: Vec<&str> = ls.iter().map(String::as_str).collect();
+        let listed = crate::listing::names(Some(&repo), &ls).expect("git lists the index");
+        let _ = std::fs::remove_dir_all(&dir);
+        let packed: Vec<&str> = listed.iter().map(String::as_str).collect();
+        assert_eq!(packed, vec!["kit/README.md", "kit/SPEC-n/x.md", "kit/gate-tests/c/good/SPEC-x.md"]);
+        for f in files {
+            let rest = f.strip_prefix("kit/").expect("under kit");
+            let withheld = withhold.iter().any(|m| withholds(m, rest));
+            assert_eq!(withheld, !packed.contains(&f), "the matcher and git disagree on {}", f);
+        }
     }
 
     // spec: installer/SPEC.md §The packer — the license text lands at the package root and in a

@@ -59,10 +59,7 @@ fn payload_path(target: &str, leaf: &str) -> Option<(String, String)> {
 // spec: gate-sdk/SPEC.md §check-packed-links — the withheld set is read from the knob and never
 // re-listed, so a member added to the withhold list extends the assertion with no gate edit
 fn withheld<'a>(rest: &str, withhold: &'a [String]) -> Option<&'a str> {
-    withhold.iter().map(String::as_str).find(|m| {
-        let m = m.trim_matches('/');
-        !m.is_empty() && crate::walk::at_or_under(m, rest)
-    })
+    withhold.iter().map(String::as_str).find(|m| crate::emit::pack_installer::withholds(m, rest))
 }
 
 fn targets(line: &str) -> Vec<&str> {
@@ -260,6 +257,10 @@ mod tests {
         assert_eq!(withheld("README.md", &w), None);
         assert_eq!(withheld("smokey.md", &w), None);
         assert_eq!(withheld("DOCTRINE.md", &w), None);
+        let g = vec!["SPEC-*.md".to_string()];
+        assert_eq!(withheld("SPEC-open.md", &g), Some("SPEC-*.md"));
+        assert_eq!(withheld("gate-tests/c/good/SPEC-x.md", &g), None);
+        assert_eq!(withheld("SPEC-n/x.md", &g), None);
     }
 
     // spec: gate-sdk/SPEC.md §check-packed-links — every link on a line is read, and an unclosed
