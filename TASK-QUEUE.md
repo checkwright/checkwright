@@ -14,6 +14,16 @@
 
 ## New Features
 
+### gate-tamper-range-arm
+
+[spec: SPEC-gate-tamper-range.md] [recurrence: 2026-11-25]
+
+`check-gate-tamper` reads only the index (delegation-kit/SPEC.md §check-gate-tamper), so a supervisor receiving an agent's commits cannot run it over the range they span.
+
+**Deliverable:** design-pending, a feature: a range form with a machine verdict, its fixture pair, and the index form unchanged.
+
+**Cost while deferred:** a handed-back range is checked for tamper only commit by commit at its own pre-commit, which an agent's hook bypass skips. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `gate-tamper`, `range` in this file, the icebox's coverage entry only; owner delegation-kit/SPEC.md §check-gate-tamper.
+
 ## Technical Debt
 
 ### attribution-trailer-ban
@@ -245,16 +255,6 @@ A declared mode where an outside tool renders the queue file and the iteration h
 **Deliverable:** design-pending, a feature, on reopening.
 
 **Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
-
-### gate-tamper-range-arm
-
-[cost: event/low] [surface: delegation-kit] [recurrence: 2026-11-25]
-
-`check-gate-tamper` reads only the index (delegation-kit/SPEC.md §check-gate-tamper), so a supervisor receiving an agent's commits cannot run it over the range they span.
-
-**Deliverable:** design-pending, a feature: a range form with a machine verdict, its fixture pair, and the index form unchanged.
-
-**Cost while deferred:** a handed-back range is checked for tamper only commit by commit at its own pre-commit, which an agent's hook bypass skips. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `gate-tamper`, `range` in this file, the icebox's coverage entry only; owner delegation-kit/SPEC.md §check-gate-tamper.
 
 ### foreign-run-verb
 
