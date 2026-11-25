@@ -44,6 +44,16 @@ No check reads an agent brief: one that grants authority the agent must not hold
 
 **Cost while deferred:** an over-granting or unquoted brief reaches the agent. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `brief`, `forbidden verb` in this file, none; [outbound-public-text-lint](#outbound-public-text-lint) reads posted text, not briefs; owner delegation-kit/SPEC.md.
 
+### external-kpi-series
+
+[spec: SPEC-external-series.md] [recurrence: 2026-11-25]
+
+drift-kit's trend report covers only what it computes in-tree, so a velocity, lesson or queue-age series an outside tool holds cannot join it.
+
+**Deliverable:** design-pending, a feature: an input form for an outside series, its validation and how the report marks its provenance.
+
+**Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
+
 ## Technical Debt
 
 ### attribution-trailer-ban
@@ -275,16 +285,6 @@ A declared mode where an outside tool renders the queue file and the iteration h
 **Deliverable:** design-pending, a feature, on reopening.
 
 **Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
-
-### external-kpi-series
-
-[cost: event/low] [surface: drift-kit] [recurrence: 2026-11-25]
-
-drift-kit's trend report covers only what it computes in-tree, so a velocity, lesson or queue-age series an outside tool holds cannot join it.
-
-**Deliverable:** design-pending, a feature: an input form for an outside series, its validation and how the report marks its provenance.
-
-**Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
 
 ### user-uninstall-containment
 
