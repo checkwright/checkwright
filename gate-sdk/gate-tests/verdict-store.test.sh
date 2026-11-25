@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §run-gates — the verdict store end to end through the front end: a
 # registry run on a clean tree keeps its verdict under the key its SARIF log's provenance carries,
-# --verdict-lookup answers it there and answers absent under another digest, a modified tree keeps
-# nothing, and an unset store is refused with its error document. Run by the --run-gate-tests arm.
+# --verdict-lookup answers it there and answers absent under another digest, a tree that moves while
+# members run or a modified tree keeps nothing, and an unset store is refused with its error
+# document. Run by the --run-gate-tests arm.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/../../gate-sdk/lib/test-hermetic.sh"
 
@@ -26,6 +27,7 @@ git -C "$repo" -c user.name=t -c user.email=t@e.invalid commit -qm base
 # One member, red exactly where the tree holds a file named red.
 { printf '#!/usr/bin/env bash\n'
   printf '# graph: couples=a.txt dir=one valve=none tier=precommit\n'
+  printf '[[ -n "${MOVE_TREE:-}" ]] && { printf "m\\n" >> a.txt; git -c user.name=t -c user.email=t@e.invalid commit -qam moved; }\n'
   printf '[[ -e red ]] && { echo "red: present"; exit 1; }\n'
   printf 'echo "g: clean (no red file)"\n'
 } > "$gates/g.sh"
@@ -76,6 +78,13 @@ key=("${pass_key[0]}" "${pass_key[1]}" "$(printf 'f%.0s' {1..64})")
 got="$(lookup GATE_SDK_VERDICT_STORE="$store")"; rc=$?
 [[ "$rc" -eq 0 && "$got" == '{"contract":"1.0.0","verdict":"absent"}' ]] || fail "another digest" "exit $rc: $got"
 
+# spec: gate-sdk/SPEC.md §run-gates — a commit landing while members run moves the tree under the
+# run, so its outcomes key nothing
+out="$(battery GATE_SDK_VERDICT_STORE="$scratch/moved" MOVE_TREE=1)"; rc=$?
+[[ "$rc" -eq 1 ]] || fail "moved run" "expected exit 1, got $rc" "$out"
+[[ ! -e "$scratch/moved" ]] || fail "moved run" "a run whose tree moved kept a verdict" "$(ls -A "$scratch/moved")"
+grep -q 'moved while members ran; nothing stored' <<<"$out" || fail "moved run" "no line names the unkept verdict" "$out"
+
 printf 'b\n' >> "$repo/a.txt"
 out="$(battery GATE_SDK_VERDICT_STORE="$scratch/modified")"; rc=$?
 [[ "$rc" -eq 1 ]] || fail "modified run" "expected exit 1, got $rc" "$out"
@@ -86,5 +95,5 @@ got="$(lookup)"; rc=$?
 [[ "$rc" -eq 2 && "$got" == '{"contract":"1.0.0","error":"refused"}' ]] || fail "unset store" "exit $rc: $got"
 
 [[ "$fails" -eq 0 ]] || { echo "verdict-store.test: $fails assertion(s) failed"; exit 1; }
-echo "verdict-store.test: clean (a registry run on a clean tree kept its pass and its fail under the SARIF log's key, --verdict-lookup answered each at exit 0 and absent under another digest, a modified tree kept nothing, and an unset store was refused at exit 2 with its error document)"
+echo "verdict-store.test: clean (a registry run on a clean tree kept its pass and its fail under the SARIF log's key, --verdict-lookup answered each at exit 0 and absent under another digest, a tree moved mid-run and a modified tree kept nothing, and an unset store was refused at exit 2 with its error document)"
 exit 0

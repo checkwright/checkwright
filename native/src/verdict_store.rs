@@ -33,6 +33,17 @@ pub fn configured() -> Result<Option<PathBuf>, Fault> {
     Ok(Some(PathBuf::from(dir)))
 }
 
+fn key(p: &Provenance) -> Option<String> {
+    let tree = p.tree_id.as_deref().filter(|_| p.clean)?;
+    Some(file_name(tree, p.tool_version.as_deref()?, p.gate_set.as_deref()?))
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the key read before the first member and after the last name
+// one key, so the outcomes judged the content the record is filed under
+pub fn steady(before: &Provenance, after: &Provenance) -> bool {
+    key(before).is_some() && key(before) == key(after)
+}
+
 // spec: gate-sdk/SPEC.md §run-gates — a run is kept only where its scope is the registry, it judged
 // (`pass` or `fail`), and its provenance carries all three key fields
 pub fn entry(scope: Scope, status: i32, p: &Provenance) -> Option<(String, String)> {
@@ -44,8 +55,7 @@ pub fn entry(scope: Scope, status: i32, p: &Provenance) -> Option<(String, Strin
     if scope != Scope::Registry {
         return None;
     }
-    let tree = p.tree_id.as_deref().filter(|_| p.clean)?;
-    let name = file_name(tree, p.tool_version.as_deref()?, p.gate_set.as_deref()?);
+    let name = key(p)?;
     let mut record = Map::new();
     record.insert("contract".into(), CONTRACT.into());
     record.insert("provenance".into(), p.block());
@@ -184,6 +194,24 @@ mod tests {
         let mut setless = fixed();
         setless.gate_set = None;
         assert!(entry(Scope::Registry, 0, &setless).is_none(), "a set it could not digest keys nothing");
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — a tree or gate set that moved between the two readings,
+    // or a key the first reading could not form, is no steady key
+    #[test]
+    fn only_a_key_unmoved_across_the_run_is_steady() {
+        let p = fixed();
+        assert!(steady(&p, &fixed()));
+        let mut committed = fixed();
+        committed.tree_id = Some("e".repeat(40));
+        assert!(!steady(&p, &committed), "a commit landed while members ran");
+        let mut reset = fixed();
+        reset.gate_set = Some("1".repeat(64));
+        assert!(!steady(&p, &reset), "a gate file moved while members ran");
+        let mut dirty = fixed();
+        dirty.clean = false;
+        assert!(!steady(&dirty, &p), "the run began on a modified worktree");
+        assert!(!steady(&p, &dirty), "the run ended on a modified worktree");
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — the key is the digest of the three fields under its tag line

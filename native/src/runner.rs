@@ -1082,6 +1082,24 @@ fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
         env: &[],
     };
 
+    let (scope, omissions) = if !parsed.only.is_empty() {
+        (sarif::Scope::Only, Vec::new())
+    } else if !parsed.paths.is_empty() {
+        (sarif::Scope::For, Vec::new())
+    } else {
+        let declared = registry::omissions(&list_text);
+        let omissions = declared
+            .into_iter()
+            .map(|(line, name, reason)| sarif::Omission { line, name, reason })
+            .collect();
+        (sarif::Scope::Registry, omissions)
+    };
+    // spec: gate-sdk/SPEC.md §run-gates — the store's key is read before the first member runs
+    let before = store
+        .as_ref()
+        .filter(|_| scope == sarif::Scope::Registry)
+        .map(|_| provenance_of(scope, &selected, &resolve_dirs));
+
     let outcomes = dispatch_all(&d, &selected);
     drop(scratch);
 
@@ -1128,18 +1146,6 @@ fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
         verdict_status(&outcomes)
     };
     let _ = w.flush();
-    let (scope, omissions) = if !parsed.only.is_empty() {
-        (sarif::Scope::Only, Vec::new())
-    } else if !parsed.paths.is_empty() {
-        (sarif::Scope::For, Vec::new())
-    } else {
-        let declared = registry::omissions(&list_text);
-        let omissions = declared
-            .into_iter()
-            .map(|(line, name, reason)| sarif::Omission { line, name, reason })
-            .collect();
-        (sarif::Scope::Registry, omissions)
-    };
     let provenance =
         (!sarif_path.is_empty() || store.is_some() || json).then(|| provenance_of(scope, &selected, &resolve_dirs));
     // spec: gate-sdk/SPEC.md §run-gates — the SARIF log is written once after the verdict lines,
@@ -1165,9 +1171,13 @@ fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
         }
     }
     // spec: gate-sdk/SPEC.md §run-gates — the store follows the log, keeping a judged registry run
+    // whose key did not move while its members ran
     if let (Some(dir), Some(provenance)) = (&store, &provenance) {
         if let Some((name, body)) = crate::verdict_store::entry(scope, code, provenance) {
-            if let Err(e) = crate::verdict_store::write(dir, &name, &body) {
+            if !before.as_ref().is_some_and(|b| crate::verdict_store::steady(b, provenance)) {
+                let _ = writeln!(w, "verdict store: the tree or the gate set moved while members ran; nothing stored");
+                let _ = w.flush();
+            } else if let Err(e) = crate::verdict_store::write(dir, &name, &body) {
                 eprintln!("{}: {}", TOOL, e);
                 return Err(exit::Kind::Tool);
             }
