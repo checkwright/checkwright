@@ -64,27 +64,37 @@ impl Wait {
     }
 }
 
+const NAME: &str = "subagent-stop-liveness";
+
+// spec: delegation-kit/SPEC.md §The turn-end liveness hook — the four knob reads, any fault among
+// them the firing's decline reason
+pub(crate) struct Inputs {
+    log: String,
+    liveness_cmd: Vec<String>,
+    run_dir: String,
+    wait: Wait,
+}
+
+pub(crate) fn inputs() -> Result<Inputs, String> {
+    let log = walk::knob_scalar("DELEGATION_KIT_STOP_LOG")?;
+    let liveness_cmd = walk::knob_array("DELEGATION_KIT_LIVENESS_CMD")?;
+    let run_dir = walk::knob_scalar("GATE_SDK_TMP_DIR")?;
+    let wait = match walk::knob_scalar("DELEGATION_KIT_STOP_WAIT")?.as_str() {
+        "resume-wait" => Wait::ResumeWait,
+        _ => Wait::Refuse,
+    };
+    tree_free_inputs(&run_dir, &log, &liveness_cmd)?;
+    Ok(Inputs { log, liveness_cmd, run_dir, wait })
+}
+
 pub fn run(payload: Option<&Value>) -> i32 {
-    let log = match walk::knob_scalar("DELEGATION_KIT_STOP_LOG") {
-        Ok(v) => v,
-        Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
-    };
-    let liveness_cmd = match walk::knob_array("DELEGATION_KIT_LIVENESS_CMD") {
-        Ok(v) => v,
-        Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
-    };
-    let run_dir = match walk::knob_scalar("GATE_SDK_TMP_DIR") {
-        Ok(v) => v,
-        Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
-    };
-    let wait = match walk::knob_scalar("DELEGATION_KIT_STOP_WAIT") {
-        Ok(v) if v == "resume-wait" => Wait::ResumeWait,
-        Ok(_) => Wait::Refuse,
-        Err(e) => return hook::decline("subagent-stop-liveness", &e, payload),
-    };
-    if let Err(e) = tree_free_inputs(&run_dir, &log, &liveness_cmd) {
-        return hook::decline("subagent-stop-liveness", &e, payload);
+    if let Some(code) = hook::decline_on_fault(NAME, payload) {
+        return code;
     }
+    let Inputs { log, liveness_cmd, run_dir, wait } = match inputs() {
+        Ok(i) => i,
+        Err(e) => return hook::decline(NAME, &e, payload),
+    };
     // spec: delegation-kit/SPEC.md §The turn-end liveness hook — the record set is the main
     // checkout's: from a linked worktree a relative scratch dir resolves there, where an isolated
     // session's launch records are written and the shell guard reads them

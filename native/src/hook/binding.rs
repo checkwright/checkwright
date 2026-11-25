@@ -11,6 +11,10 @@ pub const TOOL_BASH: &str = "Bash";
 pub const TOOL_POWERSHELL: &str = "PowerShell";
 pub const TOOL_WRITE: &str = "Write";
 pub const TOOL_EDIT: &str = "Edit";
+pub const TOOL_DISPATCH: &str = "Agent";
+pub const TOOL_MESSAGE: &str = "SendMessage";
+pub const TOOL_WAKE: &str = "ScheduleWakeup";
+pub const TOOL_CRON: &str = "CronCreate";
 
 pub const EVENT_NAME: &str = "hook_event_name";
 pub const SESSION_ID: &str = "session_id";
@@ -47,6 +51,7 @@ pub const CONFIG_DIR_VAR: &str = "CLAUDE_CONFIG_DIR";
 pub const CONFIG_HOME_DEFAULT: &str = ".claude";
 
 pub const WIRING_ARGS: &str = "args";
+pub const WIRING_MATCHER: &str = "matcher";
 pub const WIRING_HOOKS: &str = "hooks";
 pub const WIRING_TYPE: &str = "type";
 pub const HARNESS: &str = "Claude Code";
@@ -80,10 +85,6 @@ pub const DECISION_BLOCK: &str = "block";
 #[cfg_attr(not(test), allow(dead_code))]
 pub const UNREAD: &[&str] = &[
     "Stop",
-    "Agent",
-    "SendMessage",
-    "ScheduleWakeup",
-    "CronCreate",
     "Glob",
     "Grep",
     "transcript_path",
@@ -162,12 +163,18 @@ pub fn notice_envelope(text: &str) -> String {
 }
 
 // spec: gate-sdk/SPEC.md §The hook contract — one event's exec-form registration, the fragment a
-// user-scope settings file's `hooks` object takes: the event key over one matcher-less group whose
-// `hooks` array holds one command entry
-pub fn wiring_fragment(event: &str, command: &str, args: &[&str]) -> String {
+// user-scope settings file's `hooks` object takes: the event key over one group, its matcher key
+// written only where the matcher is non-empty, whose `hooks` array holds one command entry
+pub fn wiring_fragment(event: &str, matcher: &str, command: &str, args: &[&str]) -> String {
+    let matcher = if matcher.is_empty() {
+        String::new()
+    } else {
+        format!("{}:{},", super::quote(WIRING_MATCHER), super::quote(matcher))
+    };
     format!(
-        r#"{{{}:[{{{}:[{{{}:{},{}:{},{}:[{}]}}]}}]}}"#,
+        r#"{{{}:[{{{}{}:[{{{}:{},{}:{},{}:[{}]}}]}}]}}"#,
         super::quote(event),
+        matcher,
         super::quote(WIRING_HOOKS),
         super::quote(WIRING_TYPE),
         super::quote(COMMAND),
@@ -291,12 +298,17 @@ mod tests {
     // exec form reads, every path escaped, a Windows separator included
     #[test]
     fn the_wiring_fragment_is_the_exec_form_registration() {
-        let f = wiring_fragment(EVENT_CHILD_TURN_END, "C:\\u\\b.exe", &["--hook", "m"]);
+        let f = wiring_fragment(EVENT_CHILD_TURN_END, "", "C:\\u\\b.exe", &["--hook", "m"]);
         assert_eq!(
             f,
             r#"{"SubagentStop":[{"hooks":[{"type":"command","command":"C:\\u\\b.exe","args":["--hook","m"]}]}]}"#
         );
         let v: Value = serde_json::from_str(&f).expect("the fragment parses");
         assert_eq!(v["SubagentStop"][0]["hooks"][0]["command"], "C:\\u\\b.exe");
+        let g = wiring_fragment(EVENT_BEFORE_TOOL_CALL, "ScheduleWakeup|CronCreate", "/b", &["--hook", "m"]);
+        assert_eq!(
+            g,
+            r#"{"PreToolUse":[{"matcher":"ScheduleWakeup|CronCreate","hooks":[{"type":"command","command":"/b","args":["--hook","m"]}]}]}"#
+        );
     }
 }

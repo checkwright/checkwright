@@ -11,6 +11,9 @@ const NAME: &str = "escalation-guard";
 const HEADERS: &[&str] = &["Question", "Options", "Recommendation", "Evidence"];
 
 pub fn run(payload: Option<&Value>) -> i32 {
+    if let Some(code) = hook::decline_on_fault(NAME, payload) {
+        return code;
+    }
     // spec: guard-kit/SPEC.md §escalation-guard — advisory posture: never block; an uninspectable
     // payload passes, which is the whole of this member's degraded path
     let to = hook::field(payload, &[TOOL_INPUT, MESSAGE_TARGET]);

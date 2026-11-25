@@ -8,22 +8,34 @@ const NAME: &str = "agent-budget-guard";
 // spec: delegation-kit/SPEC.md §usage-verdict — the verdict rule is in this binary, so the guard
 // calls it directly: no path to resolve, no `bash` to spawn, one `String` and no stream question.
 // The arm-unavailable path the spawn error stood for is the front-end's, which fails open.
-pub fn run(_payload: Option<&Value>) -> i32 {
+pub fn run(payload: Option<&Value>) -> i32 {
+    if let Some(code) = hook::decline_on_fault(NAME, payload) {
+        return code;
+    }
     let (verdict, code) = hook::verdict::verdict(&[]);
-    relay(&verdict, code)
+    relay(&verdict, code, &corrective(hook::knob_file().as_deref()))
 }
 
 // spec: delegation-kit/SPEC.md §The delegation model — only the verdict's PAUSE status blocks
-fn relay(verdict: &str, code: i32) -> i32 {
+fn relay(verdict: &str, code: i32, corrective: &str) -> i32 {
     if code == 1 {
-        return hook::block(NAME, &format!("{}\n{}", verdict, CORRECTIVE));
+        return hook::block(NAME, &format!("{}\n{}", verdict, corrective));
     }
     hook::advise(&format!("budget verdict ({}): {}", NAME, verdict))
 }
 
+// spec: delegation-kit/SPEC.md §Layout and configuration — with no project settings file, the
+// corrective names the `--knobs` file as where a threshold is raised
+fn corrective(knob_file: Option<&str>) -> String {
+    let at = knob_file.map_or(SETTINGS_ENV.to_string(), |f| format!("in the --knobs file {}", f));
+    format!("{}{}{}", CORRECTIVE_HEAD, at, CORRECTIVE_TAIL)
+}
+
 // spec: delegation-kit/SPEC.md §The delegation model — the block's corrective half, carried verbatim
 // off the shell member: it names the axis-to-window mapping and the two knobs that raise it.
-const CORRECTIVE: &str = "corrective: the verdict names the axis that fired — a 5h PAUSE clears when that window resets (hours); a 7-day PAUSE costs days, so pause delegation and let the supervisor carry the week. The full delegation protocol is /agent-execution. To override deliberately, raise the matching knob (DELEGATION_KIT_PAUSE_PCT for 5h, DELEGATION_KIT_PAUSE_PCT_7D for the weekly axis) via the .claude/settings.local.json env block, which the hook re-reads per fire (delegation-kit/SPEC.md §The delegation model).";
+const CORRECTIVE_HEAD: &str = "corrective: the verdict names the axis that fired — a 5h PAUSE clears when that window resets (hours); a 7-day PAUSE costs days, so pause delegation and let the supervisor carry the week. The full delegation protocol is /agent-execution. To override deliberately, raise the matching knob (DELEGATION_KIT_PAUSE_PCT for 5h, DELEGATION_KIT_PAUSE_PCT_7D for the weekly axis) ";
+const SETTINGS_ENV: &str = "via the .claude/settings.local.json env block";
+const CORRECTIVE_TAIL: &str = ", which the hook re-reads per fire (delegation-kit/SPEC.md §The delegation model).";
 
 #[cfg(test)]
 mod tests {
@@ -33,16 +45,29 @@ mod tests {
     // status; OK (0) and STALE (2) advise and let the dispatch through
     #[test]
     fn only_a_pause_verdict_blocks_the_dispatch() {
-        assert_eq!(relay("PAUSE 5h 91%", 1), 2);
-        assert_eq!(relay("OK 5h 12%", 0), 0);
-        assert_eq!(relay("STALE usage file 40m old", 2), 0);
+        let c = corrective(None);
+        assert_eq!(relay("PAUSE 5h 91%", 1, &c), 2);
+        assert_eq!(relay("OK 5h 12%", 0, &c), 0);
+        assert_eq!(relay("STALE usage file 40m old", 2, &c), 0);
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — in a repository the corrective names
+    // the settings env block, and under `--knobs` it names that file instead
+    #[test]
+    fn the_corrective_names_where_a_threshold_is_raised() {
+        let tree = corrective(None);
+        assert!(tree.contains(SETTINGS_ENV) && tree.ends_with(CORRECTIVE_TAIL), "{}", tree);
+        let free = corrective(Some("/u/knobs/agent-budget-guard.knobs"));
+        assert!(free.contains("in the --knobs file /u/knobs/agent-budget-guard.knobs, which"), "{}", free);
+        assert!(!free.contains(SETTINGS_ENV), "{}", free);
     }
 
     // spec: delegation-kit/SPEC.md §The delegation model — every knob the corrective tells the
     // reader to raise is one the verdict rule reads, so the override it names takes effect
     #[test]
     fn the_corrective_names_only_knobs_the_verdict_reads() {
-        let named: Vec<&str> = CORRECTIVE
+        let c = corrective(None);
+        let named: Vec<&str> = c
             .split(|c: char| !(c.is_ascii_uppercase() || c.is_ascii_digit() || c == '_'))
             .filter(|w| w.starts_with("DELEGATION_KIT_"))
             .collect();

@@ -2064,7 +2064,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-hook-knobs-fresh",
         hook_knobs_fresh::run,
-        &[("?", "", "", "dynamic@src/emit/hook_knobs.rs:55 via emit::hook_knobs::pages")],
+        &[("?", "", "", "dynamic@src/emit/hook_knobs.rs:61 via emit::hook_knobs::pages")],
         &["GATE_SDK_NATIVE_BIN", "GATE_SDK_HOOK_PAGES_DIR"],
         "gate-sdk",
         &[],

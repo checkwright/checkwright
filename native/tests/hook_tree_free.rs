@@ -1,6 +1,6 @@
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the tree-free dispatch driven end to end: a
-// tree-free member started outside any repository runs in place on absolute knobs and declines on a
-// relative one, and every other no-tree call keeps the notice
+// tree-free member started outside any repository runs in place on absolute knobs and takes a
+// relative one through its own fault route, and every other no-tree call keeps the notice
 
 mod common;
 
@@ -155,6 +155,73 @@ fn every_other_no_tree_call_keeps_the_notice() {
     no_tree(&f, "refused");
     assert!(f.stderr.contains("marks a repository"), "{}", f.stderr);
     assert!(!s.at("stop.log").exists(), "a declined firing logged");
+}
+
+const WAKE: &str = r#"{"session_id":"s-1","hook_event_name":"PreToolUse","tool_name":"ScheduleWakeup","tool_input":{"delaySeconds":600}}"#;
+const HEADERLESS: &str = r#"{"session_id":"s-1","hook_event_name":"PreToolUse","tool_name":"SendMessage","tool_input":{"to":"main","message":"done?"}}"#;
+const DISPATCH: &str = r#"{"session_id":"s-1","hook_event_name":"PreToolUse","tool_name":"Agent","tool_input":{"subagent_type":"untyped","isolation":"worktree"}}"#;
+
+// spec: guard-kit/SPEC.md §wakeup-guard — with no repository the deny stands on an absolute log,
+// which records the attempt, and on a relative one, the default included, which names its fault
+// and writes nothing
+#[test]
+fn with_no_repository_the_wakeup_guard_denies_logged_or_naming_its_fault() {
+    let s = Scratch::new("wakeup");
+    let env = vec![("GUARD_KIT_WAKEUP_LOG", s.abs("wake.log"))];
+    let f = fire(&s, &s.at("free"), &["wakeup-guard"], &env, WAKE);
+    assert_eq!(f.code, Some(2), "{} {}", f.stdout, f.stderr);
+    assert!(!f.stderr.contains("went unlogged"), "{}", f.stderr);
+    let log = std::fs::read_to_string(s.at("wake.log")).expect("the absolute log was not written");
+    assert!(log.contains("ScheduleWakeup"), "{}", log);
+    let f = fire(&s, &s.at("free"), &["wakeup-guard"], &[], WAKE);
+    assert_eq!(f.code, Some(2), "a relative log let the call through: {}", f.stdout);
+    assert!(f.stderr.contains("went unlogged") && f.stderr.contains("GUARD_KIT_WAKEUP_LOG"), "{}", f.stderr);
+    assert!(!s.at("free/.workflow").exists(), "the relative log's dir was written");
+    std::fs::write(s.at("bad.knobs"), "NO_SUCH_KNOB = 1\n").expect("knob file");
+    let f = fire(&s, &s.at("free"), &["wakeup-guard", "--knobs", &s.abs("bad.knobs")], &[], WAKE);
+    assert_eq!(f.code, Some(2), "a faulty knob file let the call through: {}", f.stdout);
+    assert!(f.stderr.contains("went unlogged: --knobs"), "{}", f.stderr);
+}
+
+// spec: guard-kit/SPEC.md §escalation-guard — with no repository the advisory reads the payload
+// alone, and a faulty knob file declines naming itself
+#[test]
+fn with_no_repository_the_escalation_guard_advises_and_a_faulty_file_declines() {
+    let s = Scratch::new("escalation");
+    let f = fire(&s, &s.at("free"), &["escalation-guard"], &[], HEADERLESS);
+    assert_eq!(f.code, Some(0), "{}", f.stderr);
+    assert!(f.stdout.contains("decision-shape header") && !f.stdout.contains(NOTICE), "{}", f.stdout);
+    let f = fire(&s, &s.at("free"), &["escalation-guard", "--knobs", "rel.knobs"], &[], HEADERLESS);
+    assert_eq!(f.code, Some(0), "{}", f.stderr);
+    assert!(f.stdout.contains("--knobs") && f.stdout.contains("relative path: rel.knobs"), "{}", f.stdout);
+    assert!(!f.stdout.contains("decision-shape header"), "a declined firing advised: {}", f.stdout);
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — with no repository a relative usage path
+// is the `STALE` verdict naming the knob, advised and never blocking
+#[test]
+fn with_no_repository_a_relative_usage_path_reads_stale() {
+    let s = Scratch::new("budget");
+    let env = vec![("DELEGATION_KIT_USAGE_FILE", "usage.txt".to_string())];
+    let f = fire(&s, &s.at("free"), &["agent-budget-guard"], &env, DISPATCH);
+    assert_eq!(f.code, Some(0), "{}", f.stderr);
+    assert!(f.stdout.contains("DELEGATION_KIT_USAGE_FILE is 'usage.txt'") && f.stdout.contains("STALE"), "{}", f.stdout);
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — with no repository and D5 on, the
+// relative default agent dir leaves D5 unenforced with its note, and an absolute one enforces it
+#[test]
+fn with_no_repository_d5_on_a_relative_agent_dir_goes_unenforced() {
+    let s = Scratch::new("dispatch");
+    let on = vec![("DELEGATION_KIT_REQUIRE_TIER", "on".to_string())];
+    let f = fire(&s, &s.at("free"), &["agent-dispatch-guard"], &on, DISPATCH);
+    assert_eq!(f.code, Some(0), "{}", f.stderr);
+    assert!(f.stdout.contains("went unenforced") && f.stdout.contains("DELEGATION_KIT_AGENT_DIR"), "{}", f.stdout);
+    std::fs::create_dir_all(s.at("agents")).expect("agent dir");
+    let mut abs = on.clone();
+    abs.push(("DELEGATION_KIT_AGENT_DIR", s.abs("agents")));
+    let f = fire(&s, &s.at("free"), &["agent-dispatch-guard"], &abs, DISPATCH);
+    assert_eq!(f.code, Some(2), "D5 on an absolute dir let an unknown tier through: {}", f.stdout);
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — a repository path, the working directory or an

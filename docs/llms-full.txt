@@ -471,7 +471,7 @@ Choose a profile with `--profile`. If another toolkit writes your specs, pass `-
 
 ### Prove it on your tree
 
-`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive, writing and asking nothing here, so a coding agent can run it unattended.
+`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your battery there before and after the claim and reports what your install enforces at commit and in CI and what it leaves inactive. It writes and asks nothing here, so it runs unattended.
 
 Its last line is the verdict, and its exit status says the same: `PROVE: held`, exit `0`, with the minutes since the install commit, none for a personal install, or `PROVE: not held`, exit `1`, with the cause. `starter`, the default, keeps no task queue, so it is not held; on a tree with no task list either, a `help:` line names the profile that adds one.
 
@@ -485,7 +485,7 @@ Its last line is the verdict, and its exit status says the same: `PROVE: held`, 
 - **Every step of the install**, run by hand: [Manual steps](https://checkwright.dev/manual-install.html).
 - **Managing, uninstalling and upgrading**: [Maintenance](https://checkwright.dev/maintenance.html).
 - **CI from the binary alone**: [Binary-only CI](https://checkwright.dev/binary-only.html).
-- **One session hook alone**, with no repository: [the turn-end hook](https://checkwright.dev/hooks/subagent-stop-liveness.html).
+- **One session hook**, no repository: the [turn-end](https://checkwright.dev/hooks/subagent-stop-liveness.html), [wakeup](https://checkwright.dev/hooks/wakeup-guard.html), [escalation](https://checkwright.dev/hooks/escalation-guard.html), [budget](https://checkwright.dev/hooks/agent-budget-guard.html) or [dispatch](https://checkwright.dev/hooks/agent-dispatch-guard.html) hook.
 
 Back to the [kit map](https://checkwright.dev/#the-kits) or [why Checkwright](https://checkwright.dev/methodology.html).
 
@@ -549,11 +549,11 @@ A repository install commits the profile's kit files, the gate binary and a hand
 
 | Profile | Kits | Files | Of which gate-tests | Size |
 | --- | --- | --- | --- | --- |
-| `starter` | 1 | 600 | 540 | 470 kB |
-| `workflow` | 3 | 850 | 760 | 980 kB |
-| `delegation` | 8 | 1,100 | 940 | 1.5 MB |
-| `prose` | 2 | 1,000 | 930 | 700 kB |
-| `full` | 11 | 1,600 | 1,400 | 1.9 MB |
+| `starter` | 1 | 600 | 550 | 460 kB |
+| `workflow` | 3 | 860 | 770 | 960 kB |
+| `delegation` | 8 | 1,100 | 950 | 1.5 MB |
+| `prose` | 2 | 1,000 | 930 | 680 kB |
+| `full` | 11 | 1,600 | 1,400 | 1.8 MB |
 
 | Kit | Files | Of which gate-tests | Size |
 | --- | --- | --- | --- |
@@ -563,7 +563,7 @@ A repository install commits the profile's kit files, the gate binary and a hand
 | doctrine-kit | 12 | 9 | 64 kB |
 | drift-kit | 7 | 0 | 35 kB |
 | evidence-kit | 69 | 62 | 94 kB |
-| gate-sdk | 600 | 540 | 470 kB |
+| gate-sdk | 600 | 550 | 460 kB |
 | guard-kit | 42 | 30 | 220 kB |
 | lifecycle-kit | 190 | 160 | 410 kB |
 | queue-kit | 84 | 70 | 93 kB |
@@ -880,6 +880,247 @@ A PowerShell gate is two files in your gates directory: a `.gate` descriptor car
 ## Writing your own Rust gates
 
 A Rust gate is a program you build. Its `.gate` descriptor in your gates directory carries the gate's `# graph:` line, its `# spec:` line, and `# exec: <path>`, naming the built program relative to that directory with no extension. The battery adds `.exe` on Windows, so one descriptor serves every system. It needs a Rust toolchain on every machine that runs the gate. The battery runs the program at that path and never builds it, so build it before the battery runs and rebuild it after each edit: the battery does not compare it with its source. A gate not yet built fails as a gate that could not run. It prints the lines your shell gates print, and reads a knob through `--emit knob-values <NAME>` on the binary its environment names. The same descriptor starts a program built in any language.
+
+Source: https://checkwright.dev/hooks/wakeup-guard.html
+
+# The `wakeup-guard` hook
+
+This is one session hook you can run on its own, without adopting a kit: you install it for your user and add one entry to your coding agent's settings. This page tells you what it does and how to try it; each section links the specification that owns the detail. The other ways to install are on the [install page](https://checkwright.dev/install.html).
+
+## What it refuses
+
+A coding agent can schedule its own later wakeup, a stored prompt that fires in a later session as if you typed it. This hook runs before the agent's wake tools, `ScheduleWakeup` and `CronCreate` in Claude Code, and denies every such call. The session reads the denial. Its posture and the attempt log's line grammar are [guard-kit/SPEC.md §wakeup-guard](https://checkwright.dev/guard-kit/SPEC.html#wakeup-guard).
+
+## What it reads
+
+- **The event's payload**, on standard input: the session, the tool and its input, which it copies into the attempt line.
+- **Its knob file**, named in the settings entry after `--knobs`. It reads no repository, so it runs from whatever directory the agent starts it in.
+
+## How it exits
+
+- **Every wake call**: exit 2 with the denial on standard error. One line goes to the attempt log, `GUARD_KIT_WAKEUP_LOG`: the time, then the payload's fields.
+- **A knob it cannot use**, such as a relative log path or a knob file it cannot read: the call is still denied but goes unlogged. The denial names what is at fault.
+- **On trial**, every call appends one line to the observe log instead, and nothing is enforced.
+
+The dispatch and the trial are [gate-sdk/SPEC.md §The harness-integration arm](https://checkwright.dev/gate-sdk/SPEC.html#the-harness-integration-arm).
+
+## Its knobs
+
+| Knob | Kit | Shape | Default |
+| --- | --- | --- | --- |
+| `GUARD_KIT_WAKEUP_LOG` | guard-kit | scalar | `.workflow/wakeup-attempts.log` |
+
+The default is the in-repository one. Run outside a repository, the hook needs the log path absolute, so the install below writes an absolute path into the knob file. No knob turns the denial off: removing the settings entry does.
+
+## Installing it alone
+
+On macOS and Linux:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh -s -- init --user wakeup-guard
+```
+
+On Windows, in PowerShell:
+
+```powershell
+& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --user wakeup-guard
+```
+
+It needs no repository and writes into none. It places the binary and the knob file in your per-user data directory, makes the scratch directory under your per-user state directory, and prints a `settings:` block holding:
+
+- the agent and version the entry needs, and the settings file to merge it into;
+- one JSON line, the entry for the file's `hooks` object, which runs the placed binary on `PreToolUse` for the wake tools with `--hook wakeup-guard --knobs <the knob file>`;
+- a `trial:` line, for the step below;
+- an `attempt log:` line, naming the log in your per-user state directory.
+
+The install never writes your settings: merging the entry is yours to do. `--dry-run` prints the plan and the block and writes nothing, and `update --user` places a newer binary and prints the block again. The directories and the knob file are [installer/SPEC.md §The user install](https://checkwright.dev/installer/SPEC.html#the-user-install).
+
+**Try it before it enforces.** Put `--observe` after `wakeup-guard` in the entry's `args`. The hook then allows every call and logs the decision it would have taken to the observe log. Once the log shows the denials you want, take `--observe` out.
+
+**To schedule a wakeup deliberately**, remove the entry for that session; the denial is the default, not a capability removed.
+
+## Removing it
+
+Run the install line with `uninstall --user` in place of `init --user wakeup-guard`. It removes the binary, the user manifest and every knob file you left unedited, and keeps the state directory, the attempt log with it. It then prints a `settings:` reminder: delete the `PreToolUse` entry from your settings file yourself. What it removes and keeps is [installer/SPEC.md §uninstall](https://checkwright.dev/installer/SPEC.html#uninstall).
+
+Source: https://checkwright.dev/hooks/escalation-guard.html
+
+# The `escalation-guard` hook
+
+This is one session hook you can run on its own, without adopting a kit: you install it for your user and add one entry to your coding agent's settings. This page tells you what it does and how to try it; each section links the specification that owns the detail. The other ways to install are on the [install page](https://checkwright.dev/install.html).
+
+## What it advises
+
+A dispatched session escalates to the session that dispatched it with a message addressed to `main`. This hook runs before the agent's message tool, `SendMessage` in Claude Code, and advises the session when such a message lacks any of the headers **Question / Options / Recommendation / Evidence**. It never blocks: a message to any other recipient, or one carrying every header, passes untouched. The header grammar is [guard-kit/SPEC.md §escalation-guard](https://checkwright.dev/guard-kit/SPEC.html#escalation-guard).
+
+## What it reads
+
+- **The event's payload**, on standard input: the message's recipient and its text.
+- **Its knob file**, named in the settings entry after `--knobs`. It declares no knob of its own and reads no repository, so it runs from whatever directory the agent starts it in.
+
+## How it exits
+
+- **Every call**: exit 0. A headerless message to the lead gets the advice as added context for the session; any other message gets nothing.
+- **A knob file it cannot use**: it allows the call and prints a notice naming `--knobs` and the fault.
+- **On trial**, every call appends one line to the observe log instead.
+
+The dispatch and the trial are [gate-sdk/SPEC.md §The harness-integration arm](https://checkwright.dev/gate-sdk/SPEC.html#the-harness-integration-arm).
+
+## Its knobs
+
+This hook declares no knob of its own.
+
+The knob file the install writes carries the scratch directory alone, where the observe log derives.
+
+## Installing it alone
+
+On macOS and Linux:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh -s -- init --user escalation-guard
+```
+
+On Windows, in PowerShell:
+
+```powershell
+& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --user escalation-guard
+```
+
+It needs no repository and writes into none. It places the binary and the knob file in your per-user data directory and prints a `settings:` block holding the agent and version the entry needs, the settings file to merge it into, one JSON line running the placed binary on `PreToolUse` for the message tool with `--hook escalation-guard --knobs <the knob file>`, and a `trial:` line. The install never writes your settings: merging the entry is yours to do. The directories and the knob file are [installer/SPEC.md §The user install](https://checkwright.dev/installer/SPEC.html#the-user-install).
+
+## Removing it
+
+Run the install line with `uninstall --user` in place of `init --user escalation-guard`, then delete the `PreToolUse` entry from your settings file yourself, as its `settings:` reminder says. What it removes and keeps is [installer/SPEC.md §uninstall](https://checkwright.dev/installer/SPEC.html#uninstall).
+
+Source: https://checkwright.dev/hooks/agent-budget-guard.html
+
+# The `agent-budget-guard` hook
+
+This is one session hook you can run on its own, without adopting a kit: you install it for your user and add one entry to your coding agent's settings. This page tells you what it does and how to try it; each section links the specification that owns the detail. The other ways to install are on the [install page](https://checkwright.dev/install.html).
+
+## What it refuses
+
+This hook runs before the agent's dispatch tool, `Agent` in Claude Code, and reads the usage verdict: whether the plan's five-hour or weekly window is past its pause threshold. A `PAUSE` verdict blocks the dispatch, naming the window that fired and the knob that raises its threshold. Every other verdict, `OK`, `RESET-OK` or `STALE`, lets the dispatch through with the verdict as added context. The verdict rule is [delegation-kit/SPEC.md §usage-verdict](https://checkwright.dev/delegation-kit/SPEC.html#usage-verdict), and the guard's wiring is [§Layout and configuration](https://checkwright.dev/delegation-kit/SPEC.html#layout-and-configuration).
+
+## What it reads
+
+- **The usage snapshot file**, which something you run keeps current, such as the statusline arm ([delegation-kit/SPEC.md §The statusline arm](https://checkwright.dev/delegation-kit/SPEC.html#the-statusline-arm)).
+- **The credentials file and the account config**, to tell a fresh login's lagging reading from a real one.
+- **Its knob file**, named in the settings entry after `--knobs`. It reads no repository, so it runs from whatever directory the agent starts it in.
+
+## How it exits
+
+- **`PAUSE`**: exit 2, the verdict and its corrective on standard error.
+- **Any other verdict**: exit 0, the verdict as context for the session.
+- **A knob it cannot use**, such as a relative path: the verdict is `STALE`, naming the knob, and the dispatch goes through.
+- **On trial**, every call appends one line to the observe log instead, and nothing is enforced.
+
+## Its knobs
+
+| Knob | Kit | Shape | Default |
+| --- | --- | --- | --- |
+| `DELEGATION_KIT_USAGE_FILE` | delegation-kit | scalar | (empty) |
+| `DELEGATION_KIT_CRED_FILE` | delegation-kit | scalar | (empty) |
+| `DELEGATION_KIT_ACCOUNT_CONFIG` | delegation-kit | scalar | (empty) |
+| `DELEGATION_KIT_PAUSE_PCT` | delegation-kit | scalar | `80` |
+| `DELEGATION_KIT_PAUSE_PCT_7D` | delegation-kit | scalar | `95` |
+| `DELEGATION_KIT_STALE_AGE` | delegation-kit | scalar | `600` |
+| `DELEGATION_KIT_LOGIN_WINDOW` | delegation-kit | scalar | `600` |
+| `DELEGATION_KIT_LOGIN_SETTLE` | delegation-kit | scalar | `90` |
+| `DELEGATION_KIT_REFRESH_CMD` | delegation-kit | indexed | (empty) |
+| `DELEGATION_KIT_REFRESH_MIN_AGE` | delegation-kit | scalar | `60` |
+| `DELEGATION_KIT_USAGE_HISTORY` | delegation-kit | scalar | (empty) |
+| `DELEGATION_KIT_FAN_WIDTH` | delegation-kit | scalar | `2` |
+
+Run outside a repository, every path the verdict reads must be absolute. The usage, credential and account defaults derive from your home directory, so they are absolute wherever it is set. To raise a threshold, set its knob in the knob file.
+
+## Installing it alone
+
+On macOS and Linux:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh -s -- init --user agent-budget-guard
+```
+
+On Windows, in PowerShell:
+
+```powershell
+& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --user agent-budget-guard
+```
+
+It needs no repository and writes into none. It places the binary and the knob file in your per-user data directory and prints a `settings:` block holding the agent and version the entry needs, the settings file to merge it into, one JSON line running the placed binary on `PreToolUse` for the dispatch tool with `--hook agent-budget-guard --knobs <the knob file>`, and a `trial:` line. The install never writes your settings: merging the entry is yours to do. The directories and the knob file are [installer/SPEC.md §The user install](https://checkwright.dev/installer/SPEC.html#the-user-install).
+
+**Try it before it enforces.** Put `--observe` after `agent-budget-guard` in the entry's `args`, and take it out once the observe log shows the blocks you want.
+
+## Removing it
+
+Run the install line with `uninstall --user` in place of `init --user agent-budget-guard`, then delete the `PreToolUse` entry from your settings file yourself, as its `settings:` reminder says. What it removes and keeps is [installer/SPEC.md §uninstall](https://checkwright.dev/installer/SPEC.html#uninstall).
+
+Source: https://checkwright.dev/hooks/agent-dispatch-guard.html
+
+# The `agent-dispatch-guard` hook
+
+This is one session hook you can run on its own, without adopting a kit: you install it for your user and add one entry to your coding agent's settings. This page tells you what it does and how to try it; each section links the specification that owns the detail. The other ways to install are on the [install page](https://checkwright.dev/install.html).
+
+## What it refuses
+
+This hook runs before the agent's dispatch tool, `Agent` in Claude Code, and holds the dispatch to its rules, in order:
+
+- **D1** blocks a `fork` dispatch, always.
+- **D2** blocks a type you declared read-only unless it runs in its own worktree.
+- **D4** blocks a type you have not declared mutating unless it runs in its own worktree, once you declare any.
+- **D5** blocks a dispatch naming no model whose type's definition states none, once you switch it on.
+- **D6** blocks a named model outside the tiers you bound, once you bind any.
+- **D3** advises a dispatch from inside a dispatched session.
+
+Each block names the lawful alternatives. The rules and their order are [delegation-kit/SPEC.md §The delegation model](https://checkwright.dev/delegation-kit/SPEC.html#the-delegation-model).
+
+## What it reads
+
+- **The event's payload**, on standard input: the dispatch's type, isolation and model, and whether the dispatcher is itself a dispatched session.
+- **Its knob file**, named in the settings entry after `--knobs`: the type rosters, D5's switch and the agent-definition directory, and the tier binding. It reads no repository, so it runs from whatever directory the agent starts it in.
+
+## How it exits
+
+- **Allowed**: exit 0, with D3's advice as context where it fires.
+- **Blocked**: exit 2, the rule and its alternatives on standard error.
+- **A knob it cannot use**: the rule that knob serves goes unenforced on that call, and the advice says so.
+- **On trial**, every call appends one line to the observe log instead, and nothing is enforced.
+
+## Its knobs
+
+| Knob | Kit | Shape | Default |
+| --- | --- | --- | --- |
+| `DELEGATION_KIT_READONLY_TYPES` | delegation-kit | indexed | (empty) |
+| `DELEGATION_KIT_MUTATING_TYPES` | delegation-kit | indexed | (empty) |
+| `DELEGATION_KIT_REQUIRE_TIER` | delegation-kit | scalar | `off` |
+| `DELEGATION_KIT_AGENT_DIR` | delegation-kit | scalar | `.claude/agents` |
+| `DELEGATION_KIT_TIER_MODEL` | delegation-kit | indexed | (empty) |
+| `GATE_SDK_NATIVE_BIN` | gate-sdk | scalar | `native/target/release/checkwright-gates` |
+
+D2, D4, D5 and D6 do nothing until you configure them. To switch D5 on outside a repository, set `DELEGATION_KIT_AGENT_DIR` to an absolute directory in the knob file: a relative one, the default included, leaves D5 unenforced. A user-scope hook looks a type up in that one directory, never in the project the dispatch fires in ([delegation-kit/SPEC.md §Layout and configuration](https://checkwright.dev/delegation-kit/SPEC.html#layout-and-configuration)).
+
+## Installing it alone
+
+On macOS and Linux:
+
+```sh
+curl -fsSL https://checkwright.dev/install.sh | sh -s -- init --user agent-dispatch-guard
+```
+
+On Windows, in PowerShell:
+
+```powershell
+& ([scriptblock]::Create((irm https://checkwright.dev/install.ps1))) init --user agent-dispatch-guard
+```
+
+It needs no repository and writes into none. It places the binary and the knob file in your per-user data directory and prints a `settings:` block holding the agent and version the entry needs, the settings file to merge it into, one JSON line running the placed binary on `PreToolUse` for the dispatch tool with `--hook agent-dispatch-guard --knobs <the knob file>`, and a `trial:` line. The install never writes your settings: merging the entry is yours to do. The directories and the knob file are [installer/SPEC.md §The user install](https://checkwright.dev/installer/SPEC.html#the-user-install).
+
+**Try it before it enforces.** Put `--observe` after `agent-dispatch-guard` in the entry's `args`, and take it out once the observe log shows the blocks you want.
+
+## Removing it
+
+Run the install line with `uninstall --user` in place of `init --user agent-dispatch-guard`, then delete the `PreToolUse` entry from your settings file yourself, as its `settings:` reminder says. What it removes and keeps is [installer/SPEC.md §uninstall](https://checkwright.dev/installer/SPEC.html#uninstall).
 
 Source: https://checkwright.dev/spec-toolkits.html
 

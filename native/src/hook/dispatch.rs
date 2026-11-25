@@ -33,16 +33,28 @@ fn read_array(knob: &str, rule: &str, notes: &mut String) -> Vec<String> {
     }
 }
 
+// spec: delegation-kit/SPEC.md §Layout and configuration — D5's switch and the dir it looks a type
+// up in, which with D5 on and no repository must be absolute
+pub(crate) fn tier_inputs() -> Result<(bool, String), String> {
+    let on = walk::knob_scalar("DELEGATION_KIT_REQUIRE_TIER")? == "on";
+    let dir = walk::knob_scalar("DELEGATION_KIT_AGENT_DIR")?;
+    if on {
+        hook::tree_free_path("DELEGATION_KIT_AGENT_DIR", &dir)?;
+    }
+    Ok((on, dir))
+}
+
 pub fn run(payload: Option<&Value>) -> i32 {
+    if let Some(code) = hook::decline_on_fault(NAME, payload) {
+        return code;
+    }
     // spec: delegation-kit/SPEC.md §The delegation model — an unresolvable roster leaves its rule
     // with an empty set and earns a note, never a skip of D1, so a config fault cannot wedge a dispatch.
     let mut notes = String::new();
     let readonly = read_array("DELEGATION_KIT_READONLY_TYPES", "D2 (the read-only isolation claim)", &mut notes);
     let mutating = read_array("DELEGATION_KIT_MUTATING_TYPES", "D4 (default isolation)", &mut notes);
-    let tier = walk::knob_scalar("DELEGATION_KIT_REQUIRE_TIER")
-        .and_then(|t| walk::knob_scalar("DELEGATION_KIT_AGENT_DIR").map(|d| (t, d)));
-    let (require_tier, agent_dir) = match tier {
-        Ok((t, d)) => (t == "on", d),
+    let (require_tier, agent_dir) = match tier_inputs() {
+        Ok(t) => t,
         Err(e) => {
             notes.push_str(&format!("D5 (the chosen tier) went unenforced on this dispatch: {}. ", e));
             (false, String::new())
@@ -206,6 +218,24 @@ mod tests {
 
     fn payload(src: &str) -> Value {
         serde_json::from_str(src).expect("the fixture must parse")
+    }
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — with no repository and D5 on, a
+    // relative agent dir, the default included, leaves D5 unenforced with its note, an absolute one
+    // keeps it, and with D5 off the dir is never read as a path
+    #[test]
+    fn with_no_repository_a_relative_agent_dir_leaves_d5_unenforced() {
+        let call = payload(r#"{"hook_event_name":"PreToolUse","tool_input":{"subagent_type":"untyped","isolation":"worktree"}}"#);
+        let m = hook::Marked::new("dispatch", None);
+        assert!(matches!(tier_inputs(), Ok((false, _))), "D5 is off by default");
+        m.set("DELEGATION_KIT_REQUIRE_TIER", "on");
+        let e = tier_inputs().expect_err("the default dir is relative");
+        assert!(e.contains("DELEGATION_KIT_AGENT_DIR is '") && e.contains("absolute paths only"), "{}", e);
+        assert_eq!(run(Some(&call)), 0, "D5 unenforced lets the unnamed tier through with its note");
+        let dir = std::env::temp_dir().join("checkwright-no-agents").display().to_string();
+        m.set("DELEGATION_KIT_AGENT_DIR", &dir);
+        assert_eq!(tier_inputs(), Ok((true, dir)));
+        assert_eq!(run(Some(&call)), 2, "D5 enforced refuses the unnamed tier");
     }
 
     // spec: delegation-kit/SPEC.md §The delegation model — D1 is unconditional and outranks D2, and

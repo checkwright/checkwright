@@ -6,14 +6,37 @@ use crate::walk;
 use serde_json::Value;
 
 const NAME: &str = "wakeup-guard";
+const LOG_KNOB: &str = "GUARD_KIT_WAKEUP_LOG";
 
 pub fn run(payload: Option<&Value>) -> i32 {
     // spec: guard-kit/SPEC.md §wakeup-guard — the deny stands even where the log path does not
-    // resolve: the block is unconditional, so a knob fault costs the record and not the rule
-    if let Ok(log) = walk::knob_scalar("GUARD_KIT_WAKEUP_LOG") {
-        append_attempt(&walk::capture_path(&log), payload);
+    // resolve: the block is unconditional, so a knob fault costs the record and not the rule, and
+    // with no repository the denial names what cost it
+    match record_target() {
+        Ok(log) => {
+            append_attempt(&log, payload);
+            hook::block(NAME, DENIAL)
+        }
+        Err(fault) if hook::tree_free() => hook::block(NAME, &unlogged(&fault)),
+        Err(_) => hook::block(NAME, DENIAL),
     }
-    hook::block(NAME, DENIAL)
+}
+
+// spec: guard-kit/SPEC.md §wakeup-guard — the log the record goes to: the carried `--knobs` fault
+// first, then the knob, absolute under the tree-free mark
+pub(crate) fn record_target() -> Result<String, String> {
+    if let Some(fault) = hook::knob_fault() {
+        return Err(fault);
+    }
+    let log = walk::knob_scalar(LOG_KNOB)?;
+    hook::tree_free_path(LOG_KNOB, &log)?;
+    Ok(walk::capture_path(&log))
+}
+
+// spec: guard-kit/SPEC.md §wakeup-guard — the denial's one added sentence, so a lost record is never
+// silent
+fn unlogged(fault: &str) -> String {
+    format!("{} This attempt went unlogged: {}.", DENIAL, fault)
 }
 
 // spec: guard-kit/SPEC.md §wakeup-guard — the attempt record: a local-zone stamp, then the three
@@ -119,6 +142,31 @@ mod tests {
             r#"{"session_id":null,"tool_name":"ScheduleWakeup","tool_input":null}"#
         );
         assert_eq!(summary(None), "");
+    }
+
+    // spec: guard-kit/SPEC.md §wakeup-guard — with no repository a relative log, the default
+    // included, and a carried `--knobs` fault each cost the record, never the denial, which names it
+    #[test]
+    fn with_no_repository_a_lost_record_still_denies_naming_its_fault() {
+        let m = hook::Marked::new("wakeup", None);
+        let relative = record_target().expect_err("the derived default is relative");
+        assert!(relative.contains(LOG_KNOB) && relative.contains("absolute paths only"), "{}", relative);
+        assert_eq!(run(None), 2);
+        m.carry("--knobs names a relative path: rel.knobs, and takes an absolute file only");
+        let carried = record_target().expect_err("the carried fault comes first");
+        assert!(carried.starts_with("--knobs") && carried.contains("rel.knobs"), "{}", carried);
+        assert_eq!(run(None), 2);
+        drop(m);
+        let text = unlogged(&carried);
+        assert!(text.starts_with(DENIAL) && text.ends_with("takes an absolute file only."), "{}", text);
+    }
+
+    // spec: guard-kit/SPEC.md §wakeup-guard — an absolute log under the mark is the record's target
+    #[test]
+    fn with_no_repository_an_absolute_log_is_the_target() {
+        let log = std::env::temp_dir().join("wakeup-attempts.log").display().to_string();
+        let _m = hook::Marked::new("wakeup-abs", Some(&format!("{} = {}\n", LOG_KNOB, log)));
+        assert_eq!(record_target(), Ok(log));
     }
 
     // spec: guard-kit/SPEC.md §wakeup-guard — the stamp is GNU `date -Is`'s bytes at a fixed epoch

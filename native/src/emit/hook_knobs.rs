@@ -28,9 +28,15 @@ fn cell(v: Value) -> String {
     parts.iter().map(|p| code(p)).collect::<Vec<_>>().join(", ")
 }
 
+// spec: gate-sdk/SPEC.md §check-hook-knobs-fresh — a table with no row renders as no table
+const NO_KNOB: &str = "This hook declares no knob of its own.";
+
 // spec: gate-sdk/SPEC.md §check-hook-knobs-fresh — the table between the markers' blank lines
 pub fn render(member: &str) -> Result<String, String> {
     let slice = hook::knobs(member).ok_or_else(|| format!("{} is not a hook member", member))?;
+    if slice.is_empty() {
+        return Ok(format!("\n{}\n", NO_KNOB));
+    }
     let mut out = vec!["| Knob | Kit | Shape | Default |".to_string(), "| --- | --- | --- | --- |".to_string()];
     for name in slice {
         let (kit, shape, v) = knobs::default_of(name)?;
@@ -103,6 +109,12 @@ mod tests {
         assert!(t.contains("| `DELEGATION_KIT_LIVENESS_CMD` | delegation-kit | indexed | (empty) |"), "{}", t);
         assert!(t.contains("| `GATE_SDK_TMP_DIR` | gate-sdk | scalar | `.tmp` |"), "{}", t);
         assert!(!t.contains("GATE_SDK_HOOK_OBSERVE_LOG"), "{}", t);
+    }
+
+    #[test]
+    fn an_empty_slice_renders_its_line_and_no_table() {
+        assert_eq!(hook::knobs("escalation-guard"), Some(&[][..]));
+        assert_eq!(render("escalation-guard").expect("render"), format!("\n{}\n", NO_KNOB));
     }
 
     #[test]

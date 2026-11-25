@@ -20,7 +20,10 @@ const SCRATCH_DIR: &str = "tmp";
 const WINDOWS_STATE_DIR: &str = "state";
 const OBSERVE_LOG: &str = "hook-observe.log";
 const SCRATCH_KNOB: &str = "GATE_SDK_TMP_DIR";
-const LOG_KNOB: &str = "DELEGATION_KIT_STOP_LOG";
+const STOP_LIVENESS: &str = "subagent-stop-liveness";
+const STOP_LOG_KNOB: &str = "DELEGATION_KIT_STOP_LOG";
+const WAKEUP: &str = "wakeup-guard";
+const WAKEUP_LOG_KNOB: &str = "GUARD_KIT_WAKEUP_LOG";
 
 pub(super) const USAGE: &[&str] = &[
     "usage: checkwright init --user <arm> [--dry-run] [--force]",
@@ -269,16 +272,28 @@ fn at_rel(d: &Dirs, rel: &str) -> PathBuf {
     rel.split('/').fold(d.data.clone(), |p, c| p.join(c))
 }
 
-// spec: installer/SPEC.md §The user install — two absolute scalars; the observe log derives under
-// the scratch dir, so a trial needs no third line
+// spec: installer/SPEC.md §The user install — the members keeping a log, each with the knob that
+// places it
+fn log_knob(member: &str) -> Option<&'static str> {
+    match member {
+        STOP_LIVENESS => Some(STOP_LOG_KNOB),
+        WAKEUP => Some(WAKEUP_LOG_KNOB),
+        _ => None,
+    }
+}
+
+fn log_file(d: &Dirs, member: &str) -> PathBuf {
+    d.state.join(format!("{}.log", member))
+}
+
+// spec: installer/SPEC.md §The user install — absolute scalars: the scratch dir, and the log of a
+// member keeping one; the observe log derives under the scratch dir, so a trial needs no other line
 fn knob_text(d: &Dirs, member: &str) -> String {
-    format!(
-        "{} = {}\n{} = {}\n",
-        SCRATCH_KNOB,
-        spell(&d.state.join(SCRATCH_DIR)),
-        LOG_KNOB,
-        spell(&d.state.join(format!("{}.log", member)))
-    )
+    let mut text = format!("{} = {}\n", SCRATCH_KNOB, spell(&d.state.join(SCRATCH_DIR)));
+    if let Some(knob) = log_knob(member) {
+        text.push_str(&format!("{} = {}\n", knob, spell(&log_file(d, member))));
+    }
+    text
 }
 
 // spec: installer/SPEC.md §The user manifest — its own schema, reader and writer,
@@ -548,8 +563,10 @@ fn settings_file() -> String {
 // the JSON fragment alone on its line so a reader can lift it
 fn settings_block(d: &Dirs, member: &str, bin: &Path, knob: &Path, out: &mut dyn Write) {
     let event = hook::event(member).unwrap_or_default();
+    let matcher = hook::matcher(member).unwrap_or_default();
     let knob_s = spell(knob);
-    let fragment = binding::wiring_fragment(event, &spell(bin), &["--hook", member, hook::KNOBS_FLAG, &knob_s]);
+    let fragment =
+        binding::wiring_fragment(event, &matcher, &spell(bin), &["--hook", member, hook::KNOBS_FLAG, &knob_s]);
     let scratch = spell(&d.state.join(SCRATCH_DIR));
     let _ = writeln!(out, "settings:");
     let _ = writeln!(
@@ -569,11 +586,25 @@ fn settings_block(d: &Dirs, member: &str, bin: &Path, knob: &Path, out: &mut dyn
         member,
         spell(&d.state.join(SCRATCH_DIR).join(OBSERVE_LOG))
     );
-    let _ = writeln!(
-        out,
-        "  launch records: the arm reads them from {}; point your engine there, or set {} in {} to the directory it writes.",
-        scratch, SCRATCH_KNOB, knob_s
-    );
+    match member {
+        STOP_LIVENESS => {
+            let _ = writeln!(
+                out,
+                "  launch records: the arm reads them from {}; point your engine there, or set {} in {} to the directory it writes.",
+                scratch, SCRATCH_KNOB, knob_s
+            );
+        }
+        WAKEUP => {
+            let _ = writeln!(
+                out,
+                "  attempt log: the arm records each denied call in {}; set {} in {} to move it.",
+                spell(&log_file(d, member)),
+                WAKEUP_LOG_KNOB,
+                knob_s
+            );
+        }
+        _ => {}
+    }
 }
 
 // spec: installer/SPEC.md §update — the user form: init --user for each recorded member, so the new
@@ -879,6 +910,44 @@ mod tests {
         let again = init(&s, &d, "1.2.0", &flags(false, false)).expect("re-run");
         assert_eq!(snapshot(&d.data), before, "a bare re-run changed the data dir");
         assert!(again.contains("binary unchanged") && again.contains("knob file unchanged"), "{}", again);
+    }
+
+    // spec: installer/SPEC.md §The user install — for every tree-free member the printed group
+    // carries its event and matcher, and the knob file it writes reports no fault when the member
+    // reads it with no repository
+    #[test]
+    fn every_tree_free_member_installs_a_fault_free_knob_file_under_its_matcher() {
+        let s = Scratch::new("members");
+        let d = s.dirs();
+        let members: Vec<&str> = crate::hook::HOOKS.iter().filter(|r| r.4).map(|r| r.0).collect();
+        assert_eq!(members.len(), 5, "{:?}", members);
+        for m in members {
+            let mut out = Vec::new();
+            init_one(&d, &s.source("1.2.0"), m, &flags(false, false), &mut out).expect("init");
+            let report = String::from_utf8_lossy(&out).into_owned();
+            let fragment = report
+                .lines()
+                .skip_while(|l| *l != "settings:")
+                .map(str::trim)
+                .find(|l| l.starts_with('{'))
+                .expect("no fragment line");
+            let doc: Value = serde_json::from_str(fragment).expect("the fragment is not JSON");
+            let group = &doc[crate::hook::event(m).expect("a row")][0];
+            match crate::hook::matcher(m).filter(|s| !s.is_empty()) {
+                Some(want) => assert_eq!(group[binding::WIRING_MATCHER], Value::String(want), "{}", m),
+                None => assert!(group.get(binding::WIRING_MATCHER).is_none(), "{}", m),
+            }
+            let knob = at_rel(&d, &knob_rel(m));
+            let text = std::fs::read_to_string(&knob).expect("knob file");
+            assert_eq!(text, knob_text(&d, m));
+            assert_eq!(crate::knobs::check_hook_file(&spell(&knob)), Ok(()), "{}", m);
+            assert_eq!(text.contains(STOP_LOG_KNOB), m == STOP_LIVENESS, "{}", m);
+            assert_eq!(text.contains(WAKEUP_LOG_KNOB), m == WAKEUP, "{}", m);
+            assert_eq!(report.contains("launch records:"), m == STOP_LIVENESS, "{}", m);
+            assert_eq!(report.contains("attempt log:"), m == WAKEUP, "{}", m);
+            let _marked = crate::hook::Marked::new(&format!("user-{}", m), Some(&text));
+            assert_eq!(crate::hook::knob_reads(m), Ok(()), "{}", m);
+        }
     }
 
     // spec: installer/SPEC.md §The user install — a knob file edited since init wrote it is kept and

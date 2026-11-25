@@ -144,7 +144,7 @@ Choose a profile with `--profile`. If another toolkit writes your specs, pass `-
 
 ### Prove it on your tree
 
-`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your own battery there before and after the claim and reports what your install enforces at commit and in CI, and what it leaves inactive, writing and asking nothing here, so a coding agent can run it unattended.
+`checkwright prove` makes the claim `demo` shows caught, a task marked done with no evidence behind it, on a scratch clone of your `HEAD`. It runs your battery there before and after the claim and reports what your install enforces at commit and in CI and what it leaves inactive. It writes and asks nothing here, so it runs unattended.
 
 Its last line is the verdict, and its exit status says the same: `PROVE: held`, exit `0`, with the minutes since the install commit, none for a personal install, or `PROVE: not held`, exit `1`, with the cause. `starter`, the default, keeps no task queue, so it is not held; on a tree with no task list either, a `help:` line names the profile that adds one.
 
@@ -158,6 +158,6 @@ Its last line is the verdict, and its exit status says the same: `PROVE: held`, 
 - **Every step of the install**, run by hand: [Manual steps](manual-install.md).
 - **Managing, uninstalling and upgrading**: [Maintenance](maintenance.md).
 - **CI from the binary alone**: [Binary-only CI](binary-only.md).
-- **One session hook alone**, with no repository: [the turn-end hook](hooks/subagent-stop-liveness.md).
+- **One session hook**, no repository: the [turn-end](hooks/subagent-stop-liveness.md), [wakeup](hooks/wakeup-guard.md), [escalation](hooks/escalation-guard.md), [budget](hooks/agent-budget-guard.md) or [dispatch](hooks/agent-dispatch-guard.md) hook.
 
 Back to the [kit map](index.md#the-kits) or [why Checkwright](methodology.md).

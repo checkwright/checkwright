@@ -72,7 +72,7 @@ struct Config {
 fn config() -> Result<Config, String> {
     let k = walk::knob_scalar;
     let paths = crate::hook::usage::paths()?;
-    Ok(Config {
+    let cfg = Config {
         usage_file: paths.usage_file,
         cred_file: paths.cred_file,
         account_config: paths.account_config,
@@ -85,7 +85,32 @@ fn config() -> Result<Config, String> {
         refresh_min_age: int(&k("DELEGATION_KIT_REFRESH_MIN_AGE")?),
         history: k("DELEGATION_KIT_USAGE_HISTORY")?,
         width: k("DELEGATION_KIT_FAN_WIDTH")?,
-    })
+    };
+    tree_free_reads(&cfg)?;
+    Ok(cfg)
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — with no repository every path the rule
+// reads is absolute, a non-empty history included, and so is a refresh head carrying a separator
+fn tree_free_reads(cfg: &Config) -> Result<(), String> {
+    let path = crate::hook::tree_free_path;
+    path("DELEGATION_KIT_USAGE_FILE", &cfg.usage_file)?;
+    path("DELEGATION_KIT_CRED_FILE", &cfg.cred_file)?;
+    path("DELEGATION_KIT_ACCOUNT_CONFIG", &cfg.account_config)?;
+    if !cfg.history.is_empty() {
+        path("DELEGATION_KIT_USAGE_HISTORY", &cfg.history)?;
+    }
+    match cfg.refresh_cmd.first() {
+        Some(head) if head.contains(['/', '\\']) => path("DELEGATION_KIT_REFRESH_CMD", head),
+        _ => Ok(()),
+    }
+}
+
+// spec: delegation-kit/SPEC.md §usage-verdict — the knob fault the rule reads as `STALE`, for the
+// case firing the budget guard under its knob file
+#[cfg(test)]
+pub fn config_fault() -> Option<String> {
+    config().err()
 }
 
 // spec: delegation-kit/SPEC.md §usage-verdict — bash arithmetic reads an unset or non-numeric
@@ -738,6 +763,31 @@ pub fn run(args: &[String]) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — under the tree-free mark a relative
+    // path knob is the `STALE` verdict naming the knob, and a separator-free refresh head passes
+    #[test]
+    fn a_relative_path_knob_under_the_mark_reads_stale() {
+        let abs = |f: &str| std::env::temp_dir().join(f).display().to_string();
+        let m = crate::hook::Marked::new("verdict", None);
+        for (knob, given) in [
+            ("DELEGATION_KIT_USAGE_FILE", "usage.txt"),
+            ("DELEGATION_KIT_CRED_FILE", "creds.json"),
+            ("DELEGATION_KIT_ACCOUNT_CONFIG", "account.json"),
+            ("DELEGATION_KIT_USAGE_HISTORY", "history.log"),
+        ] {
+            m.set("DELEGATION_KIT_USAGE_FILE", &abs("usage.txt"));
+            m.set("DELEGATION_KIT_CRED_FILE", &abs("creds.json"));
+            m.set("DELEGATION_KIT_ACCOUNT_CONFIG", &abs("account.json"));
+            m.set("DELEGATION_KIT_USAGE_HISTORY", "");
+            m.set(knob, given);
+            let (line, code) = verdict(&[]);
+            assert_eq!(code, 2, "{}", line);
+            assert!(line.contains(&format!("{} is '{}'", knob, given)) && line.contains("-> STALE"), "{}", line);
+        }
+        m.set("DELEGATION_KIT_USAGE_HISTORY", "");
+        assert_eq!(config_fault(), None, "absolute paths and an empty history read clean");
+    }
 
     // spec: gate-sdk/SPEC.md §The bin/-tool contract — the firing and the non-firing case of the
     // shape refusal: a `-`-prefixed first positional refuses, the same token after `--` is a path

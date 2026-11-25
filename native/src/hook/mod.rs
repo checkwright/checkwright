@@ -45,9 +45,17 @@ pub type HookFn = fn(&Payload) -> i32;
 // arm dispatches on and the unknown-member refusal prints. Each row's knob slice is exactly what
 // that member's shell original read, less the knobs a compiled member cannot want; then the owning
 // kit, held to the member module's leading `spec:` binding by a unit test below, and the tree-free
-// declaration: every input the member's rule reads can resolve absolute; last, the event the member
-// registers under, a binding spelling.
-pub type Row = (&'static str, HookFn, &'static [&'static str], &'static str, bool, &'static str);
+// declaration: every input the member's rule reads can resolve absolute; then the event the member
+// registers under, a binding spelling; last, the tools a before-tool-call member registers on.
+pub type Row = (
+    &'static str,
+    HookFn,
+    &'static [&'static str],
+    &'static str,
+    bool,
+    &'static str,
+    &'static [&'static str],
+);
 
 pub const HOOKS: &[Row] = &[
     // spec: delegation-kit/SPEC.md §usage-verdict — the rule runs inside the hook process, so the row
@@ -57,8 +65,9 @@ pub const HOOKS: &[Row] = &[
         |p| budget::run(p.value()),
         verdict::KNOBS,
         "delegation-kit",
-        false,
+        true,
         binding::EVENT_BEFORE_TOOL_CALL,
+        &[binding::TOOL_DISPATCH],
     ),
     (
         "agent-dispatch-guard",
@@ -72,8 +81,9 @@ pub const HOOKS: &[Row] = &[
             "GATE_SDK_NATIVE_BIN",
         ],
         "delegation-kit",
-        false,
+        true,
         binding::EVENT_BEFORE_TOOL_CALL,
+        &[binding::TOOL_DISPATCH],
     ),
     (
         "subagent-stop-liveness",
@@ -87,15 +97,19 @@ pub const HOOKS: &[Row] = &[
         "delegation-kit",
         true,
         binding::EVENT_CHILD_TURN_END,
+        &[],
     ),
     (
         "escalation-guard",
         |p| escalation::run(p.value()),
         &[],
         "guard-kit",
-        false,
+        true,
         binding::EVENT_BEFORE_TOOL_CALL,
+        &[binding::TOOL_MESSAGE],
     ),
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — tree-bound: it runs the binary's arms
+    // over the tree
     (
         "session-context",
         session_context::run,
@@ -103,7 +117,10 @@ pub const HOOKS: &[Row] = &[
         "context-kit",
         false,
         binding::EVENT_SESSION_START,
+        &[],
     ),
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — tree-bound: it asks git for the main
+    // checkout and reads the project's settings
     (
         "shell-guard",
         shell_guard::run,
@@ -111,15 +128,19 @@ pub const HOOKS: &[Row] = &[
         "guard-kit",
         false,
         binding::EVENT_BEFORE_TOOL_CALL,
+        &[binding::TOOL_BASH, binding::TOOL_POWERSHELL],
     ),
     (
         "wakeup-guard",
         |p| wakeup::run(p.value()),
         &["GUARD_KIT_WAKEUP_LOG"],
         "guard-kit",
-        false,
+        true,
         binding::EVENT_BEFORE_TOOL_CALL,
+        &[binding::TOOL_WAKE, binding::TOOL_CRON],
     ),
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — tree-bound: it judges the repository's
+    // stamp file
     (
         "workflow-state-guard",
         |p| workflow_state::run(p.value()),
@@ -133,6 +154,7 @@ pub const HOOKS: &[Row] = &[
         "lifecycle-kit",
         false,
         binding::EVENT_BEFORE_TOOL_CALL,
+        &[binding::TOOL_WRITE, binding::TOOL_EDIT],
     ),
 ];
 
@@ -260,6 +282,12 @@ pub fn event(member: &str) -> Option<&'static str> {
     HOOKS.iter().find(|r| r.0 == member).map(|r| r.5)
 }
 
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the seventh column in the settings file's
+// spelling, its tools joined by `|`, empty for an event that takes no matcher
+pub fn matcher(member: &str) -> Option<String> {
+    HOOKS.iter().find(|r| r.0 == member).map(|r| r.6.join("|"))
+}
+
 // spec: gate-sdk/SPEC.md §The harness-integration arm — a registration's argv ends where the shell
 // syntax its command carries begins, a redirection, a pipe, a list operator or a comment
 fn shell_syntax(token: &str) -> bool {
@@ -381,11 +409,24 @@ const NO_TREE_NOTICE: &str = "checkwright-gates: git refuses or skips the reposi
 thread_local! {
     static TREE_FREE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
     static KNOB_FILE: std::cell::RefCell<Option<String>> = const { std::cell::RefCell::new(None) };
+    static KNOB_FAULT: std::cell::RefCell<Option<String>> = const { std::cell::RefCell::new(None) };
 }
 
 // spec: gate-sdk/SPEC.md §The knob file — the `--knobs` operand, the only file layer while it is set
 pub fn knob_file() -> Option<String> {
     KNOB_FILE.with(|k| k.borrow().clone())
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — the fault of a `--knobs` file the arm cannot
+// use, carried to the member, which takes it through its own route at its first act
+pub fn knob_fault() -> Option<String> {
+    KNOB_FAULT.with(|k| k.borrow().clone())
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — a fail-open member's route for the carried
+// fault: the decline, naming `--knobs`, the file and the line at fault
+pub fn decline_on_fault(name: &str, payload: Option<&Value>) -> Option<i32> {
+    knob_fault().map(|fault| decline(name, &fault, payload))
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the tree-free mark: set where a tree-free
@@ -411,6 +452,82 @@ pub(crate) fn raise_tree_free() {
 #[cfg(test)]
 pub fn set_tree_free(on: bool) {
     TREE_FREE.with(|m| m.set(on));
+}
+
+// spec: gate-sdk/SPEC.md §The harness-integration arm — a member's case under the tree-free mark:
+// every kit knob the environment carries held aside, the `--knobs` file this case writes, or none,
+// the layer, and the carried fault, each restored when the case drops it
+#[cfg(test)]
+pub struct Marked {
+    env: crate::knobenv::KnobEnv,
+    held: Vec<(String, String)>,
+    file: Option<std::path::PathBuf>,
+}
+
+#[cfg(test)]
+impl Marked {
+    pub fn new(tag: &str, knob_text: Option<&str>) -> Marked {
+        let env = crate::knobenv::lock();
+        let held: Vec<(String, String)> =
+            std::env::vars().filter(|(n, _)| crate::knobs::owner(n).is_some()).collect();
+        for (n, _) in &held {
+            env.remove(n);
+        }
+        let file = knob_text.map(|text| {
+            let f = std::env::temp_dir().join(format!("checkwright-marked.{}.{}.knobs", tag, std::process::id()));
+            std::fs::write(&f, text).expect("the case's knob file must be writable");
+            f
+        });
+        TREE_FREE.with(|m| m.set(true));
+        KNOB_FILE.with(|k| *k.borrow_mut() = file.as_ref().map(|f| f.display().to_string()));
+        crate::knobs::reset(&env);
+        Marked { env, held, file }
+    }
+
+    pub fn set(&self, name: &str, value: &str) {
+        self.env.set(name, value);
+        crate::knobs::reset(&self.env);
+    }
+
+    pub fn carry(&self, fault: &str) {
+        KNOB_FAULT.with(|k| *k.borrow_mut() = Some(fault.to_string()));
+    }
+}
+
+#[cfg(test)]
+impl Drop for Marked {
+    fn drop(&mut self) {
+        TREE_FREE.with(|m| m.set(false));
+        KNOB_FILE.with(|k| *k.borrow_mut() = None);
+        KNOB_FAULT.with(|k| *k.borrow_mut() = None);
+        for (n, _) in std::env::vars().filter(|(n, _)| crate::knobs::owner(n).is_some()) {
+            self.env.remove(&n);
+        }
+        for (n, v) in &self.held {
+            self.env.set(n, v);
+        }
+        crate::knobs::reset(&self.env);
+        if let Some(f) = &self.file {
+            let _ = std::fs::remove_file(f);
+        }
+    }
+}
+
+// spec: installer/SPEC.md §The user install — each tree-free member's knob reads as its run takes
+// them, the fault it would carry through its own route, for the case firing it under its file
+#[cfg(test)]
+pub fn knob_reads(member: &str) -> Result<(), String> {
+    if let Some(fault) = knob_fault() {
+        return Err(fault);
+    }
+    match member {
+        "subagent-stop-liveness" => stop_liveness::inputs().map(drop),
+        "escalation-guard" => Ok(()),
+        "wakeup-guard" => wakeup::record_target().map(drop),
+        "agent-budget-guard" => verdict::config_fault().map_or(Ok(()), Err),
+        "agent-dispatch-guard" => dispatch::tier_inputs().map(drop),
+        other => panic!("tree-free member {} names no knob read in this function", other),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — a path-valued knob under the mark must be
@@ -450,7 +567,7 @@ pub fn run(args: &[String]) -> i32 {
             }
         }
         Ok(None) => match (row, &parsed) {
-            (Some(&(name, f, _, _, true, _)), Ok(Tail { observe, binding: None, knobs: None })) => {
+            (Some(&(name, f, _, _, true, _, _)), Ok(Tail { observe, binding: None, knobs: None })) => {
                 TREE_FREE.with(|m| m.set(true));
                 return if *observe { observe::run(name, &read_input()) } else { f(&read_input()) };
             }
@@ -463,7 +580,7 @@ pub fn run(args: &[String]) -> i32 {
         eprintln!("  help: this binary carries: {}", members().join(", "));
         return 2;
     };
-    let Some(&(_, f, _, _, _, _)) = row else {
+    let Some(&(_, f, _, _, _, _, _)) = row else {
         return no_member(member);
     };
     let Tail { observe, binding, .. } = match parsed {
@@ -498,9 +615,10 @@ fn no_binding(given: &str) -> i32 {
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — `--knobs` puts the arm under the tree-free
-// mark wherever it stands, and a file it cannot use declines rather than refusing the turn end
+// mark wherever it stands, and a file it cannot use is a fault carried to the member; an observed
+// run has no member in process to carry it to, so it declines as an unwritable log does
 fn under_knobs(member: &str, row: Option<&Row>, observe: bool, binding: Option<&str>, file: &str) -> i32 {
-    let Some(&(name, f, _, _, free, _)) = row else {
+    let Some(&(name, f, _, _, free, _, _)) = row else {
         return no_member(member);
     };
     if !free {
@@ -525,10 +643,15 @@ fn under_knobs(member: &str, row: Option<&Row>, observe: bool, binding: Option<&
     }
     TREE_FREE.with(|m| m.set(true));
     KNOB_FILE.with(|k| *k.borrow_mut() = Some(file.to_string()));
-    if let Err(e) = crate::knobs::check_hook_file(file) {
-        return decline(name, &format!("{} {}", KNOBS_FLAG, e), input.value());
+    let fault = crate::knobs::check_hook_file(file).err().map(|e| format!("{} {}", KNOBS_FLAG, e));
+    match fault {
+        Some(fault) if observe => decline(name, &fault, input.value()),
+        _ if observe => observe::run(name, &input),
+        fault => {
+            KNOB_FAULT.with(|k| *k.borrow_mut() = fault);
+            f(&input)
+        }
     }
-    if observe { observe::run(name, &input) } else { f(&input) }
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the foreign bindings the arm's adapter
@@ -632,12 +755,56 @@ mod tests {
         assert_eq!(decline("m", "r", None), 0);
     }
 
-    // spec: gate-sdk/SPEC.md §The harness-integration arm — the tree-free column holds one member
-    // until the filed follow-on weighs the rest
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — every row weighed: five members read
+    // nothing a repository holds, and three read the tree, each row's comment saying why
     #[test]
-    fn only_the_turn_end_liveness_member_is_tree_free() {
-        let free: Vec<&str> = HOOKS.iter().filter(|r| r.4).map(|r| r.0).collect();
-        assert_eq!(free, ["subagent-stop-liveness"]);
+    fn five_members_are_tree_free_and_three_read_the_tree() {
+        let mut free = tree_free_members();
+        free.sort_unstable();
+        assert_eq!(
+            free,
+            ["agent-budget-guard", "agent-dispatch-guard", "escalation-guard", "subagent-stop-liveness", "wakeup-guard"]
+        );
+        let mut bound: Vec<&str> = HOOKS.iter().filter(|r| !r.4).map(|r| r.0).collect();
+        bound.sort_unstable();
+        assert_eq!(bound, ["session-context", "shell-guard", "workflow-state-guard"]);
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — a before-tool-call row names the tools it
+    // registers on, and a row on an event that takes no matcher names none
+    #[test]
+    fn every_before_tool_call_row_carries_a_matcher() {
+        for (name, _, _, _, _, event, tools) in HOOKS {
+            assert_eq!(*event == binding::EVENT_BEFORE_TOOL_CALL, !tools.is_empty(), "{}'s matcher", name);
+        }
+        assert_eq!(matcher("wakeup-guard").as_deref(), Some("ScheduleWakeup|CronCreate"));
+        assert_eq!(matcher("subagent-stop-liveness").as_deref(), Some(""));
+    }
+
+    // spec: gate-sdk/SPEC.md §The harness-integration arm — the project-scope wiring guard-kit ships
+    // registers each member it carries under that member's matcher
+    #[test]
+    fn the_guard_kit_wiring_template_registers_each_member_under_its_matcher() {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../guard-kit/templates/settings-hooks.json");
+        let text = std::fs::read_to_string(&path).expect("guard-kit's wiring template must read");
+        let doc: Value = serde_json::from_str(&text).expect("guard-kit's wiring template must parse");
+        let mut seen = 0;
+        for (event, groups) in doc[binding::WIRING_HOOKS].as_object().expect("the template's hooks object") {
+            for group in groups.as_array().into_iter().flatten() {
+                let on = group.get(binding::WIRING_MATCHER).and_then(Value::as_str).unwrap_or("");
+                for hook in group[binding::WIRING_HOOKS].as_array().into_iter().flatten() {
+                    let Registration::Member { name, .. } = registration(&command_tokens(hook)) else { continue };
+                    assert_eq!(event.as_str(), event_of(name), "{}'s event", name);
+                    assert_eq!(Some(on.to_string()), matcher(name), "{}'s matcher", name);
+                    seen += 1;
+                }
+            }
+        }
+        assert!(seen > 0, "the template registers no member");
+    }
+
+    fn event_of(name: &str) -> &'static str {
+        event(name).unwrap_or_else(|| panic!("{} is no member", name))
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — under the mark a relative path-valued
@@ -687,7 +854,7 @@ mod tests {
             ("wakeup-guard", include_str!("wakeup.rs")),
             ("workflow-state-guard", include_str!("workflow_state.rs")),
         ];
-        for (name, _, _, owner, _, _) in HOOKS {
+        for (name, _, _, owner, _, _, _) in HOOKS {
             let src = modules
                 .iter()
                 .find(|(m, _)| m == name)
@@ -853,8 +1020,9 @@ mod tests {
     // event the binding table names, the one a printed registration takes
     #[test]
     fn every_tree_free_row_carries_a_binding_event() {
+        let events = [binding::EVENT_BEFORE_TOOL_CALL, binding::EVENT_SESSION_START, binding::EVENT_CHILD_TURN_END];
         for name in tree_free_members() {
-            assert_eq!(event(name), Some(binding::EVENT_CHILD_TURN_END), "{}", name);
+            assert!(events.contains(&event_of(name)), "{}", name);
         }
         assert_eq!(event("session-context"), Some(binding::EVENT_SESSION_START));
         assert_eq!(event("no-such-member"), None);

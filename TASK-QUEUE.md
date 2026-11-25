@@ -54,29 +54,7 @@ drift-kit's trend report covers only what it computes in-tree, so a velocity, le
 
 **Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
 
-### tree-free-hook-roster-widening
-
-[spec: SPEC-tree-free-widening.md] [not-icebox-eligible: 2026-11-24 named a filed follow-on by the operator direction of 2026-11-14, held only in this entry]
-
-The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (gate-sdk/SPEC.md §The harness-integration arm). Another member whose inputs all resolve absolute (payload, knobs, spawned programs) could run outside a repository too. Operator direction 2026-11-14, lead-relayed (not a ruling), names this a filed follow-on.
-
-**Deliverable:** a feature: each other member weighed, the column widened with its cases or the member's tree-bound reason recorded.
-
-**Push need (2026-11-25, inside the budget):** one mid-iteration push after its batch, should the build add absolute-path handling only CI's Windows legs run; none if spec finds no host-specific code, and the closing push reads it.
-
-**Cost while deferred:** an adopter running outside any repository gets only the turn-end guard. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `tree-free` in this file, none; owner gate-sdk/SPEC.md §The harness-integration arm.
-
 ## Technical Debt
-
-### observe-plain-text-context
-
-[not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
-
-An observed `session-context` logs `would=error`: the member prints its brief as plain text on stdout (native/src/hook/session_context.rs), and the would-be decision table reads exit 0 with stdout that is not JSON as `error` (gate-sdk/SPEC.md §The harness-integration arm), so a trial of the session-start member never logs the `advise` its enforcing run gives.
-
-**Deliverable:** a table row reading plain-text stdout on a context-taking event as `advise`, reason withheld, which needs the event `classify` does not take today; or the member emits the context envelope under every binding; or the table names the case as a limit.
-
-**Cost while deferred:** a `session-context` trial reads as a failing hook, paid at each observed session start. Filed 2026-11-15 by machine-verdict-contract-pass' close. Re-verified there: native/src/hook/observe.rs `classify` sends `Some(0)` with unparseable stdout to `error`, and its unit test pins that row. Owner lookup: `observe`, `session-context` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ## Deferred
 
@@ -1036,4 +1014,6 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - amendment-queue-dangling-link
 - absent-queue-liveness-gates
 - install-size-contract-drift
+- tree-free-hook-roster-widening
+- observe-plain-text-context
 

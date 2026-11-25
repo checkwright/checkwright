@@ -53,7 +53,8 @@ pub fn run(member: &str, payload: &Payload) -> i32 {
     let (status, would) = match &child {
         Ok(done) => {
             let (out, err) = done.streams();
-            (done.code(), classify(done.code(), out, err))
+            let event = super::field(value, &[binding::EVENT_NAME]);
+            (done.code(), classify(done.code(), &event, out, err))
         }
         Err(e) => (None, Would { decision: ERROR, reason: first_line(e) }),
     };
@@ -84,13 +85,18 @@ fn log_path() -> Result<String, String> {
 }
 
 // spec: gate-sdk/SPEC.md §The harness-integration arm — the would-be decision table, each envelope
-// read through the binding table's spellings
-pub fn classify(code: Option<i32>, stdout: &[u8], stderr: &[u8]) -> Would {
+// read through the binding table's spellings; plain text on the session-start event is the context
+// the harness adds from it
+pub fn classify(code: Option<i32>, event: &str, stdout: &[u8], stderr: &[u8]) -> Would {
     let error = || Would { decision: ERROR, reason: first_line(&String::from_utf8_lossy(stderr)) };
     match code {
         Some(2) => Would { decision: BLOCK, reason: WITHHELD.to_string() },
         Some(0) if stdout.iter().all(u8::is_ascii_whitespace) => Would { decision: NONE, reason: ABSENT.to_string() },
-        Some(0) => serde_json::from_slice::<Value>(stdout).ok().and_then(|v| envelope(&v)).unwrap_or_else(error),
+        Some(0) => match serde_json::from_slice::<Value>(stdout) {
+            Ok(v) => envelope(&v).unwrap_or_else(error),
+            Err(_) if event == binding::EVENT_SESSION_START => Would { decision: ADVISE, reason: WITHHELD.to_string() },
+            Err(_) => error(),
+        },
         _ => error(),
     }
 }
@@ -153,7 +159,11 @@ mod tests {
     use super::*;
 
     fn read(code: Option<i32>, out: &str, err: &str) -> (&'static str, String) {
-        let w = classify(code, out.as_bytes(), err.as_bytes());
+        read_on(binding::EVENT_BEFORE_TOOL_CALL, code, out, err)
+    }
+
+    fn read_on(event: &str, code: Option<i32>, out: &str, err: &str) -> (&'static str, String) {
+        let w = classify(code, event, out.as_bytes(), err.as_bytes());
         (w.decision, w.reason)
     }
 
@@ -173,6 +183,10 @@ mod tests {
         assert_eq!(read(None, "", ""), ("error", s("-")));
         assert_eq!(read(Some(0), "not json", "why"), ("error", s("why")));
         assert_eq!(read(Some(0), r#"{"systemMessage":"n","x":1}"#, ""), ("error", s("-")));
+        let start = binding::EVENT_SESSION_START;
+        assert_eq!(read_on(start, Some(0), "## Brief\nplain text", "why"), ("advise", s("withheld")));
+        assert_eq!(read_on(start, Some(0), r#"{"systemMessage":"n","x":1}"#, ""), ("error", s("-")));
+        assert_eq!(read_on(binding::EVENT_CHILD_TURN_END, Some(0), "plain text", "why"), ("error", s("why")));
     }
 
     // spec: gate-sdk/SPEC.md §The harness-integration arm — the line's field order, `-` for absent
