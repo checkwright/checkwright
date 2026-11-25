@@ -76,13 +76,19 @@ pub fn paths() -> Result<Paths, String> {
         p.usage_file = format!("{}/usage.txt", crate::sessions::config_home(&var(crate::hook::binding::CONFIG_DIR_VAR), &home));
     }
     if p.cred_file.is_empty() {
-        let dir = p.usage_file.rsplit_once('/').map_or(p.usage_file.as_str(), |(d, _)| d);
-        p.cred_file = format!("{}/.credentials.json", dir);
+        p.cred_file = cred_beside(&p.usage_file);
     }
     if p.account_config.is_empty() {
         p.account_config = format!("{}/.claude.json", home);
     }
     Ok(p)
+}
+
+// spec: delegation-kit/SPEC.md §Layout and configuration — "in that file's directory" is split on the
+// host's separators, so a backslash-only Windows usage path keeps its directory
+fn cred_beside(usage_file: &str) -> String {
+    let dir = usage_file.rsplit_once(std::path::is_separator).map_or(usage_file, |(d, _)| d);
+    format!("{}/.credentials.json", dir)
 }
 
 // spec: delegation-kit/SPEC.md §The usage.txt contract — one string field of a JSON file by object
@@ -126,6 +132,15 @@ pub fn is_utilization(v: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: delegation-kit/SPEC.md §Layout and configuration — the credentials file lands in the
+    // usage file's directory; `crate-tests-windows` holds the backslash-only spelling
+    #[test]
+    fn the_credentials_file_sits_in_the_usage_files_directory() {
+        assert_eq!(cred_beside("/h/.claude/usage.txt"), "/h/.claude/.credentials.json");
+        #[cfg(windows)]
+        assert_eq!(cred_beside(r"C:\h\.claude\usage.txt"), r"C:\h\.claude/.credentials.json");
+    }
 
     // spec: delegation-kit/SPEC.md §The usage.txt contract — the two required fields always appear
     // and an absent optional one is omitted rather than written empty, which is what lets a reader
