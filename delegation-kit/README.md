@@ -16,6 +16,7 @@ Vendor the kit beside [gate-sdk](../gate-sdk/) (required), then:
    ```
    check-gate-tamper
    check-agent-tier-explicit   # every tracked agent definition states a model: tier
+   check-brief-authority   # a brief names no forbidden grant and every required section
    ```
    <!-- gate-roster:end -->
 
@@ -56,6 +57,8 @@ gates="${GATE_SDK_NATIVE_BIN:-./scripts/checkwright-gates}"
 With `DELEGATION_KIT_USAGE_HISTORY` set, `usage-verdict` logs one sample per call; `--emit usage-trend` reads that log and reports per-window footprint evolution and weekly headroom (advisory — exit 0/2, never a pause verdict).
 
 `check-gate-tamper` runs from the pre-commit hook and the battery. A supervisor checks a range of commits it received with `checkwright-gates check-gate-tamper --range <base>..<head>`; `--fixture <dir>` is for testing.
+
+`check-brief-authority` reads only the briefs named as its operands, so the battery's run skips it. A dispatcher runs `checkwright-gates check-brief-authority <brief>…` on a brief before handing it over, with `templates/brief-rules.list` copied into the gates dir and named in `DELEGATION_KIT_BRIEF_RULES`.
 
 ## Test
 

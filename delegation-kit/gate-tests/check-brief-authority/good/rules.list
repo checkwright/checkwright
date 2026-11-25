@@ -1,0 +1,5 @@
+# spec: delegation-kit/SPEC.md §check-brief-authority — the case's rules: a push and an install forbidden, a prohibition excused, the quoted request required
+forbid (^|[^[:alpha:]])[Pp]ush([^[:alpha:]]|$)
+forbid npm[[:space:]]+install
+unless (^|[^[:alpha:]])[Nn]ever[[:space:]]
+require ^>

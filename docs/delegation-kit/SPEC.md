@@ -567,6 +567,34 @@ B reds on a non-`inherit` `model:` with no `tier:`, on an unbound class, on a st
 
 **Honest limits.** It holds the tracked surface only. A dispatch naming no agent type and no `model` parameter inherits and leaves no artifact for any gate to read, which D5 reaches at the dispatch where it is switched on ([§The delegation model](#the-delegation-model)). A definition's `effort:` reaches only sessions started after it lands, as its `model:` does, and a harness environment variable that forces every session's effort overrides it, the shape [§The delegation model](#the-delegation-model) refuses for the subagent-model override; `--model-verdict`'s effort clause is what surfaces either. That a definition's `effort:` sets its child's effort is measured: a definition binding an effort other than its dispatcher's running one, dispatched with no `model` or `effort` parameter, ran at the definition's effort, read by `--model-verdict` off the child's own transcript.
 
+## check-brief-authority
+
+`checks/check-brief-authority.gate` (`precommit`, binary-dispatched). Invariant: a brief grants no authority the consumer forbids and carries every section it requires. **A brief is read as a file**, named as the gate's operands: `checkwright-gates check-brief-authority <brief>…`. A dispatcher runs it on the brief it is about to hand an agent: a foreign run's prompt file, an orchestrator's brief, or a lead's dispatch prompt written out first. A no-operand run, the battery's, is a clean skip, since no brief is a tracked surface. An operand that is not a readable file is exit 2.
+
+**A file, not the dispatch payload, is read first.** A file is the one form every dispatcher holds. A payload reader is a hook rule on `agent-dispatch-guard`, owing its own decision class, advise or deny, and its own resolution of the rule files where a hook may run with no repository. It would reuse this section's grammar and matcher unchanged.
+
+**The rules come from `DELEGATION_KIT_BRIEF_RULES`**, a whitespace list of rule files, each line one directive and one POSIX ERE, `#` comments and blanks ignored:
+
+- `forbid <ERE>` — a brief line matching it grants a forbidden authority, unless the line also matches an `unless` rule.
+- `unless <ERE>` — a line matching it states a prohibition, not a grant. It excuses that line from every `forbid` rule.
+- `require <ERE>` — some line of the brief must match it.
+
+A line with another directive, no pattern, or a malformed pattern is exit 2, naming the file, the line and the defect. Matching runs through the crate's POSIX ERE engine ([gate-sdk/SPEC.md §The POSIX ERE matcher](../gate-sdk/SPEC.md#the-posix-ere-matcher)). A named file that does not exist is exit 2. An empty knob arms nothing, and the descriptor's `# armed-by: content DELEGATION_KIT_BRIEF_RULES` lets `doctor` name that state ([gate-sdk/SPEC.md §The install disposition](../gate-sdk/SPEC.md#the-install-disposition)).
+
+**Three directives, because `forbid` alone cannot tell "push the branch" from "never push".** A negation-aware parser is a language model's job, not a lint's. An `unless` pattern the consumer writes is the honest lexical approximation, and its line scope is a stated limit below. `require` is the "quotes the request" check expressed as config, since the request's form, a blockquote or a heading, is the consumer's brief format.
+
+**One knob of files, with no tracked-and-local pair.** The knob file already has a gitignored `.local` overlay ([gate-sdk/SPEC.md §The knob file](../gate-sdk/SPEC.md#the-knob-file)), which can name a private rule file, so a second knob would be a second spelling of that overlay.
+
+**The starter list is a choice, never the default.** `templates/brief-rules.list` forbids the harness-generic grants, a push, a forge post and a package install, and excuses lines phrased as a prohibition. Its `require` lines are commented out, since a required section names the consumer's brief format. A consumer copies it into its gates dir, edits it and names the copy in the knob.
+
+A finding names the brief, the line and the rule: `<brief>:<n>: grants forbidden authority (forbid <ERE>)`, or `<brief>: lacks a required section (require <ERE>)`, each with a `help:` line. The clean line is `BRIEF-AUTHORITY: clean (<n> brief(s); <f> forbid, <u> unless, <r> require rule(s))`.
+
+**Honest limits.**
+
+- **Lexical and line-scoped.** A grant phrased in words no pattern names passes, and an `unless` match excuses its whole line, so one line that forbids one act and grants another passes. Keep one instruction per line in a brief the gate reads.
+- **A brief is not a permission.** The gate reads what the brief says. What the agent can do is set by the harness's permission system and the dispatch's isolation, so a green brief does not confine anything.
+- **A dispatch payload is not read.** A brief passed inline to the harness's `Agent` tool reaches the agent without this gate unless the dispatcher writes it out and runs the gate first.
+
 ## usage-verdict
 
 Emits a trustworthy budget verdict from a usage snapshot file, closing the three failure modes a raw percentage reading leaves open:
@@ -925,9 +953,12 @@ delegation-kit/
   gate-tests/check-gate-tamper/{good,bad}/
   gate-tests/check-gate-tamper.test.sh  # the live and range arms, over throwaway git repos
   gate-tests/check-agent-tier-explicit/{good,bad}/
+  checks/check-brief-authority.gate  # binary-dispatched: a brief operand grants no forbidden authority
+  gate-tests/check-brief-authority/{good,bad}/
   templates/agent-execution.md            # full protocol, bound as a skill shim
   templates/dispatch-checklists.md        # deletion/rename/audit pre-flight, reached by a pointer
   templates/delegation-config.knobs       # comment-only knob file: set only what you override
+  templates/brief-rules.list  # starter rule list a consumer copies; read by nothing until named
   smoke/install.sh
   smoke/violation.sh
 ```
@@ -960,6 +991,7 @@ Config is a **knob file**: copy `templates/delegation-config.knobs` into the gat
 - `DELEGATION_KIT_MUTATING_TYPES` — agent-type names the consumer declares mutating, the only types D4 lets dispatch unisolated ([§The delegation model](#the-delegation-model)). Default empty, in which case D4 is inert by construction; the entries are the consumer's own roster on `DELEGATION_KIT_READONLY_TYPES`' provenance ground. `isolation: remote` does not satisfy D4, on the same recorded exclusion as D2's.
 - `DELEGATION_KIT_REQUIRE_TIER` — D5's switch, `on` or `off`; default `off`, in which case D5 is inert. The table validator refuses any other value. A switch rather than a roster of model names, because the kit ships no model name and the tier each type rides is its definition's `model:` field ([§check-agent-tier-explicit](#check-agent-tier-explicit)) or the dispatch's own `model`.
 - `DELEGATION_KIT_AGENT_DIR` is also D5's lookup root: a type counts as tiered when a definition under it declares that type and states `model:`.
+- `DELEGATION_KIT_BRIEF_RULES` — the rule files `check-brief-authority` reads ([§check-brief-authority](#check-brief-authority)): a whitespace list of paths, repo-root-relative or absolute, expanded by nothing; default empty, which arms no rule.
 - `DELEGATION_KIT_TIER_CLASSES` — the class roster ([§The tier binding](#the-tier-binding)): indexed, highest first, default `judgment`, `routing`, `mechanical`. The table validator refuses a name outside `[a-z0-9-]` and a name given twice. Being indexed, it has no environment spelling, on the binding's own ground.
 - `DELEGATION_KIT_TIER_MODEL` — the tier binding ([§The tier binding](#the-tier-binding)): indexed, one `<class>=<model>[,<effort>]` element per class, the class one the roster holds; default empty, which is off. The table validator refuses a malformed element, a class the roster lacks, a class bound twice, an empty model, a model carrying whitespace, an `inherit` model, an all-digit model and a model equal to the leading token of a different bound one. It refuses an effort that is empty, carries whitespace or carries a second comma. Being indexed, it has no environment spelling: a freshness gate reads it, and a per-session override would red that gate against an unchanged tree.
   - **The two shapes.** A model is an ASCII letter or digit followed by ASCII letters, digits, `.`, `_`, `-`, `:`, `/`, `@`, `[` or `]`, so a vendor's dotted and bracketed ids pass. An effort is an ASCII letter followed by ASCII letters, digits, `.`, `_` or `-`. Any other is refused. `--emit agent-tiers --write` puts each bare after a definition's `model:` or `effort:` key ([§check-agent-tier-explicit](#check-agent-tier-explicit)), where a value opening on `#` reads as a comment and the definition holds none. **Honest limit:** the shapes are not a YAML reading, so a value a YAML reader types as other than a string, such as `null`, or a model ending on `:` is not refused.
@@ -999,6 +1031,7 @@ The kit's gates speak the full gate contract (`<GATE>: clean (…)` / findings +
 
 - **`check-gate-tamper`**, through `--fixture`, whose optional `exception-arrays.sh` supplies tagged arrays beside the pre-parsed `added-exemptions` list. The bad case reaches both assertions: it carries a co-staged non-meta path *and* a newly added path exemption matching one of its own staged files, beside a bare token assertion B must pass over.
 - **`check-agent-tier-explicit`**, over a fixture-local agent directory passed as its one positional argument, with a case knob file binding two classes, one of them with an effort. The `good/` side carries the passing shapes: a definition naming a cheaper class outright, with its class's bound model, one holding both halves of its class's pair, and one declaring `inherit`. So the pair proves the gate discriminates omission from choice rather than merely finding a `model:` string. The `bad/` side omits the field (A), and carries a stale model line, a stale effort line and a definition naming an unbound class (B). The arm's report, its `--write` and its refusal are its own module's unit tests, and the binding's refusals and matcher are crate tests beside the knob table and the matcher.
+- **`check-brief-authority`**, over fixture briefs passed as operands, with a case knob file naming a fixture rule file. The `good/` side holds a brief whose only push line is a prohibition the `unless` rule excuses, and which carries the required section. The `bad/` side holds a granted push and a granted install on separate lines, and a brief missing the required section. The rule grammar's exit-2 refusals (an unknown directive, an empty pattern, a malformed pattern, a named file that does not exist) and the no-operand clean skip are its module's unit tests.
 
 **The tamper pair cannot reach the live and range arms, a property of the injection rather than of the cases.** `--fixture` supplies both lists directly, so the functions that derive them run in no fixture case. They read each gate file's bytes out of the object store and diff its exemption set against the parent's. `gate-tests/check-gate-tamper.test.sh` exercises them: each case builds a throwaway git repo, stages a commit shape into a real index or commits a series and names it with `--range`, and runs the gate inside it. It pins the verdicts the pair cannot:
 

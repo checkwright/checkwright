@@ -168,6 +168,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [delegation-kit](delegation-kit/index.md) | check-gate-tamper | precommit |
 | (consumer) | check-rule-citation | precommit |
 | [delegation-kit](delegation-kit/index.md) | check-agent-tier-explicit | precommit |
+| [delegation-kit](delegation-kit/index.md) | check-brief-authority | precommit |
 | [context-kit](context-kit/index.md) | check-brevity | precommit |
 | [context-kit](context-kit/index.md) | check-surface-ratchet | precommit |
 | [context-kit](context-kit/index.md) | check-settings-pins | precommit |

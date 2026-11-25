@@ -155,6 +155,7 @@ check-battery-roster
 check-gate-tamper
 check-rule-citation
 check-agent-tier-explicit
+check-brief-authority
 check-brevity
 check-surface-ratchet
 check-settings-pins

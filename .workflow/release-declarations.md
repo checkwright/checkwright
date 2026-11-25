@@ -3,6 +3,11 @@
 ## New and tightened gates
 
 - `check-amendment-queue` — a queue path that is a dangling symlink now refuses at exit 2 (`not a file`), where it read as an absent queue and passed as not applicable. Nothing to do unless a queue link in your tree dangles: repoint it, or remove it to read the queue as absent.
+- `check-brief-authority` — new in delegation-kit: reads the agent briefs named as its operands against the rule files `DELEGATION_KIT_BRIEF_RULES` names, and reds a line granting an authority a `forbid` rule names that no `unless` rule excuses, and a brief no line of which matches a `require` rule. A no-operand run, the battery's, is a clean skip, and an empty knob arms no rule. Nothing to do; to lint a brief before dispatching it, copy `templates/brief-rules.list`, name the copy in the knob, register the gate and run it over the brief.
+
+## Knob changes
+
+- `DELEGATION_KIT_BRIEF_RULES` — new: a whitespace list of the rule files `check-brief-authority` reads, each line `forbid`, `unless` or `require` and one POSIX ERE; default empty, which arms no rule. A file the knob names that is absent, or a line with another directive, no pattern or a malformed pattern, stops the gate at exit 2.
 
 ## Behavior changes
 

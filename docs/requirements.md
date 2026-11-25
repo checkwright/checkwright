@@ -78,7 +78,7 @@ A repository install commits the profile's kit files, the gate binary and a hand
 | --- | --- | --- | --- | --- |
 | `starter` | 1 | 600 | 550 | 460 kB |
 | `workflow` | 3 | 860 | 770 | 960 kB |
-| `delegation` | 8 | 1,100 | 950 | 1.5 MB |
+| `delegation` | 8 | 1,100 | 960 | 1.5 MB |
 | `prose` | 2 | 1,000 | 930 | 680 kB |
 | `full` | 11 | 1,600 | 1,400 | 1.8 MB |
 
@@ -86,7 +86,7 @@ A repository install commits the profile's kit files, the gate binary and a hand
 | --- | --- | --- | --- |
 | canon-kit | 430 | 390 | 230 kB |
 | context-kit | 69 | 47 | 48 kB |
-| delegation-kit | 35 | 24 | 120 kB |
+| delegation-kit | 47 | 35 | 110 kB |
 | doctrine-kit | 12 | 9 | 64 kB |
 | drift-kit | 7 | 0 | 35 kB |
 | evidence-kit | 69 | 62 | 94 kB |

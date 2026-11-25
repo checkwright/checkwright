@@ -1,0 +1,3 @@
+grant.md:3: grants forbidden authority (forbid (^|[^[:alpha:]])[Pp]ush([^[:alpha:]]|$))
+grant.md:4: grants forbidden authority (forbid npm[[:space:]]+install)
+unquoted.md: lacks a required section (require ^>)

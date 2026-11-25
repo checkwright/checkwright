@@ -14,6 +14,7 @@ pub mod agent_tier_explicit;
 pub mod assertion_strength;
 pub mod audit_roster;
 pub mod brevity;
+pub mod brief_authority;
 pub mod citation_link;
 pub mod close_surfaces;
 pub mod comment_tier;
@@ -2186,6 +2187,16 @@ pub const REGISTRY: &[GateEntry] = &[
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
         ],
+        "delegation-kit",
+        &[],
+    ),
+    // spec: delegation-kit/SPEC.md §check-brief-authority — the briefs are operands and the rule
+    // files a knob's named list, so nothing is walked
+    (
+        "check-brief-authority",
+        brief_authority::run,
+        &[],
+        &["DELEGATION_KIT_BRIEF_RULES"],
         "delegation-kit",
         &[],
     ),

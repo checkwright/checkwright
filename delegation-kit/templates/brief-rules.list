@@ -1,0 +1,20 @@
+# brief-rules.list — starter rule list for check-brief-authority
+# (delegation-kit/SPEC.md §check-brief-authority). Copy it into your gates dir,
+# edit it and name the copy in DELEGATION_KIT_BRIEF_RULES. One directive and
+# one POSIX ERE per line; '#' comments and blank lines are ignored.
+
+# A push: the agent publishes its commits.
+forbid (^|[^[:alpha:]])([Pp]ush|PUSH)([^[:alpha:]]|$)
+
+# A forge post: a pull request, issue, comment or release made in the agent's name.
+forbid (^|[^[:alpha:]])gh[[:space:]]+(pr|issue|release|api)([^[:alpha:]]|$)
+forbid (^|[^[:alpha:]])([Pp]ost|[Oo]pen|[Ff]ile|[Cc]omment)[[:space:]]+(on[[:space:]]+)?(a|an|the)?[[:space:]]*(pull request|PR|issue|comment|release)
+
+# A package install.
+forbid (^|[^[:alpha:]])(npm|pnpm|yarn|pip3?|cargo|gem|go|brew|apt(-get)?)[[:space:]]+(install|add|get)([^[:alpha:]]|$)
+
+# A line phrased as a prohibition.
+unless (^|[^[:alpha:]])([Nn]ever|[Dd]o not|[Dd]on't|[Mm]ust not|NEVER|DO NOT)([^[:alpha:]]|$)
+
+# The quoted request, as a blockquote. Name your own brief format's section.
+# require ^>

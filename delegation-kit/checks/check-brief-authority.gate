@@ -1,0 +1,4 @@
+# graph: couples=knob:GATE_SDK_GATES_DIR/brief-rules.list dir=one valve=none tier=precommit
+# install: on-surface
+# armed-by: content DELEGATION_KIT_BRIEF_RULES
+# spec: delegation-kit/SPEC.md §check-brief-authority — a brief grants no forbidden authority and carries every required section

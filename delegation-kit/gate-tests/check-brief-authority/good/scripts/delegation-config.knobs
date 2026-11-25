@@ -1,0 +1,2 @@
+# spec: delegation-kit/SPEC.md §check-brief-authority — the case knob file names the fixture rule file
+DELEGATION_KIT_BRIEF_RULES = rules.list

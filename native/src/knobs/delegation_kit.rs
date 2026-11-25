@@ -63,6 +63,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("DELEGATION_KIT_USAGE_HISTORY", ""),
         Row::scalar("DELEGATION_KIT_FAN_WIDTH", "2"),
         Row::scalar("DELEGATION_KIT_AGENT_DIR", ".claude/agents"),
+        Row::scalar("DELEGATION_KIT_BRIEF_RULES", "").words(),
         Row::scalar("DELEGATION_KIT_ACCOUNT_CONFIG", ""),
         Row::scalar("DELEGATION_KIT_USAGE_ENDPOINT", "https://api.anthropic.com/api/oauth/usage"),
         Row::derived("DELEGATION_KIT_STOP_LOG", Shape::Scalar, stop_log, &["GATE_SDK_WORKFLOW_DIR"]),

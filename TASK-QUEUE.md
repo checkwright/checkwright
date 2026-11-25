@@ -24,16 +24,6 @@ The foreign-vendor run (delegation-kit/SPEC.md §The foreign-vendor run) is a pr
 
 **Cost while deferred:** each outside caller re-builds the run. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `foreign-vendor`, `foreign run` in this file and the disposed-findings record, none open; owner delegation-kit/SPEC.md §The foreign-vendor run.
 
-### brief-authority-lint
-
-[spec: SPEC-brief-authority.md]
-
-No check reads an agent brief: one that grants authority the agent must not hold (push, post, install) or that does not quote the request passes. A generic gate takes its forbidden verbs and required sections from config.
-
-**Deliverable:** design-pending, a feature: where a brief is read (a dispatch payload or a file), the config grammar, and its honest limit.
-
-**Cost while deferred:** an over-granting or unquoted brief reaches the agent. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `brief`, `forbidden verb` in this file, none; [outbound-public-text-lint](#outbound-public-text-lint) reads posted text, not briefs; owner delegation-kit/SPEC.md.
-
 ### external-kpi-series
 
 [spec: SPEC-external-series.md] [recurrence: 2026-11-25]
@@ -1007,4 +997,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - tree-free-hook-roster-widening
 - observe-plain-text-context
 - gate-tamper-range-arm
+- brief-authority-lint
 
