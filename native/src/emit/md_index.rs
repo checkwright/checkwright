@@ -127,7 +127,7 @@ fn index_one(text: &str) -> String {
 // count, the heading rows, then a blank line — after the last block too, which the shell form's
 // unconditional trailing `echo ""` is what makes true.
 pub fn emit(args: &[String]) -> Result<String, Fault> {
-    let paths = targets(args, USAGE).map_err(|e| if e.ends_with(USAGE) { Fault::usage(e) } else { Fault::tool(e) })?;
+    let paths = targets(args, USAGE)?;
     let root = walk::toplevel_opt().map_err(Fault::tool)?;
     walk::knob_array("CONTEXT_KIT_PRUNE_DIRS").map_err(Fault::refused)?;
     let mut out = String::new();

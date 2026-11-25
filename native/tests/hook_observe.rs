@@ -60,7 +60,9 @@ fn fire(s: &Scratch, from: &Path, args: &[&str], env: &[(&str, String)], payload
         c.env(k, v);
     }
     let mut child = c.spawn().expect("cannot run the binary under test");
-    std::io::Write::write_all(&mut child.stdin.take().expect("piped stdin"), payload.as_bytes()).expect("payload");
+    if let Err(e) = std::io::Write::write_all(&mut child.stdin.take().expect("piped stdin"), payload.as_bytes()) {
+        assert_eq!(e.kind(), std::io::ErrorKind::BrokenPipe, "payload: {}", e);
+    }
     let out = child.wait_with_output().expect("cannot await the binary under test");
     Fired {
         code: out.status.code(),

@@ -138,12 +138,13 @@ pub fn self_repo_prefix(reference: &str) -> String {
 // a shape refusal carrying the calling member's usage.
 // spec: gate-sdk/SPEC.md §The crate's crosser — a given path enters the tree here, so it crosses
 // here and the walk below spells every entry in the declared dialect.
-pub fn targets(args: &[String], usage: &str) -> Result<Vec<String>, String> {
-    let args = file_survey::positionals(args, "path").map_err(|e| format!("{}\n{}", e, usage))?;
+pub fn targets(args: &[String], usage: &str) -> Result<Vec<String>, crate::exit::Fault> {
+    use crate::exit::Fault;
+    let args = file_survey::positionals(args, "path").map_err(|e| Fault::usage(format!("{}\n{}", e, usage)))?;
     if args.is_empty() {
-        return Ok(vec![match crate::walk::toplevel_opt()? {
+        return Ok(vec![match crate::walk::toplevel_opt().map_err(Fault::tool)? {
             Some(t) => t,
-            None => crate::walk::cwd()?,
+            None => crate::walk::cwd().map_err(Fault::tool)?,
         }]);
     }
     Ok(args.iter().map(|a| crate::walk::cross_arg(a)).collect())

@@ -317,3 +317,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | peer-adoption-channel-pass | sc sp a b v c | 9f/1d | 5 · ≤0d | 21s clean | 159 |
 | adopter-asks-pass | sc sp a b v c | 6f/3d | 3 · ≤0d | 42s clean | 160 |
 | adopter-followthrough-pass | sc sp a b v c | 10f/4d | 5 · ≤0d | 42s clean | 161 |
+| machine-verdict-pass | sc sp a b v c | 4f/6d | 4 · ≤0d | 21s clean | 161 |

@@ -147,7 +147,7 @@ fn block(rel: &str, rows: &[String]) -> String {
 }
 
 pub fn emit(args: &[String]) -> Result<String, Fault> {
-    let paths = targets(args, USAGE).map_err(|e| if e.ends_with(USAGE) { Fault::usage(e) } else { Fault::tool(e) })?;
+    let paths = targets(args, USAGE)?;
     let root = crate::walk::toplevel_opt().map_err(Fault::tool)?;
     let dir = crate::walk::knob_scalar("CONTEXT_KIT_PUB_LANG_DIR").map_err(Fault::refused)?;
     crate::walk::knob_array("CONTEXT_KIT_PRUNE_DIRS").map_err(Fault::refused)?;

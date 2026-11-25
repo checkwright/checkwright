@@ -159,11 +159,12 @@ fn rule(_args: &[String]) -> Result<i32, Fault> {
 
 // spec: canon-kit/SPEC.md §check-provenance-seam — a slug equal to a mechanism name the tree
 // defines is structural, not a finding: a kit root's directory name, a gate declared in the
-// gates directory or a kit's `checks/`, or a `gates.list` member
+// gates directory or a kit's `checks/`, a `gates.list` member, or a non-gate arm's name
 struct Mechanism {
     kits: Vec<String>,
     dirs: Vec<String>,
     members: Vec<String>,
+    arms: Vec<&'static str>,
 }
 
 impl Mechanism {
@@ -179,12 +180,17 @@ impl Mechanism {
             Ok(text) => registry::members(&text),
             Err(_) => Vec::new(),
         };
-        Ok(Mechanism { kits, dirs: registry::resolve_dirs(&gates_dir, roots), members })
+        let arms = crate::emit::arms()
+            .into_iter()
+            .filter_map(|a| a.strip_prefix("--emit-").or_else(|| a.strip_prefix("--")))
+            .collect();
+        Ok(Mechanism { kits, dirs: registry::resolve_dirs(&gates_dir, roots), members, arms })
     }
 
     fn names(&self, slug: &str) -> bool {
         self.kits.iter().any(|k| k == slug)
             || self.members.iter().any(|m| m == slug)
+            || self.arms.contains(&slug)
             || registry::resolve(slug, &self.dirs).is_some()
     }
 }

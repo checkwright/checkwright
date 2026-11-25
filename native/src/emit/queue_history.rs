@@ -35,15 +35,7 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
     }
     let sec = queue::Sections::with_done().map_err(Fault::refused)?;
     let file = if file.is_empty() { queue::knob_scalar("QUEUE_KIT_QUEUE_FILE").map_err(Fault::refused)? } else { file };
-    Ok(render(&slug, &queue::transitions(&file, &slug, &sec).map_err(transitions_fault)?))
-}
-
-fn transitions_fault(e: String) -> Fault {
-    if e.starts_with("not a live or retired slug") {
-        Fault::refused(e)
-    } else {
-        Fault::tool(e)
-    }
+    Ok(render(&slug, &queue::transitions(&file, &slug, &sec)?))
 }
 
 fn render(slug: &str, rows: &[queue::Transition]) -> String {

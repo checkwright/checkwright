@@ -203,7 +203,7 @@ pub(super) fn hash_in(c: &str, rel: &str) -> Result<String, Outcome> {
 pub(super) fn consumer(state: &Run, label: &str) -> Result<String, Outcome> {
     let c = format!("{}/consumer-{}.{}", state.scratch, label, SEQ.fetch_add(1, Ordering::Relaxed));
     let made = || -> Result<(), Outcome> {
-        std::fs::create_dir(&c).map_err(|e| fail(format!("cannot create {}: {}", c, e)))?;
+        std::fs::create_dir(&c).map_err(|e| refuse(format!("cannot create {}: {}", c, e)))?;
         for args in [
             &["init", "-q"][..],
             &["config", "user.email", "smoke@example.invalid"],
@@ -421,8 +421,10 @@ pub(super) fn append(p: &str, body: &str) -> Result<(), Outcome> {
         .map_err(|e| fail(format!("could not append to {}: {}", p, e)))
 }
 
+// spec: installer/SPEC.md §The consumer smoke — a scratch directory the harness cannot create is its
+// own environment, never the payload, so a refusal at exit 3
 pub(super) fn mkdir(p: &str) -> Result<(), Outcome> {
-    std::fs::create_dir_all(p).map_err(|e| fail(format!("could not create {}: {}", p, e)))
+    std::fs::create_dir_all(p).map_err(|e| refuse(format!("could not create {}: {}", p, e)))
 }
 
 // spec: installer/SPEC.md §The consumer smoke — a tarball extracted with tar into a directory, the

@@ -283,6 +283,8 @@ fn validate(v: &Values) -> Vec<String> {
             errs.push("LIFECYCLE_KIT_CONSULT_CLASS is empty".to_string());
         } else if !crate::tier::name(c) {
             errs.push(format!("LIFECYCLE_KIT_CONSULT_CLASS '{}' is outside [a-z0-9-]", c));
+        } else if c == "-" {
+            errs.push("LIFECYCLE_KIT_CONSULT_CLASS is a lone dash, which a foreign session's record reads as no class".to_string());
         }
     }
     for n in ["LIFECYCLE_KIT_BOUNDARY_WORKTREE_CHECK", "LIFECYCLE_KIT_STAGE_JOURNAL_REQUIRE"] {
@@ -375,6 +377,7 @@ mod tests {
         for bad in ["Expert", "two words", "a=b"] {
             assert_eq!(run(bad), vec![format!("LIFECYCLE_KIT_CONSULT_CLASS '{}' is outside [a-z0-9-]", bad)]);
         }
+        assert_eq!(run("-").len(), 1);
         assert!(run("judgment").is_empty() && run("a-class-no-roster-holds").is_empty());
     }
 

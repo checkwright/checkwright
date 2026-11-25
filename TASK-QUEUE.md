@@ -254,6 +254,16 @@ Ask D of the orchestrator adopter's pairing asks: its content checks as config-d
 
 **Cost while deferred:** the adopter keeps nine checks of its own beside the battery, two overlapping ours under another output contract. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `deny`, `base ref` in this file, none; owner gate-sdk/SPEC.md §check-tree-terms.
 
+### exit-status-site-unification
+
+[cost: event/low] [surface: gate-sdk]
+
+The exit-status cut (usage and refused at 2, input and tool at 3) leaves one case on both readings: a configured file the tool reads that is absent is an operand naming something absent (2), and one present but unreadable is a file it cannot read (3). The crate splits it per site, so one cause carries two statuses across arms and gates: gate_argv at 2 against the battery at 3, docs_since's arm at 3 against its gate at 2, todo_task_liveness at 2 against amendment_queue at 3, and spec::command_lines and finder errors mapped either way by gate. lib/gate.sh's gate_msg_pattern_files and commit_msg::resolve_files already split it as absent at 2 and unreadable at 3.
+
+**Deliverable:** debt: one owner rule in gate-sdk/SPEC.md §Fail-closed contract, absent-configured refused at 2 and present-unreadable input at 3, then a sweep of every site onto it with its fixture asserts and doc statements.
+
+**Cost while deferred:** an outside engine retries on 3, so a misfiled 3 costs it a futile retry and a misfiled 2 a missed one; no in-tree reader branches 2 against 3 beyond tests. Surfaced 2026-11-25 by machine-verdict-pass' build, filed at its close. Re-verified here: harness_literal maps its tracked-listing error to tool at 3. **Inferred, not run:** the per-site roster of about 45 sites the build session listed — `grep -rn 'Fault::refused\|Fault::input\|Fault::tool' native/src`. Owner lookup: `absent configured`, `present-unreadable`, `exit-status cut`, `per-site`, `unreadable file` in this file, none; owner gate-sdk/SPEC.md §Fail-closed contract.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).

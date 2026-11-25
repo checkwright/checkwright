@@ -2,6 +2,7 @@
 // surface: the derived section matchers, the slug adapters and the roadmap parse
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the knob read has exactly one implementation in the
 // crate, `walk`'s; these two are the queue-kit-facing spelling of it
+use crate::exit::Fault;
 use crate::programs;
 pub fn knob_array(name: &str) -> Result<Vec<String>, String> {
     crate::walk::knob_array(name)
@@ -634,19 +635,19 @@ pub struct Transition {
 
 // spec: queue-kit/SPEC.md §The queue-history arm — every transition of one slug, oldest first,
 // the walk stopping where the slug is absent after being present
-pub fn transitions(file: &str, slug: &str, sec: &Sections) -> Result<Vec<Transition>, String> {
+pub fn transitions(file: &str, slug: &str, sec: &Sections) -> Result<Vec<Transition>, Fault> {
     let text = std::fs::read_to_string(file).unwrap_or_default();
     let live = live_slugs(&text, sec);
     let known = live.iter().any(|s| s == slug)
         || done_slugs(&text, sec).iter().any(|s| s == slug)
-        || retired_set(file, &live)?.iter().any(|s| s == slug);
+        || retired_set(file, &live).map_err(Fault::tool)?.iter().any(|s| s == slug);
     if !known {
-        return Err(format!("not a live or retired slug: {}", slug));
+        return Err(Fault::refused(format!("not a live or retired slug: {}", slug)));
     }
     if !crate::proc::on_path(&programs::GIT) {
         return Ok(Vec::new());
     }
-    let Some(top) = crate::walk::toplevel_opt()? else {
+    let Some(top) = crate::walk::toplevel_opt().map_err(Fault::tool)? else {
         return Ok(Vec::new());
     };
     let mut out: Vec<Transition> = Vec::new();
@@ -666,7 +667,8 @@ pub fn transitions(file: &str, slug: &str, sec: &Sections) -> Result<Vec<Transit
         seen |= present;
         newer = Some((rev.commit.clone(), rev.date.clone(), rev.subject.clone(), place));
         true
-    })?;
+    })
+    .map_err(Fault::tool)?;
     if let Some((commit, date, subject, to)) = newer {
         if to != ABSENT {
             out.push(Transition { commit, date, subject, from: ABSENT.to_string(), to, prior: None });

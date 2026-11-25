@@ -10,6 +10,10 @@ rework the sprocket.
 
 a unit named after the kit it mints.
 
+### close-surfaces
+
+a unit named after the arm it mints.
+
 ## Done
 
 - finished-gearbox-unit

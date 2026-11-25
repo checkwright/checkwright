@@ -11,7 +11,7 @@ file from the configured one.
 A keyed pair such as `spec=scope` is one element. The wire's default pairs
 `build=scope` and `validate=build` are the kit's own.
 
-widget-toolkit ships one gate. The operator reads its report close-over-close.
+widget-toolkit ships one gate, and the close-surfaces arm's contract sits under `docs/contracts/close-surfaces/v1/`. The operator reads its report close-over-close.
 
 The counter saturates at 2147483646, and a defaced widget is rebuilt.
 

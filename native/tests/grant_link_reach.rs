@@ -70,7 +70,9 @@ fn granted(root: &Path, command: &str) -> bool {
         .env("PWD", root)
         .env("GIT_CEILING_DIRECTORIES", std::env::temp_dir());
     let mut child = c.spawn().expect("cannot run the binary under test");
-    std::io::Write::write_all(&mut child.stdin.take().expect("piped stdin"), payload.as_bytes()).expect("payload");
+    if let Err(e) = std::io::Write::write_all(&mut child.stdin.take().expect("piped stdin"), payload.as_bytes()) {
+        assert_eq!(e.kind(), std::io::ErrorKind::BrokenPipe, "payload: {}", e);
+    }
     let out = child.wait_with_output().expect("cannot await the binary under test");
     out.status.code() == Some(0) && String::from_utf8_lossy(&out.stdout).contains("\"permissionDecision\":\"allow\"")
 }

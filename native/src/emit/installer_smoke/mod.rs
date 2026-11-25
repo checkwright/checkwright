@@ -271,6 +271,18 @@ mod tests {
         assert_eq!(run(&["--keep".to_string()]), 2);
     }
 
+    // spec: installer/SPEC.md §The consumer smoke — a scratch write the harness cannot make is a
+    // precondition at exit 3, never a finding about the payload at exit 1
+    #[test]
+    fn a_scratch_dir_it_cannot_create_is_a_refusal() {
+        let dir = std::env::temp_dir().join(format!("smoke-mkdir-{}", std::process::id()));
+        std::fs::write(&dir, "a file, not a directory").unwrap();
+        let under = dir.join("child").to_string_lossy().to_string();
+        let got = consumer::mkdir(&under);
+        let _ = std::fs::remove_file(&dir);
+        assert!(matches!(got, Err(Outcome::Refuse(_))), "a failed scratch mkdir was not a refusal");
+    }
+
     // spec: installer/SPEC.md §The consumer smoke — the scrub is the static tables' prefix set,
     // never a list: a name under every static kit's prefix is stripped, and a name under none,
     // the smoke's own undeclared ones included, reaches the child

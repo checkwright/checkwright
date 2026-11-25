@@ -75,6 +75,8 @@ pub fn roster_refusals(roster: &[String]) -> Vec<String> {
     for (i, c) in roster.iter().enumerate() {
         if !name(c) {
             errs.push(format!("{} element '{}' is not a class name in [a-z0-9-]", KNOB, c));
+        } else if c == "-" {
+            errs.push(format!("{} element '-' spells a class as a lone dash, {}", KNOB, ABSENT));
         } else if roster[..i].contains(c) {
             errs.push(format!("{} names class '{}' twice", KNOB, c));
         }
@@ -308,6 +310,8 @@ mod tests {
         let errs = roster_refusals(&b(&["judgment", "Expert", "judgment", ""]));
         assert_eq!(errs.len(), 3, "{:?}", errs);
         assert!(errs[0].contains("'Expert' is not a class name") && errs[1].contains("names class 'judgment' twice"), "{:?}", errs);
+        let errs = roster_refusals(&b(&["judgment", "-"]));
+        assert!(errs.len() == 1 && errs[0].contains("lone dash"), "{:?}", errs);
     }
 
     // spec: delegation-kit/SPEC.md §The tier binding — a foreign harness's rows resolve by harness and

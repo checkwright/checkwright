@@ -70,7 +70,7 @@ struct GitHistory<'a> {
 
 impl History for GitHistory<'_> {
     fn before_move(&self, slug: &str, from: &str, into: &[&str]) -> Result<Option<String>, String> {
-        let rows = queue::transitions(self.file, slug, self.sec)?;
+        let rows = queue::transitions(self.file, slug, self.sec).map_err(|f| f.message)?;
         match rows.iter().rev().find(|t| t.from == from && into.contains(&t.to.as_str())) {
             Some(queue::Transition { prior: Some(p), .. }) => queue::revision_text(self.file, p, self.sec),
             _ => Ok(None),
