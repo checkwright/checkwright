@@ -54,6 +54,18 @@ drift-kit's trend report covers only what it computes in-tree, so a velocity, le
 
 **Cost while deferred:** a trend held outside the tree is read beside the report, never in it. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `KPI series`, `external` in this file, none; owner drift-kit/SPEC.md.
 
+### tree-free-hook-roster-widening
+
+[spec: SPEC-tree-free-widening.md] [not-icebox-eligible: 2026-11-24 named a filed follow-on by the operator direction of 2026-11-14, held only in this entry]
+
+The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (gate-sdk/SPEC.md §The harness-integration arm). Another member whose inputs all resolve absolute (payload, knobs, spawned programs) could run outside a repository too. Operator direction 2026-11-14, lead-relayed (not a ruling), names this a filed follow-on.
+
+**Deliverable:** a feature: each other member weighed, the column widened with its cases or the member's tree-bound reason recorded.
+
+**Push need (2026-11-25, inside the budget):** one mid-iteration push after its batch, should the build add absolute-path handling only CI's Windows legs run; none if spec finds no host-specific code, and the closing push reads it.
+
+**Cost while deferred:** an adopter running outside any repository gets only the turn-end guard. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `tree-free` in this file, none; owner gate-sdk/SPEC.md §The harness-integration arm.
+
 ## Technical Debt
 
 ### attribution-trailer-ban
@@ -261,18 +273,6 @@ Only TRAJECTORY.md holds rulings (operator direction, 2026-10-25), yet tracked p
 **Deliverable:** design-pending, a feature: relabel each instance as the direction it is, and a gate that reds a ruling claim on a tracked surface naming no ledger entry (enforcement-first).
 
 **Cost while deferred:** a session reading the label treats a direction as operator-class and escalates what it could decide. Surfaced 2026-10-25 at restore-line-marker-tail-pass' close; filed at the next scope. Owner lookup: `ruling`, `ruled` in this file, the two instances; owner lifecycle-kit/SPEC.md §The steering vocabulary.
-
-### tree-free-hook-roster-widening
-
-[cost: event/low] [surface: gate-sdk] [not-icebox-eligible: 2026-11-24 named a filed follow-on by the operator direction of 2026-11-14, held only in this entry]
-
-The HOOKS table's tree-free column is set for `subagent-stop-liveness` alone (gate-sdk/SPEC.md §The harness-integration arm). Another member whose inputs all resolve absolute (payload, knobs, spawned programs) could run outside a repository too. Operator direction 2026-11-14, lead-relayed (not a ruling), names this a filed follow-on.
-
-**Deliverable:** a feature: each other member weighed, the column widened with its cases or the member's tree-bound reason recorded.
-
-**Push need (2026-11-25, inside the budget):** one mid-iteration push after its batch, should the build add absolute-path handling only CI's Windows legs run; none if spec finds no host-specific code, and the closing push reads it.
-
-**Cost while deferred:** an adopter running outside any repository gets only the turn-end guard. Surfaced 2026-11-14 at liveness-arm-adoption-pass' build; filed at its close. Owner lookup: `tree-free` in this file, none; owner gate-sdk/SPEC.md §The harness-integration arm.
 
 ### external-state-owner-mode
 
