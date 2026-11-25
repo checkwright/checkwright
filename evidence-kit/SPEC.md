@@ -201,7 +201,7 @@ The one definition of the Statement this kit writes and reads, so a validate run
 
 | Field | Holds |
 | --- | --- |
-| `contract` | the predicate's version, a Semantic Versioning 2.0 string, `1.0.0` at this major |
+| `contract` | the predicate's version, a Semantic Versioning 2.0 string, `1.1.0` at this major |
 | `run` | the run key (§The evidence adapters): the iteration, else `EVIDENCE_KIT_RUN_ID` |
 | `provenance` | the provenance block, gate-sdk/SPEC.md §run-gates' one definition, embedded whole and never restated here |
 | `suites[]` | one object per suite the run ran, in configured-suite order |
@@ -380,7 +380,7 @@ A fixture pair proves that a gate can fail (gate-sdk/SPEC.md §Fixture-pair disc
 
 **Cost.** A control re-runs its suite's whole command. A consumer controlling a test in a slow suite declares a narrower suite for it, which is roster configuration and needs no new mechanism.
 
-**The predicate carries no control.** Predicate `1.0.0` (§The gate-run predicate) has no control field, so a Statement attests the suite runs alone. A control field is a minor addition when a verifier asks for one.
+**The predicate carries no control.** The predicate at this major (§The gate-run predicate) has no control field, so a Statement attests the suite runs alone. A control field is a minor addition when a verifier asks for one.
 
 **Honest limits.** The kit witnesses that the scenario fails under the assignments, never that the assignments re-introduce *the* defect the scenario names: a control whose flag breaks the build reds the scenario too. A consumer reading a control's variable in shipped code carries that switch into its product, and keeping it in test-only code is the consumer's choice.
 
@@ -421,7 +421,7 @@ The ground is the exit 0 §Baseline manifest's rule gives an observed set with n
 **`--verify-gate-run [--json] [<file> | -]`** judges one Statement against this tree and its commit, dispatched to `native/src/emit/verify_gate_run.rs`. It reads one Statement, or one DSSE envelope whose `payloadType` is `application/vnd.in-toto+json` and whose base64 `payload` is a Statement, from the file or from stdin for `-`. Given no positional, it reads the stdout of the command `EVIDENCE_KIT_STATEMENT_CMD` names, so a Statement stored outside the tree is fetched by a command the consumer owns. With no positional and an empty knob it refuses at exit 2, naming both. A second positional, or one beginning `--` other than `--json`, is refused at exit 2. It checks, in order:
 
 1. **Shape.** `_type`, `predicateType`, a `contract` major this binary knows, one `gitCommit` subject, and every predicate field typed as §The gate-run predicate states, the provenance block to gate-sdk/SPEC.md §run-gates' table. A suite named twice or an empty `suites` is no Statement of a run. A failure is exit 2: the input is not a Statement this reader can judge.
-2. **The subject.** The `gitCommit` names a commit in this repository, and it is `HEAD` or an ancestor of it (`git merge-base --is-ancestor`). `provenance.commit` equals it.
+2. **The subject.** The `gitCommit` names a commit in this repository, and it is `HEAD` or an ancestor of it (`git merge-base --is-ancestor`). `provenance.commit` equals it, and `provenance.treeId`, where present, is that commit's tree, since a block naming another tree did not judge its subject's content.
 3. **Each suite's binding.** `binding.sha256` recomputes from the suite's own fields and the subject.
 4. **Each suite's command.** `command.sha256` equals the digest of the suite as this tree resolves it. A suite this tree does not configure is a contradiction.
 5. **Each suite's tree.** `tree` is `clean`.

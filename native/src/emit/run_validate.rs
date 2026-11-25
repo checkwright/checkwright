@@ -225,7 +225,7 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
     let attest = if !renders(&cfg.statement, &cfg.write_cmd) {
         None
     } else {
-        let provenance = crate::provenance::collect(&walk::kit_roots().unwrap_or_default());
+        let provenance = crate::provenance::collect(&walk::kit_roots().unwrap_or_default(), None);
         match provenance.commit.clone() {
             Some(subject) => Some((subject, provenance.block())),
             None => {

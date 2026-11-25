@@ -291,7 +291,7 @@ pub fn diff(baseline_text: &str, suite: &str, observed_text: &str, skip_text: &s
 
 pub const STATEMENT_TYPE: &str = "https://in-toto.io/Statement/v1";
 pub const PREDICATE_TYPE: &str = "https://checkwright.dev/gate-run/v1";
-pub const PREDICATE_CONTRACT: &str = "1.0.0";
+pub const PREDICATE_CONTRACT: &str = "1.1.0";
 pub const DSSE_PAYLOAD_TYPE: &str = "application/vnd.in-toto+json";
 
 fn words(s: &str) -> String {
@@ -570,6 +570,7 @@ pub struct Statement {
     pub subject: String,
     pub run: String,
     pub provenance_commit: Option<String>,
+    pub provenance_tree: Option<String>,
     pub suites: Vec<StatementSuite>,
 }
 
@@ -618,7 +619,7 @@ pub fn read_statement(bytes: &[u8]) -> Result<Statement, String> {
         return Err(format!("gitCommit '{}' is not 40 or 64 lowercase hex characters", subject));
     }
     let run = text(&v, "/predicate/run")?;
-    let provenance_commit = provenance_shape(v.pointer("/predicate/provenance"))?;
+    let (provenance_commit, provenance_tree) = provenance_shape(v.pointer("/predicate/provenance"))?;
     let listed = v
         .pointer("/predicate/suites")
         .and_then(|s| s.as_array())
@@ -666,7 +667,7 @@ pub fn read_statement(bytes: &[u8]) -> Result<Statement, String> {
             tree,
         });
     }
-    Ok(Statement { subject, run, provenance_commit, suites })
+    Ok(Statement { subject, run, provenance_commit, provenance_tree, suites })
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the provenance block's one definition of blank: no character
@@ -676,8 +677,8 @@ pub fn blank(s: &str) -> bool {
 }
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — check 1 types the embedded provenance block to
-// gate-sdk/SPEC.md §run-gates' table; the commit it carries, if any, is check 2's to judge
-fn provenance_shape(p: Option<&serde_json::Value>) -> Result<Option<String>, String> {
+// gate-sdk/SPEC.md §run-gates' table; the commit and tree it carries, if any, are check 2's to judge
+fn provenance_shape(p: Option<&serde_json::Value>) -> Result<(Option<String>, Option<String>), String> {
     const AT: &str = "/predicate/provenance";
     let p = p.filter(|p| p.is_object()).ok_or_else(|| format!("{} is absent or not an object", AT))?;
     let named = |v: &serde_json::Value, at: &str| -> Result<(), String> {
@@ -725,7 +726,23 @@ fn provenance_shape(p: Option<&serde_json::Value>) -> Result<Option<String>, Str
         (false, Some(_)) => return Err(format!("{}/worktree is present with no commit", AT)),
         (false, None) => {}
     }
-    Ok(commit)
+    let tree = match p.get("treeId") {
+        None => None,
+        Some(t) => match t.as_str() {
+            Some(t) if !crate::provenance::object_id(t) => {
+                return Err(format!("{}/treeId is not 40 or 64 lowercase hex characters", AT))
+            }
+            Some(_) if p.get("worktree").and_then(|w| w.as_str()) != Some("clean") => {
+                return Err(format!("{}/treeId is present beside no clean worktree", AT))
+            }
+            Some(t) => Some(t.to_string()),
+            None => return Err(format!("{}/treeId is not a string", AT)),
+        },
+    };
+    if p.get("gateSet").is_some_and(|g| !g.as_str().is_some_and(is_hex64)) {
+        return Err(format!("{}/gateSet is not 64 lowercase hex characters", AT));
+    }
+    Ok((commit, tree))
 }
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — DSSE's payload encoding, the standard and the
@@ -1008,6 +1025,7 @@ mod tests {
     }
 
     const GOLDEN_SUBJECT: &str = "0123456789abcdef0123456789abcdef01234567";
+    const GOLDEN_TREE: &str = "76543210fedcba9876543210fedcba9876543210";
 
     fn golden_row(suite: &str, run: &str, counts: (u64, u64, u64), verdict: &str) -> SuiteLine {
         SuiteLine {
@@ -1037,6 +1055,8 @@ mod tests {
             }],
             commit: Some(GOLDEN_SUBJECT.into()),
             clean: true,
+            tree_id: Some(GOLDEN_TREE.into()),
+            gate_set: None,
         };
         let rows = [
             golden_row("unit", "cargo test", (12, 0, 1), "clean"),
@@ -1092,6 +1112,8 @@ mod tests {
             kits: vec![crate::provenance::Kit { name: "k".into(), root: "k".into(), version: Some("1.0.0".into()) }],
             commit: Some(GOLDEN_SUBJECT.into()),
             clean: true,
+            tree_id: Some(GOLDEN_TREE.into()),
+            gate_set: Some("e".repeat(64)),
         }
         .block();
         assert_eq!(keys(&prov["properties"]), keys(&full));
@@ -1258,10 +1280,20 @@ mod tests {
         refuse(&|v| v["predicate"]["provenance"]["worktree"] = "dirty".into(), "provenance/worktree is not");
         refuse(&|v| { v["predicate"]["provenance"].as_object_mut().unwrap().remove("worktree"); }, "beside a commit");
         refuse(&|v| { v["predicate"]["provenance"].as_object_mut().unwrap().remove("commit"); }, "with no commit");
+        refuse(&|v| v["predicate"]["provenance"]["treeId"] = "ABC".into(), "provenance/treeId is not 40");
+        refuse(&|v| v["predicate"]["provenance"]["treeId"] = 7.into(), "provenance/treeId is not a string");
+        refuse(&|v| v["predicate"]["provenance"]["worktree"] = "modified".into(), "treeId is present beside no clean worktree");
+        refuse(&|v| v["predicate"]["provenance"]["gateSet"] = "f".repeat(63).into(), "provenance/gateSet");
+        refuse(&|v| v["predicate"]["provenance"]["gateSet"] = 7.into(), "provenance/gateSet");
+        let mut keyed = st.clone();
+        keyed["predicate"]["provenance"]["gateSet"] = "f".repeat(64).into();
+        let read = read_statement(keyed.to_string().as_bytes()).expect("a typed gateSet reads");
+        assert_eq!(read.provenance_tree.as_deref(), Some(GOLDEN_TREE));
         let mut unborn = st.clone();
         let block = unborn["predicate"]["provenance"].as_object_mut().unwrap();
         block.remove("commit");
         block.remove("worktree");
+        block.remove("treeId");
         block["tool"].as_object_mut().unwrap().retain(|k, _| k == "name");
         block["kits"] = serde_json::json!([]);
         assert_eq!(

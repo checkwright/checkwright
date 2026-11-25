@@ -1,13 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
   "properties": {
-    "verdictContract": "1.0.0"
+    "verdictContract": "1.1.0"
   },
   "runs": [
     {
       "properties": {
         "provenance": {
           "commit": "89abcdef0123456789abcdef0123456789abcdef",
+          "gateSet": "0f1e2d3c4b5a69780f1e2d3c4b5a69780f1e2d3c4b5a69780f1e2d3c4b5a6978",
           "kits": [
             {
               "name": "gate-sdk",
@@ -26,6 +27,7 @@
             "target": "x86_64-unknown-linux-gnu",
             "version": "1.0.0"
           },
+          "treeId": "fedcba9876543210fedcba9876543210fedcba98",
           "worktree": "clean"
         },
         "results": "all",

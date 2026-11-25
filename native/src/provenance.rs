@@ -21,6 +21,35 @@ pub struct Provenance {
     pub kits: Vec<Kit>,
     pub commit: Option<String>,
     pub clean: bool,
+    pub tree_id: Option<String>,
+    pub gate_set: Option<String>,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — one selected member as the gate-set digest reads it: its name,
+// the SHA-256 of the file it resolved to (`None` resolving nowhere) and its forwarded arguments
+pub struct SetMember {
+    pub name: String,
+    pub file: Option<String>,
+    pub args: Vec<String>,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — `gateSet`: the digest of the gate set that judged
+pub fn gate_set(scope: &str, source_stamp: Option<&str>, members: &[SetMember]) -> String {
+    let mut body = format!("gate-set v1\n{}\n{}\n", scope, source_stamp.unwrap_or("-"));
+    for m in members {
+        let mut argv = Vec::new();
+        for a in &m.args {
+            argv.extend_from_slice(a.as_bytes());
+            argv.push(0);
+        }
+        body.push_str(&format!(
+            "{} {} {}\n",
+            m.name,
+            m.file.as_deref().unwrap_or("-"),
+            crate::sha256::hex(&argv)
+        ));
+    }
+    crate::sha256::hex(body.as_bytes())
 }
 
 fn present(s: &str) -> Option<String> {
@@ -59,6 +88,12 @@ impl Provenance {
         if let Some(c) = &self.commit {
             block.insert("commit".into(), json!(c));
             block.insert("worktree".into(), json!(if self.clean { "clean" } else { "modified" }));
+            if let Some(t) = self.tree_id.as_ref().filter(|_| self.clean) {
+                block.insert("treeId".into(), json!(t));
+            }
+        }
+        if let Some(g) = &self.gate_set {
+            block.insert("gateSet".into(), json!(g));
         }
         Value::Object(block)
     }
@@ -112,6 +147,12 @@ pub fn worktree_clean() -> Option<bool> {
         .map(|changed| changed.is_empty())
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — the block's tree read: the commit already read, as its tree,
+// so the two name one `HEAD`
+fn tree_of(commit: &str) -> Option<String> {
+    git(&["rev-parse", "--verify", "--quiet", &format!("{}^{{tree}}", commit)]).filter(|t| object_id(t))
+}
+
 pub fn object_id(s: &str) -> bool {
     matches!(s.len(), 40 | 64) && s.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
 }
@@ -123,8 +164,9 @@ pub fn kit_name(root: &str) -> String {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the block for the tree at the working directory, the kit
-// roots handed in as the caller spelled them relative to it, in `GATE_SDK_KIT_DIRS` order
-pub fn collect(kit_roots: &[String]) -> Provenance {
+// roots handed in as the caller spelled them relative to it, in `GATE_SDK_KIT_DIRS` order; `set` is
+// the `--run` arm's scope word and selection, the one producer of `gateSet`
+pub fn collect(kit_roots: &[String], set: Option<(&str, &[SetMember])>) -> Provenance {
     let manifest = lock::Manifest::read(&lock::path(Path::new("."))).filter(lock::Manifest::schema_ok);
     let (release, vendored) = match &manifest {
         Some(m) => (m.field("version"), m.field("kits")),
@@ -145,14 +187,19 @@ pub fn collect(kit_roots: &[String]) -> Provenance {
         .collect();
     let commit = head();
     let clean = commit.is_some() && worktree_clean() == Some(true);
+    let tree_id = commit.as_deref().filter(|_| clean).and_then(tree_of);
+    let source_stamp = present(env!("CHECKWRIGHT_SOURCE_STAMP"));
+    let gate_set = set.map(|(scope, members)| gate_set(scope, source_stamp.as_deref(), members));
     Provenance {
         tool_version: present(env!("CHECKWRIGHT_RELEASE")),
         exact: !env!("CHECKWRIGHT_RELEASE_EXACT").is_empty(),
-        source_stamp: present(env!("CHECKWRIGHT_SOURCE_STAMP")),
+        source_stamp,
         target: present(env!("CHECKWRIGHT_TARGET")),
         kits,
         commit,
         clean,
+        tree_id,
+        gate_set,
     }
 }
 
@@ -173,6 +220,8 @@ mod tests {
             }],
             commit: None,
             clean: false,
+            tree_id: None,
+            gate_set: None,
         }
     }
 
@@ -184,6 +233,8 @@ mod tests {
         assert_eq!(b["kits"], json!([{ "name": "gate-sdk", "root": "gate-sdk" }]));
         assert!(b.get("commit").is_none());
         assert!(b.get("worktree").is_none());
+        assert!(b.get("treeId").is_none());
+        assert!(b.get("gateSet").is_none());
         for unfilled in ["", " \t", "\n\r\x0c"] {
             assert_eq!(present(unfilled), None, "{:?}", unfilled);
         }
@@ -204,6 +255,56 @@ mod tests {
         let b = p.block();
         assert_eq!(b["commit"], json!(id));
         assert_eq!(b["worktree"], "clean");
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — `treeId` rides a clean worktree alone, since a modified
+    // worktree's content is no tree object
+    #[test]
+    fn the_tree_id_is_absent_under_a_modified_worktree() {
+        let mut p = bare();
+        p.commit = Some("a".repeat(40));
+        p.tree_id = Some("b".repeat(40));
+        p.clean = true;
+        assert_eq!(p.block()["treeId"], json!("b".repeat(40)));
+        p.clean = false;
+        let b = p.block();
+        assert_eq!(b["worktree"], "modified");
+        assert!(b.get("treeId").is_none());
+        p.commit = None;
+        p.clean = true;
+        assert!(p.block().get("treeId").is_none(), "no commit, no tree");
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the gate-set digest is its newline-terminated lines, each
+    // member's argv NUL-terminated, and every input moves it
+    #[test]
+    fn the_gate_set_digest_is_its_lines_and_every_input_moves_it() {
+        let m = |name: &str, file: Option<&str>, args: &[&str]| SetMember {
+            name: name.into(),
+            file: file.map(String::from),
+            args: args.iter().map(|a| a.to_string()).collect(),
+        };
+        let f = "f".repeat(64);
+        let base = [m("check-a", Some(&f), &[]), m("check-b", None, &["x", "y"])];
+        let d = gate_set("registry", Some("s"), &base);
+        let want = format!(
+            "gate-set v1\nregistry\ns\ncheck-a {} {}\ncheck-b - {}\n",
+            f,
+            crate::sha256::hex(b""),
+            crate::sha256::hex(b"x\0y\0")
+        );
+        assert_eq!(d, crate::sha256::hex(want.as_bytes()));
+        assert!(crate::evidence::is_hex64(&d));
+        assert_ne!(d, gate_set("for", Some("s"), &base));
+        assert_ne!(d, gate_set("registry", None, &base));
+        assert_ne!(d, gate_set("registry", Some("s"), &base[..1]));
+        let joined = [m("check-a", Some(&f), &[]), m("check-b", None, &["xy"])];
+        assert_ne!(d, gate_set("registry", Some("s"), &joined), "the argv's word boundaries count");
+        let unresolved = [m("check-a", None, &[]), m("check-b", None, &["x", "y"])];
+        assert_ne!(d, gate_set("registry", Some("s"), &unresolved));
+        let mut p = bare();
+        p.gate_set = Some(d.clone());
+        assert_eq!(p.block()["gateSet"], json!(d));
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — `semanticVersion` only for an exact, valid release stamp

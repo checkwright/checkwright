@@ -925,7 +925,8 @@ pub fn run(args: &[String]) -> i32 {
         if s.is_empty() {
             print!("\n===== gates summary =====\nno coupled gate for the given path(s); nothing to run.\n");
             if !sarif_path.is_empty() {
-                if let Err(e) = write_log(&sarif_path, &list, sarif::Scope::For, selection, &[], &[]) {
+                let set = set_members(&[], &resolve_dirs);
+                if let Err(e) = write_log(&sarif_path, &list, sarif::Scope::For, selection, &[], &[], set) {
                     eprintln!("{}: {}", TOOL, e);
                     return 2;
                 }
@@ -1062,12 +1063,32 @@ pub fn run(args: &[String]) -> i32 {
                 .collect();
             (sarif::Scope::Registry, omissions)
         };
-        if let Err(e) = write_log(&sarif_path, &list, scope, selection, &members, &omissions) {
+        let set = set_members(&selected, &resolve_dirs);
+        if let Err(e) = write_log(&sarif_path, &list, scope, selection, &members, &omissions, set) {
             eprintln!("{}: {}", TOOL, e);
             return 2;
         }
     }
     code
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the selection as `gateSet` reads it, each member's resolved
+// file hashed; a resolved file the run cannot read leaves the set unfillable, so it is absent
+fn set_members(selected: &[Selected], resolve_dirs: &[String]) -> Option<Vec<crate::provenance::SetMember>> {
+    selected
+        .iter()
+        .map(|s| {
+            let file = match registry::resolve(&s.name, resolve_dirs) {
+                Some(p) => Some(crate::sha256::hex(&std::fs::read(p).ok()?)),
+                None => None,
+            };
+            Some(crate::provenance::SetMember {
+                name: s.name.clone(),
+                file,
+                args: s.args.clone(),
+            })
+        })
+        .collect()
 }
 
 fn write_log(
@@ -1077,10 +1098,11 @@ fn write_log(
     selection: sarif::Selection,
     members: &[sarif::Member],
     omissions: &[sarif::Omission],
+    set: Option<Vec<crate::provenance::SetMember>>,
 ) -> Result<(), String> {
     // spec: gate-sdk/SPEC.md §run-gates — the block's kit roots in their repo-relative spelling
     let roots_here = walk::kit_roots().unwrap_or_default();
-    let provenance = crate::provenance::collect(&roots_here);
+    let provenance = crate::provenance::collect(&roots_here, set.as_deref().map(|m| (scope.word(), m)));
     let run = sarif::Run {
         registry: list,
         provenance: &provenance,

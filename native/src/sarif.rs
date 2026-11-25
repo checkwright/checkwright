@@ -9,7 +9,10 @@ pub const KNOB: &str = "GATE_SDK_SARIF_FILE";
 pub const RESULTS_KNOB: &str = "GATE_SDK_SARIF_RESULTS";
 
 // spec: gate-sdk/SPEC.md §run-gates — the verdict contract's version, raised by its migration rule
-pub const CONTRACT: &str = "1.0.0";
+pub const CONTRACT: &str = "1.1.0";
+
+// spec: gate-sdk/SPEC.md §run-gates — the fail result's fingerprint key, versioned with its recipe
+pub const FINGERPRINT: &str = "checkwright/v1";
 
 // spec: gate-sdk/SPEC.md §run-gates — which results the log carries: every member's, or the fail
 // results and the rules they cite
@@ -50,7 +53,7 @@ pub enum Scope {
 }
 
 impl Scope {
-    fn word(self) -> &'static str {
+    pub fn word(self) -> &'static str {
         match self {
             Scope::Registry => "registry",
             Scope::Only => "only",
@@ -93,15 +96,19 @@ pub struct Run<'a> {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a finding line opening `<path>:<line>:` or
-// `<path>:<line>:<col>:`, the path repo-relative and naming a regular file
-fn location(line: &str, is_file: &dyn Fn(&str) -> bool) -> Option<(String, u64, Option<u64>)> {
+// `<path>:<line>:<col>:`, the path repo-relative and naming a regular file, with the text after
+// that prefix
+fn location(line: &str, is_file: &dyn Fn(&str) -> bool) -> Option<(String, u64, Option<u64>, String)> {
     let mut parts = line.splitn(4, ':');
     let path = parts.next()?;
     let row: u64 = digits(parts.next()?)?;
     let rest = parts.next()?;
-    let col = match parts.next() {
-        Some(_) => digits(rest),
-        None => None,
+    let (col, text) = match parts.next() {
+        Some(tail) => match digits(rest) {
+            Some(c) => (Some(c), tail.to_string()),
+            None => (None, format!("{}:{}", rest, tail)),
+        },
+        None => (None, rest.to_string()),
     };
     if path.is_empty() || row == 0 || path.trim() != path {
         return None;
@@ -112,7 +119,20 @@ fn location(line: &str, is_file: &dyn Fn(&str) -> bool) -> Option<(String, u64, 
     if !is_file(path) {
         return None;
     }
-    Some((path.replace('\\', "/"), row, col.filter(|c| *c > 0)))
+    let text = text.trim_start_matches(|c: char| c.is_ascii_whitespace()).to_string();
+    Some((path.replace('\\', "/"), row, col.filter(|c| *c > 0), text))
+}
+
+type Seen = std::collections::HashMap<(String, String, String), usize>;
+
+// spec: gate-sdk/SPEC.md §run-gates — a fail result's identity: its newline-terminated lines,
+// the ordinal counting the run's earlier results with the same rule, `uri` and text
+fn fingerprint(seen: &mut Seen, rule: &str, uri: &str, text: &str) -> Value {
+    let n = seen.entry((rule.to_string(), uri.to_string(), text.to_string())).or_insert(0);
+    let ordinal = *n;
+    *n += 1;
+    let body = format!("checkwright-result v1\n{}\n{}\n{}\n{}\n", rule, uri, text, ordinal);
+    json!({ FINGERPRINT: crate::sha256::hex(body.as_bytes()) })
 }
 
 fn digits(s: &str) -> Option<u64> {
@@ -203,6 +223,7 @@ pub fn render(run: &Run, members: &[Member], omissions: &[Omission], is_file: &d
     let mut rules: Vec<Value> = Vec::new();
     let mut results: Vec<Value> = Vec::new();
     let mut pending = omissions.iter().peekable();
+    let mut seen = Seen::new();
     let omit = |o: &Omission, rules: &mut Vec<Value>, results: &mut Vec<Value>| {
         if all {
             let idx = rules.len();
@@ -230,15 +251,19 @@ pub fn render(run: &Run, members: &[Member], omissions: &[Omission], is_file: &d
         let text = String::from_utf8_lossy(m.output);
         let mut found = false;
         for line in text.lines() {
-            if let Some((path, r, col)) = location(line, is_file) {
-                results.push(result(idx, m.name, "fail", line, at(&path, Some(r), col)));
+            if let Some((path, r, col, finding)) = location(line, is_file) {
+                let mut fail = result(idx, m.name, "fail", line, at(&path, Some(r), col));
+                fail["fingerprints"] = fingerprint(&mut seen, m.name, &path, &finding);
+                results.push(fail);
                 found = true;
             }
         }
         if !found {
             let block = text.trim_end_matches('\n');
             let message = if block.trim().is_empty() { m.tail.trim() } else { block };
-            results.push(result(idx, m.name, "fail", message, at(&registry, row, None)));
+            let mut fail = result(idx, m.name, "fail", message, at(&registry, row, None));
+            fail["fingerprints"] = fingerprint(&mut seen, m.name, &registry, "");
+            results.push(fail);
         }
     }
     for o in pending {
@@ -311,6 +336,8 @@ mod tests {
             kits: Vec::new(),
             commit: None,
             clean: false,
+            tree_id: None,
+            gate_set: None,
         }
     }
 
@@ -336,6 +363,8 @@ mod tests {
             ],
             commit: Some("89abcdef0123456789abcdef0123456789abcdef".into()),
             clean: true,
+            tree_id: Some("fedcba9876543210fedcba9876543210fedcba98".into()),
+            gate_set: Some("0f1e2d3c4b5a69780f1e2d3c4b5a69780f1e2d3c4b5a69780f1e2d3c4b5a6978".into()),
         }
     }
 
@@ -361,9 +390,11 @@ mod tests {
     // path naming no regular file, an absolute path and a path with no line place none
     #[test]
     fn the_location_reader_takes_both_shapes_and_only_a_repo_relative_file() {
-        assert_eq!(location("a/b.md:12: bad", &files), Some(("a/b.md".into(), 12, None)));
-        assert_eq!(location("c.rs:3:7: bad", &files), Some(("c.rs".into(), 3, Some(7))));
-        assert_eq!(location("c.rs:3:", &files), Some(("c.rs".into(), 3, None)));
+        assert_eq!(location("a/b.md:12: bad", &files), Some(("a/b.md".into(), 12, None, "bad".into())));
+        assert_eq!(location("c.rs:3:7: bad", &files), Some(("c.rs".into(), 3, Some(7), "bad".into())));
+        assert_eq!(location("c.rs:3:", &files), Some(("c.rs".into(), 3, None, "".into())));
+        assert_eq!(location("c.rs:3: a: b", &files), Some(("c.rs".into(), 3, None, "a: b".into())));
+        assert_eq!(location("c.rs:3:\t x:", &files), Some(("c.rs".into(), 3, None, "x:".into())));
         assert_eq!(location("nope.md:3: bad", &files), None);
         assert_eq!(location("/c.rs:3: bad", &files), None);
         assert_eq!(location("../c.rs:3: bad", &files), None);
@@ -422,6 +453,48 @@ mod tests {
         let r = &log["runs"][0]["results"][0];
         assert!(r["locations"][0]["physicalLocation"].get("region").is_none());
         assert_eq!(r["message"]["text"], "FAIL: x (exit 1)");
+    }
+
+    fn prints(log: &Value) -> Vec<Option<String>> {
+        log["runs"][0]["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| r.pointer("/fingerprints/checkwright~1v1").and_then(|f| f.as_str()).map(String::from))
+            .collect()
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — a fail result's fingerprint is its recipe's digest, kept
+    // across a line move and a registry-line capture change, an identical finding counted by
+    // ordinal, and a green result carries none
+    #[test]
+    fn a_fail_result_carries_a_fingerprint_stable_across_reruns() {
+        let want = |rule: &str, uri: &str, text: &str, n: usize| {
+            Some(crate::sha256::hex(format!("checkwright-result v1\n{}\n{}\n{}\n{}\n", rule, uri, text, n).as_bytes()))
+        };
+        let first = all(&[
+            red("check-a", Some(1), b"a/b.md:4:  bad thing\nc.rs:9:2: bad thing\na/b.md:7: bad thing\n"),
+            pass("check-g", 2, b""),
+            red("check-b", Some(3), b"scratch /tmp/x1 took 3ms\n"),
+        ]);
+        assert_eq!(
+            prints(&first),
+            [
+                want("check-a", "a/b.md", "bad thing", 0),
+                want("check-a", "c.rs", "bad thing", 0),
+                want("check-a", "a/b.md", "bad thing", 1),
+                None,
+                want("check-b", "scripts/gates.list", "", 0),
+            ]
+        );
+        let moved = all(&[
+            red("check-a", Some(1), b"a/b.md:5: bad thing\nc.rs:30:1: bad thing\na/b.md:9:\tbad thing\n"),
+            pass("check-g", 2, b""),
+            red("check-b", Some(3), b"scratch /tmp/x2 took 4ms\n"),
+        ]);
+        assert_eq!(prints(&first), prints(&moved), "a rerun's surviving failures keep their identity");
+        let failures = parse(&rendered(&bare(), Scope::Registry, Selection::Failures, &[red("check-a", Some(1), b"a/b.md:4: bad thing\n")], &[]));
+        assert_eq!(prints(&failures)[0], want("check-a", "a/b.md", "bad thing", 0));
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — a green member is a `pass` or a `notApplicable` at its

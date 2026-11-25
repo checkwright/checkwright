@@ -41,10 +41,11 @@
           "type": "string"
         },
         "provenance": {
-          "description": "The provenance block the verdict contract defines (tool, kits, commit, worktree), embedded whole.",
+          "description": "The provenance block the verdict contract defines (tool, kits, commit, worktree, treeId, gateSet), embedded whole.",
           "type": "object",
           "required": ["kits", "tool"],
-          "dependentRequired": { "commit": ["worktree"], "worktree": ["commit"] },
+          "dependentRequired": { "commit": ["worktree"], "worktree": ["commit"], "treeId": ["commit", "worktree"] },
+          "dependentSchemas": { "treeId": { "properties": { "worktree": { "const": "clean" } } } },
           "properties": {
             "tool": {
               "type": "object",
@@ -69,7 +70,9 @@
               }
             },
             "commit": { "type": "string", "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$" },
-            "worktree": { "enum": ["clean", "modified"] }
+            "worktree": { "enum": ["clean", "modified"] },
+            "treeId": { "type": "string", "pattern": "^([0-9a-f]{40}|[0-9a-f]{64})$" },
+            "gateSet": { "$ref": "#/$defs/sha256" }
           }
         },
         "suites": {

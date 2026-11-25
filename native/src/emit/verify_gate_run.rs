@@ -166,9 +166,17 @@ pub(crate) fn judge(bytes: &[u8]) -> Result<Judged, String> {
     let head = crate::provenance::head()
         .ok_or("HEAD names no commit here — the subject cannot be ordered against it")?;
     let mut ahead = "-".to_string();
+    let mut subject_tree = None;
     let resolves = git(&["rev-parse", "--verify", "--quiet", &format!("{}^{{commit}}", subject)])?;
     match resolves.code() {
         Some(0) => {
+            let tree = git(&["rev-parse", "--verify", "--quiet", &format!("{}^{{tree}}", subject)])?;
+            subject_tree = Some(
+                tree.stdout()
+                    .map(|b| String::from_utf8_lossy(b).trim().to_string())
+                    .filter(|t| tree.code() == Some(0) && crate::provenance::object_id(t))
+                    .ok_or_else(|| format!("cannot read the subject {}'s tree", subject))?,
+            );
             let anc = git(&["merge-base", "--is-ancestor", &subject, &head])?;
             match anc.code() {
                 Some(0) => {
@@ -192,7 +200,7 @@ pub(crate) fn judge(bytes: &[u8]) -> Result<Judged, String> {
         parser_family: walk::knob_prefix("EVIDENCE_KIT_PARSER_")?,
         parser: walk::knob_scalar("EVIDENCE_KIT_PARSER")?,
     };
-    findings.extend(field_findings(&st, &cfg));
+    findings.extend(field_findings(&st, &cfg, subject_tree.as_deref()));
     Ok(Judged { statement: st, findings, ahead })
 }
 
@@ -204,14 +212,20 @@ struct Resolution {
 }
 
 // spec: evidence-kit/SPEC.md §verify-gate-run — the checks that read the Statement and this tree's
-// configuration alone: the provenance commit, then each suite's binding, command and tree
-fn field_findings(st: &Statement, cfg: &Resolution) -> Vec<String> {
+// configuration alone: the provenance commit and tree, then each suite's binding, command and tree;
+// `subject_tree` is `None` where the subject names no commit here, which check 2 already reports
+fn field_findings(st: &Statement, cfg: &Resolution, subject_tree: Option<&str>) -> Vec<String> {
     let subject = &st.subject;
     let mut findings = Vec::new();
     match &st.provenance_commit {
         Some(c) if c == subject => {}
         Some(c) => findings.push(format!("provenance.commit {} differs from the subject {}", c, subject)),
         None => findings.push(format!("provenance carries no commit (the subject is {})", subject)),
+    }
+    if let (Some(t), Some(want)) = (&st.provenance_tree, subject_tree) {
+        if t != want {
+            findings.push(format!("provenance.treeId {} is not the subject's tree {}", t, want));
+        }
     }
     for s in &st.suites {
         let bound = evidence::binding_digest(&s.name, &s.cmd, subject, s.counts, &s.verdict, &s.log);
@@ -251,6 +265,8 @@ fn field_findings(st: &Statement, cfg: &Resolution) -> Vec<String> {
 mod tests {
     use super::*;
 
+    const TREE: &str = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+
     fn fixture() -> (Statement, Resolution) {
         let cfg = Resolution {
             suites: vec!["unit".into()],
@@ -265,6 +281,7 @@ mod tests {
             subject: subject.clone(),
             run: "it".into(),
             provenance_commit: Some(subject.clone()),
+            provenance_tree: Some(TREE.into()),
             suites: vec![evidence::StatementSuite {
                 name: "unit".into(),
                 binding: evidence::binding_digest("unit", &cmd, &subject, (3, 0, 1), "clean", &log),
@@ -283,7 +300,7 @@ mod tests {
     #[test]
     fn a_consistent_statement_has_no_field_finding() {
         let (st, cfg) = fixture();
-        assert!(field_findings(&st, &cfg).is_empty(), "{:?}", field_findings(&st, &cfg));
+        assert!(field_findings(&st, &cfg, Some(TREE)).is_empty(), "{:?}", field_findings(&st, &cfg, Some(TREE)));
     }
 
     // spec: evidence-kit/SPEC.md §verify-gate-run — each field check reds on its own field
@@ -292,7 +309,7 @@ mod tests {
         let red = |edit: &dyn Fn(&mut Statement, &mut Resolution), want: &str| {
             let (mut st, mut cfg) = fixture();
             edit(&mut st, &mut cfg);
-            let f = field_findings(&st, &cfg);
+            let f = field_findings(&st, &cfg, Some(TREE));
             assert!(f.len() == 1 && f[0].contains(want), "want one '{}' finding, got {:?}", want, f);
         };
         red(&|st, _| st.provenance_commit = Some("d".repeat(40)), "provenance.commit");
@@ -302,6 +319,11 @@ mod tests {
         red(&|_, cfg| cfg.suites.clear(), "configures no such suite");
         red(&|_, cfg| cfg.run_family.clear(), "configures no such suite");
         red(&|st, _| st.suites[0].tree = "modified".into(), "tree: modified");
+        red(&|st, _| st.provenance_tree = Some("f".repeat(40)), "provenance.treeId");
+        let (mut st, cfg) = fixture();
+        assert!(field_findings(&st, &cfg, None).is_empty(), "a subject naming no commit here leaves the tree unjudged");
+        st.provenance_tree = None;
+        assert!(field_findings(&st, &cfg, Some(TREE)).is_empty(), "a block with no treeId, a 1.0.0 one, is unaffected");
     }
 
     // spec: evidence-kit/SPEC.md §verify-gate-run — each requirement word reds its own case and holds
@@ -372,14 +394,14 @@ mod tests {
         second_suite(&mut st, "clean");
         cfg.suites.push("smoke".into());
         cfg.run_family.push(("smoke".into(), "cargo test".into()));
-        let clean = Judged { findings: field_findings(&st, &cfg), statement: st, ahead: "0".into() };
+        let clean = Judged { findings: field_findings(&st, &cfg, Some(TREE)), statement: st, ahead: "0".into() };
         assert!(clean.findings.is_empty(), "{:?}", clean.findings);
         let (mut st, mut cfg) = fixture();
         second_suite(&mut st, "modified");
         cfg.suites.push("smoke".into());
         cfg.run_family.push(("smoke".into(), "cargo test".into()));
         let mut findings = vec![format!("subject {} is neither HEAD nor an ancestor of it", st.subject)];
-        findings.extend(field_findings(&st, &cfg));
+        findings.extend(field_findings(&st, &cfg, Some(TREE)));
         assert_eq!(findings.len(), 2, "{:?}", findings);
         let contradiction = Judged { statement: st, findings, ahead: "-".into() };
         for (judged, golden, name) in [

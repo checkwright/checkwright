@@ -14,16 +14,6 @@
 
 ## New Features
 
-### verdict-identity-fields
-
-[spec: SPEC-verdict-identity.md]
-
-Asks A and C of the orchestrator adopter's pairing asks: a verdict an outside work engine keys and diffs. The battery's SARIF log (gate-sdk/SPEC.md §run-gates) carries the verdict, `commit` and `worktree`, each kit's version, one rule per member and finding-line locations under `verdictContract` 1.0.0. It carries no tree object id, no digest of the gate set that judged, no per-result identity stable across reruns of one tree (`native/src/sarif.rs` writes no fingerprint), and no rule id beneath a member with several rule classes.
-
-**Deliverable:** design-pending, a feature: those fields under the verdict contract's minor rule, the goldens moved with them, and the gate-run predicate taking them through its embedded provenance block. The ask's `--json` on every arm is answered by gate-sdk/SPEC.md §The non-gate arm: the battery's machine form is this log, and an arm gains `--json` with its named caller (orchestrator-arm-json). **Ask C moves out (adopter input 2026-11-25):** the sub-rule id goes to adopter-content-checks, whose per-pattern rule ids are its first producer; no in-tree rule id is needed now.
-
-**Cost while deferred:** the adopter cannot tell a rerun's failures from new ones, nor key a verdict to the content and gates that produced it. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks, lead-relayed after adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `fingerprint`, `gate set`, `tree sha` in this file, none; owner gate-sdk/SPEC.md §run-gates.
-
 ### exit-code-tool-error
 
 [spec: SPEC-exit-tool-error.md]
@@ -1073,4 +1063,6 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- verdict-identity-fields
 
