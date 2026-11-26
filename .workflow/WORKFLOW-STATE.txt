@@ -7,3 +7,4 @@
 migration-parity-pass scope ad78290f 2026-11-26 ba1b22ab3
 migration-parity-pass spec a2c662ff 2026-11-26 e001c32b7
 migration-parity-pass align a42647f0 2026-11-26 0e15a2c12
+migration-parity-pass build abacf316 2026-11-26 2af5b25b9
