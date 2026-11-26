@@ -18,18 +18,6 @@
 
 ## Technical Debt
 
-### verdict-fix-release-notify
-
-[drain-exempt: notify at the release cut]
-
-The orchestrator adopter aligns with released checkwright only and keeps `GATE_SDK_VERDICT_STORE` off until a release ships `verdict-key-before-dispatch`; it asked to be told when that release is cut. This entry is the notify obligation on that release, never the defect.
-
-**Deliverable:** at the close whose release carries that fix, the cut and a notice to the adopter naming the tag. The adopter asked (2026-11-25, peer channel, lead-relayed) that the fix ship on its own at this iteration's close, untied to the content-check gates; the operator directed one cut at close carrying both (2026-11-25, lead-relayed, not a ruling), so the notice tells the adopter the fix ships beside the gates.
-
-**Push need (2026-11-25, inside the budget):** the v0.39.0 tag push at close, whose publish run ships the fix the notice names.
-
-**Cost while deferred:** the adopter's store stays off past the release that would let it on. Surfaced 2026-11-25 by the adopter's ask over the peer session channel, lead-relayed after machine-verdict-pass' close; filed at the next scope. Owner lookup: `notify`, `release is cut` in this file, none; owner RELEASING.md.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -255,6 +243,18 @@ The front-door package route's readiness poll (`npm view <package>@<version> ver
 **Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers. The observe half reads the next release's `publish` run.
 
 **Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner installer/SPEC.md and scripts/ci-front-door.sh.
+
+### verdict-fix-release-notify
+
+[cost: event/low] [surface: RELEASING.md]
+
+The orchestrator adopter aligns with released checkwright only and keeps `GATE_SDK_VERDICT_STORE` off until a release ships `verdict-key-before-dispatch`; it asked to be told when that release is cut. This entry is the notify obligation on that release, never the defect.
+
+**Deliverable:** at the close whose release carries that fix, the cut and a notice to the adopter naming the tag. The adopter asked (2026-11-25, peer channel, lead-relayed) that the fix ship on its own at this iteration's close, untied to the content-check gates; the operator directed one cut at close carrying both (2026-11-25, lead-relayed, not a ruling), so the notice tells the adopter the fix ships beside the gates. Demoted from the active queue at validate (2026-11-26, lead decision, not a ruling): the cut and the notice still happen at this close, the operator's grant to cut v0.39.0 stands, and the lead sends the notice over the peer channel once the tag's publish run is green, which discharges the entry.
+
+**Push need (2026-11-25, inside the budget):** the v0.39.0 tag push at close, whose publish run ships the fix the notice names.
+
+**Cost while deferred:** the adopter's store stays off past the release that would let it on. Surfaced 2026-11-25 by the adopter's ask over the peer session channel, lead-relayed after machine-verdict-pass' close; filed at the next scope. Owner lookup: `notify`, `release is cut` in this file, none; owner RELEASING.md.
 
 ## Icebox
 
