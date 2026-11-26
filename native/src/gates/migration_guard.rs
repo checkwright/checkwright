@@ -104,8 +104,9 @@ struct Statement {
     text: String,
 }
 
-// spec: gate-sdk/SPEC.md §check-migration-guard — statements cut at `;`, comments and quoted strings
-// read as a space, whitespace runs as one, upper-cased; each `-- migration-ok:` reason with its line
+// spec: gate-sdk/SPEC.md §check-migration-guard — statements cut at `;`, comments and string
+// literals read as a space, a quoted identifier as its name, whitespace runs as one, upper-cased;
+// each `-- migration-ok:` reason with its line
 fn statements(sql: &str) -> (Vec<Statement>, Vec<(usize, String)>) {
     let (mut out, mut waivers) = (Vec::new(), Vec::new());
     let (mut text, mut first, mut line) = (String::new(), None, 1);
@@ -137,7 +138,7 @@ fn statements(sql: &str) -> (Vec<Statement>, Vec<(usize, String)>) {
                 }
                 space(&mut text);
             }
-            '\'' | '"' => {
+            '\'' => {
                 first.get_or_insert(line);
                 while let Some(q) = chars.next() {
                     line += usize::from(q == '\n');
@@ -146,6 +147,20 @@ fn statements(sql: &str) -> (Vec<Statement>, Vec<(usize, String)>) {
                     }
                 }
                 space(&mut text);
+            }
+            '"' => {
+                first.get_or_insert(line);
+                while let Some(q) = chars.next() {
+                    if q == '"' && chars.next_if_eq(&'"').is_none() {
+                        break;
+                    }
+                    if q.is_whitespace() {
+                        line += usize::from(q == '\n');
+                        space(&mut text);
+                    } else {
+                        text.push(q);
+                    }
+                }
             }
             ';' => {
                 if let Some(f) = first.take() {
@@ -345,13 +360,23 @@ mod tests {
             .iter()
             .map(|p| (p.to_string(), Ere::compile(p).expect("compiles")))
             .collect();
-        let sql = "DROP TABLE a; -- migration-ok: retired\nDROP INDEX b; -- migration-ok:\nalter table c\n  drop column d;\n";
+        let sql = "DROP TABLE a; -- migration-ok: retired\nDROP INDEX b; -- migration-ok:\nalter table c\n  drop column d;\nALTER TABLE \"users\" DROP COLUMN \"email\";\n";
         assert_eq!(
             destructive("m/0002_x.sql", sql, &list),
             [
                 "m/0002_x.sql:2: [MIGRATION-DESTRUCTIVE] matches 'DROP (TABLE|INDEX|VIEW|TRIGGER)', its waiver reason empty",
                 "m/0002_x.sql:3: [MIGRATION-DESTRUCTIVE] matches 'ALTER TABLE .* DROP'",
+                "m/0002_x.sql:5: [MIGRATION-DESTRUCTIVE] matches 'ALTER TABLE .* DROP'",
             ]
         );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-migration-guard — a double-quoted identifier reads as its name,
+    // its doubled quote as one
+    #[test]
+    fn a_quoted_identifier_reads_as_its_name() {
+        let (stmts, _) = statements("ALTER TABLE \"users\" DROP COLUMN \"e\"\"mail\";\nselect 'a; b' from \"my t\"");
+        let texts: Vec<&str> = stmts.iter().map(|s| s.text.as_str()).collect();
+        assert_eq!(texts, ["ALTER TABLE USERS DROP COLUMN E\"MAIL", "SELECT FROM MY T"]);
     }
 }

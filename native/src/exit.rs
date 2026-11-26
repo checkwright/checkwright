@@ -116,11 +116,14 @@ pub fn read_configured(path: impl AsRef<Path>, what: &str) -> Result<String, Fau
 }
 
 // spec: gate-sdk/SPEC.md §Output contract — an optional configured file: nothing at the path
-// contributes nothing, and anything there that is not a readable regular file is input
+// contributes nothing, and anything there that is not a readable regular file is input, a path
+// whose lookup fails other than as not-found among them
 pub fn read_optional(path: &str, what: &str) -> Result<Option<String>, Fault> {
     let p = Path::new(path);
-    if std::fs::symlink_metadata(p).is_err() {
-        return Ok(None);
+    match std::fs::symlink_metadata(p) {
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(e) => return Err(Fault::input(format!("cannot read the {} {}: {}", what, path, e))),
+        Ok(_) => {}
     }
     if !p.is_file() {
         return Err(Fault::input(format!("{} is not a regular file: {}", what, path)));
@@ -175,6 +178,20 @@ mod tests {
         assert_eq!(read_configured(&bad, "list").unwrap_err().kind, Kind::Input);
         assert_eq!(Fault::reading(dir.join("gone.txt"), "m").kind, Kind::Refused);
         assert_eq!(Fault::reading(&bad, "m").kind, Kind::Input);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn an_optional_file_is_absent_only_when_not_found() {
+        let dir = std::env::temp_dir().join(format!("exit-optional-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("cannot make the scratch dir");
+        let list = dir.join("list.txt");
+        std::fs::write(&list, "term\n").expect("cannot write the scratch file");
+        let gone = dir.join("gone.txt").display().to_string();
+        assert_eq!(read_optional(&gone, "list").unwrap(), None);
+        assert_eq!(read_optional(&list.display().to_string(), "list").unwrap().as_deref(), Some("term\n"));
+        assert_eq!(read_optional(&dir.display().to_string(), "list").unwrap_err().kind, Kind::Input);
+        assert_eq!(read_optional("list\0.txt", "list").unwrap_err().kind, Kind::Input);
         let _ = std::fs::remove_dir_all(&dir);
     }
 
