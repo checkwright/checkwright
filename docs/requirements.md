@@ -78,7 +78,7 @@ A repository install commits the profile's kit files, the gate binary and a hand
 | --- | --- | --- | --- | --- |
 | `starter` | 1 | 720 | 660 | 530 kB |
 | `workflow` | 3 | 980 | 880 | 1.0 MB |
-| `delegation` | 8 | 1,200 | 1,100 | 1.5 MB |
+| `delegation` | 8 | 1,200 | 1,100 | 1.6 MB |
 | `prose` | 2 | 1,100 | 1,000 | 750 kB |
 | `full` | 11 | 1,700 | 1,500 | 1.9 MB |
 

@@ -344,6 +344,118 @@ fn from_dir(base_dir: &str, dir: &str, work: &Files) -> Result<(Files, BTreeSet<
     Ok((base, edited))
 }
 
+// spec: gate-sdk/SPEC.md §check-migration-guard — every attribute git's checkout conversion reads
+const CONVERSION: &[&str] = &["text", "crlf", "eol", "ident", "filter", "working-tree-encoding"];
+
+type Attrs = BTreeMap<String, Vec<(String, String)>>;
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — each path's conversion attributes, from the working
+// tree's attribute files or, with `index` set, from that index's alone
+fn attrs(top: &str, paths: &[String], index: Option<&Path>) -> Result<Attrs, Fault> {
+    let mut out: Attrs = BTreeMap::new();
+    for chunk in paths.chunks(128) {
+        let mut argv = vec!["-C", top, "check-attr", "-z"];
+        if index.is_some() {
+            argv.push("--cached");
+        }
+        argv.extend(CONVERSION);
+        argv.push("--");
+        argv.extend(chunk.iter().map(String::as_str));
+        let env: Vec<(String, String)> = index.map(|i| ("GIT_INDEX_FILE".to_string(), i.display().to_string())).into_iter().collect();
+        let c = proc::run_with_env(&programs::GIT, &argv, &env).map_err(Fault::tool)?;
+        let raw = c.stdout().ok_or_else(|| git_failed(&c, "git check-attr"))?;
+        let fields: Vec<String> = raw.split(|&b| b == 0).map(|f| String::from_utf8_lossy(f).into_owned()).collect();
+        for r in fields.chunks_exact(3) {
+            out.entry(r[0].clone()).or_default().push((r[1].clone(), r[2].clone()));
+        }
+    }
+    Ok(out)
+}
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — the driver names some `filter.<name>.smudge`,
+// `.clean` or `.process` configures
+fn drivers(top: &str) -> Result<BTreeSet<String>, Fault> {
+    let c = git(top, &["config", "-z", "--get-regexp", r"^filter\..*\.(smudge|clean|process)$"])?;
+    let raw = match (c.stdout(), c.code()) {
+        (Some(o), _) => o.to_vec(),
+        (None, Some(1)) => Vec::new(),
+        (None, _) => return Err(git_failed(&c, "git config --get-regexp")),
+    };
+    Ok(driver_names(&raw))
+}
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — `git config -z` records, `<key>\n<value>`, read as
+// the `<name>` of each `filter.<name>.<var>` key
+fn driver_names(raw: &[u8]) -> BTreeSet<String> {
+    raw.split(|&b| b == 0)
+        .filter_map(|rec| {
+            let rec = String::from_utf8_lossy(rec);
+            let key = rec.split('\n').next()?.to_string();
+            let (name, _) = key.strip_prefix("filter.")?.rsplit_once('.')?;
+            Some(name.to_string())
+        })
+        .collect()
+}
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — the merge base's conversion attributes, read off a
+// throwaway index of its tree in this process's private temp dir, removed before return
+fn attrs_at_base(b: &since_base::Base, paths: &[String]) -> Result<Attrs, Fault> {
+    let mut index = proc::temp_base().map_err(Fault::tool)?.join(format!("migration-base-index.{}", std::process::id()));
+    if index.is_relative() {
+        index = Path::new(&walk::cwd().map_err(Fault::tool)?).join(index);
+    }
+    let _ = std::fs::remove_file(&index);
+    let env = [("GIT_INDEX_FILE".to_string(), index.display().to_string())];
+    let read = proc::run_with_env(&programs::GIT, &["-C", &b.top, "read-tree", &b.commit], &env).map_err(Fault::tool);
+    let got = read.and_then(|c| match c.stdout() {
+        Some(_) => attrs(&b.top, paths, Some(&index)),
+        None => Err(git_failed(&c, "git read-tree of the merge base")),
+    });
+    let _ = std::fs::remove_file(&index);
+    got
+}
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — the git arm's edited set, a merge-base file whose
+// bytes differ from its blob's checkout form, and its attribute drift; a missing driver is exit 3
+fn checkout_edits(b: &since_base::Base, dir: &str, dir_top: &str, base: &Files, work: &Files) -> Result<(BTreeSet<String>, Vec<String>), Fault> {
+    let kept: Vec<&String> = base.keys().filter(|n| work.contains_key(*n)).collect();
+    if kept.is_empty() {
+        return Ok((BTreeSet::new(), Vec::new()));
+    }
+    let paths: Vec<String> = kept.iter().map(|n| format!("{}/{}", dir_top, n)).collect();
+    let now = attrs(&b.top, &paths, None)?;
+    let configured = drivers(&b.top)?;
+    for (n, p) in kept.iter().zip(&paths) {
+        let named = now.get(p).into_iter().flatten().find(|(a, v)| a == "filter" && !matches!(v.as_str(), "unspecified" | "unset" | "set"));
+        if let Some((_, driver)) = named.filter(|(_, v)| !configured.contains(v)) {
+            return Err(Fault::tool(format!(
+                "{}/{}: its filter attribute names driver '{}', which no filter.{}.smudge, .clean or .process configures, so its checkout form cannot be read — install the driver",
+                dir, n, driver, driver
+            )));
+        }
+    }
+    let mut edited = BTreeSet::new();
+    for (n, p) in kept.iter().zip(&paths) {
+        let c = git(&b.top, &["cat-file", "--filters", &format!("{}:{}", b.commit, p)])?;
+        let form = c.stdout().ok_or_else(|| git_failed(&c, &format!("git cat-file --filters of {}", p)))?;
+        if read(&Path::new(&b.top).join(p))? != form {
+            edited.insert((*n).clone());
+        }
+    }
+    let then = attrs_at_base(b, &paths)?;
+    let mut drift = Vec::new();
+    for (n, p) in kept.iter().zip(&paths) {
+        let (was, is) = (then.get(p).cloned().unwrap_or_default(), now.get(p).cloned().unwrap_or_default());
+        for (attr, value) in &is {
+            let before = was.iter().find(|(a, _)| a == attr).map_or("unspecified", |(_, v)| v.as_str());
+            if before != value {
+                drift.push(format!("{}/{}: [MIGRATION-ATTR] {} {} -> {}", dir, n, attr, before, value));
+            }
+        }
+    }
+    Ok((edited, drift))
+}
+
 fn inner(args: &[String]) -> Result<i32, Fault> {
     let against = parse_args(args)?;
     let dir = walk::knob_scalar(DIR_KNOB).map_err(Fault::refused)?;
@@ -360,12 +472,12 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
     let dir_top = format!("{}{}", prefix()?, dir);
     let work = files(&dir, working(&top, &dir_top)?)?;
 
-    let (base, edited, tip, refs, what, clash) = match against {
+    let (base, edited, drift, tip, refs, what, clash) = match against {
         Against::Base(flag) => {
             let b = since_base::resolve(flag.as_deref())?;
             let base = files(&dir, under(b.files_at_base(&dir_top)?, &dir_top))?;
             shared_width(&[(&dir, &base), (&dir, &work)])?;
-            let edited: BTreeSet<String> = under(b.changed(&[&dir_top])?, &dir_top).into_iter().collect();
+            let (edited, drift) = checkout_edits(&b, &dir, &dir_top, &base, &work)?;
             let tip = readable(under(b.files_at_tip(&dir_top)?, &dir_top));
             let globs = walk::knob_words(REFS_KNOB).map_err(Fault::refused)?;
             let (refs, clash) = if globs == ["none"] {
@@ -375,15 +487,16 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
                 let read = format!(", {} other ref(s) read", refs.len());
                 (refs, read)
             };
-            (base, edited, tip, refs, format!("merge base {}", b.short()), clash)
+            (base, edited, drift, tip, refs, format!("merge base {}", b.short()), clash)
         }
         Against::Dir(d) => {
             let (base, edited) = from_dir(&d, &dir, &work)?;
-            (base, edited, Files::new(), Vec::new(), d, "; clash check off: no base ref under --base-dir".to_string())
+            (base, edited, Vec::new(), Files::new(), Vec::new(), d, "; clash check off: no base ref under --base-dir".to_string())
         }
     };
 
     let mut out = judge(&dir, &base, &work, &edited, &tip, &refs);
+    out.extend(drift);
     let added = added(&base, &work, &tip);
     if let Some(list) = &list {
         for n in added.keys() {
@@ -399,14 +512,18 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
         println!("MIGRATION-GUARD: clean ({} migration(s), {} added, against {}{}{})", work.len(), added.len(), what, clash, off);
         return Ok(0);
     }
-    println!("{}: migration(s) under {} edited, out of order, duplicated, clashing or destructive against {}:", NAME, dir, what);
+    println!(
+        "{}: migration(s) under {} edited, out of order, duplicated, clashing, destructive or re-attributed against {}:",
+        NAME, dir, what
+    );
     for r in &out {
         println!("{}", r);
     }
     println!("  help: a merged migration is history: restore an edited or deleted one and put the change in a");
     println!("        new file numbered above the highest; renumber a duplicate or a clash above every other");
     println!("        branch's; declare a deliberate destructive statement with '-- {} <reason>' on one of", WAIVER);
-    println!("        its lines.");
+    println!("        its lines; restore a merged migration's conversion attributes (.gitattributes) to the");
+    println!("        merge base's, since they change the bytes a checkout writes.");
     Ok(1)
 }
 
@@ -536,5 +653,14 @@ mod tests {
         let (stmts, _) = statements("ALTER TABLE \"users\" DROP COLUMN \"e\"\"mail\";\nselect 'a; b' from \"my t\"");
         let texts: Vec<&str> = stmts.iter().map(|s| s.text.as_str()).collect();
         assert_eq!(texts, ["ALTER TABLE USERS DROP COLUMN E\"MAIL", "SELECT FROM MY T"]);
+    }
+
+    // spec: gate-sdk/SPEC.md §check-migration-guard — a driver is the name between `filter.` and the
+    // last dot, a dotted name kept whole
+    #[test]
+    fn a_configured_driver_is_its_key_s_middle() {
+        let got = driver_names(b"filter.lfs.smudge\ngit-lfs smudge -- %f\0filter.my.tool.clean\ntr -d x\0filter.lfs.process\ngit-lfs filter-process\0");
+        assert_eq!(got.into_iter().collect::<Vec<_>>(), ["lfs", "my.tool"]);
+        assert!(driver_names(b"").is_empty());
     }
 }

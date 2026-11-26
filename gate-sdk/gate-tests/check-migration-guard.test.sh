@@ -77,6 +77,42 @@ git -C "$r" -c user.name=t -c user.email=t@e.invalid commit -qam edit
 out="$(guard "$r")"; rc=$?
 expect edit-committed 1 'db/migrations/0001_a.sql: [MIGRATION-EDITED]' "$rc" "$out"
 
+# --- the checkout form: a clean filter hiding an edit from git diff reds, an untouched file in an
+# autocrlf or an LF clone is clean, and an edit in the autocrlf clone reds.
+r="$(fresh filtered)"
+git -C "$r" config filter.strip.clean "tr -d '#'"
+git -C "$r" config filter.strip.smudge cat
+printf '*.sql filter=strip\n' > "$r/.git/info/attributes"
+printf 'CREATE TABLE a (id INTEGER);#\n' > "$r/db/migrations/0001_a.sql"
+out="$(guard "$r")"; rc=$?
+expect filter-hidden-edit 1 'db/migrations/0001_a.sql: [MIGRATION-EDITED]' "$rc" "$out"
+refute filter-untouched 'db/migrations/0002_b.sql: [MIGRATION-EDITED]' "$out"
+o="$(fresh clone-src)"
+git -C "$o" checkout -q main
+r="$SANDBOX/crlf"
+git clone -q -c core.autocrlf=true "$o" "$r" && git -C "$r" checkout -qb topic
+out="$(guard "$r")"; rc=$?
+expect autocrlf-untouched 0 'clean (2 migration(s), 0 added, against merge base' "$rc" "$out"
+printf 'CREATE TABLE b (id INTEGER, y TEXT);\r\n' > "$r/db/migrations/0002_b.sql"
+out="$(guard "$r")"; rc=$?
+expect autocrlf-edit 1 'db/migrations/0002_b.sql: [MIGRATION-EDITED]' "$rc" "$out"
+r="$SANDBOX/lf"
+git clone -q "$o" "$r" && git -C "$r" checkout -qb topic
+out="$(guard "$r")"; rc=$?
+expect lf-untouched 0 'clean (2 migration(s), 0 added, against merge base' "$rc" "$out"
+
+# --- a conversion attribute changed since the merge base reds; a filter naming no configured
+# driver cannot be read in its checkout form, which is 3, never a pass.
+r="$(fresh attr-drift)"
+printf 'db/migrations/*.sql eol=lf\n' > "$r/.gitattributes"
+out="$(guard "$r")"; rc=$?
+expect attr-drift 1 'db/migrations/0001_a.sql: [MIGRATION-ATTR] eol unspecified -> lf' "$rc" "$out"
+refute attr-drift-edit 'MIGRATION-EDITED' "$out"
+r="$(fresh no-driver)"
+printf '*.sql filter=nodriver\n' > "$r/.git/info/attributes"
+out="$(guard "$r")"; rc=$?
+expect no-driver 3 "its filter attribute names driver 'nodriver'" "$rc" "$out"
+
 # --- a delete and a rename.
 r="$(fresh delete)"
 git -C "$r" rm -q db/migrations/0002_b.sql
@@ -237,5 +273,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-migration-guard.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-migration-guard.test.sh: clean (the git arm's edit, delete, rename, order, width, duplicate, clash, ref-set and destructive cases, and its exit classes — $cases cases)"
+echo "check-migration-guard.test.sh: clean (the git arm's edit, checkout-form, attribute-drift, missing-driver, delete, rename, order, width, duplicate, clash, ref-set and destructive cases, and its exit classes — $cases cases)"
 exit 0
