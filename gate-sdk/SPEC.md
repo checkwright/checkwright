@@ -99,6 +99,8 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_PIPEFAIL_BASELINE` (default empty): the member's count baseline (§The count baseline); empty holds every file to a count of 0.
 - `GATE_SDK_SCRIPT_FILES` (default empty): space-separated pathspecs over the tracked tree for `check-script-preflight`, the shared prune dirs applied. Empty disables the gate.
 - `GATE_SDK_SCRIPT_RULES` (default `<gates-dir>/script-rules.list`): that member's rules file, required while its corpus is configured (see there).
+- `GATE_SDK_SITE_RULES` (default `<gates-dir>/site-rules.list`): `check-site-count`'s rules file, **optional**. An absent file, or one holding no block, disables the gate (see there).
+- `GATE_SDK_TEST_GLOBS` (default `tests/ fixtures/ tests.rs *_tests.rs tests_*.rs test_* *_test.*`): space-separated globs naming test code (§The test-code classifier); empty names none.
 - `GATE_SDK_PORTABILITY_PATTERNS` (default `<gates-dir>/portability-patterns.list`): space-separated banned-construct rosters for `check-portability-floor`, each **optional**. An absent file disables the assertion, where a present-but-unreadable one is exit 3 (see there).
 - `GATE_SDK_PORTABILITY_PATHS` (default **empty**): space-separated pathspecs naming that gate's install-path corpus. Empty is the shipped default because the kit cannot know any consumer's install path, and an empty corpus disables the assertion rather than failing it closed (§check-portability-floor).
 - `GATE_SDK_HARNESS_LITERALS` (default **empty**): space-separated fixed strings, the harness-bound literals §check-harness-literal holds to their declared sites. The kit ships none, since a default would be one vendor's spelling.
@@ -935,6 +937,7 @@ A gate's shell file carries five things at once: the rule, the `# graph:` manife
 | `check-task-path-claim` | **Survives unchanged: reverse trigger.** Its `couples=` carries `*` because a ticked task may name any path, a gate declaration among them, and a deleted path is what reds it. It reads its configured task lists and stats the paths they name, never a declaration's content, so a port that moves a declaration it names reds the task exactly as any deleted path does (canon-kit/SPEC.md §check-task-path-claim). It is `.gate`-dispatched. |
 | `check-path-names` | **Born native and substrate-blind: it reads names, never content.** Its `couples=` carries `*` because any tracked path, a gate declaration among them, may be named for a deny term. It splits each path into components and opens no file but the term lists, so a port moves its verdict only where the new spelling's name hits, as any rename does (§check-path-names). |
 | `check-script-preflight` | **Born native, sensitive only as a configured script.** Its `couples=` carries `*` because its corpus is whatever tracked files the consumer's pathspecs select, which need not end `.sh`. A gate declaration is in it only where those pathspecs name one, and it is then read as a script like any other, so a port moves its verdict as deleting or adding any selected script does (§check-script-preflight). |
+| `check-site-count` | **Born native, sensitive only as a counted file.** Its `couples=` carries `*` because a rule's pathspecs default to the whole tracked tree. A gate declaration is counted like any other file under them, so a port moves its verdict only where the old or new spelling holds a site, as deleting or adding any counted file does (§check-site-count). |
 | `check-install-size-fresh` | **Survives unchanged: it sizes declarations, never reads them.** Its `couples=` carries `kit:*` because its figure counts and sizes every tracked file the packer packs, a declaration among them. It reads index entries and blob sizes, never a declaration's content, so a port moves the figure as any edit of the same size does (installer/SPEC.md §The install size). It is `.gate`-dispatched. |
 
 **Every gate ports, an auditor of the dispatch relation included.** Holding such an auditor on shell, lest a compiled one pass itself with a broken binary, is refused. A shell auditor already takes `--list` from the binary, so its independence was only from the binary's presence. Presence is owned elsewhere: an absent or non-executable binary is exit 3 under §Fail-closed contract, and a stale one is §check-gate-binary-fresh's red. A gate reading declaration paths as content pays criterion 4's price for the parity oracle (§The port-candidate criteria).
@@ -3675,9 +3678,15 @@ Which readers stop early is shell semantics, the same in every project, so the l
 `native/src/count_baseline.rs` reads a count baseline: lines `<count><TAB><path>`, `<count>` decimal digits and `<path>` repo-relative, a leading `./` dropped. `#` lines and blank lines are skipped, and any other line, or a path given twice, is unparseable input at exit 3 naming the line; the file absent where a knob names it refuses at exit 2. A file with no row has a count of 0. A reading gate names its comparison:
 
 - **A ceiling** (§check-pipefail-readers) passes a file at or under its count and reds one over it. A count above the file's hits reds `<path>: [BASELINE-STALE] <found>/<count>`, so the count is lowered as sites are fixed and a fixed site cannot return unseen.
-- **An exact count** reds any difference.
+- **An exact count** (§check-site-count) reds any difference, so a stale row reds as an exceeded one does.
 
 The record carries `<found>/<count>` because the fix is a number in the baseline. **Honest limit:** that text moves the result's fingerprint whenever a count changes, the volatile-value limit §run-gates names.
+
+### The test-code classifier
+
+`walk::test_code` tells test code from shipped code for every content gate that skips or selects it, so that no gate reads a test differently from another. A path is **test code** when one of its components matches a `GATE_SDK_TEST_GLOBS` glob ending in `/`, the glob less its slash, or its basename matches any other glob; a glob's `*` matches any run of characters. In a `.rs` file the lines from the first `#[cfg(test)]` attribute on are test code too, whatever the path, since Rust keeps a module's tests in its own file. The reader answers with the line test code starts at, 1 for a test path and none for a file holding no test code.
+
+Test layout is a language and project convention, so the globs are a knob: its default names the common layouts and a consumer narrows or empties it. **Honest limit:** the `.rs` cut is lexical, so a test module ahead of shipped code takes that code with it.
 
 ### check-pipe-membership
 
@@ -3755,6 +3764,27 @@ The pair points both knobs at case-local paths in each case's knob file and shar
 - the rules file absent at 2, unreadable at 3, and malformed at 2 by an ERE, an id and a missing key;
 - a `LINT-PARSE` script and a script not UTF-8 at 3, and a failed listing outside a work tree at 3;
 - the knob selecting tracked files only under the prune set, and an unknown option.
+
+### check-site-count
+
+`checks/check-site-count.gate` (`precommit`, binary-dispatched). Invariant: **every file's count of a configured site equals the count a person reviewed.** Some calls are safe only in a reviewed form, and a pattern cannot tell the reviewed form from the unreviewed one. A CLI call may have to carry a pinned account, say, because the machine's active account can change under it. What a gate can hold is the count: a person reviewed N sites in a file, and a file whose count moves is reviewed again.
+
+**The rules file** (`GATE_SDK_SITE_RULES`) takes §check-script-preflight's block grammar with one kind and no top-level line. A block `rule <ID> site-count` takes the keys `site <ERE>` (required, repeatable), `baseline <path>` (required, a count baseline, §The count baseline) and `paths <pathspec>…` (default the whole tracked tree), each but `site` given once. A malformed file is exit 2 naming its file and line, an unreadable one exit 3. With no rules file, or one holding no block, it prints `not applicable: no site rule configured` and exits 0, and it declares `# install: on-surface` and `# armed-by: content GATE_SDK_SITE_RULES`.
+
+**The corpus** of a rule is `git ls-files` under its pathspecs, the shared prune dirs, binary files (a NUL byte, as §check-tree-terms reads one) and test code (§The test-code classifier) skipped. Outside a work tree there is no listing, so the repository is probed first and an absent one refuses with exit 2 rather than counting nothing. A file's count is the number of non-overlapping matches of every `site` ERE over each of its lines, summed, an ERE being a search (§The POSIX ERE matcher); a line two EREs match counts for each.
+
+**The comparison is exact.** A file whose count differs from its row in the rule's baseline reds `<path>: [<ID>] <found>/<reviewed>`, a file with no row counting as 0 reviewed, so a new site, a removed site and a stale row all red. A named baseline that is absent is exit 2 and an unparseable one exit 3, naming its line. The record has no line, since the count is the file's, and §run-gates places it as a path-only record. The `help:` lines name the review and the row to set.
+
+- **Why counts and not a site-level waiver.** A comment beside a call is copied with the call; a count lives apart from the code, so a new site cannot arrive pre-approved.
+- **Why one generic kind.** A CLI-account rule is a `site` ERE over an argv literal and a shell command start, consumer config like any vocabulary (§The provenance seam).
+
+This repo binds no rule: reviewing each of its own CLI call sites is a calibration not yet made, so the member is registered and not applicable here. **Honest limit:** a count is blind to which site changed, so replacing a reviewed site with an unreviewed one in the same file keeps the count and passes.
+
+The pair points `GATE_SDK_SITE_RULES` at a case-local rules file over a case-local baseline. `bad/` carries a file over its row, one under it and one with sites and no row. `good/` carries equal counts, a site inside a test directory, a binary file holding sites and a file with neither site nor row. `check-site-count.test.sh` holds the residue:
+
+- the empty configuration, a rules file with no block, an unreadable one at 3 and one missing its baseline key at 2, and the refusal outside a work tree;
+- the baseline absent at 2, a row with no tab and a duplicate row at 3;
+- a Rust test module and a test directory skipped under the default globs, and the test directory read once the knob is emptied.
 
 ### check-front-end-fail-open
 

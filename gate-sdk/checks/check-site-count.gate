@@ -1,0 +1,4 @@
+# graph: couples=*,knob:GATE_SDK_SITE_RULES dir=one valve=none tier=precommit trigger=*
+# install: on-surface
+# armed-by: content GATE_SDK_SITE_RULES
+# spec: gate-sdk/SPEC.md §check-site-count — every tracked file's count of a configured site equals the count a person reviewed (the record names the path, the rule id and both counts, never a site)

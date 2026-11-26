@@ -115,6 +115,21 @@ pub fn read_configured(path: impl AsRef<Path>, what: &str) -> Result<String, Fau
     std::fs::read_to_string(p).map_err(|e| Fault::input(format!("cannot read the {} {}: {}", what, p.display(), e)))
 }
 
+// spec: gate-sdk/SPEC.md §Output contract — an optional configured file: nothing at the path
+// contributes nothing, and anything there that is not a readable regular file is input
+pub fn read_optional(path: &str, what: &str) -> Result<Option<String>, Fault> {
+    let p = Path::new(path);
+    if std::fs::symlink_metadata(p).is_err() {
+        return Ok(None);
+    }
+    if !p.is_file() {
+        return Err(Fault::input(format!("{} is not a regular file: {}", what, path)));
+    }
+    std::fs::read_to_string(p)
+        .map(Some)
+        .map_err(|e| Fault::input(format!("cannot read the {} {}: {}", what, path, e)))
+}
+
 impl fmt::Display for Fault {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.message)

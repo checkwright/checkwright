@@ -3,6 +3,7 @@
 use crate::ere::Ere;
 use crate::exit::{self, Fault};
 use crate::listing;
+use crate::rule_blocks::{self, Grammar};
 use crate::shell_lines::{self, Options, Script, Waived, Word};
 use crate::walk;
 use std::path::Path;
@@ -28,22 +29,18 @@ struct Rules {
     rules: Vec<Rule>,
 }
 
-struct Block {
-    id: String,
-    kind: &'static str,
-    line: usize,
-    keys: Vec<(&'static str, String, usize)>,
-}
-
 // spec: gate-sdk/SPEC.md §check-script-preflight — each kind's required keys, then its optional
 // ones; `cmd` and `grammar` are given once, every other key repeats
-const KINDS: &[(&str, &[&str], &[&str])] = &[
-    ("command", &["cmd"], &["allow", "before", "waiver"]),
-    ("forbidden-token", &["token"], &["waiver"]),
-    ("early-exit", &[], &["waiver"]),
-    ("id-grammar", &["cmd", "flag", "grammar"], &["waiver"]),
-];
-const ONCE: &[&str] = &["cmd", "grammar"];
+const GRAMMAR: Grammar = Grammar {
+    kinds: &[
+        ("command", &["cmd"], &["allow", "before", "waiver"]),
+        ("forbidden-token", &["token"], &["waiver"]),
+        ("early-exit", &[], &["waiver"]),
+        ("id-grammar", &["cmd", "flag", "grammar"], &["waiver"]),
+    ],
+    once: &["cmd", "grammar"],
+    tops: &["waiver-min", "body"],
+};
 
 pub fn run(args: &[String]) -> i32 {
     match inner(args) {
@@ -57,81 +54,26 @@ pub fn run(args: &[String]) -> i32 {
 }
 
 fn parse(file: &str, text: &str) -> Result<Rules, Fault> {
-    let bad = |line: usize, what: String| Fault::refused(format!("{}:{}: {}", file, line, what));
-    let (mut floor, mut body, mut blocks) = (1usize, Vec::new(), Vec::<Block>::new());
-    for (i, raw) in text.lines().enumerate() {
-        let n = i + 1;
-        let line = raw.trim_end_matches('\r');
-        let trimmed = line.trim();
-        if trimmed.is_empty() || trimmed.starts_with('#') {
-            continue;
-        }
-        if line.starts_with([' ', '\t']) {
-            let Some(b) = blocks.last_mut() else {
-                return Err(bad(n, "a key line before any 'rule' line".to_string()));
-            };
-            let (key, value) = trimmed.split_once([' ', '\t']).map_or((trimmed, ""), |(k, v)| (k, v.trim()));
-            let (_, req, opt) = KINDS.iter().find(|k| k.0 == b.kind).expect("a block's kind is known");
-            let Some(key) = req.iter().chain(opt.iter()).find(|k| **k == key).copied() else {
-                return Err(bad(n, format!("unknown key '{}' for a {} rule", key, b.kind)));
-            };
-            if value.is_empty() {
-                return Err(bad(n, format!("key '{}' takes a value", key)));
+    let (tops, blocks) = rule_blocks::parse(file, text, &GRAMMAR)?;
+    let (mut floor, mut body) = (1usize, Vec::new());
+    for top in tops {
+        match (top.word, top.values.as_slice()) {
+            ("waiver-min", [v]) if v.bytes().all(|c| c.is_ascii_digit()) => {
+                floor = v.parse().map_err(|_| rule_blocks::refusal(file, top.line, format!("waiver-min '{}' is out of range", v)))?
             }
-            if ONCE.contains(&key) && b.keys.iter().any(|k| k.0 == key) {
-                return Err(bad(n, format!("key '{}' given twice in one rule", key)));
-            }
-            b.keys.push((key, value.to_string(), n));
-            continue;
-        }
-        let words: Vec<&str> = trimmed.split_whitespace().collect();
-        match (words[0], blocks.is_empty()) {
-            ("rule", _) => {
-                if words.len() != 3 {
-                    return Err(bad(n, "a rule line is 'rule <ID> <kind>'".to_string()));
-                }
-                if !crate::sarif::is_class(words[1]) {
-                    return Err(bad(n, format!("rule id '{}' is not [A-Z][A-Z0-9_-]*", words[1])));
-                }
-                let Some(kind) = KINDS.iter().find(|k| k.0 == words[2]).map(|k| k.0) else {
-                    return Err(bad(n, format!("unknown kind '{}'", words[2])));
-                };
-                blocks.push(Block { id: words[1].to_string(), kind, line: n, keys: Vec::new() });
-            }
-            ("waiver-min", true) => {
-                floor = match words[1..] {
-                    [v] if !v.is_empty() && v.bytes().all(|c| c.is_ascii_digit()) => {
-                        v.parse().map_err(|_| bad(n, format!("waiver-min '{}' is out of range", v)))?
-                    }
-                    _ => return Err(bad(n, "waiver-min takes one decimal count".to_string())),
-                };
-            }
-            ("body", true) if words.len() > 1 => body.extend(words[1..].iter().map(|w| w.to_string())),
-            (w, _) => return Err(bad(n, format!("unknown line '{}' (a top-level line is 'rule', 'waiver-min' or 'body', the last two before the first rule)", w))),
+            ("waiver-min", _) => return Err(rule_blocks::refusal(file, top.line, "waiver-min takes one decimal count")),
+            _ => body.extend(top.values),
         }
     }
     let mut rules = Vec::new();
     for b in blocks {
-        let (_, req, _) = KINDS.iter().find(|k| k.0 == b.kind).expect("a block's kind is known");
-        if let Some(missing) = req.iter().find(|r| !b.keys.iter().any(|k| k.0 == **r)) {
-            return Err(bad(b.line, format!("rule {} lacks its '{}' key", b.id, missing)));
-        }
-        let values = |key: &str| -> Vec<(String, usize)> {
-            b.keys.iter().filter(|k| k.0 == key).map(|k| (k.1.clone(), k.2)).collect()
-        };
-        let compile = |key: &str| -> Result<Vec<Ere>, Fault> {
-            values(key).iter().map(|(v, n)| Ere::compile(v).map_err(|e| bad(*n, format!("{}: {}", key, e)))).collect()
-        };
-        let one = |key: &str| values(key).into_iter().next().map(|k| k.0).unwrap_or_default();
-        let all = |key: &str| -> Vec<String> { values(key).into_iter().map(|k| k.0).collect() };
         let kind = match b.kind {
-            "command" => Kind::Command { cmd: one("cmd"), allow: compile("allow")?, before: compile("before")? },
-            "forbidden-token" => Kind::Forbidden { tokens: all("token") },
+            "command" => Kind::Command { cmd: b.one("cmd"), allow: b.eres(file, "allow")?, before: b.eres(file, "before")? },
+            "forbidden-token" => Kind::Forbidden { tokens: b.all("token") },
             "early-exit" => Kind::EarlyExit,
-            _ => Kind::IdGrammar { cmd: one("cmd"), flags: all("flag"), grammar: compile("grammar")?.remove(0) },
+            _ => Kind::IdGrammar { cmd: b.one("cmd"), flags: b.all("flag"), grammar: b.eres(file, "grammar")?.remove(0) },
         };
-        let waivers = all("waiver").iter().flat_map(|w| w.split_whitespace().map(str::to_string)).collect();
-        rules.push(Rule { id: b.id, kind, waivers });
+        rules.push(Rule { waivers: b.words("waiver"), id: b.id, kind });
     }
     Ok(Rules { floor, body, rules })
 }

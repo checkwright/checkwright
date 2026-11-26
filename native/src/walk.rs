@@ -34,6 +34,29 @@ pub fn path_pruned(p: &str, prune: &[String]) -> bool {
     })
 }
 
+// spec: gate-sdk/SPEC.md §check-tree-terms — a NUL byte is what makes a file binary, the same
+// test `grep` applies before it substitutes a path-only verdict for the matching line
+pub fn binary(bytes: &[u8]) -> bool {
+    bytes.contains(&0)
+}
+
+// spec: gate-sdk/SPEC.md §The test-code classifier — the line test code starts at in a file: 1
+// for a test path, else a `.rs` file's first `#[cfg(test)]` line, else none
+pub fn test_code(path: &str, text: &str, globs: &[String]) -> Option<usize> {
+    let (dirs, base) = path.rsplit_once('/').map_or(("", path), |(d, b)| (d, b));
+    let hit = globs.iter().any(|g| match g.strip_suffix('/') {
+        Some(dir) => dirs.split('/').any(|c| glob_match(dir, c)),
+        None => glob_match(g, base),
+    });
+    if hit {
+        return Some(1);
+    }
+    if !base.ends_with(".rs") {
+        return None;
+    }
+    text.lines().position(|l| l.trim_start().starts_with("#[cfg(test)]")).map(|i| i + 1)
+}
+
 // spec: gate-sdk/SPEC.md §check-gate-exemption-tasks — the compiled face of the `--tree` corpus
 // rule: tracked `*.sh`, minus the `*.test.sh` suffix, minus `path_pruned` above. A tree with no
 // tracked set yields none, on `authoring_tree`'s own degrade; an unresolved knob still fails closed
@@ -1585,6 +1608,20 @@ pub fn fixture_case_dirs(gate: &str) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: gate-sdk/SPEC.md §The test-code classifier — a directory glob matches a directory
+    // component, any other glob the basename, and a `.rs` file's test module starts its test lines
+    #[test]
+    fn test_code_reads_the_path_then_a_rust_test_module() {
+        let globs: Vec<String> = ["tests/", "*_test.*", "test_*"].iter().map(|g| g.to_string()).collect();
+        assert_eq!(test_code("a/tests/b/x.sh", "", &globs), Some(1));
+        assert_eq!(test_code("tests", "", &globs), None);
+        assert_eq!(test_code("src/run_test.go", "", &globs), Some(1));
+        assert_eq!(test_code("test_x.py", "", &globs), Some(1));
+        assert_eq!(test_code("src/a.rs", "fn a() {}\n  #[cfg(test)]\nmod t {}\n", &globs), Some(2));
+        assert_eq!(test_code("src/a.sh", "#[cfg(test)]\n", &globs), None);
+        assert_eq!(test_code("tests/a.rs", "x\n", &[]), None);
+    }
 
     // spec: gate-sdk/SPEC.md §The crate's crosser — a non-zero exit at a marked anchor is the
     // refused answer under every form, at an unmarked or missing one the absent answer

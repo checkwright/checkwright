@@ -1,0 +1,3 @@
+tool fetch --account pinned
+cd work; tool push
+a mention of tool fetch mid-line is no site

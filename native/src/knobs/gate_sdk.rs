@@ -80,6 +80,10 @@ fn script_rules(resolve: Resolve) -> Result<Value, String> {
     in_gates_dir(resolve, "script-rules.list")
 }
 
+fn site_rules(resolve: Resolve) -> Result<Value, String> {
+    in_gates_dir(resolve, "site-rules.list")
+}
+
 // spec: gate-sdk/SPEC.md §check-portability-floor — the default roster's basename, which a kit's
 // own starter roster under `templates/` also carries
 pub const PORTABILITY_PATTERN_FILE: &str = "portability-patterns.list";
@@ -224,6 +228,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_PIPEFAIL_BASELINE", "").empty_takes_default(),
         Row::scalar("GATE_SDK_SCRIPT_FILES", "").empty_takes_default().words(),
         Row::derived("GATE_SDK_SCRIPT_RULES", Shape::Scalar, script_rules, GATES).empty_takes_default(),
+        Row::derived("GATE_SDK_SITE_RULES", Shape::Scalar, site_rules, GATES).empty_takes_default(),
+        Row::scalar("GATE_SDK_TEST_GLOBS", "tests/ fixtures/ tests.rs *_tests.rs tests_*.rs test_* *_test.*").words(),
         Row::derived("GATE_SDK_PORTABILITY_PATTERNS", Shape::Scalar, portability_patterns, GATES).empty_takes_default().words(),
         Row::scalar("GATE_SDK_PORTABILITY_PATHS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_HARNESS_LITERALS", "").empty_takes_default().words(),

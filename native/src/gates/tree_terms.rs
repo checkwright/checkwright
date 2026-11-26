@@ -10,11 +10,6 @@ use crate::walk;
 use std::collections::BTreeSet;
 use std::path::Path;
 
-// spec: gate-sdk/SPEC.md §check-tree-terms — a NUL byte is what makes a file binary, the same
-// test `grep` applies before it substitutes a path-only verdict for the matching line
-fn binary(bytes: &[u8]) -> bool {
-    bytes.contains(&0)
-}
 
 pub fn run(args: &[String]) -> i32 {
     match inner(args) {
@@ -166,7 +161,7 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
             continue;
         };
         let text = String::from_utf8_lossy(&bytes).into_owned();
-        if binary(&bytes) {
+        if walk::binary(&bytes) {
             // spec: gate-sdk/SPEC.md §check-tree-terms — a binary hit is a path-only record per
             // distinct id, and still reds
             let mut ids = BTreeSet::new();
@@ -273,7 +268,7 @@ mod tests {
 
     #[test]
     fn a_nul_bearing_file_is_binary_and_a_text_one_is_not() {
-        assert!(binary(b"PNG\x00\x01"));
-        assert!(!binary(banned_home_path().as_bytes()));
+        assert!(walk::binary(b"PNG\x00\x01"));
+        assert!(!walk::binary(banned_home_path().as_bytes()));
     }
 }

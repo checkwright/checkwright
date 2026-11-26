@@ -1,0 +1,5 @@
+# A call of the `tool` CLI is reviewed per file: at a line start or after `; `.
+rule CLI-PIN site-count
+  site (^|; )tool [a-z]
+  baseline sites.tsv
+  paths tree

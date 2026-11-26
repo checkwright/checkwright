@@ -106,6 +106,7 @@ pub mod path_names;
 pub mod pipe_membership;
 pub mod pipefail_readers;
 pub mod script_preflight;
+pub mod site_count;
 pub mod plugin_parity;
 pub mod packed_links;
 pub mod payload_claim;
@@ -2717,6 +2718,16 @@ pub const REGISTRY: &[GateEntry] = &[
         script_preflight::run,
         &[],
         &["GATE_SDK_SCRIPT_FILES", "GATE_SDK_SCRIPT_RULES", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
+        "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-site-count — no walk root: each rule's corpus is `git ls-files`
+    // over its own pathspecs
+    (
+        "check-site-count",
+        site_count::run,
+        &[],
+        &["GATE_SDK_SITE_RULES", "GATE_SDK_TEST_GLOBS", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),

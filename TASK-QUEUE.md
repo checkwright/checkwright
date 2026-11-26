@@ -16,18 +16,6 @@
 
 ## New Features
 
-### reviewed-site-count
-
-[spec: gate-sdk/SPEC-site-count.md]
-
-The ghpin family of `adopter-content-checks`, generalized: every site of a configured call pattern per file, held to a count a person reviewed.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** every call of a CLI must carry the project's pinned account. A site is an argv literal naming the command, or a shell-form call at a command start: line start, or after `$(`, `; `, `&& `, `| `, `exec ` or `timeout N `. The corpus is tracked non-test source; test code is skipped. A sites file holds `<count><TAB><path>` lines, `#` and blank lines skipped, anything else a tool error. A file whose count differs reds `<path>: [GHPIN-UNREVIEWED] <found>/<reviewed>`, a removed site too. It suggests a generic reviewed-site-count gate, a configured site pattern and a count baseline in pipefail's format.
-
-**Deliverable:** check-site-count over consumer site patterns and an exact count baseline, and the test-code classifier it shares with the literals family.
-
-**Cost while deferred:** an unpinned CLI call can act under the wrong account, the adopter's own check its only guard. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `site count`, `reviewed` in this file, none; owner gate-sdk/SPEC.md §check-action-pinning.
-
 ### stale-test-literals
 
 [spec: gate-sdk/SPEC-since-base.md]
@@ -1058,4 +1046,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - deny-term-names
 - pipefail-readers
 - script-preflight
+- reviewed-site-count
 

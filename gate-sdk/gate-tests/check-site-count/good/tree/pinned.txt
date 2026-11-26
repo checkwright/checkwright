@@ -1,0 +1,2 @@
+tool fetch --account pinned
+cd work; tool push --account pinned

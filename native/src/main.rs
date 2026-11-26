@@ -57,6 +57,7 @@ mod provenance;
 mod queue;
 mod registry;
 mod release_sections;
+mod rule_blocks;
 mod release_stamp;
 mod runner;
 mod sarif;
