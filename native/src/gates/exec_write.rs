@@ -98,6 +98,15 @@ fn site(call: &Call, calls: &[Call]) -> bool {
     }
 }
 
+// spec: gate-sdk/SPEC.md §check-exec-write — a site's `<call>`: the spawned program for a
+// spawning site, else the callee's last segment
+fn called(call: &Call) -> String {
+    match call.name() {
+        "new" => call.args.first().and_then(|a| string_literal(&a.text)).unwrap_or("new").to_string(),
+        n => n.to_string(),
+    }
+}
+
 // spec: gate-sdk/SPEC.md §check-exec-write — every site of a file, calls and mode constants, in
 // offset order
 fn sites(view: &View) -> Vec<(usize, String)> {
@@ -105,7 +114,7 @@ fn sites(view: &View) -> Vec<(usize, String)> {
         .calls
         .iter()
         .filter(|c| site(c, &view.calls))
-        .map(|c| (c.start, c.line, c.name().to_string()))
+        .map(|c| (c.start, c.line, called(c)))
         .collect();
     let code = view.code.as_bytes();
     let mut i = 0;
@@ -240,7 +249,7 @@ mod tests {
                     Command::new(\"ls\");\n\
                     let m = libc::S_IXUSR;\n\
                     chmod(p, 0o755);\n";
-        assert_eq!(hits(text), ["1:from_mode", "2:mode", "4:set_permissions", "6:chmod", "7:fchmodat", "9:open", "10:copy", "11:new", "13:S_IXUSR"]);
+        assert_eq!(hits(text), ["1:from_mode", "2:mode", "4:set_permissions", "6:chmod", "7:fchmodat", "9:open", "10:copy", "11:chmod", "13:S_IXUSR"]);
     }
 
     // spec: gate-sdk/SPEC.md §check-exec-write — a site spelled in a string, a raw string or a

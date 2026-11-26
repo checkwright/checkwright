@@ -3870,7 +3870,7 @@ Both knobs read relative to the working directory, the repository root in the ba
 - `Command::new(L)` where `L` is the literal `"chmod"` or `"install"` — always hits.
 - A mode constant: an identifier `S_IXUSR`, `S_IXGRP`, `S_IXOTH`, `S_IRWXU`, `S_IRWXG`, `S_IRWXO`, `ACCESSPERMS` or `ALLPERMS` anywhere in the view — hits.
 
-**The record** is `<path>:<line>: [EXEC-WRITE] <call>`, `<call>` the callee's last path segment or the constant, one per site in file then offset order. It takes no waiver: a site moves into a helper.
+**The record** is `<path>:<line>: [EXEC-WRITE] <call>`, `<call>` the callee's last path segment, the spawned program for a `Command::new` site, or the constant, one per site in file then offset order. It takes no waiver: a site moves into a helper.
 
 - **Why every non-literal mode reds.** A mode computed from input is the case the rule exists for, and a reviewed exception has a home: the helper.
 - **Why the record names the call and not the argument.** An argument can be any expression; the call is what the reader fixes.

@@ -55,13 +55,13 @@ gate_env() {  # $1.. = NAME=VALUE — a case's environment, applied in the calle
     return 0
 }
 
-# spec: gate-sdk/SPEC.md §The non-gate arm — the arm counterpart of gate_run below: invoke an arm through the binary rather than through bin/run-gates.sh. That front-end cds to the git toplevel and refuses outside a repository, and a hermetic harness drives its subject from a non-git sandbox cwd, so the harness locates the binary itself — the sanctioned second caller, not a second entry point into the emission path. An absent binary is exit 2, the verdict the dispatcher gives it.
+# spec: gate-sdk/SPEC.md §The non-gate arm — the arm counterpart of gate_run below: invoke an arm through the binary rather than through bin/run-gates.sh. That front-end cds to the git toplevel and refuses outside a repository, and a hermetic harness drives its subject from a non-git sandbox cwd, so the harness locates the binary itself — the sanctioned second caller, not a second entry point into the emission path. An absent binary is exit 3, a tool error, the verdict the dispatcher gives it.
 gate_arm_run() {  # $1=arm flag  $2.. = the arm's own argv
     local _ar_bin
     # shellcheck source=./gate.sh
     source "$GATE_SDK_TEST_LIB_DIR/gate.sh"
     _ar_bin="$(gate_native_bin)"
-    [[ -x "$_ar_bin" ]] || return 2
+    [[ -x "$_ar_bin" ]] || return 3
     "$_ar_bin" "$@"
 }
 

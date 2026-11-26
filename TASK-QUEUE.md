@@ -256,6 +256,26 @@ The orchestrator adopter aligns with released checkwright only and keeps `GATE_S
 
 **Cost while deferred:** the adopter's store stays off past the release that would let it on. Surfaced 2026-11-25 by the adopter's ask over the peer session channel, lead-relayed after machine-verdict-pass' close; filed at the next scope. Owner lookup: `notify`, `release is cut` in this file, none; owner RELEASING.md.
 
+### manifest-name-deny-terms
+
+[cost: event/low] [surface: gate-sdk]
+
+`check-path-names` reads tracked paths against `GATE_SDK_DENY_TERMS`, so a manifest's package and binary names (the `name` fields of `Cargo.toml` and `package.json`) are outside its corpus; the orchestrator adopter called that arm welcome, not required.
+
+**Deliverable:** feature: a manifest-name reading against the deny-term list, its home a `check-path-names` arm or a sibling, with its fixture pair.
+
+**Cost while deferred:** a deny term spelled only in a package or binary name publishes with the package. Filed 2026-11-26 by content-checks-pass' close from an inbox bullet of its build. Owner lookup: `manifest-name`, `package name`, `Cargo.toml` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-path-names.
+
+### exit-status-funnel-typing
+
+[cost: event/low] [surface: gate-sdk]
+
+The String error funnels still collapse gate-sdk/SPEC.md §Output contract's absent-versus-unreadable cut: the knob loader (`native/src/knobs/mod.rs`) returns an unreadable knob file as a String that each `walk::knob_*` caller maps to refused at 2 where the rule gives input at 3; the spec corpus finders (`manifest_files`, `canonical_specs`, `governed_docs`, `amendments`) carry knob errors (2) and walk errors (3) in one String, mapped input; and the graph registry and vocab reads, `projection_roster`, `fresh::read_captured` and the support-table and llms read helpers do the same.
+
+**Deliverable:** debt: retype those funnels onto `exit::Fault` so each caller receives the kind, with a case per funnel.
+
+**Cost while deferred:** a present-but-unreadable knob file exits 2 instead of 3 and a malformed finder knob 3 instead of 2, so an outside engine retrying on 3 misses one retry or takes a futile one; no in-tree reader branches 2 against 3. About one edit-sweep session, the bulk being some 520 `walk::knob_*` call sites. Split from `exit-status-site-unification` (lead decision 2026-11-25, not a ruling). Filed 2026-11-26 by content-checks-pass' close from its inbox bullet. Owner lookup: `exit::Fault`, `knob loader`, `funnel` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).

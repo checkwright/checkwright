@@ -163,7 +163,29 @@ fn scopes(lines: &[&str]) -> Scopes {
 // spec: guard-kit/SPEC.md §check-door-binding — a Rust member's output region: the source up to its
 // test module, the cut the crate's reads-couples reader makes, since a test literal is no output
 pub fn rust_region(src: &str) -> &str {
-    src.find("#[cfg(test)]\nmod tests {").map_or(src, |at| &src[..at])
+    let (mut at, mut cfg) = (0, None);
+    for line in src.split_inclusive('\n') {
+        let t = line.trim_end_matches(['\n', '\r']);
+        if let Some(from) = cfg.filter(|_| test_module_line(t)) {
+            return &src[..from];
+        }
+        cfg = (t.trim_start() == "#[cfg(test)]").then_some(at + (t.len() - t.trim_start().len()));
+        at += line.len();
+    }
+    src
+}
+
+// spec: guard-kit/SPEC.md §check-door-binding — `mod tests {` at any visibility
+fn test_module_line(line: &str) -> bool {
+    let Some(rest) = line.strip_prefix("pub") else { return line.starts_with("mod tests {") };
+    let rest = match rest.strip_prefix('(') {
+        Some(scoped) => match scoped.split_once(')') {
+            Some((_, after)) => after,
+            None => return false,
+        },
+        None => rest,
+    };
+    rest.strip_prefix(' ').is_some_and(|r| r.starts_with("mod tests {"))
 }
 
 // spec: guard-kit/SPEC.md §check-door-binding — a Rust member's declarations: the token inside a
@@ -580,6 +602,13 @@ mod tests {
         let src = "fn a() {}\n#[cfg(test)]\nmod tests {\n    \"bash gate-sdk/bin/run-gates.sh --emit x\"\n}\n";
         assert_eq!(rust_region(src), "fn a() {}\n");
         assert_eq!(rust_region("fn a() {}\n"), "fn a() {}\n");
+        for vis in ["pub ", "pub(crate) ", "pub(super) ", "pub(in crate::a) "] {
+            let src = format!("fn a() {{}}\n#[cfg(test)]\n{}mod tests {{\n    \"x\"\n}}\n", vis);
+            assert_eq!(rust_region(&src), "fn a() {}\n", "{}", vis);
+        }
+        for kept in ["fn a() {}\n#[cfg(test)]\nmod usage_tests;\n", "fn a() {}\n#[cfg(test)]\npubmod tests {\n", "#[cfg(test)]\nfn b() {}\nmod tests {\n"] {
+            assert_eq!(rust_region(kept), kept);
+        }
 
         let lines = [
             "// door-contributor: a contributor's regenerator",

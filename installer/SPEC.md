@@ -770,7 +770,7 @@ You pick how much of the methodology to meet first, and *which part* of it: `sta
 
 ## The install size
 
-`docs/requirements.md` states what an install places, in one block between `<!-- install-size:begin -->` and `<!-- install-size:end -->` with a blank line inside each marker. `bash gate-sdk/bin/run-gates.sh --emit install-size` prints the block, and `--write` rewrites it and touches nothing else. The page is `GATE_LOCAL_INSTALL_SIZE_PAGE`.
+`docs/requirements.md` states what an install places, in one block between `<!-- install-size:begin -->` and `<!-- install-size:end -->` with a blank line inside each marker. `bash gate-sdk/bin/run-gates.sh --emit install-size` prints the block, and `--write` rewrites it and touches nothing else. Both read the index: stage an edit before `--write`, or `git commit -o` stages it and reds the gate. The page is `GATE_LOCAL_INSTALL_SIZE_PAGE`.
 
 - **A kit's figure** is what the packer packs for it: the index's tracked files under the kit root, minus the `GATE_SDK_PAYLOAD_WITHHOLD` shape, through the packer's own pathspec, each sized by its blob in the index through one `git cat-file --batch-check`. A gitlink entry is no file and is not counted. **Its gate-tests** are those of its files under `<kit>/gate-tests/`.
 - **The kits** are `walk::kit_roots`, the set the packer packs, and **a profile's figure** sums the kits the profile module resolves for it over that set, `full` included, through the one resolution `init` makes, so a profile row cannot disagree with `init`.

@@ -26,6 +26,13 @@ fn bullet(today: &str, prose: &str) -> String {
     format!("- {} — {}", today, prose)
 }
 
+// spec: lifecycle-kit/SPEC.md §The committed gap inbox — a prose leading with its own ISO day and
+// the bullet's dash would stamp the date twice
+fn leading_day(prose: &str) -> Option<&str> {
+    let day = prose.get(..10)?;
+    (super::kpi::is_iso_day(day) && prose[10..].trim_start().starts_with('—')).then_some(day)
+}
+
 // spec: lifecycle-kit/SPEC.md §The committed gap inbox — the word boundary is `[a-z0-9-]` in both
 // directions, so a slug embedded in a longer hyphenated token raises nothing.
 fn boundary(c: Option<char>) -> bool {
@@ -119,6 +126,12 @@ pub fn emit(args: &[String]) -> Result<String, Fault> {
         return Err(Fault::usage(USAGE));
     }
     let prose = &fields[0];
+    if let Some(day) = leading_day(prose) {
+        return Err(Fault::usage(format!(
+            "the prose leads with '{} —', but the arm stamps the date itself — drop it and re-issue",
+            day
+        )));
+    }
     super::file_survey::refuse_in_linked_worktree("LIFECYCLE_KIT_GAP_INBOX_FILE")?;
 
     let (inbox, spelled) = super::file_survey::anchored_fault("LIFECYCLE_KIT_GAP_INBOX_FILE")?;
@@ -362,5 +375,17 @@ one line, still live work.
         assert!(emit(&argv(&[])).is_err());
         assert!(emit(&argv(&[""])).is_err());
         assert!(emit(&argv(&["one", "two"])).is_err());
+    }
+
+    // spec: lifecycle-kit/SPEC.md §The committed gap inbox — a leading ISO day and dash is refused,
+    // a date elsewhere in the prose is not
+    #[test]
+    fn a_leading_dated_prose_is_refused() {
+        assert_eq!(leading_day("2026-11-26 — a gap"), Some("2026-11-26"));
+        assert_eq!(leading_day("2026-11-26— a gap"), Some("2026-11-26"));
+        assert_eq!(leading_day("2026-11-26 a gap"), None);
+        assert_eq!(leading_day("a gap filed 2026-11-26 — twice"), None);
+        assert_eq!(leading_day("2026-11"), None);
+        assert!(emit(&argv(&["2026-11-26 — a gap"])).is_err());
     }
 }

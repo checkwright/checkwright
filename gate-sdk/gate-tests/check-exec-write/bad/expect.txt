@@ -9,5 +9,5 @@ src/sites.rs:13: [EXEC-WRITE] fchmodat
 src/sites.rs:14: [EXEC-WRITE] open
 src/sites.rs:15: [EXEC-WRITE] creat
 src/sites.rs:16: [EXEC-WRITE] copy
-src/sites.rs:17: [EXEC-WRITE] new
+src/sites.rs:17: [EXEC-WRITE] chmod
 src/sites.rs:18: [EXEC-WRITE] S_IXUSR

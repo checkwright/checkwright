@@ -110,12 +110,12 @@
 2698cp drift-kit/templates/close-knowledge.md
 4680cp drift-kit/templates/economics.md
 128674cp evidence-kit/SPEC.md
-1179631cp gate-sdk/SPEC.md
+1179679cp gate-sdk/SPEC.md
 3130cp gate-sdk/templates/adopt.md
-356843cp guard-kit/SPEC.md
+356868cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
-332829cp installer/SPEC.md
-412719cp lifecycle-kit/SPEC.md
+332930cp installer/SPEC.md
+412820cp lifecycle-kit/SPEC.md
 8155cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
 1902cp lifecycle-kit/templates/frames/stage-contract-sweep.md
@@ -126,7 +126,7 @@
 7644cp lifecycle-kit/templates/stages/align.md
 9812cp lifecycle-kit/templates/stages/build.md
 24084cp lifecycle-kit/templates/stages/close.md
-21453cp lifecycle-kit/templates/stages/scope.md
+21511cp lifecycle-kit/templates/stages/scope.md
 10536cp lifecycle-kit/templates/stages/spec.md
 6518cp lifecycle-kit/templates/stages/validate.md
 2830cp lifecycle-kit/templates/upgrade.md

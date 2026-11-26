@@ -1383,7 +1383,7 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-door-binding",
         door_binding::run,
-        &[("?", "", "", "dynamic@src/gates/door_binding.rs:275")],
+        &[("?", "", "", "dynamic@src/gates/door_binding.rs:297")],
         &["GATE_SDK_KIT_DIRS", "GUARD_KIT_DOOR_ROOTS"],
         "guard-kit",
         &[("git", "")],
@@ -3853,11 +3853,8 @@ mod tests {
     // spec: gate-sdk/SPEC.md §check-reads-couples — the module's own rule text, with its `#[cfg(test)]`
     // block and its comments removed: a literal in either is not a root the deployed gate walks
     fn rule_text(src: &str) -> String {
-        let body = match src.find("#[cfg(test)]\nmod tests {") {
-            Some(at) => &src[..at],
-            None => src,
-        };
-        body.lines()
+        crate::gates::door_binding::rust_region(src)
+            .lines()
             .filter(|l| !l.trim_start().starts_with("//"))
             .collect::<Vec<_>>()
             .join("\n")
@@ -3952,7 +3949,7 @@ mod tests {
     // the site is the unit a ground is authored at
     fn question_mark_sites(src: &str) -> Result<Vec<Site>, String> {
         const OPEN: &str = "(\"?\", \"\", \"\", \"";
-        let body = src.find("#[cfg(test)]\nmod tests {").map_or(src, |at| &src[..at]);
+        let body = crate::gates::door_binding::rust_region(src);
         let (mut konst, mut home): (Option<String>, Option<String>) = (None, None);
         let mut out: Vec<Site> = Vec::new();
         for (i, line) in body.lines().enumerate() {
