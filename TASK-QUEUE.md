@@ -16,18 +16,6 @@
 
 ## New Features
 
-### stale-test-literals
-
-[spec: gate-sdk/SPEC-since-base.md]
-
-The literals family of `adopter-content-checks`: test lines still asserting a string the branch removed from source.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** a list, exit 0 unless a tool error, against `git merge-base REF HEAD` for `--base REF` (default the main branch), working tree included. A changed literal is a string literal on a removed non-test line; an unchanged test line whose literal overlaps it (either contains the other) is listed `LITERAL <test>:<line> (was <src>:<line>)` while no non-test line still holds it. Literals: double-quoted and Rust raw strings (`r#"…"#`, `br#"…"#`) in every language, single-quoted too in shell and Python, comments skipped; split at placeholders (`{…}`, `$x`, `${…}`, `$(`, `%s`) and escapes, a fragment counting at 8+ characters with 4+ letters. Test code: `tests/`, `fixtures/`, `tests.rs`, `*_tests.rs`, `tests_*.rs`, `test_*`, `*_test.*`, and in `.rs` everything from the first inline `#[cfg(test)]` module. A moved, re-wrapped or re-added literal is no change; `assert!`, `.expect(` and `panic!` messages assert nothing; lines the branch added don't count. Optional `--tools DIR`: a test suite outside the repo.
-
-**Deliverable:** a since-base listing arm over a shared base resolution, reading the test-code classifier.
-
-**Cost while deferred:** a test asserting a message the branch rewrote fails late, or passes on a stale copy. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `merge-base`, `stale literal` in this file, none; owner gate-sdk/SPEC.md §The non-gate arm.
-
 ### migration-guard
 
 [spec: gate-sdk/SPEC-since-base.md]
@@ -1047,4 +1035,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - pipefail-readers
 - script-preflight
 - reviewed-site-count
+- stale-test-literals
 
