@@ -24,6 +24,16 @@ Four baked calibrations in content-checks-pass' new gates: check-migration-guard
 
 **Cost while deferred:** a consumer whose migrations carry another width, or whose deny list holds a short term, cannot bind it (policy-as-choice). Surfaced 2026-11-26 by content-checks-pass' close baked-calibration audit, verified at source there, carried from its close; filed at the next scope. Re-verified here: `DIGITS`, `MIN_RUN` and `FLOOR` are consts. Owner lookup: `calibration`, `MIN_RUN`, `DIGITS` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md, each gate's section.
 
+### migration-guard-lint-parity
+
+[spec: SPEC-migration-lint-parity.md]
+
+The orchestrator adopter retires its own migrations lint once check-migration-guard refuses what it refuses. ORDER, an added migration numbered at or below the merge base's highest, is already `[MIGRATION-ORDER]`. Two are not: DUP, two migrations the branch adds with one number, which pass while both sit above the base's highest; and CLASH, a number the branch adds that another unmerged local branch also adds. CLASH reads a ref set, by default `refs/heads/**` less the branch's own ref, overridable by a ref glob or `none`; a ref with no merge base, an orphan or a shallow cut, is skipped, any other git error fails loud at 3, and it never fetches.
+
+**Deliverable:** a feature: both refusals with their class tokens, the ref-set knob, ORDER against the base ref's own commit, the already-landed skip, the pair and sandbox cases. Spec settled CLASH's reading on the adopter's direction (lead-relayed 2026-11-26): another ref's additions are counted since its merge base with the base ref, a ref the base already merged is skipped and reads as ORDER, names are compared and contents never, and a detached HEAD excludes no ref. ORDER's widening is a lead decision of 2026-11-26 under the operator's delegation, not a ruling, adopter-confirmed.
+
+**Cost while deferred:** the adopter keeps a second migrations lint beside the battery. Surfaced 2026-11-26 by the orchestrator adopter's ask, lead-relayed at this scope. Re-verified here: `judge` in native/src/gates/migration_guard.rs reports ORDER and edits only. Owner lookup: `DUP`, `CLASH`, `refs/heads` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
+
 ## Technical Debt
 
 ### migration-guard-byte-identity
@@ -313,16 +323,6 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 **Deliverable:** design-pending, a feature: a check holding the disposition file to one line per iteration, and a declaration owed when a shipped gate's code changes, each with its fixture pair.
 
 **Cost while deferred:** a stricter gate can ship as a patch, the bump an adopter takes unread; content-checks-pass' close met it when its patch cut for two review fixes was ruled and then deferred. Surfaced 2026-11-26 at content-checks-pass' close; filed at the next scope. Owner lookup: `release-disposition`, `release-bump`, `patch-only` in this file and the disposed-findings record, none; owner installer/SPEC.md §Versioning and lifecycle-kit/SPEC.md §templates/stages/.
-
-### migration-guard-lint-parity
-
-[cost: event/low] [surface: gate-sdk]
-
-The orchestrator adopter retires its own migrations lint once check-migration-guard refuses what it refuses. ORDER, an added migration numbered at or below the merge base's highest, is already `[MIGRATION-ORDER]`. Two are not: DUP, two migrations the branch adds with one number, which pass while both sit above the base's highest; and CLASH, a number the branch adds that another unmerged local branch also adds. CLASH reads a ref set, by default `refs/heads/**` less the branch's own ref, overridable by a ref glob or `none`; a ref with no merge base, an orphan or a shallow cut, is skipped, any other git error fails loud at 3, and it never fetches.
-
-**Deliverable:** design-pending, a feature: both refusals with their class tokens, the ref-set knob, the pair and sandbox cases. Spec settles CLASH's reading (lead decision 2026-11-26, under the operator's delegation, not a ruling), starting from scope's: another ref's additions are counted since its merge base with this branch, so a merged branch adds nothing, and a detached HEAD excludes no ref.
-
-**Cost while deferred:** the adopter keeps a second migrations lint beside the battery. Surfaced 2026-11-26 by the orchestrator adopter's ask, lead-relayed at this scope. Re-verified here: `judge` in native/src/gates/migration_guard.rs reports ORDER and edits only. Owner lookup: `DUP`, `CLASH`, `refs/heads` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
 
 ## Icebox
 
