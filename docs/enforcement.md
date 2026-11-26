@@ -73,6 +73,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [gate-sdk](gate-sdk/index.md) | check-pipefail-readers | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-script-preflight | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-site-count | precommit |
+| [gate-sdk](gate-sdk/index.md) | check-migration-guard | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-portability-floor | precommit |
 | (consumer) | check-harness-literal | precommit |
 | [gate-sdk](gate-sdk/index.md) | check-projection-roster | precommit |

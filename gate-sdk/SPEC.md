@@ -102,6 +102,8 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_SITE_RULES` (default `<gates-dir>/site-rules.list`): `check-site-count`'s rules file, **optional**. An absent file, or one holding no block, disables the gate (see there).
 - `GATE_SDK_TEST_GLOBS` (default `tests/ fixtures/ tests.rs *_tests.rs tests_*.rs test_* *_test.*`): space-separated globs naming test code (§The test-code classifier); empty names none.
 - `GATE_SDK_BASE_REF` (default `main`): the ref a since-base reader takes its merge base with when no `--base` is given (§The since-base corpus).
+- `GATE_SDK_MIGRATION_DIR` (default empty): the migration directory `check-migration-guard` reads, relative to the working directory. Empty disables the gate.
+- `GATE_SDK_MIGRATION_DESTRUCTIVE` (default `<gates-dir>/migration-destructive.list`): that member's destructive-statement list, **optional**. An absent file turns its destructive check off (see there).
 - `GATE_SDK_PORTABILITY_PATTERNS` (default `<gates-dir>/portability-patterns.list`): space-separated banned-construct rosters for `check-portability-floor`, each **optional**. An absent file disables the assertion, where a present-but-unreadable one is exit 3 (see there).
 - `GATE_SDK_PORTABILITY_PATHS` (default **empty**): space-separated pathspecs naming that gate's install-path corpus. Empty is the shipped default because the kit cannot know any consumer's install path, and an empty corpus disables the assertion rather than failing it closed (§check-portability-floor).
 - `GATE_SDK_HARNESS_LITERALS` (default **empty**): space-separated fixed strings, the harness-bound literals §check-harness-literal holds to their declared sites. The kit ships none, since a default would be one vendor's spelling.
@@ -939,6 +941,7 @@ A gate's shell file carries five things at once: the rule, the `# graph:` manife
 | `check-path-names` | **Born native and substrate-blind: it reads names, never content.** Its `couples=` carries `*` because any tracked path, a gate declaration among them, may be named for a deny term. It splits each path into components and opens no file but the term lists, so a port moves its verdict only where the new spelling's name hits, as any rename does (§check-path-names). |
 | `check-script-preflight` | **Born native, sensitive only as a configured script.** Its `couples=` carries `*` because its corpus is whatever tracked files the consumer's pathspecs select, which need not end `.sh`. A gate declaration is in it only where those pathspecs name one, and it is then read as a script like any other, so a port moves its verdict as deleting or adding any selected script does (§check-script-preflight). |
 | `check-site-count` | **Born native, sensitive only as a counted file.** Its `couples=` carries `*` because a rule's pathspecs default to the whole tracked tree. A gate declaration is counted like any other file under them, so a port moves its verdict only where the old or new spelling holds a site, as deleting or adding any counted file does (§check-site-count). |
+| `check-migration-guard` | **Born native, sensitive only as a file in the migration directory.** Its `couples=` carries `*` because every file under the configured directory is read, by name if by nothing else. A gate declaration is in that corpus only where the directory holds one, and is then an unparseable stray like any other non-migration file (§check-migration-guard). |
 | `check-install-size-fresh` | **Survives unchanged: it sizes declarations, never reads them.** Its `couples=` carries `kit:*` because its figure counts and sizes every tracked file the packer packs, a declaration among them. It reads index entries and blob sizes, never a declaration's content, so a port moves the figure as any edit of the same size does (installer/SPEC.md §The install size). It is `.gate`-dispatched. |
 
 **Every gate ports, an auditor of the dispatch relation included.** Holding such an auditor on shell, lest a compiled one pass itself with a broken binary, is refused. A shell auditor already takes `--list` from the binary, so its independence was only from the binary's presence. Presence is owned elsewhere: an absent or non-executable binary is exit 3 under §Fail-closed contract, and a stale one is §check-gate-binary-fresh's red. A gate reading declaration paths as content pays criterion 4's price for the parity oracle (§The port-candidate criteria).
@@ -3806,6 +3809,30 @@ The pair points `GATE_SDK_SITE_RULES` at a case-local rules file over a case-loc
 - the empty configuration, a rules file with no block, an unreadable one at 3 and one missing its baseline key at 2, and the refusal outside a work tree;
 - the baseline absent at 2, a row with no tab and a duplicate row at 3;
 - a Rust test module and a test directory skipped under the default globs, and the test directory read once the knob is emptied.
+
+### check-migration-guard
+
+`checks/check-migration-guard.gate` (`precommit`, binary-dispatched). Invariant: **a branch only appends migrations, in order, and none it adds is destructive unless declared.** Its corpus is the files under `GATE_SDK_MIGRATION_DIR` at the merge base and in the working tree (§The since-base corpus), and it takes `--base <ref>` as every since-base reader does. The working tree's files are the tracked ones still on disk and the untracked ones git does not ignore. Every file there is named `NNNN_<name>.sql`, four digits; any other file is unparseable input at exit 3, naming it.
+
+- **Order.** A file added since the merge base is numbered above the merge base's highest: `<path>: [MIGRATION-ORDER] <added> <= <highest>`.
+- **Append only.** A file present at the merge base is unchanged in the working tree, as `git diff` compares the two; an edited, deleted or renamed one reds `<path>: [MIGRATION-EDITED]`.
+- **Not destructive.** In an added file, each statement is matched against each live ERE of the destructive list (§The POSIX ERE matcher). A statement is the text up to its `;` or the file's end, its `--` and `/* */` comments and quoted strings stripped, each whitespace run read as one space, and ASCII upper-cased. A match reds `<path>:<line>: [MIGRATION-DESTRUCTIVE] matches '<ERE>'` at the statement's first line.
+- **The declaration.** A comment `-- migration-ok: <reason>` on any line from the statement's first to its `;`'s clears it. An empty reason clears nothing, and its record ends `, its waiver reason empty`.
+
+The destructive list holds one ERE per line, `#` lines and blank lines ignored, and an ERE that does not compile is exit 2 naming its line. The kit ships `templates/migration-destructive.list` holding `DROP (TABLE|INDEX|VIEW|TRIGGER)`, `ALTER TABLE .* DROP` and `ALTER TABLE .* RENAME`, which a consumer copies to its gates dir. An absent list turns the destructive check off and the clean line says so. With the knob empty it prints `not applicable: no migration directory configured` and exits 0, and it declares `# install: on-surface` and `# armed-by: GATE_SDK_MIGRATION_DIR`. The `help:` lines name the new file an edit belongs in, and the declaration.
+
+- **Why the statement list is a file.** Which statements a project treats as destructive is its schema policy; the template is the common floor (the policy-as-choice rule).
+- **Why the declaration sits on the statement.** A reviewer reads the reason beside what it clears, and a declaration elsewhere in the file would clear a statement it never names.
+
+This repo has no migrations, so the member is registered and not applicable here. **Honest limit:** a deleted file's record names a path with no file, which §run-gates places at the registry line; and a destructive effect spelled outside the list, an `UPDATE` without `WHERE` say, passes.
+
+**`--base-dir <dir>`** is the pair's input-corpus selector: a directory whose files stand in for the merge base's migration directory, compared byte for byte, with no merge base resolved. A committed fixture is identical to `HEAD`, so a pair reading git alone could never red. `--base-dir` beside `--base` refuses at exit 2.
+
+The pair points both knobs at case-local paths. `bad/` carries an edited, a deleted and a renamed file, a misnumbered addition, and a destructive statement both undeclared and declared with an empty reason. `good/` carries an unchanged history, an addition, a declared destructive statement, and destructive text inside a comment and a string. The pair cannot reach the git arm, a property of the injection, so `check-migration-guard.test.sh` drives it in sandbox repositories:
+
+- the not-applicable clean, a tree whose base is its own `HEAD`, and an uncommitted addition counted;
+- an edit, a delete, a rename, a misnumbered addition, and a destructive statement with and without a reason;
+- a stray file at 3, an unresolved base at 2 and a malformed list at 2.
 
 ### check-front-end-fail-open
 

@@ -111,6 +111,7 @@ check-binary-strings
 check-pipefail-readers
 check-script-preflight
 check-site-count
+check-migration-guard
 check-portability-floor
 check-projection-roster
 check-template-copy-parity

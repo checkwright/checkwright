@@ -1,0 +1,1 @@
+CREATE TABLE audit (id INTEGER PRIMARY KEY, note TEXT);

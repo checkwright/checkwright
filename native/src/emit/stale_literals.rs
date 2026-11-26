@@ -132,7 +132,7 @@ fn inner(args: &Args) -> Result<String, Fault> {
     }
     let base = since_base::resolve(args.base.as_deref())?;
     let globs = walk::knob_words("GATE_SDK_TEST_GLOBS").map_err(Fault::refused)?;
-    let changed = base.changed()?;
+    let changed = base.changed(&[])?;
     let mut hunks: HashMap<String, since_base::Hunks> = HashMap::new();
     for p in &changed {
         hunks.insert(p.clone(), base.hunks(p)?);

@@ -1,0 +1,1 @@
+CREATE TABLE legacy_sessions (id INTEGER PRIMARY KEY);

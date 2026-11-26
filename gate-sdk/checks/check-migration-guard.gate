@@ -1,0 +1,4 @@
+# graph: couples=*,knob:GATE_SDK_MIGRATION_DESTRUCTIVE dir=one valve=none tier=precommit trigger=*
+# install: on-surface
+# armed-by: GATE_SDK_MIGRATION_DIR
+# spec: gate-sdk/SPEC.md §check-migration-guard — a branch only appends migrations, in order, and none it adds is destructive unless declared (the record names the migration file and, for a destructive statement, its first line and the matching ERE)

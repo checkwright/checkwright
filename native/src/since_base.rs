@@ -74,8 +74,15 @@ impl Base {
 
     // spec: gate-sdk/SPEC.md §The since-base corpus — the tracked paths whose working-tree content
     // differs from the merge base's, a rename read as a delete and an add
-    pub fn changed(&self) -> Result<Vec<String>, Fault> {
-        self.names(&["diff", "--name-only", "-z", "--no-renames", "--no-ext-diff", &self.commit, "--"])
+    pub fn changed(&self, under: &[&str]) -> Result<Vec<String>, Fault> {
+        let mut args = vec!["diff", "--name-only", "-z", "--no-renames", "--no-ext-diff", &self.commit, "--"];
+        args.extend(under);
+        self.names(&args)
+    }
+
+    // spec: gate-sdk/SPEC.md §check-migration-guard — the merge base's files under a directory
+    pub fn files_at_base(&self, dir: &str) -> Result<Vec<String>, Fault> {
+        self.names(&["ls-tree", "-r", "-z", "--name-only", &self.commit, "--", dir])
     }
 
     // spec: gate-sdk/SPEC.md §The since-base corpus — untracked files git does not ignore: the

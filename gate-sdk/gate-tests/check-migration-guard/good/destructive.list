@@ -1,0 +1,4 @@
+# the kit template's floor
+DROP (TABLE|INDEX|VIEW|TRIGGER)
+ALTER TABLE .* DROP
+ALTER TABLE .* RENAME

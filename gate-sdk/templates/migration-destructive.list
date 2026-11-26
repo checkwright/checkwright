@@ -1,0 +1,10 @@
+# migration-destructive.list — destructive-statement template for check-migration-guard.
+# gate-sdk/SPEC.md §check-migration-guard. One POSIX ERE per line; '#' comments and
+# blank lines are ignored. Copy to your gates dir as migration-destructive.list and
+# point GATE_SDK_MIGRATION_DIR at your migration directory. An ERE matches a
+# statement with its comments and quoted strings stripped, each whitespace run read
+# as one space, and upper-cased. A deliberate destructive statement takes
+# '-- migration-ok: <reason>' on one of its lines.
+DROP (TABLE|INDEX|VIEW|TRIGGER)
+ALTER TABLE .* DROP
+ALTER TABLE .* RENAME

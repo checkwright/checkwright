@@ -1,0 +1,7 @@
+migrations/0001_init.sql: [MIGRATION-EDITED]
+migrations/0002_orders.sql: [MIGRATION-EDITED]
+migrations/0003_audit.sql: [MIGRATION-EDITED]
+migrations/0003_audit_log.sql: [MIGRATION-ORDER] 0003 <= 0003
+migrations/0002_late.sql: [MIGRATION-ORDER] 0002 <= 0003
+migrations/0004_prune.sql:1: [MIGRATION-DESTRUCTIVE] matches 'DROP (TABLE|INDEX|VIEW|TRIGGER)'
+migrations/0004_prune.sql:2: [MIGRATION-DESTRUCTIVE] matches 'ALTER TABLE .* DROP', its waiver reason empty

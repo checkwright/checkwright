@@ -1,0 +1,2 @@
+GATE_SDK_MIGRATION_DIR = migrations
+GATE_SDK_MIGRATION_DESTRUCTIVE = destructive.list

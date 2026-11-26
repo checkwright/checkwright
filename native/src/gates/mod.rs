@@ -107,6 +107,7 @@ pub mod pipe_membership;
 pub mod pipefail_readers;
 pub mod script_preflight;
 pub mod site_count;
+pub mod migration_guard;
 pub mod plugin_parity;
 pub mod packed_links;
 pub mod payload_claim;
@@ -2728,6 +2729,16 @@ pub const REGISTRY: &[GateEntry] = &[
         site_count::run,
         &[],
         &["GATE_SDK_SITE_RULES", "GATE_SDK_TEST_GLOBS", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
+        "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-migration-guard — no walk root: both sides are git listings of
+    // the configured directory
+    (
+        "check-migration-guard",
+        migration_guard::run,
+        &[],
+        &["GATE_SDK_MIGRATION_DIR", "GATE_SDK_MIGRATION_DESTRUCTIVE", "GATE_SDK_BASE_REF"],
         "gate-sdk",
         &[("git", "")],
     ),
