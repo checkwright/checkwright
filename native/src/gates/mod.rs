@@ -2740,7 +2740,7 @@ pub const REGISTRY: &[GateEntry] = &[
         "check-migration-guard",
         migration_guard::run,
         &[],
-        &["GATE_SDK_MIGRATION_DIR", "GATE_SDK_MIGRATION_DESTRUCTIVE", "GATE_SDK_BASE_REF"],
+        &["GATE_SDK_MIGRATION_DIR", "GATE_SDK_MIGRATION_DESTRUCTIVE", "GATE_SDK_MIGRATION_REFS", "GATE_SDK_BASE_REF"],
         "gate-sdk",
         &[("git", "")],
     ),

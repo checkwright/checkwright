@@ -169,6 +169,24 @@ fn floor_refusals(v: &Values) -> Vec<String> {
     errs
 }
 
+// spec: gate-sdk/SPEC.md §Layout and configuration — a glob opening with `-` would reach git as an
+// option, and `none` beside a glob would both read refs and turn their check off
+fn refs_refusals(v: &Values) -> Vec<String> {
+    let Some(s) = scalar(v, "GATE_SDK_MIGRATION_REFS") else {
+        return Vec::new();
+    };
+    let words: Vec<&str> = s.split_whitespace().collect();
+    let mut errs: Vec<String> = words
+        .iter()
+        .filter(|w| w.starts_with('-'))
+        .map(|w| format!("GATE_SDK_MIGRATION_REFS: '{}' opens with '-', which git reads as an option — name a ref glob", w))
+        .collect();
+    if words.len() > 1 && words.contains(&"none") {
+        errs.push(format!("GATE_SDK_MIGRATION_REFS: `none` turns the clash check off, so it stands alone (got '{}')", s));
+    }
+    errs
+}
+
 // spec: installer/SPEC.md §The update notice — the interval takes its three values only, so a
 // misspelt `off` refuses rather than reads as the default
 fn validate(v: &Values) -> Vec<String> {
@@ -184,6 +202,7 @@ fn validate(v: &Values) -> Vec<String> {
         errs.push(format!("GATE_SDK_PIPEFAIL_ALL must be 0|1 (got '{}')", s));
     }
     errs.extend(floor_refusals(v));
+    errs.extend(refs_refusals(v));
     // spec: installer/SPEC.md §The upgrade contract — the refusals are the roster module's, so the
     // validator and every reader share one reading of an element
     errs.extend(crate::release_sections::refusals(
@@ -276,6 +295,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_BASE_REF", "main").empty_takes_default(),
         Row::scalar("GATE_SDK_MIGRATION_DIR", ""),
         Row::derived("GATE_SDK_MIGRATION_DESTRUCTIVE", Shape::Scalar, migration_destructive, GATES).empty_takes_default(),
+        Row::scalar("GATE_SDK_MIGRATION_REFS", "refs/heads/**").empty_takes_default().words(),
         Row::scalar("GATE_SDK_EXEC_WRITE_PATHS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_EXEC_WRITE_HELPERS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_TEST_GLOBS", "tests/ fixtures/ tests.rs *_tests.rs tests_*.rs test_* *_test.*").words(),
@@ -400,6 +420,20 @@ mod tests {
         let refusal = resolve("GATE_SDK_STALE_LITERAL_LETTERS").expect_err("letters 4 above chars 3");
         assert!(refusal.contains("GATE_SDK_STALE_LITERAL_LETTERS (4) is above GATE_SDK_STALE_LITERAL_CHARS (3)"), "{}", refusal);
         env.remove("GATE_SDK_STALE_LITERAL_CHARS");
+        reset(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the ref set takes globs or `none` alone, and
+    // a glob opening with `-` refuses
+    #[test]
+    fn the_migration_ref_set_refuses_an_option_shaped_glob_and_none_beside_another() {
+        let env = knobenv::lock();
+        for (value, ok) in [("refs/heads/** refs/remotes/origin/*", true), ("none", true), ("-x", false), ("refs/heads/* none", false)] {
+            env.set("GATE_SDK_MIGRATION_REFS", value);
+            reset(&env);
+            assert_eq!(resolve("GATE_SDK_MIGRATION_REFS").is_ok(), ok, "{}", value);
+        }
+        env.remove("GATE_SDK_MIGRATION_REFS");
         reset(&env);
     }
 

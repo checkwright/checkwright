@@ -10,6 +10,7 @@ use std::path::Path;
 const NAME: &str = "check-migration-guard";
 const DIR_KNOB: &str = "GATE_SDK_MIGRATION_DIR";
 const LIST_KNOB: &str = "GATE_SDK_MIGRATION_DESTRUCTIVE";
+const REFS_KNOB: &str = "GATE_SDK_MIGRATION_REFS";
 const USAGE: &str = "usage: check-migration-guard [--base <ref> | --base-dir <dir>]";
 const WAIVER: &str = "migration-ok:";
 
@@ -104,22 +105,82 @@ fn shared_width(sets: &[(&str, &Files)]) -> Result<(), Fault> {
     }
 }
 
-// spec: gate-sdk/SPEC.md §check-migration-guard — a merge-base file gone or changed is edited; an
-// added one numbered at or under the merge base's highest is out of order
-fn judge(dir: &str, base: &Files, work: &Files, edited: &BTreeSet<String>) -> Vec<String> {
+// spec: gate-sdk/SPEC.md §check-migration-guard — a tree this commit does not make: its names that
+// are no migration name are skipped, and they join no width check
+fn readable(names: impl IntoIterator<Item = String>) -> Files {
+    names.into_iter().filter_map(|n| number(&n).map(|k| (n, k))).collect()
+}
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — the branch's additions: new since the merge base,
+// less any the base ref's own commit already holds by name
+fn added(base: &Files, work: &Files, tip: &Files) -> Files {
+    work.iter().filter(|(n, _)| !base.contains_key(*n) && !tip.contains_key(*n)).map(|(n, k)| (n.clone(), *k)).collect()
+}
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — a merge-base file gone or changed is edited; each
+// addition carries the first of ORDER against both base commits, DUP, then CLASH with each ref
+fn judge(dir: &str, base: &Files, work: &Files, edited: &BTreeSet<String>, tip: &Files, refs: &[(String, Files)]) -> Vec<String> {
     let mut out: Vec<String> = base
         .keys()
         .filter(|n| !work.contains_key(*n) || edited.contains(*n))
         .map(|n| format!("{}/{}: [MIGRATION-EDITED]", dir, n))
         .collect();
-    if let Some((top, highest)) = base.iter().max_by_key(|(_, k)| **k) {
-        out.extend(
-            work.iter()
-                .filter(|(n, k)| !base.contains_key(*n) && *k <= highest)
-                .map(|(n, _)| format!("{}/{}: [MIGRATION-ORDER] {} <= {}", dir, n, spelled(n), spelled(top))),
-        );
+    let highest = base.iter().chain(tip).max_by_key(|(_, k)| **k);
+    let mut first: BTreeMap<u64, String> = BTreeMap::new();
+    for (n, k) in &added(base, work, tip) {
+        if let Some((top, _)) = highest.filter(|(_, h)| k <= *h) {
+            out.push(format!("{}/{}: [MIGRATION-ORDER] {} <= {}", dir, n, spelled(n), spelled(top)));
+        } else if let Some(f) = first.get(k) {
+            out.push(format!("{}/{}: [MIGRATION-DUP] {} also {}", dir, n, spelled(n), f));
+        } else {
+            first.insert(*k, n.clone());
+            for (r, theirs) in refs {
+                if let Some((t, _)) = theirs.iter().find(|(t, j)| *j == k && *t != n) {
+                    out.push(format!("{}/{}: [MIGRATION-CLASH] {} {} {}", dir, n, spelled(n), r, t));
+                }
+            }
+        }
     }
     out
+}
+
+fn git(top: &str, args: &[&str]) -> Result<proc::Completed, Fault> {
+    let mut argv = vec!["-C", top];
+    argv.extend(args);
+    proc::run(&programs::GIT, &argv).map_err(Fault::tool)
+}
+
+fn git_failed(c: &proc::Completed, what: &str) -> Fault {
+    Fault::tool(c.failure_report().map_or_else(|| format!("{} failed", what), |r| format!("{} failed: {}", what, r)))
+}
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — the ref set: each ref the globs match that the base
+// ref's commit lacks, less `HEAD`'s own, an orphan or a shallow cut skipped; a ref's additions are
+// its directory's files its merge base with the base ref lacks
+fn ref_additions(b: &since_base::Base, dir_top: &str, globs: &[String]) -> Result<Vec<(String, Files)>, Fault> {
+    let head = git(&b.top, &["symbolic-ref", "-q", "HEAD"])?;
+    let own = match (head.stdout(), head.code()) {
+        (Some(o), _) => Some(String::from_utf8_lossy(o).trim().to_string()),
+        (None, Some(1)) => None,
+        (None, _) => return Err(git_failed(&head, "git symbolic-ref HEAD")),
+    };
+    let mut args = vec!["for-each-ref", "--no-merged", &b.tip, "--format=%(refname)"];
+    args.extend(globs.iter().map(String::as_str));
+    let listed = git(&b.top, &args)?;
+    let refs = listed.stdout().ok_or_else(|| git_failed(&listed, "git for-each-ref"))?;
+    let mut out = Vec::new();
+    for r in String::from_utf8_lossy(refs).lines().filter(|r| !r.is_empty() && Some(*r) != own.as_deref()) {
+        let mb = git(&b.top, &["merge-base", r, &b.tip])?;
+        let mb = match (mb.stdout(), mb.code()) {
+            (Some(o), _) => String::from_utf8_lossy(o).trim().to_string(),
+            (None, Some(1)) => continue,
+            (None, _) => return Err(git_failed(&mb, &format!("git merge-base {}", r))),
+        };
+        let names = listing::names(Some(&b.top), &["diff", "--name-only", "-z", "--no-renames", "--diff-filter=A", &mb, r, "--", dir_top])
+            .map_err(|e| Fault::tool(e.text()))?;
+        out.push((r.to_string(), readable(under(names, dir_top))));
+    }
+    Ok(out)
 }
 
 #[derive(Debug, PartialEq)]
@@ -299,24 +360,33 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
     let dir_top = format!("{}{}", prefix()?, dir);
     let work = files(&dir, working(&top, &dir_top)?)?;
 
-    let (base, edited, what) = match against {
+    let (base, edited, tip, refs, what, clash) = match against {
         Against::Base(flag) => {
             let b = since_base::resolve(flag.as_deref())?;
             let base = files(&dir, under(b.files_at_base(&dir_top)?, &dir_top))?;
             shared_width(&[(&dir, &base), (&dir, &work)])?;
             let edited: BTreeSet<String> = under(b.changed(&[&dir_top])?, &dir_top).into_iter().collect();
-            (base, edited, format!("merge base {}", b.short()))
+            let tip = readable(under(b.files_at_tip(&dir_top)?, &dir_top));
+            let globs = walk::knob_words(REFS_KNOB).map_err(Fault::refused)?;
+            let (refs, clash) = if globs == ["none"] {
+                (Vec::new(), format!("; clash check off: {} is none", REFS_KNOB))
+            } else {
+                let refs = ref_additions(&b, &dir_top, &globs)?;
+                let read = format!(", {} other ref(s) read", refs.len());
+                (refs, read)
+            };
+            (base, edited, tip, refs, format!("merge base {}", b.short()), clash)
         }
         Against::Dir(d) => {
             let (base, edited) = from_dir(&d, &dir, &work)?;
-            (base, edited, d)
+            (base, edited, Files::new(), Vec::new(), d, "; clash check off: no base ref under --base-dir".to_string())
         }
     };
 
-    let mut out = judge(&dir, &base, &work, &edited);
-    let added: Vec<&String> = work.keys().filter(|n| !base.contains_key(*n)).collect();
+    let mut out = judge(&dir, &base, &work, &edited, &tip, &refs);
+    let added = added(&base, &work, &tip);
     if let Some(list) = &list {
-        for n in &added {
+        for n in added.keys() {
             let path = format!("{}/{}", dir, n);
             let sql = std::fs::read_to_string(&path).map_err(|e| Fault::input(format!("cannot read {}: {}", path, e)))?;
             out.extend(destructive(&path, &sql, list));
@@ -326,16 +396,17 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
 
     if out.is_empty() {
         let off = if list.is_none() { format!("; destructive check off: no list at {}", list_path) } else { String::new() };
-        println!("MIGRATION-GUARD: clean ({} migration(s), {} added, against {}{})", work.len(), added.len(), what, off);
+        println!("MIGRATION-GUARD: clean ({} migration(s), {} added, against {}{}{})", work.len(), added.len(), what, clash, off);
         return Ok(0);
     }
-    println!("{}: migration(s) under {} edited, out of order or destructive against {}:", NAME, dir, what);
+    println!("{}: migration(s) under {} edited, out of order, duplicated, clashing or destructive against {}:", NAME, dir, what);
     for r in &out {
         println!("{}", r);
     }
     println!("  help: a merged migration is history: restore an edited or deleted one and put the change in a");
-    println!("        new file numbered above the highest; declare a deliberate destructive statement with");
-    println!("        '-- {} <reason>' on one of its lines.", WAIVER);
+    println!("        new file numbered above the highest; renumber a duplicate or a clash above every other");
+    println!("        branch's; declare a deliberate destructive statement with '-- {} <reason>' on one of", WAIVER);
+    println!("        its lines.");
     Ok(1)
 }
 
@@ -375,10 +446,54 @@ mod tests {
         let base: Files = [("0001_a.sql".to_string(), 1), ("0002_b.sql".to_string(), 2), ("0003_c.sql".to_string(), 3)].into();
         let work: Files = [("0001_a.sql".to_string(), 1), ("0003_c.sql".to_string(), 3), ("0002_late.sql".to_string(), 2), ("0004_d.sql".to_string(), 4)].into();
         let edited: BTreeSet<String> = ["0001_a.sql".to_string()].into();
-        let mut got = judge("m", &base, &work, &edited);
+        let mut got = judge("m", &base, &work, &edited, &Files::new(), &[]);
         got.sort();
         assert_eq!(got, ["m/0001_a.sql: [MIGRATION-EDITED]", "m/0002_b.sql: [MIGRATION-EDITED]", "m/0002_late.sql: [MIGRATION-ORDER] 0002 <= 0003"]);
-        assert!(judge("m", &Files::new(), &work, &BTreeSet::new()).is_empty());
+        assert!(judge("m", &Files::new(), &work, &BTreeSet::new(), &Files::new(), &[]).is_empty());
+    }
+
+    fn set(names: &[&str]) -> Files {
+        readable(names.iter().map(|n| n.to_string()))
+    }
+
+    // spec: gate-sdk/SPEC.md §check-migration-guard — ORDER reads the base ref's commit too, a shared
+    // number reds every addition but the first by name, a clash names each ref's first such file, and
+    // an addition carries the first of the three that applies
+    #[test]
+    fn each_addition_carries_the_first_of_order_dup_and_clash() {
+        let base = set(&["0001_a.sql"]);
+        let tip = set(&["0001_a.sql", "0002_theirs.sql", "README.md"]);
+        let work = set(&["0001_a.sql", "0002_mine.sql", "0003_x.sql", "0003_y.sql", "0004_z.sql", "0005_w.sql"]);
+        let refs = vec![
+            ("refs/heads/one".to_string(), set(&["0003_q.sql", "0004_r.sql", "0004_s.sql", "0005_w.sql"])),
+            ("refs/heads/two".to_string(), set(&["0004_t.sql"])),
+        ];
+        let mut got = judge("m", &base, &work, &BTreeSet::new(), &tip, &refs);
+        got.sort();
+        assert_eq!(
+            got,
+            [
+                "m/0002_mine.sql: [MIGRATION-ORDER] 0002 <= 0002",
+                "m/0003_x.sql: [MIGRATION-CLASH] 0003 refs/heads/one 0003_q.sql",
+                "m/0003_y.sql: [MIGRATION-DUP] 0003 also 0003_x.sql",
+                "m/0004_z.sql: [MIGRATION-CLASH] 0004 refs/heads/one 0004_r.sql",
+                "m/0004_z.sql: [MIGRATION-CLASH] 0004 refs/heads/two 0004_t.sql",
+            ]
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-migration-guard — an addition the base ref's commit holds by name
+    // is the base's, so no class reads it, the destructive check included
+    #[test]
+    fn an_addition_the_base_already_holds_by_name_is_not_the_branch_s() {
+        let base = set(&["0001_a.sql"]);
+        let tip = set(&["0001_a.sql", "0002_picked.sql"]);
+        let work = set(&["0001_a.sql", "0002_picked.sql", "0003_own.sql"]);
+        assert!(judge("m", &base, &work, &BTreeSet::new(), &tip, &[]).is_empty());
+        assert_eq!(added(&base, &work, &tip).keys().collect::<Vec<_>>(), ["0003_own.sql"]);
+        let list = vec![("DROP TABLE".to_string(), Ere::compile("DROP TABLE").expect("compiles"))];
+        let reds: Vec<String> = added(&base, &work, &tip).keys().flat_map(|n| destructive(n, "DROP TABLE t;", &list)).collect();
+        assert_eq!(reds, ["0003_own.sql:1: [MIGRATION-DESTRUCTIVE] matches 'DROP TABLE'"]);
     }
 
     // spec: gate-sdk/SPEC.md §check-migration-guard — comments and strings read as a space, a

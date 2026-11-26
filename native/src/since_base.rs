@@ -1,5 +1,5 @@
 // spec: gate-sdk/SPEC.md §The since-base corpus — the merge base a since-base reader compares the
-// working tree against, and every read it makes of that commit
+// working tree against, the base ref's own commit beside it, and every read it makes of either
 use crate::exit::Fault;
 use crate::{listing, proc, programs, walk};
 
@@ -8,6 +8,7 @@ pub const KNOB: &str = "GATE_SDK_BASE_REF";
 pub struct Base {
     pub top: String,
     pub commit: String,
+    pub tip: String,
 }
 
 // spec: gate-sdk/SPEC.md §The since-base corpus — one changed path's hunks: the merge base's line
@@ -57,7 +58,7 @@ pub fn resolve(flag: Option<&str>) -> Result<Base, Fault> {
     };
     let c = git(&top, &["merge-base", &commit, &head])?;
     match (c.stdout(), c.code()) {
-        (Some(o), _) => Ok(Base { commit: String::from_utf8_lossy(o).trim().to_string(), top }),
+        (Some(o), _) => Ok(Base { commit: String::from_utf8_lossy(o).trim().to_string(), tip: commit, top }),
         (None, Some(1)) => Err(refuse("shares no merge base with HEAD")),
         (None, _) => Err(failed(&c, "git merge-base failed")),
     }
@@ -83,6 +84,11 @@ impl Base {
     // spec: gate-sdk/SPEC.md §check-migration-guard — the merge base's files under a directory
     pub fn files_at_base(&self, dir: &str) -> Result<Vec<String>, Fault> {
         self.names(&["ls-tree", "-r", "-z", "--name-only", &self.commit, "--", dir])
+    }
+
+    // spec: gate-sdk/SPEC.md §check-migration-guard — the base ref's own commit's files under a directory
+    pub fn files_at_tip(&self, dir: &str) -> Result<Vec<String>, Fault> {
+        self.names(&["ls-tree", "-r", "-z", "--name-only", &self.tip, "--", dir])
     }
 
     // spec: gate-sdk/SPEC.md §The since-base corpus — untracked files git does not ignore: the

@@ -24,6 +24,12 @@ expect() {  # expect <label> <want-rc> <substring> <got-rc> <output>
     fi
 }
 
+refute() {  # refute <label> <substring> <output>
+    if grep -qF -- "$2" <<<"$3"; then
+        echo "  FAIL [$1]: output holds '$2': $3"; fails=$((fails + 1))
+    fi
+}
+
 LIST="$SANDBOX/destructive.list"
 printf '# the template floor\nDROP (TABLE|INDEX|VIEW|TRIGGER)\nALTER TABLE .* DROP\nALTER TABLE .* RENAME\n' > "$LIST"
 
@@ -120,6 +126,88 @@ printf 'CREATE TABLE c (id INTEGER);\n' > "$r/db/migrations/10003_c.sql"
 out="$(guard "$r")"; rc=$?
 expect width-mixed 3 'db/migrations/10003_c.sql: its number is 5 digit(s) wide' "$rc" "$out"
 
+# A commit on <branch> adding one migration, the topic branch checked out again after it.
+on() {  # on <repo> <branch> <file> <content> — branch made from main when absent
+    local r="$1"
+    git -C "$r" checkout -q "$2" 2>/dev/null || git -C "$r" checkout -qb "$2" main
+    printf '%s\n' "$4" > "$r/db/migrations/$3"
+    git -C "$r" add db
+    git -C "$r" -c user.name=t -c user.email=t@e.invalid commit -qm "$3"
+    git -C "$r" checkout -q topic
+}
+
+# --- a clash with an unmerged sibling, and none for one adding the same name with other content.
+r="$(fresh clash)"
+on "$r" sib 0003_theirs.sql 'CREATE TABLE t (id INTEGER);'
+printf 'CREATE TABLE m (id INTEGER);\n' > "$r/db/migrations/0003_mine.sql"
+out="$(guard "$r")"; rc=$?
+expect clash 1 'db/migrations/0003_mine.sql: [MIGRATION-CLASH] 0003 refs/heads/sib 0003_theirs.sql' "$rc" "$out"
+r="$(fresh same-name)"
+on "$r" sib 0003_c.sql 'CREATE TABLE theirs (id INTEGER);'
+printf 'CREATE TABLE mine (id INTEGER);\n' > "$r/db/migrations/0003_c.sql"
+out="$(guard "$r")"; rc=$?
+expect same-name 0 'clean (3 migration(s), 1 added, against merge base' "$rc" "$out"
+expect same-name-read 0 ', 1 other ref(s) read' "$rc" "$out"
+
+# --- a sibling merged into the base after the branch forked reads as ORDER, never CLASH; a file
+# the base took by cherry-pick under its name is the base's, and the branch passes clean.
+r="$(fresh merged)"
+on "$r" sib 0003_theirs.sql 'CREATE TABLE t (id INTEGER);'
+git -C "$r" checkout -q main && git -C "$r" merge -q --ff-only sib && git -C "$r" checkout -q topic
+printf 'CREATE TABLE m (id INTEGER);\n' > "$r/db/migrations/0003_mine.sql"
+out="$(guard "$r")"; rc=$?
+expect merged-after-fork 1 'db/migrations/0003_mine.sql: [MIGRATION-ORDER] 0003 <= 0003' "$rc" "$out"
+refute merged-after-fork 'MIGRATION-CLASH' "$out"
+r="$(fresh picked)"
+on "$r" topic 0003_c.sql 'DROP TABLE a;'
+git -C "$r" checkout -q main && git -C "$r" -c user.name=t -c user.email=t@e.invalid cherry-pick topic >/dev/null \
+    && git -C "$r" checkout -q topic
+out="$(guard "$r")"; rc=$?
+expect cherry-picked 0 'clean (3 migration(s), 0 added, against merge base' "$rc" "$out"
+
+# --- the precedence: an addition both a duplicate and a clash prints DUP alone.
+r="$(fresh precedence)"
+on "$r" sib 0003_q.sql 'CREATE TABLE q (id INTEGER);'
+printf 'CREATE TABLE a2 (id INTEGER);\n' > "$r/db/migrations/0003_a.sql"
+printf 'CREATE TABLE b2 (id INTEGER);\n' > "$r/db/migrations/0003_b.sql"
+out="$(guard "$r")"; rc=$?
+expect precedence-dup 1 'db/migrations/0003_b.sql: [MIGRATION-DUP] 0003 also 0003_a.sql' "$rc" "$out"
+expect precedence-clash 1 'db/migrations/0003_a.sql: [MIGRATION-CLASH] 0003 refs/heads/sib 0003_q.sql' "$rc" "$out"
+refute precedence-one 'db/migrations/0003_b.sql: [MIGRATION-CLASH]' "$out"
+
+# --- the ref set: a detached HEAD excludes no ref, an orphan is skipped, `none` turns the check
+# off, a glob narrows it, and a glob opening with '-' is refused at 2.
+r="$(fresh detached)"
+on "$r" topic 0003_c.sql 'CREATE TABLE c (id INTEGER);'
+out="$(guard "$r")"; rc=$?
+expect own-ref 0 ', 0 other ref(s) read' "$rc" "$out"
+git -C "$r" checkout -q --detach topic
+out="$(guard "$r")"; rc=$?
+expect detached 0 ', 1 other ref(s) read' "$rc" "$out"
+o="$SANDBOX/orphan-src"
+mkdir -p "$o/db/migrations"
+git -C "$o" init -q -b main
+printf 'CREATE TABLE x (id INTEGER);\n' > "$o/db/migrations/0003_x.sql"
+git -C "$o" add db
+git -C "$o" -c user.name=t -c user.email=t@e.invalid commit -qm lone
+r="$(fresh orphan)"
+git -C "$r" fetch -q "$o" main:refs/heads/lone
+printf 'CREATE TABLE m (id INTEGER);\n' > "$r/db/migrations/0003_mine.sql"
+out="$(guard "$r")"; rc=$?
+expect orphan 0 'clean (3 migration(s), 1 added, against merge base' "$rc" "$out"
+expect orphan-unread 0 ', 0 other ref(s) read' "$rc" "$out"
+r="$SANDBOX/clash"
+refs() {  # refs <value> — the gate in the clash repository under GATE_SDK_MIGRATION_REFS=<value>
+    ( cd "$r" && gate_env GATE_SDK_MIGRATION_DIR=db/migrations GATE_SDK_MIGRATION_DESTRUCTIVE="$LIST" \
+        GATE_SDK_MIGRATION_REFS="$1" && gate_run check-migration-guard "$CHECKS" 2>&1 )
+}
+out="$(refs none)"; rc=$?
+expect refs-none 0 '; clash check off: GATE_SDK_MIGRATION_REFS is none' "$rc" "$out"
+out="$(refs 'refs/heads/feat/**')"; rc=$?
+expect refs-narrowed 0 ', 0 other ref(s) read' "$rc" "$out"
+out="$(refs -x)"; rc=$?
+expect refs-option 2 "'-x' opens with '-'" "$rc" "$out"
+
 # --- a stray file is 3; an unresolved base, a malformed list and a bad argument are 2.
 r="$(fresh refusals)"
 printf 'notes\n' > "$r/db/migrations/README.md"
@@ -149,5 +237,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-migration-guard.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-migration-guard.test.sh: clean (the git arm's edit, delete, rename, order, width and destructive cases, and its exit classes — $cases cases)"
+echo "check-migration-guard.test.sh: clean (the git arm's edit, delete, rename, order, width, duplicate, clash, ref-set and destructive cases, and its exit classes — $cases cases)"
 exit 0

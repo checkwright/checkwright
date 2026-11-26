@@ -1,1 +1,1 @@
-MIGRATION-GUARD: clean (3 migration(s), 1 added, against base)
+MIGRATION-GUARD: clean (4 migration(s), 2 added, against base; clash check off: no base ref under --base-dir)
