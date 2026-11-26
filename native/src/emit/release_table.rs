@@ -138,7 +138,7 @@ mod tests {
     }
 
     fn tree(name: &str, files: &[(String, String)]) -> String {
-        let root = crate::proc::temp_base().join(format!("release-table-{}-{}", name, std::process::id()));
+        let root = crate::proc::temp_base().unwrap().join(format!("release-table-{}-{}", name, std::process::id()));
         let _ = fs::remove_dir_all(&root);
         fs::create_dir_all(root.join("posts")).unwrap();
         for (f, body) in files {

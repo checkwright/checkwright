@@ -257,7 +257,7 @@ mod tests {
     // unstaged edit is not in it, and a file under the kit's gate-tests is counted in both columns
     #[test]
     fn the_index_decides_what_is_counted() {
-        let root = proc::temp_base().join(format!("install-size-{}", std::process::id()));
+        let root = proc::temp_base().unwrap().join(format!("install-size-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
         std::fs::create_dir_all(root.join("k/gate-tests/check-x/good")).unwrap();
         std::fs::create_dir_all(root.join("k/smoke")).unwrap();

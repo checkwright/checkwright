@@ -24,14 +24,6 @@ check-migration-guard's git arm judges a merge-base migration unchanged as `git 
 
 **Cost while deferred:** a filtered or line-ending-normalised edit to a merged migration passes the git arm; the orchestrator adopter expects raw bytes on both arms (adopter direction 2026-11-26, lead-relayed). Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, the filter claim the reviewer's probe, carried from its close; filed at the next scope. Re-verified here: the git arm's edited set is the since-base changed list. Owner lookup: `migration`, `autocrlf`, `byte identity` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
 
-### shared-temp-fixed-names
-
-Three writers use a predictable name in the system temp dir. gate-sdk/lib/test-hermetic.sh's three shared empty files sit at fixed names under `${TMPDIR:-/tmp}` in a standalone suite run, and the `cfg(test)` gitconfig pin in native/src/proc.rs at one fixed name under the system temp dir. Spawn captures (`checkwright-out.<pid>.<seq>`) fall back to the system temp dir through `proc::temp_base` when no run scratch is held.
-
-**Deliverable:** debt: each moves to a private directory made with mode 700 and owner-checked before use, with a case asserting a pre-existing name owned elsewhere is never used, and gate-sdk/SPEC.md §lib/test-hermetic.sh and §run-gates aligned.
-
-**Cost while deferred:** on a shared host a suite or capture can use a file it did not make. Surfaced 2026-11-26 by this scope's census for the orchestrator adopter's ask to keep lock, holder and record files out of shared dirs, which found none of those there (the survey record). Re-verified here: test-hermetic.sh truncates and exports each fixed path; `temp_base` falls back to `std::env::temp_dir`. Owner lookup: `TMPDIR`, `temp dir`, `fixed name` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/test-hermetic.sh and §run-gates.
-
 ### content-gate-reading-limits
 
 Four reading limits in content-checks-pass' gates, unstated in gate-sdk/SPEC.md. check-exec-write's path reader (native/src/rust_code.rs) skips no whitespace around `::`, so `std::fs ::copy` loses its leading segment and evades the gate. `--emit stale-literals` tests only a literal's opening line against the removed hunks, so an edit inside a multi-line raw or triple-quoted literal is never collected. check-script-preflight's id grammar accepts a listed flag with no following word (the `None` arm). check-binary-strings returns an empty scan for an ELF64 whose `e_shoff` is 0 (native/src/elf.rs), so a sectionless output is judged clean with nothing read.
@@ -1052,4 +1044,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - content-gate-calibrations
 - migration-guard-lint-parity
+- shared-temp-fixed-names
 

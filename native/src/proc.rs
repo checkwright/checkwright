@@ -89,7 +89,10 @@ mod git_isolation {
     #[cfg(test)]
     pub fn pin(cmd: &mut std::process::Command) {
         let global = GLOBAL.get_or_init(|| {
-            let p = std::env::temp_dir().join("checkwright-test-empty.gitconfig");
+            let p = super::private_system_temp()
+                .as_ref()
+                .expect("the unit tests' private temp dir")
+                .join("test-empty.gitconfig");
             let _ = std::fs::File::create(&p);
             p
         });
@@ -556,7 +559,7 @@ fn merged(
             program.label(), e
         )
     };
-    let capture = temp_base().join(format!(
+    let capture = temp_base()?.join(format!(
         "checkwright-merged.{}.{}",
         std::process::id(),
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
@@ -769,7 +772,7 @@ pub fn run_bounded_capture(
             program.label(), e
         )
     };
-    let capture = temp_base().join(format!(
+    let capture = temp_base()?.join(format!(
         "checkwright-bounded.{}.{}",
         std::process::id(),
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
@@ -908,13 +911,68 @@ static MERGE_SEQ: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsiz
 static TEMP_BASE: std::sync::Mutex<Option<std::path::PathBuf>> = std::sync::Mutex::new(None);
 
 // spec: gate-sdk/SPEC.md §run-gates — where this process writes a spawn's capture: the run scratch
-// it holds, else its own temp dir, the spawn layer's read of that
-pub fn temp_base() -> std::path::PathBuf {
-    TEMP_BASE
-        .lock()
-        .unwrap_or_else(|e| e.into_inner())
-        .clone()
-        .unwrap_or_else(std::env::temp_dir)
+// it holds, else a directory private to this user under its own temp dir, the spawn layer's read of
+// that; a name there that is not private is refused, never used
+pub fn temp_base() -> Result<std::path::PathBuf, String> {
+    let held = TEMP_BASE.lock().unwrap_or_else(|e| e.into_inner()).clone();
+    match held {
+        Some(d) => Ok(d),
+        None => private_system_temp().clone(),
+    }
+}
+
+fn private_system_temp() -> &'static Result<std::path::PathBuf, String> {
+    static DIR: std::sync::OnceLock<Result<std::path::PathBuf, String>> = std::sync::OnceLock::new();
+    DIR.get_or_init(|| private_dir(&std::env::temp_dir(), owner()))
+}
+
+#[cfg(unix)]
+fn owner() -> u32 {
+    unsafe { libc::geteuid() }
+}
+
+#[cfg(not(unix))]
+fn owner() -> u32 {
+    0
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — `checkwright-<uid>` under <sys>, made mode 700, then used only
+// as a directory, never a link, owned by <uid> and closed to group and other; native Windows' per-user
+// temp dir is private by its ACL, and the name there is not owner-checked
+fn private_dir(sys: &std::path::Path, uid: u32) -> Result<std::path::PathBuf, String> {
+    let dir = sys.join(format!("checkwright-{}", uid));
+    #[cfg(unix)]
+    let created = std::os::unix::fs::DirBuilderExt::mode(&mut std::fs::DirBuilder::new(), 0o700).create(&dir);
+    #[cfg(not(unix))]
+    let created = std::fs::DirBuilder::new().create(&dir);
+    match created {
+        Ok(()) => {}
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {}
+        Err(e) => return Err(format!("cannot create {}: {}", dir.display(), e)),
+    }
+    let refuse = |why: &str| {
+        Err(format!(
+            "{} {} — it is not a directory private to this user, so nothing is written there; remove it, or point TMPDIR at a directory of your own",
+            dir.display(), why
+        ))
+    };
+    let meta = std::fs::symlink_metadata(&dir).map_err(|e| format!("cannot read {}: {}", dir.display(), e))?;
+    if !meta.is_dir() {
+        return refuse("is not a directory");
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        if meta.uid() != uid {
+            return refuse(&format!("is owned by uid {}", meta.uid()));
+        }
+        if meta.mode() & 0o077 != 0 {
+            return refuse(&format!("is open to group or other (mode {:o})", meta.mode() & 0o777));
+        }
+    }
+    #[cfg(not(unix))]
+    let _ = uid;
+    Ok(dir)
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — `runner::RunScratch` is the one holder: it takes the base when
@@ -1142,7 +1200,7 @@ pub fn run_streamed(
         )
     };
     let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-    let dir = temp_base();
+    let dir = temp_base()?;
     let inp = dir.join(format!("checkwright-in.{}.{}", std::process::id(), seq));
     let outp = dir.join(format!("checkwright-out.{}.{}", std::process::id(), seq));
     let cleanup = || {
@@ -1309,7 +1367,7 @@ pub fn run_stdout_scrubbed(
         )
     };
     let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-    let outp = temp_base().join(format!("checkwright-out.{}.{}", std::process::id(), seq));
+    let outp = temp_base()?.join(format!("checkwright-out.{}.{}", std::process::id(), seq));
     let sink = std::fs::File::create(&outp).map_err(io_err)?;
     let mut cmd = command(spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
@@ -2000,6 +2058,34 @@ pub(crate) mod tests {
              a `spawn-funnel-exempt:` cause above the site",
             offenders
         );
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the private temp dir is made mode 700 and reused while it
+    // stays private, and a name owned by another user, open to others, or a link is never used
+    #[cfg(unix)]
+    #[test]
+    fn the_private_temp_dir_refuses_a_name_it_does_not_own_privately() {
+        use std::os::unix::fs::PermissionsExt;
+        let sys = std::env::temp_dir().join(format!("checkwright-private-dir.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&sys);
+        std::fs::create_dir_all(&sys).unwrap();
+        let me = super::owner();
+        let made = super::private_dir(&sys, me).expect("a fresh name is made and used");
+        assert_eq!(std::fs::metadata(&made).unwrap().permissions().mode() & 0o777, 0o700);
+        assert_eq!(super::private_dir(&sys, me).as_ref(), Ok(&made), "a private dir of ours is reused");
+        let foreign = super::private_dir(&sys, me + 1).expect_err("another user's name is used");
+        assert!(foreign.contains("is owned by uid"), "{}", foreign);
+        std::fs::set_permissions(&made, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let open = super::private_dir(&sys, me).expect_err("an open dir is used");
+        assert!(open.contains("open to group or other"), "{}", open);
+        std::fs::remove_dir(&made).unwrap();
+        let elsewhere = sys.join("elsewhere");
+        std::fs::create_dir(&elsewhere).unwrap();
+        std::os::unix::fs::symlink(&elsewhere, &made).unwrap();
+        let link = super::private_dir(&sys, me).expect_err("a link is followed");
+        assert!(link.contains("is not a directory"), "{}", link);
+        assert!(crate::walk::list_dir(&elsewhere).unwrap().is_empty(), "the link's target was written");
+        let _ = std::fs::remove_dir_all(&sys);
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — the temp-dir roster: shipped code reads the system temp

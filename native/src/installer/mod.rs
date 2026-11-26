@@ -326,7 +326,7 @@ pub fn git_commit(root: &Path, message: &str) -> Result<(), Unmade> {
 // spec: installer/SPEC.md §init — a fresh scratch file for the one spawned commit's trace, absolute
 // because git ignores a relative trace target
 fn trace_file() -> Option<PathBuf> {
-    let base = PathBuf::from(walk::abs_against(&walk::cwd().ok()?, &proc::temp_base().display().to_string()));
+    let base = PathBuf::from(walk::abs_against(&walk::cwd().ok()?, &proc::temp_base().ok()?.display().to_string()));
     let t = base.join(format!(
         "checkwright-commit-trace.{}.{}",
         std::process::id(),

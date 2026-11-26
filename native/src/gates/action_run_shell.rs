@@ -192,7 +192,13 @@ pub fn run(args: &[String]) -> i32 {
         return 0;
     }
 
-    let work = proc::temp_base().join(format!("checkwright-runshell.{}", std::process::id()));
+    let work = match proc::temp_base() {
+        Ok(base) => base.join(format!("checkwright-runshell.{}", std::process::id())),
+        Err(e) => {
+            eprintln!("{}: could not create a scratch dir ({})", NAME, e);
+            return exit::TOOL;
+        }
+    };
     let _ = std::fs::remove_dir_all(&work);
     if let Err(e) = std::fs::create_dir_all(&work) {
         eprintln!("{}: could not create a scratch dir ({})", NAME, e);

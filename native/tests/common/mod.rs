@@ -40,11 +40,37 @@ fn stripped(program: impl AsRef<OsStr>, drop: impl Fn(&str) -> bool) -> Command 
     c
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — the tests' own private temp dir, made mode 700 and
+// owner-checked before use as the binary's is; one that is not private stops the test run
+fn private_dir() -> std::path::PathBuf {
+    #[cfg(unix)]
+    let uid = unsafe { libc::geteuid() };
+    #[cfg(not(unix))]
+    let uid = 0u32;
+    let dir = std::env::temp_dir().join(format!("checkwright-test-{}", uid));
+    #[cfg(unix)]
+    let _ = std::os::unix::fs::DirBuilderExt::mode(&mut std::fs::DirBuilder::new(), 0o700).create(&dir);
+    #[cfg(not(unix))]
+    let _ = std::fs::DirBuilder::new().create(&dir);
+    let meta = std::fs::symlink_metadata(&dir).unwrap_or_else(|e| panic!("cannot read {}: {}", dir.display(), e));
+    assert!(meta.is_dir(), "{} is not a directory, so the tests write nothing there", dir.display());
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        assert!(
+            meta.uid() == uid && meta.mode() & 0o077 == 0,
+            "{} is not private to this user, so the tests write nothing there",
+            dir.display()
+        );
+    }
+    dir
+}
+
 // spec: gate-sdk/SPEC.md §check-crate-arms — the empty global file, and no system file off native
 // Windows
 fn pin(c: &mut Command) {
     let global = GLOBAL.get_or_init(|| {
-        let p = std::env::temp_dir().join("checkwright-test-empty.gitconfig");
+        let p = private_dir().join("empty.gitconfig");
         let _ = std::fs::File::create(&p);
         p
     });

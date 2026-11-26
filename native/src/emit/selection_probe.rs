@@ -141,7 +141,7 @@ fn key_shaped(k: &str) -> bool {
 // spec: drift-kit/SPEC.md §The agent-selection probe — a fresh empty directory under the host's
 // temporary directory, made exclusively so no earlier run's leftover is reused
 fn cold_dir(seq: &mut usize) -> Result<PathBuf, Fault> {
-    let d = proc::temp_base().join(format!("checkwright-selection-probe.{}.{}", std::process::id(), seq));
+    let d = proc::temp_base().map_err(Fault::tool)?.join(format!("checkwright-selection-probe.{}.{}", std::process::id(), seq));
     *seq += 1;
     std::fs::create_dir(&d).map_err(|e| Fault::tool(format!("cannot create {}: {}", d.display(), e)))?;
     Ok(d)

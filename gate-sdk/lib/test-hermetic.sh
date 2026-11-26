@@ -5,9 +5,28 @@
 # shellcheck disable=SC2164 # the anchor is the contract's bare builtin, which check-path-dialect clears only as the whole line; a failed chdir leaves the cwd where it was
 cd "$(pwd -P)"
 _th_root="$(cd "${BASH_SOURCE[0]%/*}/../.." && pwd)"
-_th_empty="${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.sh"
+_th_sep=:
+case "${OSTYPE:-}" in msys* | cygwin* | win32*) _th_sep=';' ;; esac
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the empty files live in a directory private to this
+# user, made mode 700 and owner-checked before use; a name that is not private is refused, never used
+_th_dir="${TMPDIR:-/tmp}/gate-sdk-hermetic.$(id -u)"
+mkdir -m 700 "$_th_dir" 2>/dev/null
+_th_why=
+if [[ -L "$_th_dir" || ! -d "$_th_dir" ]]; then
+    _th_why='is not a directory'
+elif [[ ! -O "$_th_dir" ]]; then
+    _th_why='is owned by another user'
+elif [[ "$_th_sep" == : ]]; then
+    case "$(ls -ld "$_th_dir")" in d???------*) ;; *) _th_why='is open to group or other' ;; esac
+fi
+if [[ -n "$_th_why" ]]; then
+    printf 'test-hermetic.sh: %s %s, so nothing is written there; remove it, or point TMPDIR at a directory of your own\n' \
+        "$_th_dir" "$_th_why" >&2
+    exit 3
+fi
+_th_empty="$_th_dir/empty.sh"
 : >"$_th_empty"
-_th_empty_knobs="${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.knobs"
+_th_empty_knobs="$_th_dir/empty.knobs"
 : >"$_th_empty_knobs"
 for _th_kit in "$_th_root"/gate-sdk "$_th_root"/*-kit; do
     [[ -d "$_th_kit" ]] || continue
@@ -20,12 +39,10 @@ for _th_kit in "$_th_root"/gate-sdk "$_th_root"/*-kit; do
     [[ "$_th_var" == GATE_SDK ]] || export "${_th_var}_LOCAL_KNOB_FILE=${_th_empty_knobs}"
 done
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the temp dir the suite is handed heads the git ceiling list
-_th_sep=:
-case "${OSTYPE:-}" in msys* | cygwin* | win32*) _th_sep=';' ;; esac
 _th_tmp="$(cd -P "${TMPDIR:-/tmp}" && pwd -P)"
 export GIT_CEILING_DIRECTORIES="${_th_tmp}${GIT_CEILING_DIRECTORIES:+${_th_sep}${GIT_CEILING_DIRECTORIES}}"
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — git reads no host global config, and no system config off native Windows
-_th_git_global="${TMPDIR:-/tmp}/gate-sdk-hermetic-empty.gitconfig"
+_th_git_global="$_th_dir/empty.gitconfig"
 : >"$_th_git_global"
 export GIT_CONFIG_GLOBAL="$_th_git_global"
 [[ "$_th_sep" == ';' ]] || export GIT_CONFIG_NOSYSTEM=1
@@ -44,7 +61,7 @@ if [[ -z "${GATE_SDK_NATIVE_BIN:-}" ]]; then
 fi
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — gate-sdk's overlay is pinned after the binary read above, outside its already-set guard
 export GATE_SDK_LOCAL_KNOB_FILE="$_th_empty_knobs"
-unset _th_name _th_root _th_empty _th_empty_knobs _th_kit _th_var _th_bin _th_sep _th_tmp _th_git_global
+unset _th_name _th_root _th_empty _th_empty_knobs _th_kit _th_var _th_bin _th_sep _th_tmp _th_git_global _th_dir _th_why
 
 # spec: gate-sdk/SPEC.md §run-gate-tests — invoke a gate through its declared dispatch rather
 # than by script path, so a bespoke test names a gate and never a substrate: gate_command

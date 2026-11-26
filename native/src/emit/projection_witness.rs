@@ -225,7 +225,7 @@ fn witness_in(
     place: &dyn Fn(&Path) -> Result<(), String>,
     gate: &dyn Fn(&Path, &str) -> Verdict,
 ) -> Result<Report, String> {
-    let guard = csmoke::tracked_history_scratch(source, &crate::gates::fence_run::scratch_base(), NAME)?;
+    let guard = csmoke::tracked_history_scratch(source, &crate::gates::fence_run::scratch_base()?, NAME)?;
     let dir = guard.dir.clone().ok_or("the scratch was not created")?;
     place(&dir)?;
     for m in members {

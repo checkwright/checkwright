@@ -363,7 +363,7 @@ fn arm_verdict(t: &Token) -> Option<String> {
 // order, each its own `bash -euo pipefail` under the fixed environment; the scratch guard removes
 // the directory on every exit path
 fn execute(fences: &[Runnable], bin: &str) -> Result<Vec<Option<String>>, String> {
-    let base = scratch_base();
+    let base = scratch_base()?;
     let guard = csmoke::tracked_scratch(&base, "fence-run")?;
     let dir: PathBuf = guard.dir.clone().ok_or("the scratch was not created")?;
     let root = dir.display().to_string();
@@ -416,11 +416,11 @@ fn execute(fences: &[Runnable], bin: &str) -> Result<Vec<Option<String>>, String
 
 // spec: canon-kit/SPEC.md §check-fence-run — `DEMO_TMP_DIR`, then the process's temp base, the
 // base §Consumer smoke's builder takes
-pub(crate) fn scratch_base() -> PathBuf {
-    std::env::var_os("DEMO_TMP_DIR")
-        .filter(|v| !v.is_empty())
-        .map(PathBuf::from)
-        .unwrap_or_else(crate::proc::temp_base)
+pub(crate) fn scratch_base() -> Result<PathBuf, String> {
+    match std::env::var_os("DEMO_TMP_DIR").filter(|v| !v.is_empty()) {
+        Some(v) => Ok(PathBuf::from(v)),
+        None => crate::proc::temp_base(),
+    }
 }
 
 // spec: canon-kit/SPEC.md §check-fence-run — the fixed environment, inherited in nothing but the

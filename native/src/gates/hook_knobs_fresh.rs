@@ -81,7 +81,7 @@ mod tests {
 
     #[test]
     fn a_tree_free_member_with_no_page_reds_and_a_missing_dir_refuses() {
-        let d = crate::proc::temp_base().join(format!("hook-knobs-fresh-{}", std::process::id()));
+        let d = crate::proc::temp_base().unwrap().join(format!("hook-knobs-fresh-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
         std::fs::create_dir_all(&d).unwrap();
         let rc = rule(&[d.display().to_string()]);

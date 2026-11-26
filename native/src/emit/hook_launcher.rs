@@ -329,7 +329,7 @@ fn scratch_input(bytes: &[u8]) -> Result<PathBuf, String> {
     use std::hash::{BuildHasher, Hasher};
     use std::io::Write;
     let drawn = std::collections::hash_map::RandomState::new().build_hasher().finish();
-    let file = proc::temp_base().join(format!("checkwright-chain-{}.{:016x}", std::process::id(), drawn));
+    let file = proc::temp_base()?.join(format!("checkwright-chain-{}.{:016x}", std::process::id(), drawn));
     let mut f = std::fs::OpenOptions::new()
         .write(true)
         .create_new(true)

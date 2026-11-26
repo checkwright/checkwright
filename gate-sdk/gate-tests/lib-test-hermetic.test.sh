@@ -39,4 +39,38 @@ leaked="$(env -u GIT_CONFIG_NOSYSTEM "$system=$hostile/system.config" GIT_CONFIG
     printf 'FAIL: a sourcing suite read host git config: %s\n' "$leaked"
     exit 1
 }
-echo 'LIB-TEST-HERMETIC: clean (inherited kit variables cleared, binary kept, library and later pins applied, host git config unread)'
+
+# A name under the temp dir that is not private to this user is refused at 3 and never written:
+# a link to another directory, and off native Windows a directory open to others.
+mkdir -p "$hostile/tmp-link" "$hostile/target" "$hostile/tmp-open/gate-sdk-hermetic.$(id -u)"
+ln -s "$hostile/target" "$hostile/tmp-link/gate-sdk-hermetic.$(id -u)"
+TMPDIR="$hostile/tmp-link" bash -c 'source "$1"' bash "$GATE_SDK_TEST_LIB_DIR/test-hermetic.sh" 2>/dev/null
+rc=$?
+[[ "$rc" == 3 && -z "$(ls -A "$hostile/target")" ]] || {
+    printf 'FAIL: a linked private-dir name was used (exit %s): %s\n' "$rc" "$(ls -A "$hostile/target")"
+    exit 1
+}
+case "${OSTYPE:-}" in
+    msys* | cygwin* | win32*) ;;
+    *)
+        open="$hostile/tmp-open/gate-sdk-hermetic.$(id -u)"
+        chmod 755 "$open"
+        TMPDIR="$hostile/tmp-open" bash -c 'source "$1"' bash "$GATE_SDK_TEST_LIB_DIR/test-hermetic.sh" 2>/dev/null
+        rc=$?
+        [[ "$rc" == 3 && -z "$(ls -A "$open")" ]] || {
+            printf 'FAIL: an open private-dir name was used (exit %s)\n' "$rc"
+            exit 1
+        }
+        ;;
+esac
+fresh="$hostile/tmp-fresh"
+mkdir -p "$fresh"
+TMPDIR="$fresh" bash -c 'source "$1"' bash "$GATE_SDK_TEST_LIB_DIR/test-hermetic.sh" || {
+    echo 'FAIL: a fresh temp dir refused the private dir'
+    exit 1
+}
+[[ -f "$fresh/gate-sdk-hermetic.$(id -u)/empty.knobs" ]] || {
+    echo 'FAIL: the empty files are not under the private dir'
+    exit 1
+}
+echo 'LIB-TEST-HERMETIC: clean (inherited kit variables cleared, binary kept, library and later pins applied, host git config unread, a non-private temp name refused)'

@@ -332,7 +332,10 @@ fn chain_line(dir: &Path, names: &[String], hooks_dir: &Path) -> String {
 // run --to-stdin`, so a bare run over a live hook first asks this git to run one
 #[cfg(windows)]
 fn chain_probe() -> bool {
-    let d = proc::temp_base().join(format!("checkwright-chain-probe.{}", run_tag()));
+    let Ok(base) = proc::temp_base() else {
+        return false;
+    };
+    let d = base.join(format!("checkwright-chain-probe.{}", run_tag()));
     let (empty, input) = (d.join("hooks"), d.join("stdin"));
     let ready = std::fs::create_dir_all(&empty).and_then(|()| std::fs::write(&input, ""));
     let ran = ready.is_ok()
