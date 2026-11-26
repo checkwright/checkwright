@@ -1121,18 +1121,18 @@ fn command_name(args: &[&Word]) -> usize {
 }
 
 // spec: gate-sdk/SPEC.md §The shell reader — the early-exit detector over every pipeline under
-// `pipefail`, a guarded producer clearing its pipeline and a waiver its site
+// `pipefail`, a reader cleared when every stage before it is guarded and a pipeline by its waiver
 pub fn early_exits(script: &Script, tokens: &[String], floor: usize) -> Vec<Hit> {
     let mut hits = Vec::new();
     for p in script.pipelines.iter().filter(|p| p.pipefail) {
-        if guarded(&p.stages[0]) {
-            continue;
-        }
         let state = waived(script, p.line, p.last, tokens, floor);
         if state == Waived::Cleared {
             continue;
         }
-        for stage in &p.stages[1..] {
+        for (i, stage) in p.stages.iter().enumerate().skip(1) {
+            if p.stages[..i].iter().all(guarded) {
+                continue;
+            }
             if let Some((reader, fix)) = early_exit(script, stage) {
                 hits.push(Hit { line: p.line, reader, fix, short_waiver: state == Waived::Short });
             }
@@ -1144,8 +1144,7 @@ pub fn early_exits(script: &Script, tokens: &[String], floor: usize) -> Vec<Hit>
     hits
 }
 
-// spec: gate-sdk/SPEC.md §The shell reader — a guarded producer is a first stage of the shape
-// `{ <cmd> || true; }`
+// spec: gate-sdk/SPEC.md §The shell reader — a guarded stage is one of the shape `{ <cmd> || true; }`
 fn guarded(stage: &Stage) -> bool {
     let raw = stage.raw.trim();
     let Some(inner) = raw.strip_prefix('{').and_then(|r| r.strip_suffix('}')) else { return false };
@@ -1212,26 +1211,73 @@ fn unquoted(w: &Word) -> bool {
     !w.quoted && !w.expands && w.raw == w.value
 }
 
+fn positive(s: &str) -> bool {
+    digits(s) && s.bytes().any(|c| c != b'0')
+}
+
+// spec: gate-sdk/SPEC.md §The shell reader — the grep flags under which the first N output lines
+// are the first N matches, so a max-count moves to `sed -n` with the output kept
+const COUNT_KEEPS_SHORT: &str = "EFGPiyvwxnbHhsaUTZlmq";
+const COUNT_KEEPS_LONG: &[&str] = &[
+    "extended-regexp",
+    "fixed-strings",
+    "basic-regexp",
+    "perl-regexp",
+    "ignore-case",
+    "no-ignore-case",
+    "invert-match",
+    "word-regexp",
+    "line-regexp",
+    "line-number",
+    "byte-offset",
+    "with-filename",
+    "no-filename",
+    "no-messages",
+    "text",
+    "binary",
+    "initial-tab",
+    "null",
+    "color",
+    "colour",
+    "label",
+    "line-buffered",
+    "regexp",
+    "file",
+    "max-count",
+    "quiet",
+    "silent",
+    "files-with-matches",
+];
+
 // spec: gate-sdk/SPEC.md §The shell reader — `grep` with `-q`, `-m` or `-l`, long or in a short
-// cluster; a lone quiet form and a lone digit max-count are fixable
+// cluster; a lone quiet form, and a lone nonzero digit max-count over its input alone with no flag
+// shaping the output around the count, are fixable
 fn grep(cmd: &Command, stage: &Stage, rest: &[&Word]) -> Option<(&'static str, Option<Vec<Edit>>)> {
     let mut quiet: Vec<(usize, Option<String>)> = Vec::new();
     let mut count: Vec<(usize, Option<String>)> = Vec::new();
     let mut max: Option<String> = None;
     let mut list = false;
     let mut fixable = true;
+    let mut shaped = false;
+    let mut pattern = false;
+    let mut operands = 0usize;
     let mut k = 0;
     while k < rest.len() {
         let v = rest[k].value.as_str();
         if v == "--" || !v.starts_with('-') || v == "-" {
             if v == "--" {
+                operands += rest.len() - k - 1;
                 break;
             }
+            operands += 1;
             k += 1;
             continue;
         }
         fixable &= unquoted(rest[k]);
         if let Some(long) = v.strip_prefix("--") {
+            let name = long.split('=').next().unwrap_or(long);
+            shaped |= !COUNT_KEEPS_LONG.contains(&name);
+            pattern |= matches!(name, "regexp" | "file");
             match long {
                 "quiet" | "silent" => quiet.push((k, None)),
                 "files-with-matches" => list = true,
@@ -1275,11 +1321,13 @@ fn grep(cmd: &Command, stage: &Stage, rest: &[&Word]) -> Option<(&'static str, O
                     break;
                 }
                 'e' | 'f' | 'A' | 'B' | 'C' | 'd' | 'D' => {
+                    pattern |= matches!(ch, 'e' | 'f');
+                    shaped |= matches!(ch, 'A' | 'B' | 'C');
                     arg_next = j + 1 == flags.len();
                     kept.push_str(&flags[j..]);
                     break;
                 }
-                _ => {}
+                _ => shaped |= !COUNT_KEEPS_SHORT.contains(ch),
             }
             kept.push(ch);
         }
@@ -1305,7 +1353,10 @@ fn grep(cmd: &Command, stage: &Stage, rest: &[&Word]) -> Option<(&'static str, O
             return None;
         }
         let (removed, tail) = if quiet.is_empty() {
-            let n = max.as_deref().filter(|n| digits(n))?;
+            if shaped || operands > usize::from(!pattern) {
+                return None;
+            }
+            let n = max.as_deref().filter(|n| positive(n))?;
             (&count, Edit { start: stage.end, end: stage.end, text: format!(" | sed -n '1,{}p'", n) })
         } else {
             let gone: Vec<usize> = quiet.iter().filter(|q| q.1.is_none()).map(|q| q.0).collect();
@@ -1329,8 +1380,8 @@ fn grep(cmd: &Command, stage: &Stage, rest: &[&Word]) -> Option<(&'static str, O
     Some((reader, fix()))
 }
 
-// spec: gate-sdk/SPEC.md §The shell reader — `head` with no operand, `-n N`, `-nN` or `-N` is
-// fixable, a bare `head` being `-n 10`
+// spec: gate-sdk/SPEC.md §The shell reader — `head` with no operand, `-n N`, `-nN` or `-N`, `N`
+// nonzero, is fixable, a bare `head` being `-n 10`
 fn head_fix(cmd: &Command, head: &Word, rest: &[&Word]) -> Option<Vec<Edit>> {
     if !rest.iter().all(|w| unquoted(w)) {
         return None;
@@ -1338,9 +1389,9 @@ fn head_fix(cmd: &Command, head: &Word, rest: &[&Word]) -> Option<Vec<Edit>> {
     let vals: Vec<&str> = rest.iter().map(|w| w.value.as_str()).collect();
     let n = match vals.as_slice() {
         [] => "10",
-        ["-n", n] if digits(n) => n,
-        [one] if one.starts_with("-n") && digits(&one[2..]) => &one[2..],
-        [one] if one.starts_with('-') && digits(&one[1..]) => &one[1..],
+        ["-n", n] if positive(n) => n,
+        [one] if one.starts_with("-n") && positive(&one[2..]) => &one[2..],
+        [one] if one.starts_with('-') && positive(&one[1..]) => &one[1..],
         _ => return None,
     };
     let end = rest.last().map_or(head.end, |w| w.end);
@@ -1559,11 +1610,14 @@ mod tests {
         assert!(readers("grep -q x file\n").is_empty());
     }
 
-    // spec: gate-sdk/SPEC.md §The shell reader — a guarded producer and a waiver clear a pipeline; a
-    // waiver under the floor clears nothing
+    // spec: gate-sdk/SPEC.md §The shell reader — a reader with every stage before it guarded, and a
+    // waived pipeline, are cleared; a waiver under the floor clears nothing
     #[test]
     fn guards_and_waivers_clear() {
         assert!(readers("{ a || true; } | head -1\n").is_empty());
+        assert!(readers("{ a || true; } | { cat || true; } | head -1\n").is_empty());
+        assert_eq!(readers("{ a || true; } | cat | head -1\n"), ["head"]);
+        assert_eq!(readers("{ a || true; } | head -1 | grep -q x\n"), ["grep -q"]);
         assert!(readers("a | head -1 # pipefail-ok: reads one line by design\n").is_empty());
         assert!(readers("a |  # pipefail-ok: one line\n  head -1\n").is_empty());
         let s = lib("a | head -1 # pipefail-ok:\n");
@@ -1582,8 +1636,35 @@ mod tests {
         assert_eq!(fixed("a | head -n 3\n"), "a | sed -n '1,3p'\n");
         assert_eq!(fixed("v=$(a | head -1)\n"), "v=$(a | sed -n '1,1p')\n");
         assert_eq!(fixed("a | head\n"), "a | sed -n '1,10p'\n");
+        assert_eq!(fixed("a | grep -nvm1 -e x --color=never\n"), "a | grep -nv -e x --color=never | sed -n '1,1p'\n");
         let s = lib("a | grep -qm1 x\na | head -c 4\na | grep -l x\n");
         assert!(early_exits(&s, &[], 1).iter().all(|h| h.fix.is_none()));
+    }
+
+    // spec: gate-sdk/SPEC.md §The shell reader — a count of zero, a flag shaping the output around
+    // the count and a file operand are hits with no rewrite, since `sed -n` would change the output
+    #[test]
+    fn a_count_the_rewrite_would_change_is_no_fix() {
+        let shapes = [
+            "a | grep -m1 -A2 x\n",
+            "a | grep -m1 -C 1 x\n",
+            "a | grep -m1 --after-context=2 x\n",
+            "a | grep -cm1 x\n",
+            "a | grep -o -m1 x\n",
+            "a | grep -m1 -z x\n",
+            "a | grep -m1 -2 x\n",
+            "a | grep -m1 x f1 f2\n",
+            "a | grep -m1 -e x f1\n",
+            "a | grep -m0 x\n",
+            "a | grep --max-count=00 x\n",
+            "a | head -n0\n",
+            "a | head -n 0\n",
+            "a | head -0\n",
+        ];
+        for text in shapes {
+            let hits = early_exits(&lib(text), &[], 1);
+            assert!(hits.len() == 1 && hits[0].fix.is_none(), "{}", text);
+        }
     }
 
     // spec: gate-sdk/SPEC.md §The shell reader — a named command's here-doc and quoted operand are

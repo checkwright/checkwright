@@ -24,14 +24,6 @@ check-migration-guard's git arm judges a merge-base migration unchanged as `git 
 
 **Cost while deferred:** a filtered or line-ending-normalised edit to a merged migration passes the git arm; the orchestrator adopter expects raw bytes on both arms (adopter direction 2026-11-26, lead-relayed). Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, the filter claim the reviewer's probe, carried from its close; filed at the next scope. Re-verified here: the git arm's edited set is the since-base changed list. Owner lookup: `migration`, `autocrlf`, `byte identity` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
 
-### pipefail-reader-semantic-gaps
-
-Two gaps in the pipefail reader (native/src/shell_lines.rs). The fix arm's rewrites drop output: `grep -m1 -A2 x` becomes `grep -A2 x | sed -n '1,1p'`, losing the context lines, and `head -n0` becomes `sed -n '1,0p'`, which prints line 1. And a guarded first stage clears the whole pipeline, though an unguarded middle stage such as `cat` can still die of a broken pipe under pipefail.
-
-**Deliverable:** debt: no rewrite, or an output-preserving one, for those shapes, and a clearance judged per stage, each with a case.
-
-**Cost while deferred:** the fix arm can change a script's output silently, and a pipeline that still fails under pipefail passes. Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, both outputs shell-verified by the reviewer and the rewrite shapes confirmed in the unit tests, carried from its close; filed at the next scope. Owner lookup: `pipefail`, `sed -n`, `guarded` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-pipefail-readers.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1038,4 +1030,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - migration-guard-lint-parity
 - shared-temp-fixed-names
 - content-gate-reading-limits
+- pipefail-reader-semantic-gaps
 

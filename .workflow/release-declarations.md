@@ -8,6 +8,7 @@
 - `check-exec-write` — reads a path with whitespace around a `::` as one path, where `std::fs ::copy` lost its leading segments and passed: such a site now reds like its unspaced spelling; move it into a helper, as for any other site.
 - `check-script-preflight` — an `id-grammar` flag that ends its invocation is now judged as the empty value, where it passed unread: `submit --owner` with nothing after it reds unless the grammar accepts the empty text.
 - `check-binary-strings` — reads an ELF64 file whose header names no section table whole, where it read nothing and passed: a term anywhere in such a file now reds.
+- `check-pipefail-readers` and the `early-exit` kind of `check-script-preflight` — clear a reader only when every stage before it is guarded, where a guarded first stage cleared the whole pipeline: `{ a || true; } | cat | head -1` now reds at `head`, since `cat` can die of a broken pipe. Guard the middle stage too, or waive the pipeline.
 
 ## Knob changes
 
@@ -23,3 +24,4 @@
 - `check-migration-guard` drops from the branch's additions a file the base ref's own commit already holds under its name, one the base took by cherry-pick say: no class reads it, so a destructive statement in such a file no longer reds on the branch, judged where it landed.
 - The gate binary, outside a run that holds its own scratch, writes its spawn captures and sandboxes under `checkwright-<uid>` in the temp dir, and `lib/test-hermetic.sh` its empty files under `gate-sdk-hermetic.<uid>`, each a directory made mode 700 and private to the user, where both used fixed names in the shared temp dir. A name there that is a link, another user's, or open to group or other is now exit 3, naming it; remove it, or point `TMPDIR` at a directory of your own.
 - `--emit stale-literals` collects a literal the branch edited on any line it spans, where it read its opening line alone: an edit inside a multi-line raw or triple-quoted string now lists the tests asserting it.
+- `--emit pipefail-fix` leaves a zero count, and a `grep` count beside a flag shaping its output (context, count, only-matching, null-data and the like) or a file operand, as a hand fix, where it rewrote them to a `sed -n` that changed the output: `grep -m1 -A2 x` lost its context lines and `head -n0` printed a line. Both still red; fix them by hand.
