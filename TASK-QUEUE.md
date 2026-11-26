@@ -1028,10 +1028,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- content-gate-calibrations
-- migration-guard-lint-parity
-- shared-temp-fixed-names
-- content-gate-reading-limits
-- pipefail-reader-semantic-gaps
-- migration-guard-byte-identity
-
