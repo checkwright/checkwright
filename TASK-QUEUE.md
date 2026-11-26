@@ -234,7 +234,7 @@ wakeup-guard's denial says 'Attempt logged.' when `append_attempt` (native/src/h
 
 ### front-door-registry-readiness
 
-[cost: event/low] [surface: installer] [observed-by: publish]
+[cost: event/low] [surface: installer] [observed-by: publish] [recurrence: 2026-11-26]
 
 The front-door package route's readiness poll (`npm view <package>@<version> version` in scripts/ci-front-door.sh and its PowerShell twin) named 0.38.0 at the registry's publish time while the tarball still answered 404, so all seven legs of publish run 45592369014 redded at `npx` init on E404, green on a re-run once the tarball served.
 
