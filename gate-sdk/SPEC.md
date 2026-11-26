@@ -97,6 +97,8 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_PIPEFAIL_LIBRARIES` (default `*lib.sh *-lib*`): basename globs of the files that member lints with `pipefail` on from their first line; empty names none.
 - `GATE_SDK_PIPEFAIL_ALL` (default `0`): `1` lints every file in that corpus that way; any other value refuses at exit 2.
 - `GATE_SDK_PIPEFAIL_BASELINE` (default empty): the member's count baseline (§The count baseline); empty holds every file to a count of 0.
+- `GATE_SDK_SCRIPT_FILES` (default empty): space-separated pathspecs over the tracked tree for `check-script-preflight`, the shared prune dirs applied. Empty disables the gate.
+- `GATE_SDK_SCRIPT_RULES` (default `<gates-dir>/script-rules.list`): that member's rules file, required while its corpus is configured (see there).
 - `GATE_SDK_PORTABILITY_PATTERNS` (default `<gates-dir>/portability-patterns.list`): space-separated banned-construct rosters for `check-portability-floor`, each **optional**. An absent file disables the assertion, where a present-but-unreadable one is exit 3 (see there).
 - `GATE_SDK_PORTABILITY_PATHS` (default **empty**): space-separated pathspecs naming that gate's install-path corpus. Empty is the shipped default because the kit cannot know any consumer's install path, and an empty corpus disables the assertion rather than failing it closed (§check-portability-floor).
 - `GATE_SDK_HARNESS_LITERALS` (default **empty**): space-separated fixed strings, the harness-bound literals §check-harness-literal holds to their declared sites. The kit ships none, since a default would be one vendor's spelling.
@@ -932,6 +934,7 @@ A gate's shell file carries five things at once: the rule, the `# graph:` manife
 | `check-template-copy-parity`, `check-template-registry-parity` | **Survive unchanged**: their corpus is kit templates and the template registry, and neither reads a gate declaration. Both are `.gate`-dispatched. |
 | `check-task-path-claim` | **Survives unchanged: reverse trigger.** Its `couples=` carries `*` because a ticked task may name any path, a gate declaration among them, and a deleted path is what reds it. It reads its configured task lists and stats the paths they name, never a declaration's content, so a port that moves a declaration it names reds the task exactly as any deleted path does (canon-kit/SPEC.md §check-task-path-claim). It is `.gate`-dispatched. |
 | `check-path-names` | **Born native and substrate-blind: it reads names, never content.** Its `couples=` carries `*` because any tracked path, a gate declaration among them, may be named for a deny term. It splits each path into components and opens no file but the term lists, so a port moves its verdict only where the new spelling's name hits, as any rename does (§check-path-names). |
+| `check-script-preflight` | **Born native, sensitive only as a configured script.** Its `couples=` carries `*` because its corpus is whatever tracked files the consumer's pathspecs select, which need not end `.sh`. A gate declaration is in it only where those pathspecs name one, and it is then read as a script like any other, so a port moves its verdict as deleting or adding any selected script does (§check-script-preflight). |
 | `check-install-size-fresh` | **Survives unchanged: it sizes declarations, never reads them.** Its `couples=` carries `kit:*` because its figure counts and sizes every tracked file the packer packs, a declaration among them. It reads index entries and blob sizes, never a declaration's content, so a port moves the figure as any edit of the same size does (installer/SPEC.md §The install size). It is `.gate`-dispatched. |
 
 **Every gate ports, an auditor of the dispatch relation included.** Holding such an auditor on shell, lest a compiled one pass itself with a broken binary, is refused. A shell auditor already takes `--list` from the binary, so its independence was only from the binary's presence. Presence is owned elsewhere: an absent or non-executable binary is exit 3 under §Fail-closed contract, and a stale one is §check-gate-binary-fresh's red. A gate reading declaration paths as content pays criterion 4's price for the parity oracle (§The port-candidate criteria).
@@ -3646,10 +3649,10 @@ Its fixture pair exercises both corpus arms, both assertions and every clearance
 
 ### The shell reader
 
-`native/src/shell_lines.rs` is the one reader of shell text for the shell content gates (§check-pipe-membership, §check-pipefail-readers and its fix arm). A gate run single-script and tree-wide over two parsers would get two verdicts on one script wherever they disagreed on a continuation or a quote, so there is one.
+`native/src/shell_lines.rs` is the one reader of shell text for the shell content gates (§check-pipe-membership, §check-pipefail-readers and its fix arm, §check-script-preflight). A gate run single-script and tree-wide over two parsers would get two verdicts on one script wherever they disagreed on a continuation or a quote, so there is one.
 
-- **Lines.** A backslash continuation and a trailing `|`, `&&` or `||` join the next physical line, so a pipeline broken across lines is one pipeline, numbered by its first physical line and spanning to its last.
-- **Halves.** Each line splits into a **code half and a comment half** outside quotes; a `#` opens a comment only where a word could begin.
+- **Lines.** A backslash continuation and a trailing `|`, `&&` or `||` join the next physical line into one **logical line**, so a pipeline broken across lines is one pipeline, numbered by its first physical line and spanning to its last.
+- **Halves.** Each logical line splits into a **code half and a comment half** outside quotes; a `#` opens a comment only where a word could begin. The code half keeps quoted text and leaves out comments, continuations and here-doc bodies. It also leaves out a quoted operand read as a body, which is judged once, as its own script.
 - **Pipelines.** Code splits into pipelines and each pipeline into stages outside quotes. A nested `( )` or `$( )` is a pipeline set of its own, a backtick span is opaque, and a `{ }` group is read in its enclosing shell.
 - **`pipefail` scope.** A `set` command whose words hold `-o pipefail`, or a flag word ending in `o` followed by `pipefail` (`set -euo pipefail`), turns it on. It holds to the end of the file, or of the `( )` or `$( )` holding it, and a `{ }` group's setting holds in its enclosing shell. An entry point may start a file with it on.
 - **Bodies.** A here-doc body or a quoted operand fed to a command the entry point names is read as **a script of its own**, its scope off at its start and its line numbers the outer file's. A here-doc body fed to any other command is content.
@@ -3715,6 +3718,43 @@ The pair points `GATE_SDK_PIPEFAIL_PATHS` and `GATE_SDK_PIPEFAIL_BASELINE` at ca
 - the empty configuration, an absent operand at 2, and an operand narrowing the corpus and its stale rows;
 - `GATE_SDK_PIPEFAIL_ALL` and its malformed value, a `LINT-PARSE` file at 3, an absent and a malformed baseline, and the prune set;
 - the fix arm rewriting a tree in place and refusing an unparseable file untouched.
+
+### check-script-preflight
+
+`checks/check-script-preflight.gate` (`precommit`, binary-dispatched). Invariant: **no configured shell script breaks a rule in the consumer's rules file.** A consumer submitting scripts to a scheduler, or sharing one machine across sessions, wants a script refused before it runs. The hazards are a kill by a broad pattern, a forbidden path, an early-exit reader fed under `pipefail` and a malformed id.
+
+**The corpus** is the scripts given as operands, tracked or not, else the tracked files `GATE_SDK_SCRIPT_FILES`' pathspecs select, the shared prune dirs applied. A named operand that is absent refuses at exit 2, and a script unreadable or not UTF-8 is exit 3, as is a failed listing outside a work tree. With no operand and the knob empty it prints `not applicable: no script configured` and exits 0, and it declares `# install: on-surface` and `# armed-by: GATE_SDK_SCRIPT_FILES`. Each script is read by §The shell reader, and a `LINT-PARSE` script is exit 3.
+
+**The rules file** (`GATE_SDK_SCRIPT_RULES`) is blocks. A line `rule <ID> <kind>` opens one, `<ID>` matching the class grammar (§Output contract). Each following line indented by blanks is `<key> <value>`, the value the rest of the line, and `#` lines and blank lines are skipped. Two top-level lines may precede the first block:
+
+- `waiver-min <n>`, the shortest reason a waiver takes, default 1;
+- `body <word>…`, the commands whose here-doc or quoted operand §The shell reader reads as a script of its own.
+
+The file absent while a corpus is configured refuses at exit 2, and unreadable is exit 3. An unknown kind or key, a key with no value, a single-valued key given twice, a missing required key, a malformed id or an ERE the engine refuses is exit 2 naming the file and line.
+
+**The four kinds.** Every command, flag, token and grammar is a value, so a kit literal names none of them. An ERE value is a POSIX ERE (§The POSIX ERE matcher) and a **search**, so a rule anchors it with `^` and `$` to match a whole text.
+
+- `command` — keys `cmd` (required), `allow <ERE>`, `before <ERE>` and `waiver <token>`, each but `cmd` repeatable. Every unquoted word equal to `cmd` in a simple command opens an invocation, its text running to the end of its simple command, quotes kept and blank runs collapsed. It is refused unless an `allow` matches that text, a `before` matches the logical line's code ahead of the word, or a waiver clears it.
+- `forbidden-token` — keys `token <literal>` (required, repeatable) and `waiver`. A logical line whose code half holds a token is refused once per token held.
+- `early-exit` — key `waiver`. §The shell reader's early-exit detector, its waiver tokens the rule's.
+- `id-grammar` — keys `cmd`, `flag <flag>` (repeatable) and `grammar <ERE>`, all required, and `waiver`. In each invocation of `cmd` the value of each listed flag, its next word or the text after `<flag>=`, must match `grammar`; a value holding an expansion is skipped.
+
+A `waiver` value is one or more tokens. **A waiver** is `# <token>: <reason>` on any physical line of the site's logical line, its trimmed reason at least `waiver-min` characters. Its reader is the reviewer of the diff adding it, and a reason of a word or two tells that reader nothing, so the floor is the consumer's; a shorter reason clears nothing and is itself refused.
+
+**The record** is `<path>:<line>: [<ID>] <what>`, in corpus order and then line order. `<what>` names the kind's subject and never a value from the script: the command word, `token <n>` (the token's position among the rule's), the early-exit reader, the flag, or `waiver reason under <n> characters`. A `command` and an `id-grammar` record sit at their word's physical line, the other two at the logical line's first. The `help:` lines name the rewrite and the waiver with its floor.
+
+The kinds are generic because each adopter rule is one instance of a kind: a kill allowlist is a `command` block, a mount layout a `forbidden-token` block, an owner flag an `id-grammar` block. A kit literal naming a scheduler's command or a mount layout would publish both (§The provenance seam). The kit ships `templates/script-rules.list`, commented out whole, one example block per kind, on `templates/portability-patterns.list`'s model; `init` does not seed it.
+
+This repo binds `GATE_SDK_SCRIPT_FILES` to its tracked `*.sh`, and `scripts/script-rules.list` holds one `command` rule over `pkill` with `waiver-min 5`. Several sessions share one tree, so it allows a kill by parent PID, `-P` with a lone quoted expansion, and by exact name, `-x` with a quoted literal, and nothing broader.
+
+**Honest limit.** An `allow` is an ERE over the invocation as written, so an allowed form spelled with different quoting reds, and a command reached through a variable (`"$kill" -f …`) is no invocation.
+
+The pair points both knobs at case-local paths in each case's knob file and shares one rules file holding every kind and a `body` line. `bad/` carries a broad and an unallowed invocation, a forbidden token, an early-exit reader, a malformed flag value in each spelling, a short waiver, and an invocation and a token inside a body. `good/` carries an allowed form, a `before` match, a waived site, command text inside quotes, a comment and a here-doc fed to an unnamed command, a guarded and a waived reader, valid and expanded flag values, and an allowed body. `check-script-preflight.test.sh` holds the residue:
+
+- the empty configuration, an absent operand at 2, and an untracked operand narrowing the corpus;
+- the rules file absent at 2, unreadable at 3, and malformed at 2 by an ERE, an id and a missing key;
+- a `LINT-PARSE` script and a script not UTF-8 at 3, and a failed listing outside a work tree at 3;
+- the knob selecting tracked files only under the prune set, and an unknown option.
 
 ### check-front-end-fail-open
 

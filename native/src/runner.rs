@@ -1545,7 +1545,7 @@ mod tests {
     // kind, cause and scope carried by at least one
     #[test]
     fn the_goldens_are_the_documents() {
-        let p = crate::sarif::tests::fixed();
+        let p = crate::sarif::fixed();
         let ran = |code: i32, output: &str| Outcome {
             tail: String::new(),
             output: output.as_bytes().to_vec(),

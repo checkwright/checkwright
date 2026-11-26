@@ -76,10 +76,10 @@ A repository install commits the profile's kit files, the gate binary and a hand
 
 | Profile | Kits | Files | Of which gate-tests | Size |
 | --- | --- | --- | --- | --- |
-| `starter` | 1 | 650 | 600 | 490 kB |
-| `workflow` | 3 | 910 | 820 | 990 kB |
+| `starter` | 1 | 660 | 610 | 500 kB |
+| `workflow` | 3 | 920 | 820 | 1.0 MB |
 | `delegation` | 8 | 1,200 | 1,000 | 1.5 MB |
-| `prose` | 2 | 1,100 | 980 | 710 kB |
+| `prose` | 2 | 1,100 | 990 | 720 kB |
 | `full` | 11 | 1,700 | 1,500 | 1.8 MB |
 
 | Kit | Files | Of which gate-tests | Size |
@@ -90,7 +90,7 @@ A repository install commits the profile's kit files, the gate binary and a hand
 | doctrine-kit | 12 | 9 | 64 kB |
 | drift-kit | 6 | 0 | 24 kB |
 | evidence-kit | 69 | 62 | 94 kB |
-| gate-sdk | 650 | 600 | 490 kB |
+| gate-sdk | 660 | 610 | 500 kB |
 | guard-kit | 42 | 30 | 220 kB |
 | lifecycle-kit | 190 | 160 | 410 kB |
 | queue-kit | 84 | 70 | 93 kB |

@@ -102,6 +102,7 @@ check-tree-terms
 check-path-names
 check-binary-strings
 check-pipefail-readers
+check-script-preflight
 check-portability-floor
 check-projection-roster
 check-template-copy-parity

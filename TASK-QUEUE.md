@@ -28,18 +28,6 @@ The ghpin family of `adopter-content-checks`, generalized: every site of a confi
 
 **Cost while deferred:** an unpinned CLI call can act under the wrong account, the adopter's own check its only guard. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `site count`, `reviewed` in this file, none; owner gate-sdk/SPEC.md §check-action-pinning.
 
-### script-preflight
-
-[spec: gate-sdk/SPEC-shell-preflight.md]
-
-The script family of `adopter-content-checks`: a preflight on each shell script a batch-job wrapper ships, its rules consumer config.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** exit 0 clean, 1 with one line per refusal, 3 for an unreadable file or a span the shell reader cannot parse, over logical lines joining backslash continuations, every waiver owing a reason of 5+ characters. PKILL-REFUSED for `pkill -f` or an unquoted or variable pattern, allowing `-P "$pid"`, `-x` with a quoted literal, a pkill inside a container namespace (an earlier `docker exec` on the line), `-f` anchored by the run's config path in the form `<cmd> [--flag N]... --config $VAR`, and `# pkill-ok: <reason>`. MOUNT-REFUSED for a code line naming a configured forbidden path token. PIPEFAIL-REFUSED for a pipe into an early-exit reader while pipefail is on, in force from its `set` to the end of its file, `( )` or `$( )`, a here-doc or quoted script body checked as its own script, waived by `# pipefail-ok:` on the line or `# sigpipe-ok:` on the reader's. OWNER-REFUSED for a configured submit command whose configured flags fail a configured id grammar, a value holding an expansion skipped. Every token list, command, flag and grammar is consumer config, never a kit literal.
-
-**Deliverable:** check-script-preflight over a consumer rules file of generic rule kinds, on the shell reader the pipefail family shares.
-
-**Cost while deferred:** a script that kills a sibling job by a broad pattern, writes a forbidden mount or submits under a malformed owner is refused only by the adopter's own check. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `preflight`, `pkill` in this file, none; owner gate-sdk/SPEC.md §check-pipe-membership.
-
 ### stale-test-literals
 
 [spec: gate-sdk/SPEC-since-base.md]
@@ -1069,4 +1057,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - binary-strings-scan
 - deny-term-names
 - pipefail-readers
+- script-preflight
 

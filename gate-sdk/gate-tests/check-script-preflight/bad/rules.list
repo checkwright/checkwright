@@ -1,0 +1,23 @@
+# One block per kind, the shared rules of both cases.
+waiver-min 5
+body sbatch
+
+rule KILL-BROAD command
+  cmd pkill
+  allow ^pkill -P "[$][A-Za-z_][A-Za-z0-9_]*"$
+  before timeout [0-9]+ $
+  waiver kill-ok
+
+rule MOUNT forbidden-token
+  token /mnt/shared
+  token /scratch/team
+  waiver mount-ok
+
+rule EARLY early-exit
+  waiver pipefail-ok
+
+rule OWNER id-grammar
+  cmd submit
+  flag --owner
+  flag -u
+  grammar ^[a-z][a-z0-9]{2,}$

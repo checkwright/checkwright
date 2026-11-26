@@ -1,0 +1,39 @@
+# script-rules.list — rules template for check-script-preflight.
+# gate-sdk/SPEC.md §check-script-preflight. Copy to your gates dir as
+# script-rules.list, name your scripts in GATE_SDK_SCRIPT_FILES, and uncomment
+# the blocks you want, each bound to your own commands, paths and grammars.
+#
+# A block opens with 'rule <ID> <kind>' and takes the indented '<key> <value>'
+# lines after it; '#' lines and blank lines are ignored. An ERE value is a search,
+# so anchor it with ^ and $ to match the whole text. A site a rule cannot see is
+# cleared by '# <waiver>: <reason>' on any physical line of its logical line.
+
+# The shortest waiver reason, in characters; the default is 1.
+# waiver-min 10
+
+# Commands whose here-doc or quoted operand is read as a script of its own.
+# body sbatch
+
+# command: every invocation of cmd is refused unless an allow ERE matches its
+# text, a before ERE matches the code ahead of it on its line, or a waiver clears it.
+# rule KILL-BY-PARENT command
+#   cmd pkill
+#   allow ^pkill -P "[$][A-Za-z_][A-Za-z0-9_]*"$
+#   before ^timeout [0-9]+ $
+#   waiver kill-ok
+
+# forbidden-token: a line's code holding any token is refused.
+# rule SHARED-MOUNT forbidden-token
+#   token /mnt/shared
+#   waiver mount-ok
+
+# early-exit: a reader that stops early, fed under pipefail.
+# rule PIPEFAIL-READER early-exit
+#   waiver pipefail-ok
+
+# id-grammar: each listed flag's value in an invocation of cmd must match grammar.
+# rule OWNER-ID id-grammar
+#   cmd submit
+#   flag --owner
+#   grammar ^[a-z][a-z0-9_]{2,31}$
+#   waiver owner-ok

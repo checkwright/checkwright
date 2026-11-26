@@ -353,7 +353,10 @@ pub fn write(path: &str, body: &str) -> Result<(), String> {
 }
 
 #[cfg(test)]
-pub(crate) mod tests {
+pub(crate) use tests::fixed;
+
+#[cfg(test)]
+mod tests {
     use super::*;
     use crate::provenance::Kit;
 

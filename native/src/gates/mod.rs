@@ -105,6 +105,7 @@ pub mod path_dialect;
 pub mod path_names;
 pub mod pipe_membership;
 pub mod pipefail_readers;
+pub mod script_preflight;
 pub mod plugin_parity;
 pub mod packed_links;
 pub mod payload_claim;
@@ -2708,6 +2709,16 @@ pub const REGISTRY: &[GateEntry] = &[
         ],
         "gate-sdk",
         &[],
+    ),
+    // spec: gate-sdk/SPEC.md §check-script-preflight — no walk root: the corpus is the operands
+    // named exactly, else `git ls-files` over the configured pathspecs, as §check-portability-floor's
+    (
+        "check-script-preflight",
+        script_preflight::run,
+        &[],
+        &["GATE_SDK_SCRIPT_FILES", "GATE_SDK_SCRIPT_RULES", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
+        "gate-sdk",
+        &[("git", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-portability-floor — no walk root: the corpus is
     // `git ls-files` over the configured pathspecs, which §check-reads-couples rules outside the

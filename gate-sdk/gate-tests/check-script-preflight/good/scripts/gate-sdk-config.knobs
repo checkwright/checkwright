@@ -1,0 +1,2 @@
+GATE_SDK_SCRIPT_FILES = tree
+GATE_SDK_SCRIPT_RULES = rules.list

@@ -1,0 +1,10 @@
+script site(s) breaking a rule in rules.list
+tree/submit-job.sh:3: [KILL-BROAD] pkill
+tree/submit-job.sh:4: [KILL-BROAD] pkill
+tree/submit-job.sh:5: [MOUNT] token 1
+tree/submit-job.sh:6: [EARLY] head
+tree/submit-job.sh:7: [OWNER] --owner
+tree/submit-job.sh:8: [OWNER] -u
+tree/submit-job.sh:9: [KILL-BROAD] waiver reason under 5 characters
+tree/submit-job.sh:11: [KILL-BROAD] pkill
+tree/submit-job.sh:13: [MOUNT] token 2

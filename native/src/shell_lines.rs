@@ -61,13 +61,62 @@ pub struct Comment {
     pub text: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct Logical {
+    pub first: usize,
+    pub last: usize,
+    pub start: usize,
+    pub end: usize,
+}
+
+// spec: gate-sdk/SPEC.md §The shell reader — a span the code half leaves out: a continuation, a
+// comment, a here-doc body, and an operator-joined newline read as one blank
+#[derive(Debug, Clone, Copy)]
+struct Skip {
+    start: usize,
+    end: usize,
+    blank: bool,
+}
+
 #[derive(Debug, Default)]
 pub struct Script {
     pub commands: Vec<Command>,
     pub pipelines: Vec<Pipeline>,
     pub comments: Vec<Comment>,
+    pub logicals: Vec<Logical>,
     pub bodies: Vec<Script>,
     pub sets_pipefail: bool,
+    src: String,
+    base: usize,
+    skips: Vec<Skip>,
+}
+
+impl Script {
+    // spec: gate-sdk/SPEC.md §The shell reader — the code half between two of the script's
+    // offsets, quoted text kept
+    pub fn code(&self, start: usize, end: usize) -> String {
+        let b = self.src.as_bytes();
+        let at = |o: usize| o.saturating_sub(self.base).min(b.len());
+        let mut out: Vec<u8> = Vec::new();
+        let mut k = start;
+        for s in self.skips.iter().filter(|s| s.end > start && s.start < end) {
+            if s.start > k {
+                out.extend_from_slice(&b[at(k)..at(s.start)]);
+            }
+            if s.blank {
+                out.push(b' ');
+            }
+            k = k.max(s.end);
+        }
+        if k < end {
+            out.extend_from_slice(&b[at(k)..at(end)]);
+        }
+        lossy(&out)
+    }
+
+    pub fn logical_at(&self, offset: usize) -> Option<&Logical> {
+        self.logicals.iter().find(|l| l.start <= offset && offset < l.end)
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -104,10 +153,14 @@ fn read_at(text: &str, opts: &Options, base: usize, first_line: usize) -> Result
         next_shell: 1,
         pending: Vec::new(),
         docs: Vec::new(),
+        lstart: 0,
+        lfirst: first_line,
         out: Script::default(),
     };
     r.run()?;
     let Reader { mut out, docs, .. } = r;
+    out.src = text.to_string();
+    out.base = base;
     let body_opts = Options { body: opts.body, pipefail: false };
     if !opts.body.is_empty() {
         let named = |w: &Word| !w.redir && !w.quoted && opts.body.contains(&w.value);
@@ -124,10 +177,12 @@ fn read_at(text: &str, opts: &Options, base: usize, first_line: usize) -> Result
                     let inner = &w.raw[1..w.raw.len() - 1];
                     let inner = if w.raw.starts_with('"') { unescape_dq(inner) } else { inner.to_string() };
                     operands.push((inner, w.start + 1, w.line));
+                    out.skips.push(Skip { start: w.start, end: w.end, blank: true });
                 }
                 seen |= named(w);
             }
         }
+        out.skips.sort_by_key(|s| s.start);
         for (inner, at, line) in operands {
             out.bodies.push(read_at(&inner, &body_opts, at, line)?);
         }
@@ -254,6 +309,8 @@ struct Reader<'t> {
     next_shell: usize,
     pending: Vec<HereDoc>,
     docs: Vec<HereDoc>,
+    lstart: usize,
+    lfirst: usize,
     out: Script,
 }
 
@@ -541,7 +598,20 @@ impl Reader<'_> {
         let end = self.b[self.i..].iter().position(|c| *c == b'\n').map_or(self.b.len(), |p| self.i + p);
         let text = lossy(&self.b[self.i..end]);
         self.out.comments.push(Comment { line: self.line, text });
+        self.skip(self.i, end, false);
         self.i = end;
+    }
+
+    fn skip(&mut self, start: usize, end: usize, blank: bool) {
+        let base = self.base;
+        self.out.skips.push(Skip { start: base + start, end: base + end, blank });
+    }
+
+    fn end_logical(&mut self, end: usize) {
+        if end > self.lstart {
+            let (base, first, last) = (self.base, self.lfirst, self.line);
+            self.out.logicals.push(Logical { first, last, start: base + self.lstart, end: base + end });
+        }
     }
 
     // comment-tier-exempt: a zero `open` ends the span at the first unescaped `close`, no nesting
@@ -690,7 +760,10 @@ impl Reader<'_> {
                 self.adv(1, true);
             }
             b'\\' => match self.peek(1) {
-                Some(b'\n') => self.adv(2, true),
+                Some(b'\n') => {
+                    self.skip(self.i, self.i + 2, false);
+                    self.adv(2, true);
+                }
                 Some(c @ (b'$' | b'`' | b'"' | b'\\')) => {
                     self.push_value(&[c]);
                     self.adv(2, true);
@@ -718,8 +791,21 @@ impl Reader<'_> {
         if !joins && !pattern {
             self.end_pipeline();
         }
+        let nl = self.i;
+        if joins {
+            self.skip(nl, nl + 1, true);
+        } else {
+            self.end_logical(nl);
+        }
         self.adv(1, false);
-        self.heredocs()
+        self.heredocs()?;
+        if self.i > nl + 1 {
+            self.skip(nl + 1, self.i, false);
+        }
+        if !joins {
+            (self.lstart, self.lfirst) = (self.i, self.line);
+        }
+        Ok(())
     }
 
     fn heredocs(&mut self) -> Result<(), ParseError> {
@@ -854,6 +940,7 @@ impl Reader<'_> {
                     self.adv(1, true);
                 }
                 b'\\' if next == Some(b'\n') => {
+                    self.skip(self.i, self.i + 2, false);
                     self.i += 2;
                     self.line += 1;
                 }
@@ -967,6 +1054,7 @@ impl Reader<'_> {
             return self.err(d.line);
         }
         self.end_pipeline();
+        self.end_logical(self.b.len());
         Ok(())
     }
 }
@@ -1383,6 +1471,27 @@ mod tests {
         assert_eq!(spans, [(1, 3), (4, 4), (5, 5)]);
     }
 
+    // spec: gate-sdk/SPEC.md §The shell reader — a logical line's code half keeps quoted text and
+    // leaves out its comments, continuations and joined here-doc bodies
+    #[test]
+    fn a_logical_line_reads_its_code_half() {
+        let s = script("a \\\n  b 'x # y' | # c\n  d\ncat <<EOF |\nbody\nEOF\n  e\nf # g\n");
+        let lines: Vec<(usize, usize, String)> =
+            s.logicals.iter().map(|l| (l.first, l.last, s.code(l.start, l.end))).collect();
+        assert_eq!(
+            lines,
+            [
+                (1, 3, "a   b 'x # y' |    d".to_string()),
+                (4, 7, "cat <<EOF |   e".to_string()),
+                (8, 8, "f ".to_string()),
+            ]
+        );
+        let d = &s.commands[1].words[0];
+        assert_eq!(d.value, "d");
+        let l = s.logical_at(d.start).expect("in a logical line");
+        assert_eq!(s.code(l.start, d.start), "a   b 'x # y' |    ");
+    }
+
     // spec: gate-sdk/SPEC.md §The shell reader — quoted text, here-doc bodies, case patterns and
     // test brackets hold no pipeline
     #[test]
@@ -1488,5 +1597,7 @@ mod tests {
         assert_eq!(s.bodies[0].pipelines[0].line, 4);
         assert!(!s.bodies[0].pipelines[0].pipefail);
         assert_eq!(s.bodies[1].pipelines[0].line, 6);
+        let codes: Vec<String> = s.logicals.iter().map(|l| s.code(l.start, l.end)).collect();
+        assert_eq!(codes, ["set -o pipefail", "bash <<'EOF'", "bash -c  "]);
     }
 }

@@ -156,7 +156,7 @@ pub fn lookup(args: &[String]) -> i32 {
 mod tests {
     use super::*;
     use crate::exit::Kind;
-    use crate::sarif::tests::fixed;
+    use crate::sarif::fixed;
 
     fn scratch(tag: &str) -> PathBuf {
         let d = std::env::temp_dir().join(format!("cw-verdict-store-{}-{}", tag, std::process::id()));

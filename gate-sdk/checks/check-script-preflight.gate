@@ -1,0 +1,4 @@
+# graph: couples=*,knob:GATE_SDK_SCRIPT_RULES dir=one valve=none tier=precommit trigger=*
+# install: on-surface
+# armed-by: GATE_SDK_SCRIPT_FILES
+# spec: gate-sdk/SPEC.md §check-script-preflight — no configured shell script breaks a rule in the consumer's rules file (the record names the rule id and the kind's subject, never a value from the script)

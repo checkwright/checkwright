@@ -1,0 +1,8 @@
+# spec: gate-sdk/SPEC.md §check-script-preflight — this repo's script rules. Several sessions share one tree, so a kill by name or pattern reaches another session's processes: a script kills a child by parent pid or by an exact quoted name, never more broadly.
+waiver-min 5
+
+rule KILL-BROAD command
+  cmd pkill
+  allow ^pkill -P "[$][{]?[A-Za-z_][A-Za-z0-9_]*[}]?"$
+  allow ^pkill -x ("[^"$`]+"|'[^']+')$
+  waiver kill-ok
