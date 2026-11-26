@@ -53,6 +53,7 @@ pub mod overhead_meter;
 pub mod pack_installer;
 pub mod parse_smoke_log;
 pub mod peer_channel;
+pub mod pipefail_fix;
 pub mod projection_witness;
 pub mod port_blockers;
 pub mod price_coverage;
@@ -532,6 +533,12 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-md-section",
         Arm::Emit(md_section::emit, Grammar::Parsed(md_section::USAGE)),
         md_section::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §check-pipefail-readers — the gate's remedy, its corpus the gate's
+    (
+        "--emit-pipefail-fix",
+        Arm::Emit(pipefail_fix::emit, Grammar::Parsed(pipefail_fix::USAGE)),
+        pipefail_fix::KNOBS,
     ),
     // spec: canon-kit/SPEC.md §check-md-unwrapped — the gate's remedy, reading no knob: its
     // operands are the files, and the scanner is the gate's own

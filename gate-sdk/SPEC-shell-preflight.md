@@ -13,7 +13,7 @@ Pairs `script-preflight` and `pipefail-readers`. A consumer that ships shell scr
 
 ### (1) The shared shell reader {design-bearing} {user-facing: the adopter input on `pipefail-readers` — one detector, two entry points}
 
-**Not yet applied**: a new section, §The shell reader, before §check-pipe-membership:
+**Applied** (merged into gate-sdk/SPEC.md §The shell reader): a new section, §The shell reader, before §check-pipe-membership:
 
 > `native/src/shell_lines.rs` is the one reader of shell text for the shell content gates. It joins backslash continuations and trailing `|`, `&&` and `||` into **logical lines**, each keeping its first physical line's number; splits each into its **code half and comment half** outside quotes; splits code into **pipelines** and each pipeline into stages outside quotes, a nested `( )` or `$( )` read as a pipeline set of its own; and tracks **`pipefail` scope**: on from a code line's `set -o pipefail` (or a flag word ending in `o` followed by `pipefail`) to the end of the file, `( )` or `$( )` that holds it. A here-doc body or a quoted operand fed to a command the caller names is read as **a script of its own**, its own scope off at its start and its line numbers the outer file's.
 >
@@ -54,7 +54,7 @@ The kit ships `templates/script-rules.list`, commented out whole, one example bl
 
 ### (3) check-pipefail-readers {design-bearing} {user-facing: the adopter input on `pipefail-readers`}
 
-**Not yet applied**: §Layout and configuration's rule rosters gain `GATE_SDK_PIPEFAIL_PATHS` (default empty: files and directories, a directory searched for `*.sh` under the shared prune dirs), `GATE_SDK_PIPEFAIL_LIBRARIES` (default `*lib.sh *-lib*`: basename globs of files linted with `pipefail` on from their first line), `GATE_SDK_PIPEFAIL_ALL` (default `0`; `1` lints every file in the corpus that way) and `GATE_SDK_PIPEFAIL_BASELINE` (default empty: a count baseline, §The count baseline). A new section, §check-pipefail-readers:
+**Applied** (merged into gate-sdk/SPEC.md §check-pipefail-readers and §Layout and configuration): §Layout and configuration's rule rosters gain `GATE_SDK_PIPEFAIL_PATHS` (default empty: files and directories, a directory searched for `*.sh` under the shared prune dirs), `GATE_SDK_PIPEFAIL_LIBRARIES` (default `*lib.sh *-lib*`: basename globs of files linted with `pipefail` on from their first line), `GATE_SDK_PIPEFAIL_ALL` (default `0`; `1` lints every file in the corpus that way) and `GATE_SDK_PIPEFAIL_BASELINE` (default empty: a count baseline, §The count baseline). A new section, §check-pipefail-readers:
 
 > `checks/check-pipefail-readers.gate` (`precommit`, binary-dispatched). Invariant: no early-exit reader is fed under `pipefail` in the configured shell tree beyond its baselined count. Its corpus is the operands, else `GATE_SDK_PIPEFAIL_PATHS`; a file is linted when a code line sets `pipefail` (from that line, §The shell reader), when its basename matches a library glob, or when `GATE_SDK_PIPEFAIL_ALL` is `1`. With the knob empty and no operand it prints `not applicable: no shell path configured`; it declares `# install: on-surface` and `# armed-by: GATE_SDK_PIPEFAIL_PATHS`.
 >
@@ -64,7 +64,7 @@ The kit ships `templates/script-rules.list`, commented out whole, one example bl
 
 ### (4) The fix arm {design-bearing} {user-facing: the adopter input on `pipefail-readers` — a mechanical rewrite}
 
-**Not yet applied**: §check-pipefail-readers continues:
+**Applied** (merged into gate-sdk/SPEC.md §check-pipefail-readers): §check-pipefail-readers continues:
 
 > **`--emit pipefail-fix [<path>…]`**, an `Arm::Emit` member (§The non-gate arm), rewrites every fixable hit in its corpus, chosen as the gate chooses it, in place: `grep -q X` to `grep X >/dev/null`, `grep -m N …` to `grep … | sed -n '1,Np'`, and `head -n N` to `sed -n '1,Np'`. Each rewritten file keeps its mode, and the arm prints one `<path>:<line>: fixed` line per site. Any other hit is a hand fix and is left alone. An unparseable file is exit 3 with nothing written to it; an unwritable one is exit 3. Its caller is the session fixing a red, which the gate's `help:` line names.
 
@@ -72,7 +72,7 @@ The kit ships `templates/script-rules.list`, commented out whole, one example bl
 
 ### (5) The count baseline {design-bearing} {user-facing: the adopter input on `pipefail-readers` and `reviewed-site-count` — one format}
 
-**Not yet applied**: a new section, §The count baseline, after §The shell reader:
+**Applied** (merged into gate-sdk/SPEC.md §The count baseline): a new section, §The count baseline, after §The shell reader:
 
 > A count baseline holds lines `<count><TAB><path>`, `<count>` decimal digits and `<path>` repo-relative; `#` lines and blank lines are skipped, and any other line, or a path given twice, is unparseable input at exit 3 naming the line. A reading gate names its comparison: **a ceiling** (check-pipefail-readers) passes a file at or under its count, reds one over it, and reds `<path>: [BASELINE-STALE] <found>/<count>` where the count exceeds the file's hits so the count is lowered; **an exact count** (check-site-count) reds any difference. A file with no row has a count of 0.
 

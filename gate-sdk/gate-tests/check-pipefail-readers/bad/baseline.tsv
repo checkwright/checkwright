@@ -1,0 +1,4 @@
+# reviewed early-exit sites, one row per file
+1	tree/over.sh
+3	tree/stale.sh
+2	tree/gone.sh

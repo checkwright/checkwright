@@ -100,6 +100,10 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_DENY_TERMS` (default `<gates-dir>/deny-terms.local.list`): space-separated literal-term lists ([§The deny-term list](#the-deny-term-list)), each **optional**, read by check-tree-terms, check-path-names and check-binary-strings. An absent file contributes nothing; a present one that is not a readable regular file is exit 3.
 - `GATE_SDK_STRINGS_FILES` (default empty): space-separated build-output paths for `check-binary-strings`, each named exactly, never globbed or discovered. Empty disables the gate.
 - `GATE_SDK_STRINGS_SHAPES` (default `<gates-dir>/strings-shapes.list`): space-separated ERE shape lists for the same gate, each **optional**, read as `GATE_SDK_DENY_TERMS`' lists are.
+- `GATE_SDK_PIPEFAIL_PATHS` (default empty): space-separated files and directories for `check-pipefail-readers` and its fix arm, a directory searched for `*.sh` under the shared prune dirs. Empty disables the gate.
+- `GATE_SDK_PIPEFAIL_LIBRARIES` (default `*lib.sh *-lib*`): basename globs of the files that member lints with `pipefail` on from their first line; empty names none.
+- `GATE_SDK_PIPEFAIL_ALL` (default `0`): `1` lints every file in that corpus that way; any other value refuses at exit 2.
+- `GATE_SDK_PIPEFAIL_BASELINE` (default empty): the member's count baseline ([§The count baseline](#the-count-baseline)); empty holds every file to a count of 0.
 - `GATE_SDK_PORTABILITY_PATTERNS` (default `<gates-dir>/portability-patterns.list`): space-separated banned-construct rosters for `check-portability-floor`, each **optional**. An absent file disables the assertion, where a present-but-unreadable one is exit 3 (see there).
 - `GATE_SDK_PORTABILITY_PATHS` (default **empty**): space-separated pathspecs naming that gate's install-path corpus. Empty is the shipped default because the kit cannot know any consumer's install path, and an empty corpus disables the assertion rather than failing it closed ([§check-portability-floor](#check-portability-floor)).
 - `GATE_SDK_HARNESS_LITERALS` (default **empty**): space-separated fixed strings, the harness-bound literals [§check-harness-literal](#check-harness-literal) holds to their declared sites. The kit ships none, since a default would be one vendor's spelling.
@@ -3647,13 +3651,45 @@ Its fixture pair exercises both corpus arms, both assertions and every clearance
 - `good/` carries the primitives spelled in the speller's own body, a module reaching each through a named helper, and a declared namespace site. It also carries an anchored two-root file, a one-root file doing arithmetic, and a shell file defining `gate_path_rooted()` with both single-dialect forms inside it, a site routed through it, a `# path-dialect-exempt:` line and the prefix arms that must stay green.
 - `bad/` carries each vocabulary member, a declaration with no reason, an unanchored two-root file, one anchored after its first binding, a `[[ … == /* ]]` file and a `case … /*)` file.
 
+### The shell reader
+
+`native/src/shell_lines.rs` is the one reader of shell text for the shell content gates ([§check-pipe-membership](#check-pipe-membership), [§check-pipefail-readers](#check-pipefail-readers) and its fix arm). A gate run single-script and tree-wide over two parsers would get two verdicts on one script wherever they disagreed on a continuation or a quote, so there is one.
+
+- **Lines.** A backslash continuation and a trailing `|`, `&&` or `||` join the next physical line, so a pipeline broken across lines is one pipeline, numbered by its first physical line and spanning to its last.
+- **Halves.** Each line splits into a **code half and a comment half** outside quotes; a `#` opens a comment only where a word could begin.
+- **Pipelines.** Code splits into pipelines and each pipeline into stages outside quotes. A nested `( )` or `$( )` is a pipeline set of its own, a backtick span is opaque, and a `{ }` group is read in its enclosing shell.
+- **`pipefail` scope.** A `set` command whose words hold `-o pipefail`, or a flag word ending in `o` followed by `pipefail` (`set -euo pipefail`), turns it on. It holds to the end of the file, or of the `( )` or `$( )` holding it, and a `{ }` group's setting holds in its enclosing shell. An entry point may start a file with it on.
+- **Bodies.** A here-doc body or a quoted operand fed to a command the entry point names is read as **a script of its own**, its scope off at its start and its line numbers the outer file's. A here-doc body fed to any other command is content.
+
+**A span the reader cannot parse** — an unterminated quote, a here-doc with no terminator, an unbalanced `(`, `)` or `$(` — is reported as `<path>:<line>: [LINT-PARSE] unparseable span`, and the reading gate exits 3, unparseable input; the rest of the file is not judged. Every tracked script outside the prune set reads without one, so a script the reader refuses is a reader defect fixed in the reader, never a corpus narrowed around it.
+
+**The early-exit detector** is the reader's rule shared by its gates. A pipeline under `pipefail` hits when a stage after the first stops reading early, since the producer still writing then takes `SIGPIPE` and the signal becomes the pipeline's status:
+
+- `grep` with `-q`, `-m` or `-l`, their long forms, or a short flag cluster holding one;
+- `head`; `read`;
+- `sed` whose script ends a command with `q`; `awk` whose program holds `exit`;
+- a `while read` loop whose body, in its own shell, holds a `break` reaching it.
+
+Which readers stop early is shell semantics, the same in every project, so the list is kit mechanism; which files, which waiver tokens and which reasons count are the entry point's. A pipeline is cleared by a **guarded producer**, a first stage of the shape `{ <cmd> || true; }`, or by **a waiver**: `# <token>: <reason>` on any physical line of the pipeline, a token the entry point names, its trimmed reason at least the entry point's floor in characters. A waiver under the floor clears nothing, and each of its pipeline's hits records `waiver reason under <n> characters` in place of the reader. A hit the fix arm can rewrite ([§check-pipefail-readers](#check-pipefail-readers)) is marked fixable: a `grep` quiet or bounded by a literal `-m` count but not both and never listing, its flags unquoted; and a `head` reading its input with no count or a literal one.
+
+**Honest limit.** The reader is lexical: a pipeline built through `eval`, a function called inside a pipeline, and `pipefail` set in a sourcing script and inherited by a library are outside it, the last bounded by [§check-pipefail-readers](#check-pipefail-readers)' library globs.
+
+### The count baseline
+
+`native/src/count_baseline.rs` reads a count baseline: lines `<count><TAB><path>`, `<count>` decimal digits and `<path>` repo-relative, a leading `./` dropped. `#` lines and blank lines are skipped, and any other line, or a path given twice, is unparseable input at exit 3 naming the line; the file absent where a knob names it refuses at exit 2. A file with no row has a count of 0. A reading gate names its comparison:
+
+- **A ceiling** ([§check-pipefail-readers](#check-pipefail-readers)) passes a file at or under its count and reds one over it. A count above the file's hits reds `<path>: [BASELINE-STALE] <found>/<count>`, so the count is lowered as sites are fixed and a fixed site cannot return unseen.
+- **An exact count** reds any difference.
+
+The record carries `<found>/<count>` because the fix is a number in the baseline. **Honest limit:** that text moves the result's fingerprint whenever a count changes, the volatile-value limit [§run-gates](#run-gates) names.
+
 ### check-pipe-membership
 
 Invariant: **no set producer feeds a short-circuiting reader in a shell file under `pipefail`.** It holds [§run-gates](#run-gates)' rule — a short-circuiting consumer may not be fed by a producer inside the same gate — at the one shape that rule's defect takes. The reader exits on its first match while the writer is still writing, the writer takes `SIGPIPE`, and `pipefail` makes the signal the pipeline's status, so a present member reads as **absent**. The onset is a roster size rather than a race on every run, which is why review does not hold it.
 
 **The corpus** is `walk::tracked_shell_tree`, the corpus and prune set [§check-path-dialect](#check-path-dialect) walks, plus the tracked unit-test suites, read on the same code-and-comment split. A suite is each `*.test.sh` whose parent directory is named `gate-tests` (the kit layout's) or is the resolved `GATE_SDK_TESTS_DIR`, and whose path above it is unpruned. That is the `<tests-dir>/*.test.sh` shape [§run-gate-tests](#run-gate-tests) runs, so a consumer relocating its tests dir keeps its suites in scope. The suites join because a suite is a shell file under `pipefail` like any other; a case directory's files stay out, since its `bad/` trees carry deliberate violations. The clean line counts the two halves apart.
 
-**A file is in scope** when a code line sets `pipefail`: `set -o pipefail`, or a combined flag word ending in `o` (`set -euo pipefail`). A line whose code half ends in `\` or `|` continues onto the next, so a pipe broken across lines is one pipeline.
+**A file is in scope** when a code line sets `pipefail`, read by [§The shell reader](#the-shell-reader) with no body command and its pipelines, continuations joined, the ones judged.
 
 **The predicate is keyed on the producer, and that is what keeps it narrow.** A pipeline reds when its **last** stage is a short-circuiting reader and its **first** stage is a set producer.
 
@@ -3667,9 +3703,25 @@ Any other pipe into a short-circuiting reader is safe or benign: its producer wr
 
 **Honest limit.** A producer that is a command reading a large file or roster, such as `grep -Ev … "$roster" | grep -qxF …`, passes: its writes are the command's own buffered output rather than a per-element loop, and judging its size is dataflow. The live instance of that shape runs under `/bin/sh` with no `pipefail`, outside the hazard's precondition.
 
-**Fail-closed.** Outside a work tree the corpus degrades to empty, so the repository is probed first and an absent one refuses with exit 2; an unreadable tracked file is exit 3. Its implementation is a compiled subcommand, born native, `precommit` with `trigger=*` for [§check-path-dialect](#check-path-dialect)'s reason, and `install: zero-config`.
+**Fail-closed.** Outside a work tree the corpus degrades to empty, so the repository is probed first and an absent one refuses with exit 2; an unreadable tracked file is exit 3, as is a file holding a `LINT-PARSE` span ([§The shell reader](#the-shell-reader)). Its implementation is a compiled subcommand, born native, `precommit` with `trigger=*` for [§check-path-dialect](#check-path-dialect)'s reason, and `install: zero-config`.
 
 Its fixture pair asserts the count. `bad/` carries each producer shape under `pipefail`, a suite among them and a second in the tests dir the case's knob file relocates. `good/` carries an array pipe with no `pipefail`, an array pipe into a full reader, a one-line producer into a quiet `grep`, the loop form, and a violating file nested inside a case directory under a tests dir.
+
+### check-pipefail-readers
+
+`checks/check-pipefail-readers.gate` (`precommit`, binary-dispatched). Invariant: **no early-exit reader is fed under `pipefail` in the configured shell tree beyond its baselined count.** [§check-pipe-membership](#check-pipe-membership) is zero-config and kit-wide on a predicate narrow enough to hold every tree with no baseline. This member reds the whole class [§The shell reader](#the-shell-reader)'s early-exit detector names, which a tree adopts site by site, so it is consumer-armed and baselined.
+
+**The corpus** is the operands, tracked or not, else `GATE_SDK_PIPEFAIL_PATHS`: a file is read as named and a directory is searched for `*.sh` under the shared prune dirs. An operand or knob path naming nothing on disk refuses at exit 2, and a file unreadable or not UTF-8 is exit 3. A file is linted when a code line sets `pipefail` (from that line), when its basename matches a `GATE_SDK_PIPEFAIL_LIBRARIES` glob, or when `GATE_SDK_PIPEFAIL_ALL` is `1`; the last two lint it with `pipefail` on from its first line, since a library inherits its sourcing script's setting. With no operand and the knob empty it prints `not applicable: no shell path configured` and exits 0, and it declares `# install: on-surface` and `# armed-by: GATE_SDK_PIPEFAIL_PATHS`. This repo binds no path: [§check-pipe-membership](#check-pipe-membership) holds the set-producer shape here, and adopting the wider class is a calibration not yet made, so the member is registered and disarmed.
+
+It runs the detector with the waiver token `pipefail-ok` and a reason floor of 1. **The record is `<path>:<line>: [PIPEFAIL-EARLY-EXIT] <reader>`**, `<line>` the pipeline's first, and a site the fix arm rewrites ends in `[auto-fix]`. Under `GATE_SDK_PIPEFAIL_BASELINE` each file's hits are held to its row as **a ceiling** ([§The count baseline](#the-count-baseline)). A file over its count prints every hit, since which one is new is unknowable, and a stale row prints its `BASELINE-STALE` record; a row for a file outside an operand-named corpus is not judged. The `help:` lines name the fix arm where an `[auto-fix]` site is in the output, the waiver, and the baseline to lower where a row is stale. A `LINT-PARSE` file is exit 3.
+
+**`--emit pipefail-fix [<path>…]`**, an `Arm::Emit` member ([§The non-gate arm](#the-non-gate-arm)), rewrites every fixable hit in its corpus in place, the corpus and the hits chosen as the gate chooses them: `grep -q X` to `grep X >/dev/null`, `grep -m N …` to `grep … | sed -n '1,Np'`, and `head -n N` to `sed -n '1,Np'`. Each rewritten file keeps its mode, and the arm prints one `<path>:<line>: fixed` line per site. Any other hit is a hand fix and is left alone. An unparseable file is exit 3 with nothing written to it, as is an unwritable one; every other file is still rewritten. It is an arm and not a gate flag because a gate judges and never writes the tree ([§run-gates](#run-gates)' leave-no-trace invariant), while a rewrite has a person reader and the `Arm::Emit` family's status grammar of 0, 2 and 3. Its caller is the session fixing a red, which the gate's `help:` line names.
+
+The pair points `GATE_SDK_PIPEFAIL_PATHS` and `GATE_SDK_PIPEFAIL_BASELINE` at case-local paths in each case's knob file. `bad/` carries one site per reader, a multi-line pipeline inside a `$( )`, a short waiver, a library that sets no `pipefail`, a file over its row, a stale row and a row for a file that is gone. `good/` carries readers before the `set` line, a guarded producer, a waived site, full readers, reader text inside quotes, a here-doc and a `case` pattern, a file that never sets `pipefail`, and a library within its row. `check-pipefail-readers.test.sh` holds the residue:
+
+- the empty configuration, an absent operand at 2, and an operand narrowing the corpus and its stale rows;
+- `GATE_SDK_PIPEFAIL_ALL` and its malformed value, a `LINT-PARSE` file at 3, an absent and a malformed baseline, and the prune set;
+- the fix arm rewriting a tree in place and refusing an unparseable file untouched.
 
 ### check-front-end-fail-open
 

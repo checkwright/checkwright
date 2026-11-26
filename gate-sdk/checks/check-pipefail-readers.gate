@@ -1,0 +1,4 @@
+# graph: couples=*.sh,knob:GATE_SDK_PIPEFAIL_BASELINE dir=one valve=none tier=precommit trigger=*
+# install: on-surface
+# armed-by: GATE_SDK_PIPEFAIL_PATHS
+# spec: gate-sdk/SPEC.md §check-pipefail-readers — no early-exit reader is fed under pipefail in the configured shell tree beyond its baselined count (the record names the reader, and [auto-fix] where --emit pipefail-fix rewrites it)

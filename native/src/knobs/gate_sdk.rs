@@ -128,6 +128,11 @@ fn validate(v: &Values) -> Vec<String> {
     };
     // spec: gate-sdk/SPEC.md §The gate-authoring surface — the one host set every host knob accepts
     errs.extend(scalar(v, crate::substrate::KNOB).and_then(|s| crate::substrate::host_refusal(crate::substrate::KNOB, s)));
+    // spec: gate-sdk/SPEC.md §check-pipefail-readers — a switch, so a misspelt value refuses rather
+    // than reads as off
+    if let Some(s) = scalar(v, "GATE_SDK_PIPEFAIL_ALL").filter(|s| !matches!(*s, "0" | "1")) {
+        errs.push(format!("GATE_SDK_PIPEFAIL_ALL must be 0|1 (got '{}')", s));
+    }
     // spec: installer/SPEC.md §The upgrade contract — the refusals are the roster module's, so the
     // validator and every reader share one reading of an element
     errs.extend(crate::release_sections::refusals(
@@ -209,6 +214,10 @@ pub const KIT: Kit = Kit {
         Row::derived("GATE_SDK_DENY_TERMS", Shape::Scalar, deny_terms, GATES).empty_takes_default().words(),
         Row::scalar("GATE_SDK_STRINGS_FILES", "").empty_takes_default().words(),
         Row::derived("GATE_SDK_STRINGS_SHAPES", Shape::Scalar, strings_shapes, GATES).empty_takes_default().words(),
+        Row::scalar("GATE_SDK_PIPEFAIL_PATHS", "").empty_takes_default().words(),
+        Row::scalar("GATE_SDK_PIPEFAIL_LIBRARIES", "*lib.sh *-lib*").words(),
+        Row::scalar("GATE_SDK_PIPEFAIL_ALL", "0").empty_takes_default(),
+        Row::scalar("GATE_SDK_PIPEFAIL_BASELINE", "").empty_takes_default(),
         Row::derived("GATE_SDK_PORTABILITY_PATTERNS", Shape::Scalar, portability_patterns, GATES).empty_takes_default().words(),
         Row::scalar("GATE_SDK_PORTABILITY_PATHS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_HARNESS_LITERALS", "").empty_takes_default().words(),

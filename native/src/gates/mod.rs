@@ -104,6 +104,7 @@ pub mod merge_attrs;
 pub mod path_dialect;
 pub mod path_names;
 pub mod pipe_membership;
+pub mod pipefail_readers;
 pub mod plugin_parity;
 pub mod packed_links;
 pub mod payload_claim;
@@ -2689,6 +2690,24 @@ pub const REGISTRY: &[GateEntry] = &[
         &["GATE_SDK_DENY_TERMS", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS", "GATE_SDK_KIT_DIRS"],
         "gate-sdk",
         &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-reads-couples — `?` because the walked set is the member's own
+    // operands, else a knob's list of files and directories: neither is statically bounded
+    (
+        "check-pipefail-readers",
+        pipefail_readers::run,
+        &[("?", "", "", "dynamic@src/gates/pipefail_readers.rs:64")],
+        &[
+            "GATE_SDK_PIPEFAIL_PATHS",
+            "GATE_SDK_PIPEFAIL_LIBRARIES",
+            "GATE_SDK_PIPEFAIL_ALL",
+            "GATE_SDK_PIPEFAIL_BASELINE",
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "GATE_SDK_NATIVE_BIN",
+        ],
+        "gate-sdk",
+        &[],
     ),
     // spec: gate-sdk/SPEC.md §check-portability-floor — no walk root: the corpus is
     // `git ls-files` over the configured pathspecs, which §check-reads-couples rules outside the

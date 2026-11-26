@@ -24,6 +24,7 @@ macro_rules! println {
 mod actions;
 mod actions_run;
 mod bashscan;
+mod count_baseline;
 mod declaration;
 mod deny_terms;
 mod diff;
@@ -62,6 +63,7 @@ mod sarif;
 mod section;
 mod sessions;
 mod sha256;
+mod shell_lines;
 mod spec;
 mod stages;
 mod substrate;

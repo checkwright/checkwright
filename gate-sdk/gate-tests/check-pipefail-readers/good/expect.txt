@@ -1,0 +1,1 @@
+PIPEFAIL-READERS: clean (3 shell file(s) read, 2 linted under `pipefail`; 2 early-exit reader(s) within the baseline)

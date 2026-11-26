@@ -29,6 +29,7 @@ check-commit-msg
 check-tree-terms
 check-path-names
 check-binary-strings
+check-pipefail-readers
 check-portability-floor
 check-projection-roster
 check-assertion-strength

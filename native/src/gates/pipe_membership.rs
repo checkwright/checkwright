@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-pipe-membership — no set producer feeds a short-circuiting reader
 // in a shell file under `pipefail`
 use crate::exit::Fault;
-use crate::gates::path_dialect::shell_split;
+use crate::shell_lines::{self, Options, ParseError};
 use crate::walk;
 use std::path::Path;
 
@@ -19,136 +19,6 @@ pub fn run(args: &[String]) -> i32 {
             e.status()
         }
     }
-}
-
-// spec: gate-sdk/SPEC.md §check-pipe-membership — in scope when a code line sets `pipefail`, as
-// `-o pipefail` or a combined flag word ending in `o`
-fn sets_pipefail(code: &str) -> bool {
-    let words: Vec<&str> = code.split_whitespace().collect();
-    words.contains(&"set")
-        && words.windows(2).any(|w| {
-            w[1] == "pipefail"
-                && w[0].len() >= 2
-                && w[0].starts_with('-')
-                && !w[0].starts_with("--")
-                && w[0].ends_with('o')
-                && w[0][1..].chars().all(|c| c.is_ascii_alphabetic())
-        })
-}
-
-// spec: gate-sdk/SPEC.md §check-pipe-membership — logical lines: a code half ending in `\` or `|`
-// continues onto the next; each logical line keeps its first physical line's number
-fn logical_lines(text: &str) -> Vec<(usize, String)> {
-    let mut out: Vec<(usize, String)> = Vec::new();
-    let mut open: Option<(usize, String)> = None;
-    for (idx, raw) in text.lines().enumerate() {
-        let code = shell_split(raw).code;
-        let trimmed = code.trim_end();
-        let (body, cont) = if let Some(b) = trimmed.strip_suffix('\\') {
-            (b.to_string(), true)
-        } else {
-            (trimmed.to_string(), trimmed.ends_with('|') && !trimmed.ends_with("||"))
-        };
-        let entry = open.get_or_insert((idx, String::new()));
-        entry.1.push(' ');
-        entry.1.push_str(&body);
-        if !cont {
-            out.extend(open.take());
-        }
-    }
-    out.extend(open);
-    out
-}
-
-// spec: gate-sdk/SPEC.md §check-pipe-membership — every pipeline on a logical line as its stages,
-// nested substitutions and subshells read as pipelines of their own and quoted text as content
-fn pipelines(line: &str) -> Vec<Vec<String>> {
-    struct Frame {
-        dq: bool,
-        stages: Vec<String>,
-        cur: String,
-    }
-    fn close(f: &mut Frame, out: &mut Vec<Vec<String>>) {
-        let mut stages = std::mem::take(&mut f.stages);
-        stages.push(std::mem::take(&mut f.cur));
-        if stages.len() > 1 {
-            out.push(stages);
-        }
-    }
-    let b = line.as_bytes();
-    let mut out: Vec<Vec<String>> = Vec::new();
-    let mut stack = vec![Frame { dq: false, stages: Vec::new(), cur: String::new() }];
-    let (mut i, mut sq) = (0usize, false);
-    while i < b.len() {
-        let c = b[i];
-        let top = stack.len() - 1;
-        let dq = stack[top].dq;
-        if sq {
-            if c == b'\'' {
-                sq = false;
-            }
-            stack[top].cur.push(c as char);
-            i += 1;
-            continue;
-        }
-        if c == b'\\' && i + 1 < b.len() {
-            stack[top].cur.push(c as char);
-            stack[top].cur.push(b[i + 1] as char);
-            i += 2;
-            continue;
-        }
-        let next = b.get(i + 1).copied();
-        if c == b'$' && next == Some(b'(') {
-            stack[top].cur.push_str("$(…)");
-            stack.push(Frame { dq: false, stages: Vec::new(), cur: String::new() });
-            i += 2;
-            continue;
-        }
-        if dq {
-            if c == b'"' {
-                stack[top].dq = false;
-            }
-            stack[top].cur.push(c as char);
-            i += 1;
-            continue;
-        }
-        match c {
-            b'\'' => {
-                sq = true;
-                stack[top].cur.push('\'');
-            }
-            b'"' => {
-                stack[top].dq = true;
-                stack[top].cur.push('"');
-            }
-            b'(' => {
-                stack.push(Frame { dq: false, stages: Vec::new(), cur: String::new() });
-            }
-            b')' if stack.len() > 1 => {
-                let mut f = stack.pop().unwrap_or(Frame { dq: false, stages: Vec::new(), cur: String::new() });
-                close(&mut f, &mut out);
-            }
-            b'|' if next == Some(b'|') => {
-                close(&mut stack[top], &mut out);
-                i += 1;
-            }
-            b'|' => {
-                let s = std::mem::take(&mut stack[top].cur);
-                stack[top].stages.push(s);
-            }
-            b'&' if next == Some(b'&') => {
-                close(&mut stack[top], &mut out);
-                i += 1;
-            }
-            b';' | b'&' => close(&mut stack[top], &mut out),
-            _ => stack[top].cur.push(c as char),
-        }
-        i += 1;
-    }
-    while let Some(mut f) = stack.pop() {
-        close(&mut f, &mut out);
-    }
-    out
 }
 
 fn words(stage: &str) -> Vec<&str> {
@@ -197,29 +67,31 @@ struct Tally {
     readers: usize,
 }
 
-fn scan(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>) {
-    if !text.lines().any(|l| sets_pipefail(&shell_split(l).code)) {
-        return;
+// spec: gate-sdk/SPEC.md §check-pipe-membership — the file is in scope when any code line sets
+// `pipefail`, and then every pipeline in it is judged, the reader's scope not narrowing it
+fn scan(path: &str, text: &str, t: &mut Tally, findings: &mut Vec<String>) -> Result<(), ParseError> {
+    let script = shell_lines::read(text, &Options { body: &[], pipefail: false })?;
+    if !script.sets_pipefail {
+        return Ok(());
     }
     t.in_scope += 1;
-    for (idx, line) in logical_lines(text) {
-        for stages in pipelines(&line) {
-            let last = stages.last().map(String::as_str).unwrap_or("");
-            if !short_circuits(last) {
-                continue;
-            }
-            t.readers += 1;
-            if set_producer(&stages[0]) {
-                findings.push(format!(
-                    "{}:{} — a set producer (`{}`) feeds a short-circuiting reader (`{}`) under `pipefail`, so a present member can read as absent",
-                    path,
-                    idx + 1,
-                    words(&stages[0]).first().copied().unwrap_or(""),
-                    words(last).first().copied().unwrap_or("")
-                ));
-            }
+    for p in &script.pipelines {
+        let (first, last) = (&p.stages[0].text, &p.stages[p.stages.len() - 1].text);
+        if !short_circuits(last) {
+            continue;
+        }
+        t.readers += 1;
+        if set_producer(first) {
+            findings.push(format!(
+                "{}:{} — a set producer (`{}`) feeds a short-circuiting reader (`{}`) under `pipefail`, so a present member can read as absent",
+                path,
+                p.line,
+                words(first).first().copied().unwrap_or(""),
+                words(last).first().copied().unwrap_or("")
+            ));
         }
     }
+    Ok(())
 }
 
 fn rule(_args: &[String]) -> Result<i32, Fault> {
@@ -232,11 +104,22 @@ fn rule(_args: &[String]) -> Result<i32, Fault> {
     let suites = walk::tracked_suites().map_err(Fault::tool)?;
     let mut t = Tally { in_scope: 0, readers: 0 };
     let mut findings: Vec<String> = Vec::new();
+    let mut unparsed: Vec<String> = Vec::new();
     for f in shell.iter().chain(&suites) {
         let text = std::fs::read(Path::new(f))
             .map(|b| String::from_utf8_lossy(&b).into_owned())
             .map_err(|e| Fault::input(format!("cannot read {}: {}", f, e)))?;
-        scan(f, &text, &mut t, &mut findings);
+        if let Err(e) = scan(f, &text, &mut t, &mut findings) {
+            unparsed.push(format!("{}:{}: [LINT-PARSE] unparseable span", f, e.line));
+        }
+    }
+    // spec: gate-sdk/SPEC.md §The shell reader — a span the reader cannot parse is unparseable
+    // input; the parsed files' findings still print beside it
+    if !unparsed.is_empty() {
+        for f in findings.iter().chain(&unparsed) {
+            println!("{}", f);
+        }
+        return Ok(crate::exit::INPUT);
     }
     if !findings.is_empty() {
         println!("PIPE-MEMBERSHIP: {} violation(s):", findings.len());
@@ -262,25 +145,17 @@ fn rule(_args: &[String]) -> Result<i32, Fault> {
 mod tests {
     use super::*;
 
-    // spec: gate-sdk/SPEC.md §check-pipe-membership — the scope test reads the flag word, never the
-    // bare word `pipefail`
-    #[test]
-    fn pipefail_is_set_by_its_flag_word() {
-        assert!(sets_pipefail("set -o pipefail"));
-        assert!(sets_pipefail("set -euo pipefail"));
-        assert!(!sets_pipefail("echo pipefail"));
-        assert!(!sets_pipefail("set +o pipefail"));
+    fn scanned(text: &str) -> (usize, Vec<String>) {
+        let (mut t, mut found) = (Tally { in_scope: 0, readers: 0 }, Vec::new());
+        scan("f.sh", text, &mut t, &mut found).expect("parses");
+        (t.in_scope, found)
     }
 
     // spec: gate-sdk/SPEC.md §check-pipe-membership — the three producer shapes red, and a nested
     // substitution or a quoted `|` neither hides nor invents a pipeline
     #[test]
     fn a_set_producer_into_a_short_circuiting_reader_is_found() {
-        let red = |l: &str| {
-            pipelines(l)
-                .iter()
-                .any(|s| short_circuits(s.last().unwrap()) && set_producer(&s[0]))
-        };
+        let red = |l: &str| !scanned(&format!("set -o pipefail\n{}\n", l)).1.is_empty();
         assert!(red(r#"if printf '%s\n' "${a[@]}" | grep -qxF "$x"; then"#));
         assert!(red("done | head -1"));
         assert!(red(r#"n="$(echo "${a[*]}" | grep -m1 -E "a|b")""#));
@@ -292,11 +167,14 @@ mod tests {
         assert!(!red(r#"echo "${#a[@]}" | grep -q 0"#), "a length is one value, not a set");
     }
 
-    // spec: gate-sdk/SPEC.md §check-pipe-membership — a pipe continued onto the next line is one pipeline
+    // spec: gate-sdk/SPEC.md §check-pipe-membership — a pipe continued onto the next line is one
+    // pipeline, named at its first line, and a file setting no `pipefail` is out of scope
     #[test]
     fn a_trailing_pipe_joins_the_next_line() {
-        let l = logical_lines("printf '%s\\n' \"${a[@]}\" |\n  grep -q x\n");
-        assert_eq!(l.len(), 1);
-        assert_eq!(l[0].0, 0);
+        let (scope, found) = scanned("set -o pipefail\nprintf '%s\\n' \"${a[@]}\" |\n  grep -q x\n");
+        assert_eq!(scope, 1);
+        assert_eq!(found.len(), 1);
+        assert!(found[0].starts_with("f.sh:2 "), "{}", found[0]);
+        assert_eq!(scanned("printf '%s\\n' \"${a[@]}\" | grep -q x\n"), (0, Vec::new()));
     }
 }

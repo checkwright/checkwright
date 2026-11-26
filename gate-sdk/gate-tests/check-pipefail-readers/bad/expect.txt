@@ -1,0 +1,17 @@
+early-exit reader(s) fed under `pipefail`
+tree/over.sh:4: [PIPEFAIL-EARLY-EXIT] head [auto-fix]
+tree/over.sh:5: [PIPEFAIL-EARLY-EXIT] grep -q [auto-fix]
+tree/readers.sh:4: [PIPEFAIL-EARLY-EXIT] grep -q [auto-fix]
+tree/readers.sh:5: [PIPEFAIL-EARLY-EXIT] grep -m [auto-fix]
+tree/readers.sh:6: [PIPEFAIL-EARLY-EXIT] grep -l
+tree/readers.sh:7: [PIPEFAIL-EARLY-EXIT] head [auto-fix]
+tree/readers.sh:8: [PIPEFAIL-EARLY-EXIT] read
+tree/readers.sh:9: [PIPEFAIL-EARLY-EXIT] sed q
+tree/readers.sh:10: [PIPEFAIL-EARLY-EXIT] awk exit
+tree/readers.sh:11: [PIPEFAIL-EARLY-EXIT] while-read break
+tree/readers.sh:14: [PIPEFAIL-EARLY-EXIT] grep -q [auto-fix]
+tree/readers.sh:16: [PIPEFAIL-EARLY-EXIT] waiver reason under 1 characters [auto-fix]
+tree/shared-lib.sh:3: [PIPEFAIL-EARLY-EXIT] head [auto-fix]
+tree/gone.sh: [BASELINE-STALE] 0/2
+tree/stale.sh: [BASELINE-STALE] 1/3
+--emit pipefail-fix <path>…
