@@ -11,7 +11,7 @@ Pairs `stale-test-literals` and `migration-guard`. Two of the adopter's checks j
 
 ### (1) The base {design-bearing} {user-facing: the adopter input on both entries — a base ref, the working tree included}
 
-**Not yet applied**: §Layout and configuration's rule rosters gain `GATE_SDK_BASE_REF` (default `main`). A new section, §The since-base corpus:
+**Applied** (merged into gate-sdk/SPEC.md §The since-base corpus): §Layout and configuration's rule rosters gain `GATE_SDK_BASE_REF` (default `main`). A new section, §The since-base corpus:
 
 > A since-base reader takes `--base <ref>`, else `GATE_SDK_BASE_REF`, and compares the merge base `git merge-base <ref> HEAD` against the **working tree**, so an uncommitted edit counts. A ref that does not resolve, or shares no merge base with `HEAD`, refuses at exit 2; outside a work tree is exit 2; a git failure reading a resolved commit is exit 3.
 
@@ -20,7 +20,7 @@ Pairs `stale-test-literals` and `migration-guard`. Two of the adopter's checks j
 
 ### (2) The stale-literals arm {design-bearing} {user-facing: the adopter input on `stale-test-literals`}
 
-**Not yet applied**: §The since-base corpus continues:
+**Applied** (merged into gate-sdk/SPEC.md §The since-base corpus): §The since-base corpus continues:
 
 > **`--emit stale-literals [--base <ref>] [--tools <dir>]`**, an `Arm::Emit` member (§The non-gate arm), lists test lines that may assert a string the branch removed. It judges nothing: it exits 0 whatever it lists, 2 or 3 only on its own failures.
 >

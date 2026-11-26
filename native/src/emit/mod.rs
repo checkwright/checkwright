@@ -75,6 +75,7 @@ pub mod rewrite;
 pub mod scan_prompts;
 pub mod selection_probe;
 pub mod stage_economics;
+pub mod stale_literals;
 pub mod stage_contract;
 pub mod stage_rules;
 pub mod statistics;
@@ -539,6 +540,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         "--emit-pipefail-fix",
         Arm::Emit(pipefail_fix::emit, Grammar::Parsed(pipefail_fix::USAGE)),
         pipefail_fix::KNOBS,
+    ),
+    // spec: gate-sdk/SPEC.md §The since-base corpus — a worklist for a person reviewing a branch,
+    // so a member of the class that judges nothing
+    (
+        "--emit-stale-literals",
+        Arm::Emit(stale_literals::emit, Grammar::Parsed(stale_literals::USAGE)),
+        stale_literals::KNOBS,
     ),
     // spec: canon-kit/SPEC.md §check-md-unwrapped — the gate's remedy, reading no knob: its
     // operands are the files, and the scanner is the gate's own

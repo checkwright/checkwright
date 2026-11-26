@@ -108,6 +108,7 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_SCRIPT_RULES` (default `<gates-dir>/script-rules.list`): that member's rules file, required while its corpus is configured (see there).
 - `GATE_SDK_SITE_RULES` (default `<gates-dir>/site-rules.list`): `check-site-count`'s rules file, **optional**. An absent file, or one holding no block, disables the gate (see there).
 - `GATE_SDK_TEST_GLOBS` (default `tests/ fixtures/ tests.rs *_tests.rs tests_*.rs test_* *_test.*`): space-separated globs naming test code ([§The test-code classifier](#the-test-code-classifier)); empty names none.
+- `GATE_SDK_BASE_REF` (default `main`): the ref a since-base reader takes its merge base with when no `--base` is given ([§The since-base corpus](#the-since-base-corpus)).
 - `GATE_SDK_PORTABILITY_PATTERNS` (default `<gates-dir>/portability-patterns.list`): space-separated banned-construct rosters for `check-portability-floor`, each **optional**. An absent file disables the assertion, where a present-but-unreadable one is exit 3 (see there).
 - `GATE_SDK_PORTABILITY_PATHS` (default **empty**): space-separated pathspecs naming that gate's install-path corpus. Empty is the shipped default because the kit cannot know any consumer's install path, and an empty corpus disables the assertion rather than failing it closed ([§check-portability-floor](#check-portability-floor)).
 - `GATE_SDK_HARNESS_LITERALS` (default **empty**): space-separated fixed strings, the harness-bound literals [§check-harness-literal](#check-harness-literal) holds to their declared sites. The kit ships none, since a default would be one vendor's spelling.
@@ -3694,6 +3695,26 @@ The record carries `<found>/<count>` because the fix is a number in the baseline
 `walk::test_code` tells test code from shipped code for every content gate that skips or selects it, so that no gate reads a test differently from another. A path is **test code** when one of its components matches a `GATE_SDK_TEST_GLOBS` glob ending in `/`, the glob less its slash, or its basename matches any other glob; a glob's `*` matches any run of characters. In a `.rs` file the lines from the first `#[cfg(test)]` attribute on are test code too, whatever the path, since Rust keeps a module's tests in its own file. The reader answers with the line test code starts at, 1 for a test path and none for a file holding no test code.
 
 Test layout is a language and project convention, so the globs are a knob: its default names the common layouts and a consumer narrows or empties it. **Honest limit:** the `.rs` cut is lexical, so a test module ahead of shipped code takes that code with it.
+
+### The since-base corpus
+
+`native/src/since_base.rs` lets a reader judge a branch against the point it left its base rather than the tree alone. A since-base reader takes `--base <ref>`, else `GATE_SDK_BASE_REF`, and compares the merge base `git merge-base <ref> HEAD` against the **working tree**, so an uncommitted edit counts. A ref that names no commit, or shares no merge base with `HEAD`, refuses at exit 2, as does a cwd outside a work tree; a git failure reading a resolved commit is exit 3. A changed path is a tracked one whose working-tree content differs from the merge base's, a rename read as a delete and an add, and its zero-context diff names the lines the branch removed and added.
+
+- **Why the working tree.** A since-base reader runs before its caller commits, so the change under review is not yet a commit.
+- **Why a knob default.** A base branch's name is a consumer's convention; `main` is the common one, and a consumer whose base is another branch binds it.
+
+**`--emit stale-literals [--base <ref>] [--tools <dir>]`**, an `Arm::Emit` member ([§The non-gate arm](#the-non-gate-arm)), lists the test lines that may assert a string the branch removed. It judges nothing: it exits 0 whatever it lists, and 2 or 3 only on its own failures.
+
+- **A literal** is a double-quoted string or a Rust raw string (`r#"…"#`, `br#"…"#`) in any file, and a single-quoted string too in a `.sh` or `.py` file. It is never inside a comment: `//` and `/* */` in a `.rs` file, `#` opening a word in a `.sh` or `.py` file. Outside a `.rs` file a quote its line does not close opens no literal, Python's triple quotes aside. A literal is split into **fragments** at each placeholder (`{…}`, `$x`, `${…}`, `$(`, `%s`) and each escape, and a fragment counts at 8 or more characters holding at least 4 ASCII letters.
+- **Test code** is [§The test-code classifier](#the-test-code-classifier)'s, read on the merge base's content for a removed line and the working tree's for a listed one.
+- **A changed fragment** is one on a non-test line the branch removed, unless some non-test line in the working tree still holds it. The branch's own additions are working-tree lines, so a moved or re-wrapped string is no change.
+- **It lists** each test line present at the merge base and unchanged since whose literal overlaps a changed fragment, either containing the other. The record is `LITERAL <test>:<line> (was <src>:<line>)`, its source site the first by path and line, and a count line closes the list. A test line the branch added, and a literal that is an assertion's message, are never listed. A message is the argument of `.expect(` or `panic!(`, or an `assert…!` argument after its operands, two for a name ending `_eq`, `_ne` or `_matches` and else one; a call nested in that argument is message too.
+- `--tools <dir>` adds a test suite outside the repository: every file under it, a `.git` directory aside, is test code at its current content. A `--tools` path that is no directory refuses at exit 2.
+
+Its caller is a session reviewing a branch before it merges; a session reaching an arm through the front end counts as a stage step does.
+
+- **Why an arm and not a gate.** The output is a worklist for a person and its caller wants no verdict from it: a gate that never reds is a report, and [§The non-gate arm](#the-non-gate-arm) is that class.
+- **Honest limit.** Overlap is textual: a test asserting a reformatted message, or one built from fragments shorter than the floor, is not listed, and a common phrase overlaps unrelated tests.
 
 ### check-pipe-membership
 
