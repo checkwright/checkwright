@@ -16,18 +16,6 @@
 
 ## New Features
 
-### migration-guard
-
-[spec: gate-sdk/SPEC-since-base.md]
-
-The migrations family of `adopter-content-checks`: SQL migrations appended in order and never destructive unless declared, since a base ref.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** `--dir DIR` holds `NNNN_<name>.sql`, any other file a tool error. A file added since the merge base with `--base REF` (default the main branch) is numbered above REF's highest, else `[MIGRATION-ORDER] <added> <= <highest>`. A file at the merge base is byte-identical at HEAD, an edit, delete or rename giving `[MIGRATION-EDITED]`. An added file holds no destructive statement, `[MIGRATION-DESTRUCTIVE] <file>:<line>`: by default `DROP TABLE|INDEX|VIEW|TRIGGER`, `ALTER TABLE … DROP` and `ALTER TABLE … RENAME`, case-insensitive with comments and string literals stripped, the list a config key, waived by `-- migration-ok: <reason>` on the statement.
-
-**Deliverable:** check-migration-guard over the shared base resolution, with a starter destructive-statement list.
-
-**Cost while deferred:** an edited or destructive migration reaches a deployed schema with only the adopter's own check between. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `migration`, `additive` in this file, none; owner gate-sdk/SPEC.md §Layout and configuration.
-
 ### exec-write-guard
 
 [spec: gate-sdk/SPEC-exec-write.md]
@@ -1036,4 +1024,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - script-preflight
 - reviewed-site-count
 - stale-test-literals
+- migration-guard
 
