@@ -108,6 +108,7 @@ pub mod pipefail_readers;
 pub mod script_preflight;
 pub mod site_count;
 pub mod migration_guard;
+pub mod exec_write;
 pub mod plugin_parity;
 pub mod packed_links;
 pub mod payload_claim;
@@ -2739,6 +2740,16 @@ pub const REGISTRY: &[GateEntry] = &[
         migration_guard::run,
         &[],
         &["GATE_SDK_MIGRATION_DIR", "GATE_SDK_MIGRATION_DESTRUCTIVE", "GATE_SDK_BASE_REF"],
+        "gate-sdk",
+        &[("git", "")],
+    ),
+    // spec: gate-sdk/SPEC.md §check-exec-write — no walk root: the corpus is `git ls-files` over the
+    // configured pathspecs
+    (
+        "check-exec-write",
+        exec_write::run,
+        &[],
+        &["GATE_SDK_EXEC_WRITE_PATHS", "GATE_SDK_EXEC_WRITE_HELPERS", "GATE_SDK_PRUNE_DIRS", "GATE_SDK_PRUNE_EXTRA_DIRS"],
         "gate-sdk",
         &[("git", "")],
     ),

@@ -1,0 +1,4 @@
+# graph: couples=*.rs dir=one valve=none tier=precommit trigger=*
+# install: on-surface
+# armed-by: GATE_SDK_EXEC_WRITE_PATHS
+# spec: gate-sdk/SPEC.md §check-exec-write — no Rust file but a declared helper writes a file with an execute bit (the record names the call or the mode constant, never the argument)

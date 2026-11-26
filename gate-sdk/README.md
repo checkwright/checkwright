@@ -105,6 +105,7 @@ check-pipefail-readers
 check-script-preflight
 check-site-count
 check-migration-guard
+check-exec-write
 check-portability-floor
 check-projection-roster
 check-template-copy-parity

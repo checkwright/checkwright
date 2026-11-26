@@ -111,6 +111,8 @@ The kit set defaults to gate-sdk plus every sibling directory holding a `checks/
 - `GATE_SDK_BASE_REF` (default `main`): the ref a since-base reader takes its merge base with when no `--base` is given ([§The since-base corpus](#the-since-base-corpus)).
 - `GATE_SDK_MIGRATION_DIR` (default empty): the migration directory `check-migration-guard` reads, relative to the working directory. Empty disables the gate.
 - `GATE_SDK_MIGRATION_DESTRUCTIVE` (default `<gates-dir>/migration-destructive.list`): that member's destructive-statement list, **optional**. An absent file turns its destructive check off (see there).
+- `GATE_SDK_EXEC_WRITE_PATHS` (default empty): space-separated pathspecs over the tracked tree for `check-exec-write`, the shared prune dirs applied. Empty disables the gate.
+- `GATE_SDK_EXEC_WRITE_HELPERS` (default empty): space-separated helper files that member exempts, each relative to the working directory.
 - `GATE_SDK_PORTABILITY_PATTERNS` (default `<gates-dir>/portability-patterns.list`): space-separated banned-construct rosters for `check-portability-floor`, each **optional**. An absent file disables the assertion, where a present-but-unreadable one is exit 3 (see there).
 - `GATE_SDK_PORTABILITY_PATHS` (default **empty**): space-separated pathspecs naming that gate's install-path corpus. Empty is the shipped default because the kit cannot know any consumer's install path, and an empty corpus disables the assertion rather than failing it closed ([§check-portability-floor](#check-portability-floor)).
 - `GATE_SDK_HARNESS_LITERALS` (default **empty**): space-separated fixed strings, the harness-bound literals [§check-harness-literal](#check-harness-literal) holds to their declared sites. The kit ships none, since a default would be one vendor's spelling.
@@ -3840,6 +3842,41 @@ The pair points both knobs at case-local paths. `bad/` carries an edited, a dele
 - the not-applicable clean, a tree whose base is its own `HEAD`, and an uncommitted addition counted;
 - an edit, a delete, a rename, a misnumbered addition, and a destructive statement with and without a reason;
 - a stray file at 3, an unresolved base at 2 and a malformed list at 2.
+
+### The Rust code reader
+
+`native/src/rust_code.rs` gives a Rust file's **code view**. The view is the text with every comment and every string, byte-string and character literal blanked to spaces, line breaks kept, so a position in the view is a position in the file. The comments are `//` to the line end and nested `/* */`. The literals are `"…"`, `b"…"`, `r#"…"#` at any hash count, `br#"…"#` and `'…'`, told from a lifetime by the lexer [§The since-base corpus](#the-since-base-corpus) reads literals with. Integer literals stay.
+
+It gives each **call** in the view: the callee path as written (`a::b::c`, a qualified `<T as U>::m`, or `.m` for a method), a turbofish dropped, and the argument list split at depth-zero commas, each argument's source text kept. A macro invocation, a `fn` definition and a bare parenthesised group are no call. An unterminated literal, an unterminated block comment or a bracket nothing balances is reported as `<path>:<line>: [LINT-PARSE] unparseable span`, and the reading gate exits 3.
+
+- **Why a view and not a parse.** The rules that read it are callee paths and an argument's text, which a token-level view gives; a full Rust parser is a dependency the floor rules out ([§The adopter constraints](#the-adopter-constraints)).
+- **Honest limit.** Calls are read as written: a callee renamed on import (`use std::fs::copy as cp`), or built inside a macro, is invisible; and an argument holding a closure or a generic's comma splits there.
+
+### check-exec-write
+
+`checks/check-exec-write.gate` (`precommit`, binary-dispatched). Invariant: **no Rust file but a declared helper writes a file with an execute bit.** A program writing an executable file is where an attacker who controls the bytes gets them run, so a consumer routes every such write through one reviewed helper. Its corpus is the tracked `.rs` files under the pathspecs `GATE_SDK_EXEC_WRITE_PATHS` names, minus the helpers. A path with a component in the shared prune dirs, or one opening with `.`, is skipped.
+
+Both knobs read relative to the working directory, the repository root in the battery. Each helper is exempt for its own content alone, never for a file it is called from. A helper path that is absolute, holds `..` or names no file refuses at exit 2. With the paths knob empty it prints `not applicable: no Rust path configured`, and it declares `# install: on-surface` and `# armed-by: GATE_SDK_EXEC_WRITE_PATHS`.
+
+**The mode test.** An argument passes when it is an integer literal whose value has no bit of `0o111`: decimal, `0o`, `0x` or `0b`, with `_` and a type suffix allowed. Any other argument, a name or an expression, fails, since the gate cannot know its value, and so does an absent one.
+
+**The sites**, each read in the code view ([§The Rust code reader](#the-rust-code-reader)):
+
+- `from_mode(M)` and `from_raw_mode(M)`; `.mode(M)` and a path's `::mode(…, M)`, a bare `mode(…)` being none; `.set_mode(M)` and `set_mode(…, M)` — each hits when `M` fails the mode test.
+- `set_permissions(P, Q)` — hits when `Q` holds none of the calls above, a copied or computed permission set; when it holds one, that call is judged instead.
+- `chmod`, `lchmod` and `fchmod` (last argument) and `fchmodat` (third), under a `libc`, `nix` or `rustix` path — each hits when the mode fails the mode test.
+- `open` (third) and `openat` (fourth) under `libc`, hitting only when that argument is given and fails; `creat` (second) under `libc`, hitting when it fails.
+- `fs::copy(…)` — always hits, since it copies the source's permissions.
+- `Command::new(L)` where `L` is the literal `"chmod"` or `"install"` — always hits.
+- A mode constant: an identifier `S_IXUSR`, `S_IXGRP`, `S_IXOTH`, `S_IRWXU`, `S_IRWXG`, `S_IRWXO`, `ACCESSPERMS` or `ALLPERMS` anywhere in the view — hits.
+
+**The record** is `<path>:<line>: [EXEC-WRITE] <call>`, `<call>` the callee's last path segment or the constant, one per site in file then offset order. It takes no waiver: a site moves into a helper.
+
+- **Why every non-literal mode reds.** A mode computed from input is the case the rule exists for, and a reviewed exception has a home: the helper.
+- **Why the record names the call and not the argument.** An argument can be any expression; the call is what the reader fixes.
+- **Honest limit.** A file made executable by a child process the gate does not name (a shell running `chmod`, say) is outside it; so is a write through a crate the site list omits.
+
+This repo sets execute modes from Rust files in production and test code both, through no one helper, so the member is registered and not applicable here. The pair points both knobs at case-local paths. `bad/` holds each site kind once, a non-literal mode, and a helper's own call made from another file. `good/` holds a `0o644` mode, sites spelled inside a string, a raw string and a comment, and the helper's own content. `check-exec-write.test.sh` holds a `..`, an absent and an absolute helper at 2, an unterminated raw string at 3 and an unbalanced call at 3.
 
 ### check-front-end-fail-open
 

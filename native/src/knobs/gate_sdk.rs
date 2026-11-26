@@ -236,6 +236,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_BASE_REF", "main").empty_takes_default(),
         Row::scalar("GATE_SDK_MIGRATION_DIR", ""),
         Row::derived("GATE_SDK_MIGRATION_DESTRUCTIVE", Shape::Scalar, migration_destructive, GATES).empty_takes_default(),
+        Row::scalar("GATE_SDK_EXEC_WRITE_PATHS", "").empty_takes_default().words(),
+        Row::scalar("GATE_SDK_EXEC_WRITE_HELPERS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_TEST_GLOBS", "tests/ fixtures/ tests.rs *_tests.rs tests_*.rs test_* *_test.*").words(),
         Row::derived("GATE_SDK_PORTABILITY_PATTERNS", Shape::Scalar, portability_patterns, GATES).empty_takes_default().words(),
         Row::scalar("GATE_SDK_PORTABILITY_PATHS", "").empty_takes_default().words(),

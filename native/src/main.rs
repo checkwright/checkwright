@@ -60,6 +60,7 @@ mod registry;
 mod release_sections;
 mod rule_blocks;
 mod release_stamp;
+mod rust_code;
 mod runner;
 mod sarif;
 mod section;
