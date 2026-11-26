@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-content-checks-pass release v0.39.0 — minor by the declarations (the seven gate-sdk content-check gates, check-tree-terms' rule-id record, the verdict store keyed before dispatch, the exit 3 split, the SARIF rule class), no decommission; cut on operator grant 2026-11-25, one cut with the verdict-store fix by operator direction, lead-relayed

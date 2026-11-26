@@ -1,18 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: content-checks-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-25, operator direction, lead-relayed, not a ruling, on scope's recommendation widened to the whole ask):** the orchestrator adopter's remaining asks. Debt: `verdict-key-before-dispatch` leads, `exit-status-site-unification` lands before the new gates so they are born on its one exit rule, and `verdict-fix-release-notify` rides to close. Feature for spec to author: `adopter-content-checks`, all nine checks, in the adopter's order: the redacted record with its rule id, then strings and text, names, ghpin, then the rest.
-
-  **The feature split (2026-11-25, lead decision, not a ruling; a later scope or spec may revise it):** `adopter-content-checks` splits at spec into family entries, each paired with one amendment, several entries free to pair one; spec sets the grouping. The adopter answered every open question the same day (peer channel, lead-relayed), each answer carried on the entry it shapes.
-
-  **The release and pushes (2026-11-25, operator grant, lead-relayed):** cut v0.39.0 at this iteration's close. **One cut at close (2026-11-25, operator direction, lead-relayed, not a ruling),** carrying the store fix together with the content gates, over the adopter's ask that the fix ship on its own; the release notice says so. Push need 2 against 2, inside the budget: the closing push, and the release tag whose publish run ships the store fix.
-
-  **The third push and the patch (2026-11-26, operator grant and ruling, lead-relayed):** a third push carries the drain, the discharge and the fixes. The close fixes the second-vendor review's quoted-identifier defect in check-migration-guard and read_optional's non-NotFound errors as debt-shaped gaps; the migration git arm's byte comparison stays filed. **The patch cut was ruled, then deferred (2026-11-26, operator ruling, lead-relayed):** no second cut at this close. The disposition file holds one line per iteration, and the fixes read as minor under installer/SPEC.md §Versioning, a stricter gate, never a patch. The fixes ride the next release, their declarations on the release declaration surface.
 
 ---
 
