@@ -16,18 +16,6 @@
 
 ## New Features
 
-### exec-write-guard
-
-[spec: gate-sdk/SPEC-exec-write.md]
-
-The exec-write family of `adopter-content-checks`: Rust writes of executable files outside named helpers.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** the corpus is tracked `.rs`, skipping `target/` and dot directories; `--helper REL`, repo-relative with no `..` and existing (else usage), exempts that file's own content only. In scope, outside strings and comments: `from_mode(M)`, `from_raw_mode(M)`, `.mode(M)`, `Trait::mode(…, M)`, `set_mode(…, M)`, `.set_mode(M)`, and `set_permissions(P, Q)` with none of those in Q. M fails when an integer literal with `M & 0o111 != 0`, or anything non-literal. Gaps to close too: `fs::copy`, `libc::chmod`, `fchmod`, `fchmodat`, nix and rustix chmod and fchmod, `Mode` constants, `libc::open` or `creat` with a mode, and `Command::new("chmod" | "install")`. Record `EXEC-WRITE <file>:<line>: <call>`, no waiver; an unterminated string, comment or call is a tool error.
-
-**Deliverable:** check-exec-write, born native with its pair, on a Rust code reader that blanks strings and comments.
-
-**Cost while deferred:** an executable written from untrusted bytes outside the reviewed helper goes unseen but for the adopter's own check. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `exec-write`, `from_mode` in this file, none; owner gate-sdk/SPEC.md §check-exec-bit.
-
 ## Technical Debt
 
 ### verdict-fix-release-notify
@@ -1025,4 +1013,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - reviewed-site-count
 - stale-test-literals
 - migration-guard
+- exec-write-guard
 
