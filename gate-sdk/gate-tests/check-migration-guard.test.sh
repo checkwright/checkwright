@@ -103,6 +103,23 @@ out="$( cd "$r" && gate_env GATE_SDK_MIGRATION_DIR=db/migrations GATE_SDK_MIGRAT
     && gate_run check-migration-guard "$CHECKS" 2>&1 )"; rc=$?
 expect list-absent 0 'destructive check off: no list at absent.list' "$rc" "$out"
 
+# --- the width is the directory's own: a five-digit history takes a five-digit addition, and a
+# four-digit history refuses a five-digit one at 3, naming it.
+r="$SANDBOX/wide"
+mkdir -p "$r/db/migrations"
+git -C "$r" init -q -b main
+printf 'CREATE TABLE a (id INTEGER);\n' > "$r/db/migrations/00001_a.sql"
+git -C "$r" add db
+git -C "$r" -c user.name=t -c user.email=t@e.invalid commit -qm base
+git -C "$r" checkout -qb topic
+printf 'CREATE TABLE b (id INTEGER);\n' > "$r/db/migrations/00002_b.sql"
+out="$(guard "$r")"; rc=$?
+expect five-digit-history 0 'clean (2 migration(s), 1 added, against merge base' "$rc" "$out"
+r="$(fresh widened)"
+printf 'CREATE TABLE c (id INTEGER);\n' > "$r/db/migrations/10003_c.sql"
+out="$(guard "$r")"; rc=$?
+expect width-mixed 3 'db/migrations/10003_c.sql: its number is 5 digit(s) wide' "$rc" "$out"
+
 # --- a stray file is 3; an unresolved base, a malformed list and a bad argument are 2.
 r="$(fresh refusals)"
 printf 'notes\n' > "$r/db/migrations/README.md"
@@ -132,5 +149,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-migration-guard.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-migration-guard.test.sh: clean (the git arm's edit, delete, rename, order and destructive cases, and its exit classes — $cases cases)"
+echo "check-migration-guard.test.sh: clean (the git arm's edit, delete, rename, order, width and destructive cases, and its exit classes — $cases cases)"
 exit 0

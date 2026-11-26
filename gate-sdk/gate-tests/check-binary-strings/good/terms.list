@@ -1,4 +1,4 @@
 # rule: CODENAME
 zephyr
-# A three-byte term: its only occurrence is a run too short to be a string.
+# The shortest term, three bytes, sets the string floor at 3.
 qux

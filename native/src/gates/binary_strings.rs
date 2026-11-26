@@ -11,7 +11,8 @@ use std::path::Path;
 // spec: gate-sdk/SPEC.md §check-binary-strings — the id a hit takes when no `# rule:` line names one
 const DEFAULT_ID: &str = "STRINGS-DENIED";
 
-// spec: gate-sdk/SPEC.md §check-binary-strings — the `strings(1)` default run length
+// spec: gate-sdk/SPEC.md §check-binary-strings — the `strings(1)` default run length, the floor's
+// ceiling
 const MIN_RUN: usize = 4;
 
 pub fn run(args: &[String]) -> i32 {
@@ -32,9 +33,19 @@ fn token_byte(b: u8) -> bool {
     b.is_ascii_alphanumeric() || b == b'.' || b == b'_' || b == b'-'
 }
 
-// spec: gate-sdk/SPEC.md §check-binary-strings — every run of printable bytes at least `MIN_RUN`
+// spec: gate-sdk/SPEC.md §check-binary-strings — the floor is `MIN_RUN`, or the shortest term
+// able to hit if that is shorter
+fn floor(terms: &[Entry]) -> usize {
+    terms
+        .iter()
+        .filter(|t| !t.text.is_empty() && t.text.bytes().all(token_byte))
+        .map(|t| t.text.len())
+        .fold(MIN_RUN, usize::min)
+}
+
+// spec: gate-sdk/SPEC.md §check-binary-strings — every run of printable bytes at least `floor`
 // long inside one range, with the file offset of its first byte; a run never crosses a range
-fn strings(bytes: &[u8], range: std::ops::Range<usize>) -> Vec<(usize, &str)> {
+fn strings(bytes: &[u8], range: std::ops::Range<usize>, floor: usize) -> Vec<(usize, &str)> {
     let mut out = Vec::new();
     let mut at = range.start;
     while at < range.end {
@@ -46,7 +57,7 @@ fn strings(bytes: &[u8], range: std::ops::Range<usize>) -> Vec<(usize, &str)> {
         while at < range.end && printable(bytes[at]) {
             at += 1;
         }
-        if at - start >= MIN_RUN {
+        if at - start >= floor {
             if let Ok(s) = std::str::from_utf8(&bytes[start..at]) {
                 out.push((start, s));
             }
@@ -85,8 +96,9 @@ struct Hit {
 
 fn scan(bytes: &[u8], ranges: Vec<std::ops::Range<usize>>, terms: &[Entry], shapes: &[(Ere, Entry)]) -> Vec<Hit> {
     let mut hits = Vec::new();
+    let floor = floor(terms);
     for range in ranges {
-        for (start, s) in strings(bytes, range) {
+        for (start, s) in strings(bytes, range, floor) {
             for (off, tok) in tokens(s) {
                 for t in terms.iter().filter(|t| t.text.eq_ignore_ascii_case(tok)) {
                     hits.push(Hit { offset: start + off, list: "term", position: t.position, id: t.id_or(DEFAULT_ID).to_string() });
@@ -189,10 +201,18 @@ mod tests {
         assert_eq!(offsets, vec![6, 43]);
     }
 
+    // spec: gate-sdk/SPEC.md §check-binary-strings — the floor is 4, lowered only by a term able
+    // to hit, and a run shorter than it is no string
     #[test]
-    fn a_run_shorter_than_four_bytes_is_no_string() {
-        assert!(strings(b"\x00abc\x00", 0..5).is_empty());
-        assert_eq!(strings(b"\x00abcd\x00", 0..6), vec![(1, "abcd")]);
+    fn the_string_floor_derives_from_the_shortest_term() {
+        assert_eq!(floor(&[entry("zephyr", 1)]), 4);
+        assert_eq!(floor(&[entry("zephyr", 1), entry("qux", 2)]), 3);
+        assert_eq!(floor(&[entry("zephyr", 1), entry("a/b", 2)]), 4);
+        assert!(strings(b"\x00abc\x00", 0..5, 4).is_empty());
+        assert_eq!(strings(b"\x00abcd\x00", 0..6, 4), vec![(1, "abcd")]);
+        assert_eq!(strings(b"\x00ab\x00abc\x00", 0..8, 3), vec![(4, "abc")]);
+        let whole = 0..5;
+        assert_eq!(scan(b"\x00qux\x00", vec![whole], &[entry("zephyr", 1), entry("qux", 2)], &[]).len(), 1);
     }
 
     #[test]

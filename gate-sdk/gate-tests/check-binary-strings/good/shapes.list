@@ -1,2 +1,4 @@
 # rule: HOME-PATH
 /(home|root|Users)/
+# A two-byte run carries this shape, and a run shorter than the floor is no string.
+qu

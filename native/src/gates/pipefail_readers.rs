@@ -10,9 +10,9 @@ use std::path::Path;
 const NAME: &str = "check-pipefail-readers";
 const ID: &str = "PIPEFAIL-EARLY-EXIT";
 
-// spec: gate-sdk/SPEC.md §check-pipefail-readers — the waiver token and its reason floor
+// spec: gate-sdk/SPEC.md §check-pipefail-readers — the waiver token, its reason floor the knob's
 pub const TOKEN: &str = "pipefail-ok";
-const FLOOR: usize = 1;
+pub const FLOOR_KNOB: &str = "GATE_SDK_PIPEFAIL_WAIVER_MIN";
 
 pub fn run(args: &[String]) -> i32 {
     match inner(args) {
@@ -27,12 +27,16 @@ pub fn run(args: &[String]) -> i32 {
 pub struct Config {
     libraries: Vec<String>,
     all: bool,
+    floor: usize,
 }
 
 pub fn config() -> Result<Config, Fault> {
     let libraries = walk::knob_words("GATE_SDK_PIPEFAIL_LIBRARIES").map_err(Fault::refused)?;
     let all = walk::knob_scalar("GATE_SDK_PIPEFAIL_ALL").map_err(Fault::refused)? == "1";
-    Ok(Config { libraries, all })
+    let raw = walk::knob_scalar(FLOOR_KNOB).map_err(Fault::refused)?;
+    let floor = crate::knobs::gate_sdk::positive(&raw)
+        .ok_or_else(|| Fault::refused(format!("{} must be a positive integer (got '{}')", FLOOR_KNOB, raw)))?;
+    Ok(Config { libraries, all, floor })
 }
 
 fn normalized(p: &str) -> String {
@@ -95,13 +99,13 @@ pub fn lint(path: &str, text: &str, cfg: &Config) -> Lint {
     if !whole && !script.sets_pipefail {
         return Lint::Off;
     }
-    Lint::Hits(shell_lines::early_exits(&script, &[TOKEN.to_string()], FLOOR))
+    Lint::Hits(shell_lines::early_exits(&script, &[TOKEN.to_string()], cfg.floor))
 }
 
-pub fn record(path: &str, hit: &Hit) -> String {
+pub fn record(path: &str, hit: &Hit, cfg: &Config) -> String {
     let fix = if hit.fix.is_some() { " [auto-fix]" } else { "" };
     if hit.short_waiver {
-        return format!("{}:{}: [{}] waiver reason under {} characters{}", path, hit.line, ID, FLOOR, fix);
+        return format!("{}:{}: [{}] waiver reason under {} characters{}", path, hit.line, ID, cfg.floor, fix);
     }
     format!("{}:{}: [{}] {}{}", path, hit.line, ID, hit.reader, fix)
 }
@@ -140,7 +144,7 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
         let ceiling = baseline.as_ref().map_or(0, |b| b.get(f).copied().unwrap_or(0));
         if hits.len() > ceiling {
             fixable += hits.iter().filter(|h| h.fix.is_some()).count();
-            records.extend(hits.iter().map(|h| record(f, h)));
+            records.extend(hits.iter().map(|h| record(f, h, &cfg)));
         } else {
             within += hits.len();
         }
@@ -205,12 +209,12 @@ mod tests {
     use super::*;
 
     fn cfg(libraries: &[&str], all: bool) -> Config {
-        Config { libraries: libraries.iter().map(|s| s.to_string()).collect(), all }
+        Config { libraries: libraries.iter().map(|s| s.to_string()).collect(), all, floor: 1 }
     }
 
     fn readers(path: &str, text: &str, c: &Config) -> Option<Vec<String>> {
         match lint(path, text, c) {
-            Lint::Hits(h) => Some(h.iter().map(|h| record(path, h)).collect()),
+            Lint::Hits(h) => Some(h.iter().map(|h| record(path, h, c)).collect()),
             Lint::Off => None,
             Lint::Unparsed(l) => panic!("unparsed at {}", l),
         }

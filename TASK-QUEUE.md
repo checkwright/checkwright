@@ -14,16 +14,6 @@
 
 ## New Features
 
-### content-gate-calibrations
-
-[spec: SPEC-content-gate-calibrations.md]
-
-Four baked calibrations in content-checks-pass' new gates: check-migration-guard's four-digit number (`DIGITS`), check-binary-strings' minimum printable run (`MIN_RUN` 4, so a deny term of two or three characters is never caught), check-pipefail-readers' waiver-reason floor (`FLOOR` 1, where check-script-preflight's sibling floor is its rules file's waiver-min), and `--emit stale-literals`' counting floor (8 characters and 4 letters, native/src/literals.rs). Each default moves no verdict.
-
-**Deliverable:** a feature, each calibration settled at spec from the options scope filed, a structural bound (a numeric read of the leading decimal run; scanning down to the shortest configured deny term) or a consumer knob defaulting to today's value: the migration width read off the directory, the string floor derived from the terms, and knobs for the two floors.
-
-**Cost while deferred:** a consumer whose migrations carry another width, or whose deny list holds a short term, cannot bind it (policy-as-choice). Surfaced 2026-11-26 by content-checks-pass' close baked-calibration audit, verified at source there, carried from its close; filed at the next scope. Re-verified here: `DIGITS`, `MIN_RUN` and `FLOOR` are consts. Owner lookup: `calibration`, `MIN_RUN`, `DIGITS` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md, each gate's section.
-
 ### migration-guard-lint-parity
 
 [spec: SPEC-migration-lint-parity.md]
@@ -1069,4 +1059,6 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- content-gate-calibrations
 

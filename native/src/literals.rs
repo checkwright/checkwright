@@ -397,9 +397,16 @@ pub fn literals(text: &str, lang: Lang) -> Vec<Literal<'_>> {
         .collect()
 }
 
-// spec: gate-sdk/SPEC.md §The since-base corpus — the counting floor: 8 characters, 4 ASCII letters
-pub fn counts(fragment: &str) -> bool {
-    fragment.chars().count() >= 8 && fragment.chars().filter(char::is_ascii_alphabetic).count() >= 4
+// spec: gate-sdk/SPEC.md §The since-base corpus — the counting floor, the fewest characters and
+// ASCII letters a fragment holds to count
+#[derive(Clone, Copy)]
+pub struct Floor {
+    pub chars: usize,
+    pub letters: usize,
+}
+
+pub fn counts(fragment: &str, floor: Floor) -> bool {
+    fragment.chars().count() >= floor.chars && fragment.chars().filter(char::is_ascii_alphabetic).count() >= floor.letters
 }
 
 // spec: gate-sdk/SPEC.md §The since-base corpus — the width of a two-byte cut: an escape, `$(`,
@@ -408,7 +415,7 @@ const PAIR: usize = 2;
 
 // spec: gate-sdk/SPEC.md §The since-base corpus — the counted runs between placeholders (`{…}`,
 // `$x`, `${…}`, `$(`, `%s`) and escapes
-pub fn fragments(body: &str, escapes: bool) -> Vec<&str> {
+pub fn fragments(body: &str, escapes: bool, floor: Floor) -> Vec<&str> {
     let b = body.as_bytes();
     let mut out = Vec::new();
     let (mut from, mut i) = (0, 0);
@@ -436,7 +443,7 @@ pub fn fragments(body: &str, escapes: bool) -> Vec<&str> {
         }
     }
     out.push(&body[from..]);
-    out.retain(|f| counts(f));
+    out.retain(|f| counts(f, floor));
     out
 }
 
@@ -496,15 +503,28 @@ mod tests {
         assert_eq!((lang("a/b.rs"), lang("t.sh"), lang("x.py"), lang("README.md")), (Lang::Rust, Lang::Hash, Lang::Hash, Lang::Plain));
     }
 
+    const DEFAULTS: Floor = Floor { chars: 8, letters: 4 };
+
     // spec: gate-sdk/SPEC.md §The since-base corpus — placeholders and escapes cut a literal, and
     // a fragment under the floor is dropped
     #[test]
     fn a_literal_splits_at_placeholders_and_escapes() {
-        assert_eq!(fragments("cannot read {} config file", true), ["cannot read ", " config file"]);
-        assert_eq!(fragments("missing ${name} value here\\nsecond line text", true), ["missing ", " value here", "second line text"]);
-        assert_eq!(fragments("checking $name now %s please", true), ["checking "]);
-        assert_eq!(fragments("run $(make all) twice", true), ["make all) twice"]);
-        assert_eq!(fragments("raw \\n is one fragment", false), ["raw \\n is one fragment"]);
-        assert!(counts("abcd1234") && !counts("abc12345") && !counts("abcdefg"));
+        assert_eq!(fragments("cannot read {} config file", true, DEFAULTS), ["cannot read ", " config file"]);
+        assert_eq!(fragments("missing ${name} value here\\nsecond line text", true, DEFAULTS), ["missing ", " value here", "second line text"]);
+        assert_eq!(fragments("checking $name now %s please", true, DEFAULTS), ["checking "]);
+        assert_eq!(fragments("run $(make all) twice", true, DEFAULTS), ["make all) twice"]);
+        assert_eq!(fragments("raw \\n is one fragment", false, DEFAULTS), ["raw \\n is one fragment"]);
+        assert!(counts("abcd1234", DEFAULTS) && !counts("abc12345", DEFAULTS) && !counts("abcdefg", DEFAULTS));
+    }
+
+    // spec: gate-sdk/SPEC.md §The since-base corpus — both floors are the consumer's: lowered, a
+    // fragment the defaults drop counts
+    #[test]
+    fn a_lowered_floor_counts_a_shorter_fragment() {
+        let low = Floor { chars: 3, letters: 2 };
+        assert!(!counts("no a1", DEFAULTS) && counts("no a1", low));
+        assert!(!counts("123", low) && counts("ab1", low));
+        assert_eq!(fragments("ok {} go", true, DEFAULTS), Vec::<&str>::new());
+        assert_eq!(fragments("ok {} go", true, Floor { chars: 2, letters: 2 }), ["ok ", " go"]);
     }
 }

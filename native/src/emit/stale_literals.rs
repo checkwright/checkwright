@@ -1,13 +1,16 @@
 // spec: gate-sdk/SPEC.md §The since-base corpus — `--emit stale-literals`, the test lines that may
 // assert a string the branch removed: a worklist, never a verdict
 use crate::exit::Fault;
-use crate::literals::{self, Literal};
+use crate::literals::{self, Floor, Literal};
 use crate::since_base::{self, Base};
 use crate::walk;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::Path;
 
-pub const KNOBS: &[&str] = &[since_base::KNOB, "GATE_SDK_TEST_GLOBS"];
+pub const KNOBS: &[&str] = &[since_base::KNOB, "GATE_SDK_TEST_GLOBS", CHARS_KNOB, LETTERS_KNOB];
+
+const CHARS_KNOB: &str = "GATE_SDK_STALE_LITERAL_CHARS";
+const LETTERS_KNOB: &str = "GATE_SDK_STALE_LITERAL_LETTERS";
 
 pub const USAGE: &str = "usage: --emit stale-literals [--base <ref>] [--tools <dir>]";
 
@@ -53,7 +56,7 @@ fn shipped(test_from: Option<usize>, line: usize) -> bool {
 
 // spec: gate-sdk/SPEC.md §The since-base corpus — each fragment on a non-test line the branch
 // removed, with every site it was removed from
-fn removed(base: &Base, changed: &[String], hunks: &HashMap<String, since_base::Hunks>, globs: &[String]) -> Result<BTreeMap<String, BTreeSet<Site>>, Fault> {
+fn removed(base: &Base, changed: &[String], hunks: &HashMap<String, since_base::Hunks>, globs: &[String], floor: Floor) -> Result<BTreeMap<String, BTreeSet<Site>>, Fault> {
     let mut out: BTreeMap<String, BTreeSet<Site>> = BTreeMap::new();
     for p in changed {
         let h = &hunks[p];
@@ -70,7 +73,7 @@ fn removed(base: &Base, changed: &[String], hunks: &HashMap<String, since_base::
             if !shipped(test_from, lit.line) || !since_base::within(&h.removed, lit.line) {
                 continue;
             }
-            for f in literals::fragments(lit.body, lit.escapes) {
+            for f in literals::fragments(lit.body, lit.escapes, floor) {
                 out.entry(f.to_string()).or_default().insert((p.clone(), lit.line));
             }
         }
@@ -103,11 +106,11 @@ fn overlaps(a: &str, b: &str) -> bool {
 
 // spec: gate-sdk/SPEC.md §The since-base corpus — a test line's first source site among the changed
 // fragments its listable literals overlap
-fn listed(text: &str, path: &str, test_from: usize, added: &[(usize, usize)], changed: &BTreeMap<String, BTreeSet<Site>>) -> BTreeMap<usize, Site> {
+fn listed(text: &str, path: &str, test_from: usize, added: &[(usize, usize)], changed: &BTreeMap<String, BTreeSet<Site>>, floor: Floor) -> BTreeMap<usize, Site> {
     let mut out: BTreeMap<usize, Site> = BTreeMap::new();
     let lits: Vec<Literal> = literals::literals(text, literals::lang(path));
     for lit in lits.iter().filter(|l| l.line >= test_from && !l.message && !since_base::within(added, l.line)) {
-        for f in literals::fragments(lit.body, lit.escapes) {
+        for f in literals::fragments(lit.body, lit.escapes, floor) {
             for site in changed.iter().filter(|(c, _)| overlaps(f, c)).filter_map(|(_, s)| s.first()) {
                 let slot = out.entry(lit.line).or_insert_with(|| site.clone());
                 if site < slot {
@@ -117,6 +120,18 @@ fn listed(text: &str, path: &str, test_from: usize, added: &[(usize, usize)], ch
         }
     }
     out
+}
+
+// spec: gate-sdk/SPEC.md §The since-base corpus — the counting floor, both halves the consumer's
+fn floor() -> Result<Floor, Fault> {
+    let read = |name: &str, parse: fn(&str) -> Option<usize>| -> Result<usize, Fault> {
+        let raw = walk::knob_scalar(name).map_err(Fault::refused)?;
+        parse(&raw).ok_or_else(|| Fault::refused(format!("{} must be an integer count (got '{}')", name, raw)))
+    };
+    Ok(Floor {
+        chars: read(CHARS_KNOB, crate::knobs::gate_sdk::positive)?,
+        letters: read(LETTERS_KNOB, crate::knobs::gate_sdk::count)?,
+    })
 }
 
 pub fn emit(args: &[String]) -> Result<String, Fault> {
@@ -132,12 +147,13 @@ fn inner(args: &Args) -> Result<String, Fault> {
     }
     let base = since_base::resolve(args.base.as_deref())?;
     let globs = walk::knob_words("GATE_SDK_TEST_GLOBS").map_err(Fault::refused)?;
+    let floor = floor()?;
     let changed = base.changed(&[])?;
     let mut hunks: HashMap<String, since_base::Hunks> = HashMap::new();
     for p in &changed {
         hunks.insert(p.clone(), base.hunks(p)?);
     }
-    let mut fragments = removed(&base, &changed, &hunks, &globs)?;
+    let mut fragments = removed(&base, &changed, &hunks, &globs, floor)?;
     let tracked = base.tracked()?;
     if !fragments.is_empty() {
         let mut corpus = tracked.clone();
@@ -152,14 +168,14 @@ fn inner(args: &Args) -> Result<String, Fault> {
             let Some(text) = read_text(&base.path(p))? else { continue };
             let Some(test_from) = walk::test_code(p, &text, &globs) else { continue };
             let added = hunks.get(p).map_or(&none, |h| &h.added);
-            rows.extend(listed(&text, p, test_from, added, &fragments).into_iter().map(|(l, s)| (p.clone(), l, s)));
+            rows.extend(listed(&text, p, test_from, added, &fragments, floor).into_iter().map(|(l, s)| (p.clone(), l, s)));
         }
         if let Some(dir) = &args.tools {
             let files = walk::find_with_prune(Path::new(dir), &|n: &str| n == ".git").map_err(Fault::input)?;
             for f in files {
                 let p = f.display().to_string().replace('\\', "/");
                 let Some(text) = read_text(&f)? else { continue };
-                rows.extend(listed(&text, &p, 1, &[], &fragments).into_iter().map(|(l, s)| (p.clone(), l, s)));
+                rows.extend(listed(&text, &p, 1, &[], &fragments, floor).into_iter().map(|(l, s)| (p.clone(), l, s)));
             }
         }
     }
@@ -204,7 +220,7 @@ mod tests {
         ]
         .into();
         let text = "fn f() {}\n#[cfg(test)]\nassert!(e.contains(\"read the config\"));\nassert!(x, \"cannot read the config\");\nlet s = \"error: unknown flag given here\";\nlet t = \"cannot read the config\";\n";
-        let got = listed(text, "src/c.rs", 2, &[(6, 7)], &changed);
+        let got = listed(text, "src/c.rs", 2, &[(6, 7)], &changed, Floor { chars: 8, letters: 4 });
         assert_eq!(got, BTreeMap::from([(3, ("src/a.rs".to_string(), 7)), (5, ("src/a.rs".to_string(), 9))]));
     }
 }

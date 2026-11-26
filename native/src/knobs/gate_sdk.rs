@@ -131,6 +131,44 @@ fn native_bin(_resolve: Resolve) -> Result<Value, String> {
     Ok(Value::Scalar(host_native_bin()))
 }
 
+// spec: gate-sdk/SPEC.md §Layout and configuration — a count spelled in ASCII digits alone, so a
+// sign or a blank refuses rather than parses
+pub(crate) fn count(s: &str) -> Option<usize> {
+    if s.is_empty() || !s.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    s.parse().ok()
+}
+
+pub(crate) fn positive(s: &str) -> Option<usize> {
+    count(s).filter(|n| *n > 0)
+}
+
+// spec: gate-sdk/SPEC.md §Layout and configuration — the three counting floors; the letters floor
+// above the characters floor is refused naming both, since no fragment could count
+fn floor_refusals(v: &Values) -> Vec<String> {
+    let mut errs = Vec::new();
+    for name in ["GATE_SDK_PIPEFAIL_WAIVER_MIN", "GATE_SDK_STALE_LITERAL_CHARS"] {
+        if let Some(s) = scalar(v, name).filter(|s| positive(s).is_none()) {
+            errs.push(format!("{} must be a positive integer (got '{}')", name, s));
+        }
+    }
+    let letters = scalar(v, "GATE_SDK_STALE_LITERAL_LETTERS");
+    if let Some(s) = letters.filter(|s| count(s).is_none()) {
+        errs.push(format!("GATE_SDK_STALE_LITERAL_LETTERS must be a non-negative integer (got '{}')", s));
+    }
+    if let (Some(chars), Some(letters)) = (scalar(v, "GATE_SDK_STALE_LITERAL_CHARS").and_then(positive), letters.and_then(count)) {
+        if letters > chars {
+            errs.push(format!(
+                "GATE_SDK_STALE_LITERAL_LETTERS ({}) is above GATE_SDK_STALE_LITERAL_CHARS ({}), so no fragment could count — \
+                 the two floors move together: lower the letters floor with the characters floor",
+                letters, chars
+            ));
+        }
+    }
+    errs
+}
+
 // spec: installer/SPEC.md §The update notice — the interval takes its three values only, so a
 // misspelt `off` refuses rather than reads as the default
 fn validate(v: &Values) -> Vec<String> {
@@ -145,6 +183,7 @@ fn validate(v: &Values) -> Vec<String> {
     if let Some(s) = scalar(v, "GATE_SDK_PIPEFAIL_ALL").filter(|s| !matches!(*s, "0" | "1")) {
         errs.push(format!("GATE_SDK_PIPEFAIL_ALL must be 0|1 (got '{}')", s));
     }
+    errs.extend(floor_refusals(v));
     // spec: installer/SPEC.md §The upgrade contract — the refusals are the roster module's, so the
     // validator and every reader share one reading of an element
     errs.extend(crate::release_sections::refusals(
@@ -230,6 +269,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_PIPEFAIL_LIBRARIES", "*lib.sh *-lib*").words(),
         Row::scalar("GATE_SDK_PIPEFAIL_ALL", "0").empty_takes_default(),
         Row::scalar("GATE_SDK_PIPEFAIL_BASELINE", "").empty_takes_default(),
+        Row::scalar("GATE_SDK_PIPEFAIL_WAIVER_MIN", "1").empty_takes_default(),
         Row::scalar("GATE_SDK_SCRIPT_FILES", "").empty_takes_default().words(),
         Row::derived("GATE_SDK_SCRIPT_RULES", Shape::Scalar, script_rules, GATES).empty_takes_default(),
         Row::derived("GATE_SDK_SITE_RULES", Shape::Scalar, site_rules, GATES).empty_takes_default(),
@@ -239,6 +279,8 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_EXEC_WRITE_PATHS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_EXEC_WRITE_HELPERS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_TEST_GLOBS", "tests/ fixtures/ tests.rs *_tests.rs tests_*.rs test_* *_test.*").words(),
+        Row::scalar("GATE_SDK_STALE_LITERAL_CHARS", "8").empty_takes_default(),
+        Row::scalar("GATE_SDK_STALE_LITERAL_LETTERS", "4").empty_takes_default(),
         Row::derived("GATE_SDK_PORTABILITY_PATTERNS", Shape::Scalar, portability_patterns, GATES).empty_takes_default().words(),
         Row::scalar("GATE_SDK_PORTABILITY_PATHS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_HARNESS_LITERALS", "").empty_takes_default().words(),
@@ -322,6 +364,42 @@ mod tests {
             assert_eq!(resolve("GATE_SDK_UPDATE_CHECK").is_ok(), ok, "{}", value);
         }
         env.remove("GATE_SDK_UPDATE_CHECK");
+        reset(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §Layout and configuration — each floor takes a count of its own shape,
+    // and the letters floor never sits above the characters floor
+    #[test]
+    fn the_counting_floors_refuse_a_malformed_value() {
+        let env = knobenv::lock();
+        let cases: &[(&[(&str, &str)], bool)] = &[
+            (&[("GATE_SDK_PIPEFAIL_WAIVER_MIN", "10")], true),
+            (&[("GATE_SDK_PIPEFAIL_WAIVER_MIN", "0")], false),
+            (&[("GATE_SDK_PIPEFAIL_WAIVER_MIN", "+3")], false),
+            (&[("GATE_SDK_STALE_LITERAL_CHARS", "x")], false),
+            (&[("GATE_SDK_STALE_LITERAL_CHARS", "3")], false),
+            (&[("GATE_SDK_STALE_LITERAL_CHARS", "3"), ("GATE_SDK_STALE_LITERAL_LETTERS", "2")], true),
+            (&[("GATE_SDK_STALE_LITERAL_LETTERS", "0")], true),
+            (&[("GATE_SDK_STALE_LITERAL_LETTERS", "-1")], false),
+        ];
+        let names = ["GATE_SDK_PIPEFAIL_WAIVER_MIN", "GATE_SDK_STALE_LITERAL_CHARS", "GATE_SDK_STALE_LITERAL_LETTERS"];
+        for (set, ok) in cases {
+            for (n, value) in *set {
+                env.set(n, value);
+            }
+            reset(&env);
+            for n in names {
+                assert_eq!(resolve(n).is_ok(), *ok, "{} under {:?}", n, set);
+            }
+            for n in names {
+                env.remove(n);
+            }
+        }
+        env.set("GATE_SDK_STALE_LITERAL_CHARS", "3");
+        reset(&env);
+        let refusal = resolve("GATE_SDK_STALE_LITERAL_LETTERS").expect_err("letters 4 above chars 3");
+        assert!(refusal.contains("GATE_SDK_STALE_LITERAL_LETTERS (4) is above GATE_SDK_STALE_LITERAL_CHARS (3)"), "{}", refusal);
+        env.remove("GATE_SDK_STALE_LITERAL_CHARS");
         reset(&env);
     }
 

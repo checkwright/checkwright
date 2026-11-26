@@ -57,6 +57,19 @@ out="$( cd "$SANDBOX/empty" && gate_env GATE_SDK_PIPEFAIL_ALL=yes \
     && gate_run check-pipefail-readers "$CHECKS" 2>&1 )"; rc=$?
 expect all-value 2 'GATE_SDK_PIPEFAIL_ALL must be 0|1' "$rc" "$out"
 
+# --- the waiver floor is the consumer's: a five-character reason the default passes reds under
+# a floor of 10, and a value that is no positive integer is refused at 2.
+mkdir -p "$SANDBOX/floor"
+printf '#!/usr/bin/env bash\nset -o pipefail\nls | head -1 # pipefail-ok: short\n' > "$SANDBOX/floor/waived.sh"
+out="$( cd "$SANDBOX/floor" && gate_run check-pipefail-readers "$CHECKS" waived.sh 2>&1 )"; rc=$?
+expect floor-default 0 'clean (1 shell file(s) read' "$rc" "$out"
+out="$( cd "$SANDBOX/floor" && gate_env GATE_SDK_PIPEFAIL_WAIVER_MIN=10 \
+    && gate_run check-pipefail-readers "$CHECKS" waived.sh 2>&1 )"; rc=$?
+expect floor-raised 1 'waived.sh:3: [PIPEFAIL-EARLY-EXIT] waiver reason under 10 characters' "$rc" "$out"
+out="$( cd "$SANDBOX/floor" && gate_env GATE_SDK_PIPEFAIL_WAIVER_MIN=0 \
+    && gate_run check-pipefail-readers "$CHECKS" waived.sh 2>&1 )"; rc=$?
+expect floor-value 2 'GATE_SDK_PIPEFAIL_WAIVER_MIN must be a positive integer' "$rc" "$out"
+
 # --- a span the reader cannot read is LINT-PARSE at 3, and the fix arm writes nothing to it.
 mkdir -p "$SANDBOX/parse"
 printf '#!/usr/bin/env bash\nset -o pipefail\necho "open\nls | head -1\n' > "$SANDBOX/parse/broken.sh"
@@ -110,5 +123,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-pipefail-readers.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-pipefail-readers.test.sh: clean (configuration, operands, exit classes, the whole-file knob, pruning and the fix arm — $cases cases)"
+echo "check-pipefail-readers.test.sh: clean (configuration, operands, exit classes, the whole-file knob, the waiver floor, pruning and the fix arm — $cases cases)"
 exit 0

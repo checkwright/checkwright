@@ -1,2 +1,4 @@
 # rule: CODENAME
 zephyr
+# A three-byte term, alone in a three-byte run.
+qux

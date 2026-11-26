@@ -2700,12 +2700,13 @@ pub const REGISTRY: &[GateEntry] = &[
     (
         "check-pipefail-readers",
         pipefail_readers::run,
-        &[("?", "", "", "dynamic@src/gates/pipefail_readers.rs:64")],
+        &[("?", "", "", "dynamic@src/gates/pipefail_readers.rs:68")],
         &[
             "GATE_SDK_PIPEFAIL_PATHS",
             "GATE_SDK_PIPEFAIL_LIBRARIES",
             "GATE_SDK_PIPEFAIL_ALL",
             "GATE_SDK_PIPEFAIL_BASELINE",
+            "GATE_SDK_PIPEFAIL_WAIVER_MIN",
             "GATE_SDK_PRUNE_DIRS",
             "GATE_SDK_PRUNE_EXTRA_DIRS",
             "GATE_SDK_NATIVE_BIN",

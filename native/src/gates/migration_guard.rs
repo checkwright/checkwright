@@ -12,9 +12,8 @@ const DIR_KNOB: &str = "GATE_SDK_MIGRATION_DIR";
 const LIST_KNOB: &str = "GATE_SDK_MIGRATION_DESTRUCTIVE";
 const USAGE: &str = "usage: check-migration-guard [--base <ref> | --base-dir <dir>]";
 const WAIVER: &str = "migration-ok:";
-const DIGITS: usize = 4;
 
-type Files = BTreeMap<String, u32>;
+type Files = BTreeMap<String, u64>;
 
 pub fn run(args: &[String]) -> i32 {
     match inner(args) {
@@ -55,14 +54,19 @@ fn parse_args(args: &[String]) -> Result<Against, Fault> {
     }
 }
 
-// spec: gate-sdk/SPEC.md §check-migration-guard — `NNNN_<name>.sql`, four digits and a name
-fn number(name: &str) -> Option<u32> {
-    let stem = name.get(DIGITS..)?.strip_prefix('_')?.strip_suffix(".sql")?;
-    let digits = name.get(..DIGITS)?;
-    if stem.is_empty() || stem.contains('/') || !digits.bytes().all(|b| b.is_ascii_digit()) {
+// spec: gate-sdk/SPEC.md §check-migration-guard — `<digits>_<name>.sql`, its number the decimal
+// value of `<digits>`, refused past 64 bits
+fn number(name: &str) -> Option<u64> {
+    let digits = spelled(name);
+    let stem = name[digits.len()..].strip_prefix('_')?.strip_suffix(".sql")?;
+    if digits.is_empty() || stem.is_empty() || stem.contains('/') {
         return None;
     }
     digits.parse().ok()
+}
+
+fn spelled(name: &str) -> &str {
+    &name[..name.bytes().take_while(u8::is_ascii_digit).count()]
 }
 
 fn files(dir: &str, names: impl IntoIterator<Item = String>) -> Result<Files, Fault> {
@@ -70,13 +74,34 @@ fn files(dir: &str, names: impl IntoIterator<Item = String>) -> Result<Files, Fa
         .into_iter()
         .map(|n| match number(&n) {
             Some(k) => Ok((n, k)),
-            None => Err(Fault::input(format!("{}/{}: not a migration file — every file there is named NNNN_<name>.sql", dir, n))),
+            None => Err(Fault::input(format!(
+                "{}/{}: not a migration file — every file there is named <digits>_<name>.sql, its number under 64 bits",
+                dir, n
+            ))),
         })
         .collect()
 }
 
-fn padded(n: u32) -> String {
-    format!("{:0width$}", n, width = DIGITS)
+// spec: gate-sdk/SPEC.md §check-migration-guard — every file at the merge base and in the working
+// tree shares the width of the first by name, so name order is number order
+fn shared_width(sets: &[(&str, &Files)]) -> Result<(), Fault> {
+    let mut all: Vec<(&str, &str)> = sets.iter().flat_map(|(d, f)| f.keys().map(move |n| (n.as_str(), *d))).collect();
+    all.sort();
+    let Some((first, _)) = all.first().copied() else {
+        return Ok(());
+    };
+    let width = spelled(first).len();
+    match all.iter().find(|(n, _)| spelled(n).len() != width) {
+        Some((n, d)) => Err(Fault::input(format!(
+            "{}/{}: its number is {} digit(s) wide where the first file by name, {}, is {} — every file there shares one width",
+            d,
+            n,
+            spelled(n).len(),
+            first,
+            width
+        ))),
+        None => Ok(()),
+    }
 }
 
 // spec: gate-sdk/SPEC.md §check-migration-guard — a merge-base file gone or changed is edited; an
@@ -87,11 +112,11 @@ fn judge(dir: &str, base: &Files, work: &Files, edited: &BTreeSet<String>) -> Ve
         .filter(|n| !work.contains_key(*n) || edited.contains(*n))
         .map(|n| format!("{}/{}: [MIGRATION-EDITED]", dir, n))
         .collect();
-    if let Some(highest) = base.values().max() {
+    if let Some((top, highest)) = base.iter().max_by_key(|(_, k)| **k) {
         out.extend(
             work.iter()
                 .filter(|(n, k)| !base.contains_key(*n) && *k <= highest)
-                .map(|(n, k)| format!("{}/{}: [MIGRATION-ORDER] {} <= {}", dir, n, padded(*k), padded(*highest))),
+                .map(|(n, _)| format!("{}/{}: [MIGRATION-ORDER] {} <= {}", dir, n, spelled(n), spelled(top))),
         );
     }
     out
@@ -248,6 +273,7 @@ fn from_dir(base_dir: &str, dir: &str, work: &Files) -> Result<(Files, BTreeSet<
     }
     let names = walk::list_dir(Path::new(base_dir)).map_err(Fault::input)?;
     let base = files(base_dir, names.into_iter().filter(|(_, is_dir)| !is_dir).map(|(n, _)| n))?;
+    shared_width(&[(base_dir, &base), (dir, work)])?;
     let mut edited = BTreeSet::new();
     for n in base.keys().filter(|n| work.contains_key(*n)) {
         if read(&Path::new(base_dir).join(n))? != read(&Path::new(dir).join(n))? {
@@ -277,6 +303,7 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
         Against::Base(flag) => {
             let b = since_base::resolve(flag.as_deref())?;
             let base = files(&dir, under(b.files_at_base(&dir_top)?, &dir_top))?;
+            shared_width(&[(&dir, &base), (&dir, &work)])?;
             let edited: BTreeSet<String> = under(b.changed(&[&dir_top])?, &dir_top).into_iter().collect();
             (base, edited, format!("merge base {}", b.short()))
         }
@@ -316,13 +343,29 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
 mod tests {
     use super::*;
 
-    // spec: gate-sdk/SPEC.md §check-migration-guard — four digits, an underscore, a name and `.sql`
+    // spec: gate-sdk/SPEC.md §check-migration-guard — digits of any width, an underscore, a name and
+    // `.sql`, the number fitting 64 bits
     #[test]
     fn a_migration_name_carries_its_number() {
         assert_eq!(number("0042_add_users.sql"), Some(42));
-        for stray in ["42_add.sql", "0042add.sql", "0042_.sql", "0042_add.txt", "00a2_add.sql", "README.md", "0001_x/y.sql"] {
+        assert_eq!(number("42_add.sql"), Some(42));
+        assert_eq!(number("20261126120000_x.sql"), Some(20261126120000));
+        for stray in ["0042add.sql", "0042_.sql", "0042_add.txt", "00a2_add.sql", "_add.sql", "README.md", "0001_x/y.sql", "99999999999999999999_x.sql"] {
             assert_eq!(number(stray), None, "{}", stray);
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §check-migration-guard — one width across both sets, the first file off
+    // it named
+    #[test]
+    fn every_file_shares_the_first_file_s_width() {
+        let base: Files = [("0001_a.sql".to_string(), 1), ("0002_b.sql".to_string(), 2)].into();
+        let work: Files = [("0001_a.sql".to_string(), 1), ("0003_c.sql".to_string(), 3)].into();
+        assert!(shared_width(&[("m", &base), ("m", &work)]).is_ok());
+        assert!(shared_width(&[("m", &Files::new()), ("m", &Files::new())]).is_ok());
+        let wide: Files = [("0001_a.sql".to_string(), 1), ("10003_c.sql".to_string(), 3)].into();
+        let fault = shared_width(&[("m", &base), ("w", &wide)]).expect_err("a five-digit name in a four-digit directory");
+        assert!(fault.to_string().contains("w/10003_c.sql: its number is 5 digit(s) wide where the first file by name, 0001_a.sql, is 4"), "{}", fault);
     }
 
     // spec: gate-sdk/SPEC.md §check-migration-guard — gone or changed is edited, an addition at or
