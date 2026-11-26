@@ -4712,7 +4712,7 @@ A consumer keeps one private list of literal terms its tracked tree and its buil
 
 **The seam ruling.** Kit mechanism is the grammar, the matchers and the knob; consumer config is every term and every id. The kit ships no starter list, since a generic term is no one's secret. A list is gitignored by its default name; one a consumer tracks is self-exempt from every gate reading it, as a resolved pattern file is from check-tree-terms.
 
-**One reader, three matchers.** `native/src/deny_terms.rs` owns the grammar, the ids, the positions and the optional-file split, for the term lists and §check-binary-strings' shape lists alike; each reading gate owns its match, a word in text, a token in a binary, a stem in a path. One ERE could not serve all three, and a literal lets each gate match it its own way. The id rides a comment line because every reader of a pattern file already skips `#` lines, so the same `# rule:` line in an ERE pattern file is invisible to §check-commit-msg.
+**One reader, a matcher per gate.** `native/src/deny_terms.rs` owns the grammar, the ids, the positions and the optional-file split, for the term lists and §check-binary-strings' shape lists alike; each reading gate owns its match. One ERE could not serve them all, and a literal lets each gate match it its own way. The id rides a comment line because every reader of a pattern file already skips `#` lines, so the same `# rule:` line in an ERE pattern file is invisible to §check-commit-msg.
 
 ### check-path-names
 
