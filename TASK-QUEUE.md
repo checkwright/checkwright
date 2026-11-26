@@ -1022,16 +1022,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- verdict-key-before-dispatch
-- content-rule-class
-- exit-status-site-unification
-- adopter-content-checks
-- binary-strings-scan
-- deny-term-names
-- pipefail-readers
-- script-preflight
-- reviewed-site-count
-- stale-test-literals
-- migration-guard
-- exec-write-guard
-
