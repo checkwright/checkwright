@@ -256,6 +256,56 @@ The String error funnels still collapse gate-sdk/SPEC.md §Output contract's abs
 
 **Cost while deferred:** a present-but-unreadable knob file exits 2 instead of 3 and a malformed finder knob 3 instead of 2, so an outside engine retrying on 3 misses one retry or takes a futile one; no in-tree reader branches 2 against 3. About one edit-sweep session, the bulk being some 520 `walk::knob_*` call sites. Split from `exit-status-site-unification` (lead decision 2026-11-25, not a ruling). Filed 2026-11-26 by content-checks-pass' close from its inbox bullet. Owner lookup: `exit::Fault`, `knob loader`, `funnel` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
 
+### migration-guard-byte-identity
+
+[cost: event/low] [surface: gate-sdk]
+
+check-migration-guard's git arm judges a merge-base migration unchanged as `git diff` compares it (the edited set is `since_base`'s changed list, native/src/gates/migration_guard.rs), while its `--base-dir` arm compares raw bytes, so a clean or smudge filter or `core.autocrlf` hides a byte change on the git arm alone. gate-sdk/SPEC.md §check-migration-guard states the git-diff reading; the consumed amendment required byte identity.
+
+**Deliverable:** debt: the git arm compares the merge base's blob bytes with the working tree's, the section's sentence aligned, with sandbox cases under a filter and under autocrlf.
+
+**Cost while deferred:** a filtered or line-ending-normalised edit to a merged migration passes the git arm; the orchestrator adopter expects raw bytes on both arms (adopter direction 2026-11-26, lead-relayed). Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, the filter claim the reviewer's probe, carried from its close; filed at the next scope. Re-verified here: the git arm's edited set is the since-base changed list. Owner lookup: `migration`, `autocrlf`, `byte identity` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
+
+### content-gate-calibrations
+
+[cost: event/low] [surface: gate-sdk]
+
+Four baked calibrations in content-checks-pass' new gates: check-migration-guard's four-digit number (`DIGITS`), check-binary-strings' minimum printable run (`MIN_RUN` 4, so a deny term of two or three characters is never caught), check-pipefail-readers' waiver-reason floor (`FLOOR` 1, where check-script-preflight's sibling floor is its rules file's waiver-min), and `--emit stale-literals`' counting floor (8 characters and 4 letters, native/src/literals.rs). Each default moves no verdict.
+
+**Deliverable:** design-pending, per calibration at spec: the structural bound (a numeric read of the leading decimal run; scanning down to the shortest configured deny term) or a consumer knob defaulting to today's value, the last two borderline.
+
+**Cost while deferred:** a consumer whose migrations carry another width, or whose deny list holds a short term, cannot bind it (policy-as-choice). Surfaced 2026-11-26 by content-checks-pass' close baked-calibration audit, verified at source there, carried from its close; filed at the next scope. Re-verified here: `DIGITS`, `MIN_RUN` and `FLOOR` are consts. Owner lookup: `calibration`, `MIN_RUN`, `DIGITS` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md, each gate's section.
+
+### pipefail-reader-semantic-gaps
+
+[cost: event/low] [surface: gate-sdk]
+
+Two gaps in the pipefail reader (native/src/shell_lines.rs). The fix arm's rewrites drop output: `grep -m1 -A2 x` becomes `grep -A2 x | sed -n '1,1p'`, losing the context lines, and `head -n0` becomes `sed -n '1,0p'`, which prints line 1. And a guarded first stage clears the whole pipeline, though an unguarded middle stage such as `cat` can still die of a broken pipe under pipefail.
+
+**Deliverable:** debt: no rewrite, or an output-preserving one, for those shapes, and a clearance judged per stage, each with a case.
+
+**Cost while deferred:** the fix arm can change a script's output silently, and a pipeline that still fails under pipefail passes. Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, both outputs shell-verified by the reviewer and the rewrite shapes confirmed in the unit tests, carried from its close; filed at the next scope. Owner lookup: `pipefail`, `sed -n`, `guarded` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-pipefail-readers.
+
+### content-gate-reading-limits
+
+[cost: event/low] [surface: gate-sdk]
+
+Four reading limits in content-checks-pass' gates, unstated in gate-sdk/SPEC.md. check-exec-write's path reader (native/src/rust_code.rs) skips no whitespace around `::`, so `std::fs ::copy` loses its leading segment and evades the gate. `--emit stale-literals` tests only a literal's opening line against the removed hunks, so an edit inside a multi-line raw or triple-quoted literal is never collected. check-script-preflight's id grammar accepts a listed flag with no following word (the `None` arm). check-binary-strings returns an empty scan for an ELF64 whose `e_shoff` is 0 (native/src/elf.rs), so a sectionless output is judged clean with nothing read.
+
+**Deliverable:** debt: each fixed with a case or stated as its gate's honest limit, decided per limit at spec.
+
+**Cost while deferred:** each is a silent pass the orchestrator adopter, retiring its own checks onto these gates, cannot see. Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: elf.rs returns at `shoff == 0`. **Inferred, not run:** the exec-write, stale-literals and preflight claims, each the reviewer's reading of source. Owner lookup: `e_shoff`, `id grammar`, `multi-line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md, each gate's section.
+
+### release-record-gates
+
+[cost: event/low] [surface: installer]
+
+Two release records state contracts no gate holds. `.workflow/release-disposition.txt`'s header says one line per iteration, and a second line for one iteration passes. And `check-release-bump` passes a patch-only bump for a stricter gate whenever the note declares nothing, since nothing requires a declaration for a shipped gate's code change.
+
+**Deliverable:** design-pending, a feature: a check holding the disposition file to one line per iteration, and a declaration owed when a shipped gate's code changes, each with its fixture pair.
+
+**Cost while deferred:** a stricter gate can ship as a patch, the bump an adopter takes unread; content-checks-pass' close met it when its patch cut for two review fixes was ruled and then deferred. Surfaced 2026-11-26 at content-checks-pass' close; filed at the next scope. Owner lookup: `release-disposition`, `release-bump`, `patch-only` in this file and the disposed-findings record, none; owner installer/SPEC.md §Versioning and lifecycle-kit/SPEC.md §templates/stages/.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
