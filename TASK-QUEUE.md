@@ -14,6 +14,16 @@
 
 ## New Features
 
+### content-gate-calibrations
+
+[spec: SPEC-content-gate-calibrations.md]
+
+Four baked calibrations in content-checks-pass' new gates: check-migration-guard's four-digit number (`DIGITS`), check-binary-strings' minimum printable run (`MIN_RUN` 4, so a deny term of two or three characters is never caught), check-pipefail-readers' waiver-reason floor (`FLOOR` 1, where check-script-preflight's sibling floor is its rules file's waiver-min), and `--emit stale-literals`' counting floor (8 characters and 4 letters, native/src/literals.rs). Each default moves no verdict.
+
+**Deliverable:** a feature, each calibration settled at spec from the options scope filed, a structural bound (a numeric read of the leading decimal run; scanning down to the shortest configured deny term) or a consumer knob defaulting to today's value: the migration width read off the directory, the string floor derived from the terms, and knobs for the two floors.
+
+**Cost while deferred:** a consumer whose migrations carry another width, or whose deny list holds a short term, cannot bind it (policy-as-choice). Surfaced 2026-11-26 by content-checks-pass' close baked-calibration audit, verified at source there, carried from its close; filed at the next scope. Re-verified here: `DIGITS`, `MIN_RUN` and `FLOOR` are consts. Owner lookup: `calibration`, `MIN_RUN`, `DIGITS` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md, each gate's section.
+
 ## Technical Debt
 
 ### migration-guard-byte-identity
@@ -293,16 +303,6 @@ The String error funnels still collapse gate-sdk/SPEC.md §Output contract's abs
 **Deliverable:** debt: retype those funnels onto `exit::Fault` so each caller receives the kind, with a case per funnel.
 
 **Cost while deferred:** a present-but-unreadable knob file exits 2 instead of 3 and a malformed finder knob 3 instead of 2, so an outside engine retrying on 3 misses one retry or takes a futile one; no in-tree reader branches 2 against 3. About one edit-sweep session, the bulk being some 520 `walk::knob_*` call sites. Split from `exit-status-site-unification` (lead decision 2026-11-25, not a ruling). Filed 2026-11-26 by content-checks-pass' close from its inbox bullet. Owner lookup: `exit::Fault`, `knob loader`, `funnel` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Output contract.
-
-### content-gate-calibrations
-
-[cost: event/low] [surface: gate-sdk]
-
-Four baked calibrations in content-checks-pass' new gates: check-migration-guard's four-digit number (`DIGITS`), check-binary-strings' minimum printable run (`MIN_RUN` 4, so a deny term of two or three characters is never caught), check-pipefail-readers' waiver-reason floor (`FLOOR` 1, where check-script-preflight's sibling floor is its rules file's waiver-min), and `--emit stale-literals`' counting floor (8 characters and 4 letters, native/src/literals.rs). Each default moves no verdict.
-
-**Deliverable:** design-pending, per calibration at spec: the structural bound (a numeric read of the leading decimal run; scanning down to the shortest configured deny term) or a consumer knob defaulting to today's value, the last two borderline.
-
-**Cost while deferred:** a consumer whose migrations carry another width, or whose deny list holds a short term, cannot bind it (policy-as-choice). Surfaced 2026-11-26 by content-checks-pass' close baked-calibration audit, verified at source there, carried from its close; filed at the next scope. Re-verified here: `DIGITS`, `MIN_RUN` and `FLOOR` are consts. Owner lookup: `calibration`, `MIN_RUN`, `DIGITS` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md, each gate's section.
 
 ### release-record-gates
 
