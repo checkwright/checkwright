@@ -11,3 +11,4 @@ src/sites.rs:15: [EXEC-WRITE] creat
 src/sites.rs:16: [EXEC-WRITE] copy
 src/sites.rs:17: [EXEC-WRITE] chmod
 src/sites.rs:18: [EXEC-WRITE] S_IXUSR
+src/sites.rs:19: [EXEC-WRITE] copy

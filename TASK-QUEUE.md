@@ -24,14 +24,6 @@ check-migration-guard's git arm judges a merge-base migration unchanged as `git 
 
 **Cost while deferred:** a filtered or line-ending-normalised edit to a merged migration passes the git arm; the orchestrator adopter expects raw bytes on both arms (adopter direction 2026-11-26, lead-relayed). Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, the filter claim the reviewer's probe, carried from its close; filed at the next scope. Re-verified here: the git arm's edited set is the since-base changed list. Owner lookup: `migration`, `autocrlf`, `byte identity` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
 
-### content-gate-reading-limits
-
-Four reading limits in content-checks-pass' gates, unstated in gate-sdk/SPEC.md. check-exec-write's path reader (native/src/rust_code.rs) skips no whitespace around `::`, so `std::fs ::copy` loses its leading segment and evades the gate. `--emit stale-literals` tests only a literal's opening line against the removed hunks, so an edit inside a multi-line raw or triple-quoted literal is never collected. check-script-preflight's id grammar accepts a listed flag with no following word (the `None` arm). check-binary-strings returns an empty scan for an ELF64 whose `e_shoff` is 0 (native/src/elf.rs), so a sectionless output is judged clean with nothing read.
-
-**Deliverable:** debt: each fixed with a case or stated as its gate's honest limit, decided per limit at spec.
-
-**Cost while deferred:** each is a silent pass the orchestrator adopter, retiring its own checks onto these gates, cannot see. Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here, each at source: elf.rs returns at `shoff == 0`; `callee` stops at a `::` with a space before it; `removed` tests `lit.line`, the opening line; and the id-grammar arm's `None` value matches no arm that reports. Owner lookup: `e_shoff`, `id grammar`, `multi-line` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md, each gate's section.
-
 ### pipefail-reader-semantic-gaps
 
 Two gaps in the pipefail reader (native/src/shell_lines.rs). The fix arm's rewrites drop output: `grep -m1 -A2 x` becomes `grep -A2 x | sed -n '1,1p'`, losing the context lines, and `head -n0` becomes `sed -n '1,0p'`, which prints line 1. And a guarded first stage clears the whole pipeline, though an unguarded middle stage such as `cat` can still die of a broken pipe under pipefail.
@@ -1045,4 +1037,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - content-gate-calibrations
 - migration-guard-lint-parity
 - shared-temp-fixed-names
+- content-gate-reading-limits
 

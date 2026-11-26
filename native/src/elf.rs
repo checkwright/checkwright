@@ -48,7 +48,8 @@ pub fn scan_ranges(bytes: &[u8]) -> Result<Vec<Range<usize>>, String> {
     let shentsize = usize::from(u16_at(bytes, 0x3A).ok_or_else(|| bad("header"))?);
     let mut shnum = u64::from(u16_at(bytes, 0x3C).ok_or_else(|| bad("header"))?);
     if shoff == 0 {
-        return Ok(Vec::new());
+        let whole = 0..bytes.len();
+        return Ok(vec![whole]);
     }
     if shentsize < SECTION {
         return Err(format!("ELF section header size {} is below {}", shentsize, SECTION));
@@ -118,11 +119,15 @@ pub mod tests {
     }
 
     #[test]
-    fn a_file_that_is_no_elf64_le_is_read_whole() {
+    fn a_file_that_is_no_elf64_le_or_has_no_section_table_is_read_whole() {
         for whole in [&b"plain text"[..], &b"\x7fELF\x01\x01 a 32-bit one"[..]] {
             let all = 0..whole.len();
             assert_eq!(scan_ranges(whole).unwrap(), vec![all]);
         }
+        let mut sectionless = image(&[(1, 0x2, b"rodata")]);
+        sectionless[0x28..0x30].copy_from_slice(&0u64.to_le_bytes());
+        let all = 0..sectionless.len();
+        assert_eq!(scan_ranges(&sectionless).unwrap(), vec![all]);
     }
 
     #[test]

@@ -54,6 +54,13 @@ fn shipped(test_from: Option<usize>, line: usize) -> bool {
     !matches!(test_from, Some(t) if line >= t)
 }
 
+// spec: gate-sdk/SPEC.md §The since-base corpus — a literal is removed where any line it spans is,
+// so an edit inside a multi-line literal is collected
+fn touched(removed: &[(usize, usize)], lit: &Literal) -> bool {
+    let last = lit.line + lit.body.matches('\n').count();
+    (lit.line..=last).any(|l| since_base::within(removed, l))
+}
+
 // spec: gate-sdk/SPEC.md §The since-base corpus — each fragment on a non-test line the branch
 // removed, with every site it was removed from
 fn removed(base: &Base, changed: &[String], hunks: &HashMap<String, since_base::Hunks>, globs: &[String], floor: Floor) -> Result<BTreeMap<String, BTreeSet<Site>>, Fault> {
@@ -70,7 +77,7 @@ fn removed(base: &Base, changed: &[String], hunks: &HashMap<String, since_base::
         let text = String::from_utf8_lossy(&bytes);
         let test_from = walk::test_code(p, &text, globs);
         for lit in literals::literals(&text, literals::lang(p)) {
-            if !shipped(test_from, lit.line) || !since_base::within(&h.removed, lit.line) {
+            if !shipped(test_from, lit.line) || !touched(&h.removed, &lit) {
                 continue;
             }
             for f in literals::fragments(lit.body, lit.escapes, floor) {
@@ -222,5 +229,20 @@ mod tests {
         let text = "fn f() {}\n#[cfg(test)]\nassert!(e.contains(\"read the config\"));\nassert!(x, \"cannot read the config\");\nlet s = \"error: unknown flag given here\";\nlet t = \"cannot read the config\";\n";
         let got = listed(text, "src/c.rs", 2, &[(6, 7)], &changed, Floor { chars: 8, letters: 4 });
         assert_eq!(got, BTreeMap::from([(3, ("src/a.rs".to_string(), 7)), (5, ("src/a.rs".to_string(), 9))]));
+    }
+
+    // spec: gate-sdk/SPEC.md §The since-base corpus — an edit on any line a literal spans removes it,
+    // a multi-line raw string and a triple-quoted one alike
+    #[test]
+    fn a_literal_is_removed_on_any_line_it_spans() {
+        let rs = "let a = 1;\nlet s = r#\"first line\nsecond line\nthird\"#;\nlet b = 2;\n";
+        let py = "a = 1\ns = \"\"\"first\nsecond\n\"\"\"\nb = 2\n";
+        for (text, path) in [(rs, "a.rs"), (py, "a.py")] {
+            let lits = literals::literals(text, literals::lang(path));
+            let lit = lits.iter().find(|l| l.body.contains("first")).expect("the literal");
+            assert_eq!(lit.line, 2, "{}", path);
+            assert!(touched(&[(3, 4)], lit) && touched(&[(2, 3)], lit), "{}", path);
+            assert!(!touched(&[(1, 2)], lit) && !touched(&[(5, 6)], lit), "{}", path);
+        }
     }
 }

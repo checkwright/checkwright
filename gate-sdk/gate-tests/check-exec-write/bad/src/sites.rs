@@ -16,4 +16,6 @@ pub fn every_site(p: &str, fd: i32, mode: u32) {
     let _ = fs::copy(p, "out");
     let _ = Command::new("chmod").arg("+x").arg(p);
     let _ = libc::S_IXUSR;
+    let _ = std::fs ::
+        copy(p, "spaced");
 }

@@ -162,7 +162,7 @@ fn check(s: &Script, rule: &Rule, floor: usize, out: &mut Vec<Site>) {
                 for (j, a) in args.iter().enumerate().skip(k + 1) {
                     for f in flags {
                         let value = if !a.quoted && a.value == *f {
-                            args.get(j + 1).map(|v| (v.value.as_str(), v.expands))
+                            Some(args.get(j + 1).map_or(("", false), |v| (v.value.as_str(), v.expands)))
                         } else {
                             a.value.strip_prefix(f.as_str()).and_then(|r| r.strip_prefix('=')).map(|v| (v, a.expands))
                         };
@@ -302,6 +302,7 @@ mod tests {
         assert_eq!(sites(rules, "submit --owner Bob -u 'al'\n"), ["1: [OWNER] --owner", "1: [OWNER] -u"]);
         assert!(sites(rules, "submit --owner=bob -u \"$USER\" --owner=\"${who}\"\n").is_empty());
         assert_eq!(sites(rules, "submit --owner=x1\n"), ["1: [OWNER] --owner"]);
+        assert_eq!(sites(rules, "submit -u\nsubmit --owner= ; true\n"), ["1: [OWNER] -u", "2: [OWNER] --owner"]);
     }
 
     // spec: gate-sdk/SPEC.md §check-script-preflight — a malformed rules file names its file and line

@@ -77,6 +77,25 @@ fn back_over_angles(code: &[u8], close: usize) -> Option<usize> {
     None
 }
 
+// spec: gate-sdk/SPEC.md §The Rust code reader — a path with the whitespace around each `::` dropped
+fn tight(path: &str) -> String {
+    path.split("::").map(str::trim).collect::<Vec<_>>().join("::")
+}
+
+// spec: gate-sdk/SPEC.md §The Rust code reader — a keyword ending at `end` opens no path segment, so
+// `return ::f()` reads `::f`
+fn keyword_before(code: &[u8], end: usize) -> bool {
+    let mut w = end;
+    while w > 0 && ident(code[w - 1]) {
+        w -= 1;
+    }
+    matches!(
+        &code[w..end],
+        b"as" | b"break" | b"const" | b"else" | b"for" | b"if" | b"impl" | b"in" | b"let" | b"match" | b"move"
+            | b"mut" | b"ref" | b"return" | b"static" | b"unsafe" | b"use" | b"where" | b"while" | b"dyn" | b"yield"
+    )
+}
+
 // spec: gate-sdk/SPEC.md §The Rust code reader — the callee a `(` closes over, read backwards: a
 // `::` path whose head may be a qualified `<…>`, a turbofish dropped, `.` marking a method. A macro,
 // a `fn` definition and a bare group are no call
@@ -98,21 +117,25 @@ fn callee(code: &[u8], open: usize) -> Option<(usize, String)> {
         if k == seg_end {
             return None;
         }
-        if k >= 2 && &code[k - 2..k] == b"::" {
-            k -= 2;
-            if k > 0 && code[k - 1] == b'>' {
-                k = back_over_angles(code, k)?;
+        let sep = back_over_space(code, k);
+        if sep >= 2 && &code[sep - 2..sep] == b"::" {
+            let head = back_over_space(code, sep - 2);
+            if head > 0 && code[head - 1] == b'>' {
+                k = back_over_angles(code, head)?;
                 break;
             }
-            if k == 0 || !ident(code[k - 1]) {
+            if head == 0 || !ident(code[head - 1]) || keyword_before(code, head) {
+                k = sep - 2;
                 break;
             }
+            k = head;
             continue;
         }
         break;
     }
     let start = k;
-    let path = std::str::from_utf8(&code[start..end]).ok()?;
+    let path = tight(std::str::from_utf8(&code[start..end]).ok()?);
+    let path = path.as_str();
     let before = back_over_space(code, start);
     if before > 0 && code[before - 1] == b'.' && !(before > 1 && code[before - 2] == b'.') {
         return Some((before - 1, format!(".{}", path)));
@@ -242,6 +265,9 @@ mod tests {
         let v = read("std::fs::copy(a, b);\nx\n  .mode(0o755);\n").expect("reads");
         assert_eq!(v.calls[0].segments(), ["std", "fs", "copy"]);
         assert!(v.calls[1].method() && v.calls[1].name() == "mode" && v.calls[1].line == 3);
+        let v = read("std::fs ::copy(a, b);\nstd :: fs\n  :: copy(a);\n:: libc :: chmod(p, m);\n<X as Y> :: mode(o, 0o600);\nreturn ::std::fs::copy(a, b);\n").expect("reads");
+        let paths: Vec<_> = v.calls.iter().map(|c| (c.path.as_str(), c.line)).collect();
+        assert_eq!(paths, [("std::fs::copy", 1), ("std::fs::copy", 2), ("::libc::chmod", 4), ("<X as Y>::mode", 5), ("::std::fs::copy", 6)]);
     }
 
     // spec: gate-sdk/SPEC.md §The Rust code reader — an unterminated literal or block comment, or
