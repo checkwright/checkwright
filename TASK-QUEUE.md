@@ -22,6 +22,8 @@ check-migration-guard's git arm judges a merge-base migration unchanged as `git 
 
 **Deliverable:** debt: the git arm compares the merge base's blob bytes with the working tree's, the section's sentence aligned, with sandbox cases under a filter and under autocrlf.
 
+**The comparison form (2026-11-26, lead decision under the operator's delegation, not a ruling, on build's escalation):** the checkout form — the merge base's blob as this clone's filters and attributes write it (`git cat-file --filters`), compared byte for byte with the working-tree file, matching the `--base-dir` arm's reading of a file a migrator reads; the adopter confirmed "raw bytes" meant no normalisation by the check, not the stored blob. Two conditions: a change between base and working tree to a judged path's conversion attributes reds, declared under Behavior changes; a filter attribute naming no configured driver is exit 3, never a pass, with a sandbox case. The SPEC confirms `cat-file --filters` (git 2.11) sits under the git floor. The adopter's parity fixture is an LF clone without autocrlf; the autocrlf case is this tree's.
+
 **Cost while deferred:** a filtered or line-ending-normalised edit to a merged migration passes the git arm; the orchestrator adopter expects raw bytes on both arms (adopter direction 2026-11-26, lead-relayed). Surfaced 2026-11-26 by content-checks-pass' close second-vendor review, the filter claim the reviewer's probe, carried from its close; filed at the next scope. Re-verified here: the git arm's edited set is the since-base changed list. Owner lookup: `migration`, `autocrlf`, `byte identity` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
 
 ## Deferred
