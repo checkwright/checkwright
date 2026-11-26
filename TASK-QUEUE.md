@@ -28,18 +28,6 @@ The ghpin family of `adopter-content-checks`, generalized: every site of a confi
 
 **Cost while deferred:** an unpinned CLI call can act under the wrong account, the adopter's own check its only guard. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `site count`, `reviewed` in this file, none; owner gate-sdk/SPEC.md §check-action-pinning.
 
-### pipefail-readers
-
-[spec: gate-sdk/SPEC-shell-preflight.md]
-
-The pipefail family of `adopter-content-checks`: early-exit readers under `pipefail` across a shell tree, with a fix and a baseline.
-
-**Adopter input (2026-11-25, peer channel, lead-relayed):** one detector with two entry points, this and the script preflight's pipefail rule. The corpus is given files, or directories searched for `*.sh` skipping `target`, `.git`, `fixtures` and `__pycache__`; a file is linted when it sets `pipefail` or is a library (`*lib.sh`, `*-lib*`), every given file under `--all`. A hit is `PIPEFAIL-EARLY-EXIT <path>:<line>`, a pipeline into `grep -q`, `-m` or `-l`, `head`, `read`, `sed …q`, `awk` with `exit`, or a breaking `while read` loop; a guarded producer `{ p || true; } | …` or `# pipefail-ok: <reason>` on any pipeline line clears it. `--fix` keeps the mode and rewrites `grep -q X` to `grep X >/dev/null`, `grep -m N` to `grep … | sed -n '1,Np'` and `head -n N` to `sed -n '1,Np'`, fixable hits marked `[auto-fix]`. A baseline of `<count><TAB><path>` lines passes at or under a count, fails above it, and reds a count above the hits as `BASELINE-STALE`. An unparseable span is `LINT-PARSE <path>:<line>` and a tool error.
-
-**Deliverable:** a shell reader shared with the script family, check-pipefail-readers, a fix arm, and the count baseline.
-
-**Cost while deferred:** a pipeline that dies of SIGPIPE under `pipefail` fails at random in the adopter's scripts outside the one shape check-pipe-membership holds. Surfaced 2026-11-25 by the orchestrator adopter's pairing asks; split at spec. Owner lookup: `pipefail`, `early-exit` in this file, none; owner gate-sdk/SPEC.md §check-pipe-membership.
-
 ### script-preflight
 
 [spec: gate-sdk/SPEC-shell-preflight.md]
@@ -1080,4 +1068,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - adopter-content-checks
 - binary-strings-scan
 - deny-term-names
+- pipefail-readers
 
