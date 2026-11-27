@@ -102,11 +102,11 @@ fn keyword_before(code: &[u8], end: usize) -> bool {
 fn callee(code: &[u8], open: usize) -> Option<(usize, String)> {
     let mut end = back_over_space(code, open);
     if end > 0 && code[end - 1] == b'>' {
-        let lt = back_over_angles(code, end)?;
-        if lt < 2 || &code[lt - 2..lt] != b"::" {
+        let sep = back_over_space(code, back_over_angles(code, end)?);
+        if sep < 2 || &code[sep - 2..sep] != b"::" {
             return None;
         }
-        end = lt - 2;
+        end = back_over_space(code, sep - 2);
     }
     let mut k = end;
     loop {
@@ -268,6 +268,9 @@ mod tests {
         let v = read("std::fs ::copy(a, b);\nstd :: fs\n  :: copy(a);\n:: libc :: chmod(p, m);\n<X as Y> :: mode(o, 0o600);\nreturn ::std::fs::copy(a, b);\n").expect("reads");
         let paths: Vec<_> = v.calls.iter().map(|c| (c.path.as_str(), c.line)).collect();
         assert_eq!(paths, [("std::fs::copy", 1), ("std::fs::copy", 2), ("::libc::chmod", 4), ("<X as Y>::mode", 5), ("::std::fs::copy", 6)]);
+        let v = read("std::fs::copy:: <&str, &str>(a, b);\nstd::fs::copy ::<&str, &str>(a, b);\nstd::fs::copy :: <&str>\n  (a);\n").expect("reads");
+        let paths: Vec<_> = v.calls.iter().map(|c| (c.path.as_str(), c.line)).collect();
+        assert_eq!(paths, [("std::fs::copy", 1), ("std::fs::copy", 2), ("std::fs::copy", 3)]);
     }
 
     // spec: gate-sdk/SPEC.md §The Rust code reader — an unterminated literal or block comment, or

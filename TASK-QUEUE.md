@@ -46,14 +46,6 @@ An outside engine can look a verdict up (`--verdict-lookup`) only by computing i
 
 ## Technical Debt
 
-### rust-reader-turbofish-spacing
-
-The Rust code reader's `callee` (native/src/rust_code.rs) wants `::` directly before a turbofish's `<` and an identifier directly before that `::`, so `std::fs::copy:: <&str, &str>(a, b)` and `std::fs::copy ::<&str, &str>(a, b)` read as no call and check-exec-write never sees them. gate-sdk/SPEC.md §The Rust code reader promises both the turbofish dropped and the whitespace around each `::` dropped.
-
-**Deliverable:** debt: whitespace skipped on both sides of a turbofish's `::`, with a case per spelling.
-
-**Cost while deferred:** a spaced turbofish call evades check-exec-write. Surfaced 2026-11-26 by migration-parity-pass' close second-vendor review, carried from its close; filed at this scope. Re-verified here at source: the `lt - 2` test reads the two bytes before `<` with no space skip, and the first segment loop returns `None` on a space. Owner lookup: `turbofish`, `rust_code` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The Rust code reader.
-
 ### pipefail-fix-redirected-grep
 
 `--emit pipefail-fix`'s bounded-grep rewrite (`grep` in native/src/shell_lines.rs) checks the stage's flags and operands but not its redirections, and appends `| sed -n '1,Np'` at the stage's end, so `grep -m1 x >out` becomes `grep x >out | sed -n '1,1p'` and writes every match to `out`. gate-sdk/SPEC.md §check-pipefail-readers names the rewrite as `grep … | sed -n '1,Np'`, the same output.
@@ -1109,4 +1101,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - test-hermetic-rerun-mkdir
+- rust-reader-turbofish-spacing
 

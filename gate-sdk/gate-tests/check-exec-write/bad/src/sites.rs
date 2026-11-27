@@ -18,4 +18,6 @@ pub fn every_site(p: &str, fd: i32, mode: u32) {
     let _ = libc::S_IXUSR;
     let _ = std::fs ::
         copy(p, "spaced");
+    let _ = std::fs::copy:: <&str, &str>(p, "after");
+    let _ = std::fs::copy ::<&str, &str>(p, "before");
 }
