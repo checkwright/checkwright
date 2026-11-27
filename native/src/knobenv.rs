@@ -1,7 +1,6 @@
 // spec: gate-sdk/SPEC.md §lib/gate.sh — the crate's one serialization point for the
 // process-global environment: a case writes a variable only while holding this guard, so
 // cargo's threads cannot interleave two writers of one variable
-use std::path::Path;
 use std::sync::{Mutex, MutexGuard};
 
 static LOCK: Mutex<()> = Mutex::new(());
@@ -23,7 +22,12 @@ pub fn lock() -> KnobEnv {
 }
 
 impl KnobEnv {
+    #[cfg(test)]
     pub fn set(&self, name: &str, value: &str) {
+        std::env::set_var(name, value);
+    }
+
+    pub fn set_os(&self, name: &str, value: &std::ffi::OsStr) {
         std::env::set_var(name, value);
     }
 
@@ -35,6 +39,7 @@ impl KnobEnv {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::Path;
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the roster of process-global environment writes; a
     // spelling outside this module is a write nothing serializes

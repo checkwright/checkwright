@@ -43,7 +43,6 @@ mod hook;
 mod install;
 mod installer;
 mod json;
-#[cfg(test)]
 mod knobenv;
 mod knobfile;
 mod knobs;
@@ -230,6 +229,7 @@ fn utf8_args(raw: Vec<std::ffi::OsString>) -> Result<Vec<String>, String> {
 }
 
 fn main() {
+    proc::restore_caller_locale();
     // spec: gate-sdk/SPEC.md §git-hook — the start name is read ahead of the argument parse: under
     // a served hook's name the process is that hook's launcher and git's operands are not arms, and
     // under any other git hook's name with the chain record beside it a forwarding hook

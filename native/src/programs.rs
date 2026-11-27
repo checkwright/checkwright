@@ -15,6 +15,7 @@ enum Identity {
         // spec: gate-sdk/SPEC.md §The program roster — read by the parity tests alone
         #[cfg_attr(not(test), allow(dead_code))]
         audience: &'static str,
+        runs_authored: bool,
     },
     Consumer {
         command: String,
@@ -32,13 +33,16 @@ pub const GATE_DECLARATION: &str = "gate declaration";
 pub const CHAINED_HOOK: &str = "the chain record";
 
 // spec: gate-sdk/SPEC.md §The program roster — one row per member; the test-only `ALL` is emitted
-// from the same rows, so it is complete by construction
+// from the same rows, so it is complete by construction; a row's trailing `runs_authored`, a tool
+// running code its author owns, is the mark §Fail-closed contract's locale pin reads
 macro_rules! roster {
-    ($($(#[$m:meta])* $id:ident = $name:expr, $audience:expr;)*) => {
+    (@mark runs_authored) => { true };
+    (@mark) => { false };
+    ($($(#[$m:meta])* $id:ident = $name:expr, $audience:expr $(, $mark:ident)?;)*) => {
         $(
             $(#[$m])*
             pub const $id: Program = Program {
-                identity: Identity::Member { name: $name, audience: $audience },
+                identity: Identity::Member { name: $name, audience: $audience, runs_authored: roster!(@mark $($mark)?) },
                 path: None,
             };
         )*
@@ -52,7 +56,7 @@ roster! {
     GIT = "git", "";
     // spec: context-kit/SPEC.md §bin/env-probe — the audience is `toolfloor`'s own holder rather
     // than a twin literal here, so the roster and `PROBE_SET` cannot be edited apart
-    BASH = "bash", crate::toolfloor::DERIVED;
+    BASH = "bash", crate::toolfloor::DERIVED, runs_authored;
     #[cfg(not(unix))]
     DATE = "date", "";
     MKTEMP = "mktemp", "contributor";
@@ -62,21 +66,21 @@ roster! {
     #[cfg(not(unix))]
     PS = "ps", "";
     CURL = "curl", "delegation-kit";
-    CARGO = "cargo", "contributor";
+    CARGO = "cargo", "contributor", runs_authored;
     RUSTC = "rustc", "contributor";
     TAR = "tar", "contributor";
-    NPM = "npm", "contributor";
+    NPM = "npm", "contributor", runs_authored;
     UNAME = "uname", "contributor";
     #[cfg(unix)]
-    SH = "sh", "contributor";
+    SH = "sh", "contributor", runs_authored;
     #[cfg(unix)]
     SHASUM = "shasum", "contributor";
-    PWSH = "pwsh", "contributor";
-    POWERSHELL = "powershell", "contributor";
+    PWSH = "pwsh", "contributor", runs_authored;
+    POWERSHELL = "powershell", "contributor", runs_authored;
     #[cfg(target_os = "linux")]
     DOCKER = "docker", "contributor";
     #[cfg(target_os = "linux")]
-    DASH = "dash", "contributor";
+    DASH = "dash", "contributor", runs_authored;
     CHECKWRIGHT_GATES = env!("CARGO_PKG_NAME"), "";
 }
 
@@ -164,6 +168,15 @@ impl Program {
         match self.ground() {
             Some(g) => format!("{} (named by {})", self.name(), g),
             None => self.name(),
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a child the crate parses runs in the C locale: a
+    // member that neither runs code its author owns nor is the binary's own image
+    pub fn takes_c_locale(&self) -> bool {
+        match &self.identity {
+            Identity::Member { name, runs_authored, .. } => !runs_authored && *name != env!("CARGO_PKG_NAME"),
+            Identity::Consumer { .. } => false,
         }
     }
 

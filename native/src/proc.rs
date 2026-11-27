@@ -71,10 +71,70 @@ impl Completed {
 
 // spec: gate-sdk/SPEC.md §check-crate-arms — every child this module builds; under the test build
 // it reads no host git configuration, and a caller's own value for either name still wins
-fn command(target: &str) -> Command {
+fn command(program: &Program, target: &str) -> Command {
     let mut cmd = Command::new(target);
-    git_isolation::pin(&mut cmd);
+    pins(&mut cmd, program);
     cmd
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the pins every child carries, set before a face
+// applies its caller's environment and re-applied by the isolated face after its clear
+fn pins(cmd: &mut Command, program: &Program) {
+    git_isolation::pin(cmd);
+    if program.takes_c_locale() {
+        // spec: gate-sdk/SPEC.md §Fail-closed contract — a live record is an unrestored path's, kept
+        // so the outermost caller's locale wins
+        let record = std::env::var_os(CALLER_LOCALE).unwrap_or_else(|| caller_record(std::env::var_os("LC_ALL")));
+        cmd.env(CALLER_LOCALE, record).env("LC_ALL", "C");
+    }
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the invoking `LC_ALL` a pinned child carries, so the
+// binary's image a roster tool launches restores it before anything runs
+const CALLER_LOCALE: &str = "CHECKWRIGHT_GATES_CALLER_LC_ALL";
+const UNSET: &str = "unset";
+
+fn caller_record(lc_all: Option<std::ffi::OsString>) -> std::ffi::OsString {
+    lc_all.map_or_else(
+        || UNSET.into(),
+        |v| {
+            let mut r = std::ffi::OsString::from("=");
+            r.push(v);
+            r
+        },
+    )
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — `None` a record of neither form, `Some(None)` an
+// unset caller, `Some(Some(v))` a caller's value, the empty one included
+fn caller_value(record: &std::ffi::OsStr) -> Option<Option<std::ffi::OsString>> {
+    if record == UNSET {
+        return Some(None);
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::{OsStrExt, OsStringExt};
+        record.as_bytes().strip_prefix(b"=").map(|v| Some(std::ffi::OsString::from_vec(v.to_vec())))
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::ffi::{OsStrExt, OsStringExt};
+        let wide: Vec<u16> = record.encode_wide().collect();
+        wide.strip_prefix(&[u16::from(b'=')]).map(|v| Some(std::ffi::OsString::from_wide(v)))
+    }
+}
+
+// spec: gate-sdk/SPEC.md §Fail-closed contract — the binary image's first act: the caller's `LC_ALL`
+// back as it was, and the record gone so it reaches no child
+pub fn restore_caller_locale() {
+    let Some(record) = std::env::var_os(CALLER_LOCALE) else { return };
+    let env = crate::knobenv::lock();
+    match caller_value(&record) {
+        Some(Some(v)) => env.set_os("LC_ALL", &v),
+        Some(None) => env.remove("LC_ALL"),
+        None => {}
+    }
+    env.remove(CALLER_LOCALE);
 }
 
 mod git_isolation {
@@ -110,7 +170,7 @@ pub fn run(program: &Program, args: &[&str]) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
     let target = spawn_target(program.invocation())?;
-    let out = command(target.as_ref()).args(args).output().map_err(|e| {
+    let out = command(program, target.as_ref()).args(args).output().map_err(|e| {
         format!(
             "cannot run {}: {} — the check could not run; treating as failure (not clean)",
             program.label(), e
@@ -566,14 +626,14 @@ fn merged(
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
     let err = out.try_clone().map_err(spawn_err)?;
-    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(program, spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
         .stderr(std::process::Stdio::from(err));
     if isolated {
         cmd.env_clear();
-        git_isolation::pin(&mut cmd);
+        pins(&mut cmd, program);
     }
     for k in unset {
         cmd.env_remove(k);
@@ -623,7 +683,7 @@ pub fn run_bounded_in(
     #[cfg(test)]
     recorder::note(program.invocation());
     let target = spawn_target(program.invocation()).map_err(BoundedError::Spawn)?;
-    let mut cmd = command(target.as_ref());
+    let mut cmd = command(program, target.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
@@ -778,7 +838,7 @@ pub fn run_bounded_capture(
         MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     ));
     let out = std::fs::File::create(&capture).map_err(spawn_err)?;
-    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(program, spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .envs(env.iter().copied())
         .stdin(std::process::Stdio::null())
@@ -837,7 +897,7 @@ pub fn run_bounded_redirected(
     let stdin = std::fs::File::open(io.stdin).map_err(spawn_err)?;
     let stdout = std::fs::File::create(io.stdout).map_err(spawn_err)?;
     let stderr = std::fs::File::create(io.stderr).map_err(spawn_err)?;
-    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(program, spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .current_dir(io.cwd)
         .stdin(std::process::Stdio::from(stdin))
@@ -885,7 +945,7 @@ pub fn run_with_env_in(
 ) -> Result<Completed, String> {
     #[cfg(test)]
     recorder::note(program.invocation());
-    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(program, spawn_target(program.invocation())?.as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -1021,7 +1081,7 @@ pub fn run_with_stdin_in(
             program.label(), e
         )
     };
-    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(program, spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -1140,7 +1200,7 @@ pub fn piped(program: &Program, args: &[&str]) -> Result<Piped, String> {
             program.label(), e
         )
     };
-    let mut child = command(spawn_target(program.invocation())?.as_ref())
+    let mut child = command(program, spawn_target(program.invocation())?.as_ref())
         .args(args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -1222,7 +1282,7 @@ pub fn run_streamed(
             return Err(io_err(e));
         }
     };
-    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(program, spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .stdin(std::process::Stdio::from(feed))
         .stdout(std::process::Stdio::from(sink));
@@ -1315,7 +1375,7 @@ pub fn run_to_in(
             program.label(), e
         )
     };
-    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(program, spawn_target(program.invocation())?.as_ref());
     cmd.args(args);
     for (k, v) in env {
         cmd.env(k, v);
@@ -1369,7 +1429,7 @@ pub fn run_stdout_scrubbed(
     let seq = MERGE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     let outp = temp_base()?.join(format!("checkwright-out.{}.{}", std::process::id(), seq));
     let sink = std::fs::File::create(&outp).map_err(io_err)?;
-    let mut cmd = command(spawn_target(program.invocation())?.as_ref());
+    let mut cmd = command(program, spawn_target(program.invocation())?.as_ref());
     cmd.args(args)
         .current_dir(cwd)
         .stdout(std::process::Stdio::from(sink));
@@ -1482,7 +1542,7 @@ pub fn dispatch(
     };
     let out = std::fs::File::create(capture).map_err(|e| io_err("create the capture file", e))?;
     let err = out.try_clone().map_err(|e| io_err("share the capture file", e))?;
-    let mut cmd = command(program.invocation());
+    let mut cmd = command(program, program.invocation());
     cmd.args(args)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::from(out))
@@ -1525,6 +1585,71 @@ pub(crate) mod tests {
         assert_eq!(name_of(&suffixed), "git");
         assert_eq!(name_of("git"), "git");
         assert_eq!(name_of("git.exe"), "git.exe", "a bare name is noted as passed");
+    }
+
+    fn locale_of(cmd: &Command) -> Option<Option<String>> {
+        cmd.get_envs()
+            .find(|(k, _)| *k == "LC_ALL")
+            .map(|(_, v)| v.map(|v| v.to_string_lossy().into_owned()))
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — the pin is keyed on the program's identity: a
+    // roster tool carries `LC_ALL=C`, and a consumer program, a tool running code its author owns
+    // and the binary's image carry nothing of their own
+    #[test]
+    fn only_a_roster_tool_is_built_in_the_c_locale() {
+        use crate::programs::{CARGO, CHECKWRIGHT_GATES, JQ, NPM, POWERSHELL, PWSH, RUSTC};
+        for p in [GIT, JQ, RUSTC, GIT.at("/opt/bin/git")] {
+            assert_eq!(locale_of(&command(&p, p.invocation())), Some(Some("C".to_string())), "{}", p);
+        }
+        let consumer = Program::consumer(crate::programs::GATE_DECLARATION, "git");
+        for p in [consumer, BASH, PWSH, POWERSHELL, CARGO, NPM, CHECKWRIGHT_GATES, CHECKWRIGHT_GATES.at("/opt/cwg")] {
+            assert_eq!(locale_of(&command(&p, p.invocation())), None, "{}", p);
+        }
+        #[cfg(unix)]
+        assert!(!crate::programs::SH.takes_c_locale());
+        #[cfg(target_os = "linux")]
+        assert!(!crate::programs::DASH.takes_c_locale());
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a pinned child carries the caller's `LC_ALL`
+    // record, which reads back as unset, empty or the value, and a record of neither form reads as none;
+    // an exempt launch carries none, so a test process cargo starts inherits no record it cannot restore
+    #[test]
+    fn the_caller_locale_record_round_trips_unset_empty_and_a_value() {
+        for v in [None, Some(""), Some("el_GR.UTF-8")] {
+            let record = caller_record(v.map(std::ffi::OsString::from));
+            assert_eq!(caller_value(&record), Some(v.map(std::ffi::OsString::from)), "{:?}", v);
+        }
+        assert_eq!(caller_value(std::ffi::OsStr::new("C")), None);
+        let recorded = |p: &Program| command(p, p.invocation()).get_envs().any(|(k, v)| k == CALLER_LOCALE && v.is_some());
+        assert!(recorded(&GIT), "a pinned child carries no record");
+        for p in [BASH, crate::programs::CARGO, crate::programs::NPM] {
+            assert!(!recorded(&p), "{} is exempt and carries a record", p);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §Fail-closed contract — a caller's own `LC_ALL` replaces the pin, and
+    // the isolated face carries it after its clear; the roster tool is `env`, spawned under git's
+    // identity so the pin reaches it
+    #[cfg(unix)]
+    #[test]
+    fn a_callers_locale_wins_and_the_isolated_face_keeps_the_pin() {
+        let env = which("env").expect("env resolves on a unix host");
+        let tool = GIT.at(env.clone());
+        let lines = |out: &[u8]| -> Vec<String> {
+            String::from_utf8_lossy(out).lines().filter(|l| l.starts_with("LC_ALL=")).map(str::to_string).collect()
+        };
+        let plain = run(&tool, &[]).expect("env spawns");
+        assert_eq!(lines(&plain.stdout), ["LC_ALL=C"]);
+        let own = run_with_env(&tool, &[], &[("LC_ALL".to_string(), "en_US.UTF-8".to_string())]).expect("env spawns");
+        assert_eq!(lines(&own.stdout), ["LC_ALL=en_US.UTF-8"]);
+        let dir = std::env::temp_dir();
+        let isolated = run_merged_isolated(&tool, &[], &[], &dir).expect("env spawns");
+        assert_eq!(lines(isolated.output()), ["LC_ALL=C"]);
+        let shell = Program::consumer(crate::programs::GATE_DECLARATION, env);
+        let bare = run_merged_isolated(&shell, &[], &[], &dir).expect("env spawns");
+        assert!(lines(bare.output()).is_empty(), "a consumer program was pinned: {:?}", lines(bare.output()));
     }
 
     // spec: installer/SPEC.md §The update notice — an expired bound kills the grandchild with the

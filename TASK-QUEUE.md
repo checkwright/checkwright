@@ -14,16 +14,6 @@
 
 ## New Features
 
-### parsed-output-c-locale
-
-[spec: SPEC-child-locale.md]
-
-A gate that parses a child's output, git's stderr wording or a tool's message, reads it in the invoking locale, since `proc::command` (native/src/proc.rs) builds every child with the inherited environment; a localized git answers in a form no matcher expects.
-
-**Deliverable:** design-pending, a feature: the locale contract for parsed child output, `LC_ALL=C` on every child whose output a gate parses, its home in gate-sdk/SPEC.md §Fail-closed contract, with which spawns it reaches (a consumer gate or a hook a gate only runs is not parsed) and a case under a non-C locale. A shared `native/src` module, so every kit's suite runs.
-
-**Cost while deferred:** a localized host can turn a recognized git answer into an unrecognized one. Surfaced 2026-11-27 as the orchestrator adopter's first ask, adopter direction, lead-relayed; filed at this scope. Owner lookup: `LC_ALL`, `locale` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Fail-closed contract.
-
 ## Technical Debt
 
 ## Deferred
@@ -1056,4 +1046,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - binary-only-doc-gaps
 - migration-guard-silent-skips
 - verdict-key-arm
+- parsed-output-c-locale
 
