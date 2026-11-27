@@ -1038,9 +1038,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- codex-plugin-version-pin
-- release-archive-provenance
-- turbofish-fn-pointer-arrow
-- verdict-key-version-token
-- front-door-registry-readiness
-
