@@ -8,3 +8,16 @@ jobs:
       - uses: actions/attest-build-provenance@0000000000000000000000000000000000000000 # v4
         with:
           subject-path: ${{ runner.temp }}/dist/app-*.tgz
+
+      - name: attest the archives, folded into one path
+        uses: actions/attest-build-provenance@0000000000000000000000000000000000000000 # v4
+        with:
+          subject-path: >
+            ${{ runner.temp }}/dist/app-gates-*-x86_64-unknown-linux-gnu.tar.gz
+            ${{ runner.temp }}/dist/app-gates-*-aarch64-apple-darwin.tar.gz
+
+      - name: attest one target's archive alone
+        uses: actions/attest-build-provenance@0000000000000000000000000000000000000000 # v4
+        with:
+          subject-path: |
+            ${{ runner.temp }}/dist/app-gates-*-x86_64-unknown-linux-gnu.tar.gz

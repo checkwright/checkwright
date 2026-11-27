@@ -1,12 +1,13 @@
 payload.md: 2 declaration lines (lines 5, 7), and exactly one is admissible
 payload.md:7: template 'notes.txt' lacks the required {version}
 payload.md: template 'app-{version}.tgz' has no sidecar template 'app-{version}.tgz.sha256' declared beside it
-publish.yml: template 'app-gates-{version}-{target}.tar.gz' is matched by no attest step's subject-path, so its asset ships unattested
+publish.yml: subject-path entry '${{ runner.temp }}/dist/app-gates-*-x86_64-unknown-linux-gnu.tar.gz ${{ runner.temp }}/dist/app-gates-*-aarch64-apple-darwin.tar.gz' is folded from several lines into one path, which names no asset
 publish.yml: no step invokes check-release-assets with --dist, so no tag's asset set is held
 dist: declared asset 'app-gates-0.1.0-aarch64-apple-darwin.tar.gz' is absent
 dist: declared asset 'app-gates-0.1.0-aarch64-apple-darwin.tar.gz.sha256' is absent
 dist: entry 'app-0.1.0.tgz.sha256' is declared by no template
 dist: entry 'stray.txt' is declared by no template
+dist: asset 'app-gates-0.1.0-aarch64-apple-darwin.tar.gz' is matched by no attest step's subject-path, so it ships unattested
 dist: archive 'app-gates-0.1.0-x86_64-unknown-linux-gnu.tar.gz' carries its binary 'app-gates-0.1.0-x86_64-unknown-linux-gnu/app-gates' at mode -rw-r--r--, not -rwxr-xr-x, so an adopter must chmod it before it runs
 dist: sidecar 'app-0.1.0.tgz.sha256' names 'dist/app-0.1.0.tgz', not its asset's bare name 'app-0.1.0.tgz'
 dist: sidecar 'app-gates-0.1.0-x86_64-unknown-linux-gnu.tar.gz.sha256' carries digest 0000000000000000000000000000000000000000000000000000000000000000, and 'app-gates-0.1.0-x86_64-unknown-linux-gnu.tar.gz' hashes to 62fe91092cbcd038538620b0b39e5d69e627e6906d94d27fcbd35056801a9da3

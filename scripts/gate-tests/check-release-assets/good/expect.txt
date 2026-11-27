@@ -1,1 +1,1 @@
-RELEASE-ASSETS: clean (4 template(s) declared in payload.md, the publish half wired in publish.yml, 2 attest step(s) read; dist carries exactly the 6 declared asset(s) for version 0.1.0, 2 archive binar(ies) at -rwxr-xr-x, 3 sidecar(s) verified)
+RELEASE-ASSETS: clean (4 template(s) declared in payload.md, the publish half wired in publish.yml, 2 attest step(s) read; dist carries exactly the 6 declared asset(s) for version 0.1.0, 3 attested by name, 2 archive binar(ies) at -rwxr-xr-x, 3 sidecar(s) verified)

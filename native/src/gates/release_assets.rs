@@ -224,23 +224,54 @@ fn is_attest_uses(v: &str) -> bool {
     ATTEST_ACTIONS.contains(&name)
 }
 
-// spec: gate-sdk/SPEC.md §check-release-assets — a key's value: inline, or a `|` or `>` block of the
-// lines indented past the key
+const FOLD: char = '\0';
+
+// spec: gate-sdk/SPEC.md §check-release-assets — a key's value as the lines the action splits: inline,
+// a `|` block's lines indented past the key, or a `>` block's paragraphs, each folded to one line
+// with `FOLD` where YAML joins two lines with a space
 fn key_value(lines: &[&str], at: usize, col: usize, inline: &str) -> Vec<String> {
     let v = inline.trim();
     if !(v.starts_with('|') || v.starts_with('>')) {
         return vec![scalar(v).to_string()];
     }
-    lines[at + 1..]
+    let block = lines[at + 1..]
         .iter()
         .take_while(|l| l.trim().is_empty() || indent(l) > col)
-        .map(|l| l.trim().to_string())
-        .collect()
+        .map(|l| l.trim())
+        .filter(|l| !l.starts_with('#'));
+    if v.starts_with('|') {
+        return block.map(String::from).collect();
+    }
+    let mut out: Vec<String> = Vec::new();
+    let mut open = false;
+    for l in block {
+        match (l.is_empty(), open) {
+            (true, _) => open = false,
+            (false, true) => {
+                let last = out.last_mut().expect("an open paragraph has a line");
+                last.push(FOLD);
+                last.push_str(l);
+            }
+            (false, false) => {
+                out.push(l.to_string());
+                open = true;
+            }
+        }
+    }
+    out
+}
+
+// spec: gate-sdk/SPEC.md §check-release-assets — one attest step's entries, and those a `>` block
+// folded across lines, spelled with the space the action reads
+#[derive(Debug, Default, PartialEq)]
+pub(crate) struct Subjects {
+    entries: Vec<String>,
+    folded: Vec<String>,
 }
 
 // spec: gate-sdk/SPEC.md §check-release-assets — the subject read: each attest step's
 // `subject-path` under its `with:`, split on newlines and commas, a `#`-led line no entry
-pub(crate) fn attest_subjects(text: &str) -> Vec<Vec<String>> {
+pub(crate) fn attest_subjects(text: &str) -> Vec<Subjects> {
     let lines = fresh::file_lines(text);
     let mut out = Vec::new();
     for (i, l) in lines.iter().enumerate() {
@@ -265,7 +296,7 @@ pub(crate) fn attest_subjects(text: &str) -> Vec<Vec<String>> {
         while end < lines.len() && (opaque(lines[end]) || indent(lines[end]) >= col) {
             end += 1;
         }
-        let mut entries = Vec::new();
+        let mut step = Subjects::default();
         for w in start..end {
             let (wcol, wrest) = key_line(lines[w]);
             if wcol != col || wrest.trim_end() != "with:" {
@@ -281,12 +312,18 @@ pub(crate) fn attest_subjects(text: &str) -> Vec<Vec<String>> {
                         if line.starts_with('#') {
                             continue;
                         }
-                        entries.extend(line.split(',').map(str::trim).filter(|e| !e.is_empty()).map(String::from));
+                        for e in line.split(',').map(|e| e.trim_matches(|c: char| c.is_whitespace() || c == FOLD)) {
+                            match e {
+                                "" => {}
+                                e if e.contains(FOLD) => step.folded.push(e.replace(FOLD, " ")),
+                                e => step.entries.push(e.to_string()),
+                            }
+                        }
                     }
                 }
             }
         }
-        out.push(entries);
+        out.push(step);
     }
     out
 }
@@ -337,16 +374,42 @@ fn subject_matches(entry: &str, template: &str) -> bool {
     seen[gn][tn]
 }
 
-// spec: gate-sdk/SPEC.md §check-release-assets — every asset other than a sidecar is attested
-fn attest_rule(workflows: &str, kept: &[&str], subjects: &[String], findings: &mut Vec<String>) {
+// spec: gate-sdk/SPEC.md §check-release-assets — every asset other than a sidecar is attested, and a
+// path folded from several lines is no subject; returns the templates some entry matched
+fn attest_rule<'a>(workflows: &str, kept: &[&'a str], subjects: &Subjects, findings: &mut Vec<String>) -> Vec<&'a str> {
+    for f in &subjects.folded {
+        findings.push(format!(
+            "{}: subject-path entry '{}' is folded from several lines into one path, which names no asset",
+            workflows, f
+        ));
+    }
+    let mut matched = Vec::new();
     for t in kept.iter().filter(|t| !t.ends_with(SIDECAR)) {
-        if !subjects.iter().any(|e| subject_matches(e, t)) {
+        if subjects.entries.iter().any(|e| subject_matches(e, t)) {
+            matched.push(*t);
+        } else {
             findings.push(format!(
                 "{}: template '{}' is matched by no attest step's subject-path, so its asset ships unattested",
                 workflows, t
             ));
         }
     }
+    matched
+}
+
+// spec: gate-sdk/SPEC.md §check-release-assets — coverage at the tag: each name a matched template
+// expands to is itself matched, so a glob narrowed to one target or version is a finding
+fn coverage_rule(dir: &str, matched: &[&str], version: &str, targets: &[String], subjects: &Subjects, findings: &mut Vec<String>) -> usize {
+    let names = expand(matched, version, targets);
+    for name in &names {
+        if !subjects.entries.iter().any(|e| subject_matches(e, name)) {
+            findings.push(format!(
+                "{}: asset '{}' is matched by no attest step's subject-path, so it ships unattested",
+                dir, name
+            ));
+        }
+    }
+    names.len()
 }
 
 // spec: gate-sdk/SPEC.md §check-release-assets — the publish half: the directory's own entries,
@@ -484,20 +547,21 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
     }
     let mut wired = false;
     let mut steps = 0usize;
-    let mut subjects: Vec<String> = Vec::new();
+    let mut subjects = Subjects::default();
     for w in &workflows {
         let text = read(w, "publish workflow")?;
         wired |= fresh::file_lines(&text).iter().any(|l| is_call(l));
-        for entries in attest_subjects(&text) {
+        for step in attest_subjects(&text) {
             steps += 1;
-            subjects.extend(entries);
+            subjects.entries.extend(step.entries);
+            subjects.folded.extend(step.folded);
         }
     }
 
     let mut findings: Vec<String> = Vec::new();
     let templates = battery_half(&a.doc, &doc_text, &mut findings);
     sidecar_rules(&a.doc, &templates, &mut findings);
-    attest_rule(&workflows.join(" "), &templates, &subjects, &mut findings);
+    let matched = attest_rule(&workflows.join(" "), &templates, &subjects, &mut findings);
     if !wired {
         findings.push(format!(
             "{}: no step invokes check-release-assets with --dist, so no tag's asset set is held",
@@ -515,6 +579,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         let targets = roster(&read(&roster_path, "target roster")?, &roster_path).map_err(Fault::input)?;
         let declared = expand(&templates, version, &targets);
         publish_half(dir, &declared, &entries, &mut findings);
+        let attested = coverage_rule(dir, &matched, version, &targets, &subjects, &mut findings);
         let present: BTreeSet<&str> = entries.iter().filter(|(_, d)| !d).map(|(n, _)| n.as_str()).collect();
         let mut read_archives = 0usize;
         for archive in binary_archives(&templates, version, &targets) {
@@ -527,10 +592,11 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         }
         let sidecars = check_sidecars(dir, &present, &mut findings)?;
         dist_note = format!(
-            "; {} carries exactly the {} declared asset(s) for version {}, {} archive binar(ies) at -rwxr-xr-x, {} sidecar(s) verified",
+            "; {} carries exactly the {} declared asset(s) for version {}, {} attested by name, {} archive binar(ies) at -rwxr-xr-x, {} sidecar(s) verified",
             dir,
             declared.len(),
             version,
+            attested,
             read_archives,
             sidecars
         );
@@ -541,7 +607,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: keep exactly one well-formed release-assets line in §Consumer payload, declaring each asset's .sha256 beside it; name every asset other than a sidecar in an attest step's subject-path and keep the --dist call in the publish workflow's pack job; make the pack output and the line name the same files, write each sidecar from the bytes it vouches for, and draw each archive's binary from the packed payload, whose packer sets its mode.");
+        println!("  help: keep exactly one well-formed release-assets line in §Consumer payload, declaring each asset's .sha256 beside it; name every asset other than a sidecar, for every target and version, in an attest step's subject-path, listed in a | block since a > block folds its lines into one path, and keep the --dist call in the publish workflow's pack job; make the pack output and the line name the same files, write each sidecar from the bytes it vouches for, and draw each archive's binary from the packed payload, whose packer sets its mode.");
         return Ok(1);
     }
     println!(
@@ -687,15 +753,33 @@ mod tests {
     #[test]
     fn the_subject_read_takes_each_attest_step_s_entries() {
         let wf = "jobs:\n  pack:\n    steps:\n      - uses: actions/attest-build-provenance@abc # v4\n        with:\n          subject-path: ${{ runner.temp }}/dist/a-*.tgz\n      - uses: actions/attest@def\n        with:\n          subject-path: |\n            x/b-*.tar.gz\n            # x/z-*.zip\n            x/c-*.zip, y/d-*.zip\n          other: 1\n      - name: third\n        uses: \"actions/attest-build-provenance@abc\"\n        with:\n          subject-path: >-\n            e-*.zip\n      - uses: actions/attest-sbom@abc\n        with:\n          subject-path: n-*.zip\n      - uses: actions/upload-artifact@x\n        with:\n          path: p\n";
+        let entries = |v: &[&str]| Subjects {
+            entries: s(v),
+            folded: Vec::new(),
+        };
         assert_eq!(
             attest_subjects(wf),
             vec![
-                s(&["${{ runner.temp }}/dist/a-*.tgz"]),
-                s(&["x/b-*.tar.gz", "x/c-*.zip", "y/d-*.zip"]),
-                s(&["e-*.zip"]),
+                entries(&["${{ runner.temp }}/dist/a-*.tgz"]),
+                entries(&["x/b-*.tar.gz", "x/c-*.zip", "y/d-*.zip"]),
+                entries(&["e-*.zip"]),
             ]
         );
-        assert_eq!(attest_subjects("on: push\n"), Vec::<Vec<String>>::new());
+        assert_eq!(attest_subjects("on: push\n"), Vec::<Subjects>::new());
+    }
+
+    // spec: gate-sdk/SPEC.md §check-release-assets — a `>` block folds a paragraph's lines into one
+    // path; a blank line or a comma still ends an entry
+    #[test]
+    fn a_folded_block_reads_as_the_one_path_yaml_makes_of_it() {
+        let wf = "steps:\n  - uses: actions/attest@x\n    with:\n      subject-path: >\n        d/a-*.tgz\n        d/b-*.tgz\n\n        d/c-*.zip,\n        d/e-*.zip\n";
+        assert_eq!(
+            attest_subjects(wf),
+            vec![Subjects {
+                entries: s(&["d/c-*.zip", "d/e-*.zip"]),
+                folded: s(&["d/a-*.tgz d/b-*.tgz"]),
+            }]
+        );
     }
 
     // spec: gate-sdk/SPEC.md §check-release-assets — the entry's last component is matched, a `*`
@@ -715,10 +799,38 @@ mod tests {
     #[test]
     fn a_non_sidecar_template_no_entry_matches_is_a_finding() {
         let mut f = Vec::new();
-        attest_rule("w.yml", &["a-{version}.tgz", "a-{version}.tgz.sha256", "g-{version}-{target}.tar.gz"], &s(&["d/a-*.tgz"]), &mut f);
+        let subjects = Subjects {
+            entries: s(&["d/a-*.tgz"]),
+            folded: s(&["d/x-*.tgz d/y-*.tgz"]),
+        };
+        let matched = attest_rule("w.yml", &["a-{version}.tgz", "a-{version}.tgz.sha256", "g-{version}-{target}.tar.gz"], &subjects, &mut f);
+        assert_eq!(matched, vec!["a-{version}.tgz"]);
         assert_eq!(
             f,
-            s(&["w.yml: template 'g-{version}-{target}.tar.gz' is matched by no attest step's subject-path, so its asset ships unattested"])
+            s(&[
+                "w.yml: subject-path entry 'd/x-*.tgz d/y-*.tgz' is folded from several lines into one path, which names no asset",
+                "w.yml: template 'g-{version}-{target}.tar.gz' is matched by no attest step's subject-path, so its asset ships unattested",
+            ])
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §check-release-assets — a glob narrowed to one target or one version
+    // overlaps its template and still leaves an expanded name unattested
+    #[test]
+    fn coverage_names_each_expanded_asset_no_entry_matches() {
+        let mut f = Vec::new();
+        let subjects = Subjects {
+            entries: s(&["d/g-*-t1.tar.gz", "d/a-1.0.*.tgz"]),
+            folded: Vec::new(),
+        };
+        let checked = coverage_rule("out", &["g-{version}-{target}.tar.gz", "a-{version}.tgz"], "2.0.0", &s(&["t1", "t2"]), &subjects, &mut f);
+        assert_eq!(checked, 3);
+        assert_eq!(
+            f,
+            s(&[
+                "out: asset 'a-2.0.0.tgz' is matched by no attest step's subject-path, so it ships unattested",
+                "out: asset 'g-2.0.0-t2.tar.gz' is matched by no attest step's subject-path, so it ships unattested",
+            ])
         );
     }
 
