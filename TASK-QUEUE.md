@@ -1,14 +1,50 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: release-provenance-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-27, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** the two carried gap-inbox debts and the release-surface units the adopter's archive ask leads. Debt: `verdict-key-version-token`, `turbofish-fn-pointer-arrow` and `front-door-registry-readiness`. Feature for spec to author: `release-archive-provenance`. Both release units' observe halves, `archive-provenance-observe` and `registry-readiness-observe`, are split off deferred, since only a release `publish` run reads them. `release-record-gates`, `user-uninstall-containment` and `exit-status-funnel-typing` stay deferred against the budget.
+
+  **The release and pushes (2026-11-27, lead decision under the same delegation, not a ruling):** a cut at this iteration's close is granted, which `release-archive-provenance` needs for its proof. Push need 1 against 2, inside the budget: the closing push, which also carries the two close commits already on master locally; the release tag push is the cut's.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### verdict-key-version-token
+
+`--verdict-key` can print a `tool.version` that `--verdict-lookup` refuses. The release stamp keeps any `CHECKWRIGHT_BUILD_VERSION` bytes after a leading `v` (`stamp` in native/src/release_stamp.rs), while `version_token` in native/src/verdict_store.rs admits only ASCII alphanumerics and `.+-`. So a build stamped `v1.2.3_review` keys and stores under a version the lookup refuses at exit 2, against gate-sdk/SPEC.md §run-gates naming the key's fields the lookup's operands.
+
+**Deliverable:** debt: one grammar for the stamp and the lookup's version operand, so every key a stamped build prints is a lookup's operand, with a case.
+
+**Cost while deferred:** a verdict stored under such a stamp is unreachable by lookup, so an adopter keying CI runs with `--verdict-key` re-runs what it stored. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: `stamp` returns its input trimmed and `v`-stripped, unfiltered. Owner lookup: `version_token`, `release_stamp`, `verdict-key` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
+### turbofish-fn-pointer-arrow
+
+The Rust code reader drops a turbofish call whose type argument holds a fn-pointer arrow: `back_over_angles` in native/src/rust_code.rs counts the `>` of `->` as a closing angle, so `f::<fn() -> ()>()` reads as no call and `check-exec-write` passes such a site, against gate-sdk/SPEC.md §The Rust code reader reading each call with its turbofish removed.
+
+**Deliverable:** debt: the backward angle scan skips the `>` of `->`, with a case.
+
+**Cost while deferred:** an exec or write call spelled with such a turbofish escapes the gates the reader feeds. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: the scan counts every `>`. Owner lookup: `back_over_angles`, `turbofish` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The Rust code reader.
+
+### front-door-registry-readiness
+
+[recurrence: 2026-11-26]
+
+The front-door package route's readiness poll (`npm view <package>@<version> version` in scripts/ci-front-door.sh and its PowerShell twin) named 0.38.0 at the registry's publish time while the tarball still answered 404, so all seven legs of publish run 45592369014 redded at `npx` init on E404, green on a re-run once the tarball served.
+
+**Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers.
+
+**First-run risk (2026-11-27, lead decision):** no local host runs the PowerShell twin, so its edit first executes on the tag's `publish` run; close's procedure for a red publish run, a re-run or a hotfix push inside the budget, is the backstop.
+
+**Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner installer/SPEC.md and scripts/ci-front-door.sh.
+
+Its observe half is [registry-readiness-observe](#registry-readiness-observe), split at scope 2026-11-27 since only a release run reads it.
 
 ## Deferred
 
@@ -216,15 +252,15 @@ wakeup-guard's denial says 'Attempt logged.' when `append_attempt` (native/src/h
 
 **Cost while deferred:** an adopter's attempt log misses denied attempts while the model is told they were logged. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: both results discarded. Owner lookup: `append_attempt`, `Attempt logged` in this file, none; owner guard-kit/SPEC.md §wakeup-guard.
 
-### front-door-registry-readiness
+### registry-readiness-observe
 
-[cost: event/low] [surface: installer] [observed-by: publish] [recurrence: 2026-11-26]
+[cost: event/low] [surface: installer] [observed-by: publish]
 
-The front-door package route's readiness poll (`npm view <package>@<version> version` in scripts/ci-front-door.sh and its PowerShell twin) named 0.38.0 at the registry's publish time while the tarball still answered 404, so all seven legs of publish run 45592369014 redded at `npx` init on E404, green on a re-run once the tarball served.
+The observe half of [front-door-registry-readiness](#front-door-registry-readiness): the front-door legs run only in a release `publish` run, so the first release after the fix is the only run that shows the poll waiting for the tarball rather than the metadata.
 
-**Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers. The observe half reads the next release's `publish` run.
+**Deliverable:** debt: read that run's front-door legs in both drivers, green with no E404 re-run; a red on registry lag is filed as a defect.
 
-**Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner installer/SPEC.md and scripts/ci-front-door.sh.
+**Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-27 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner installer/SPEC.md and scripts/ci-front-door.sh.
 
 ### manifest-name-deny-terms
 
@@ -268,33 +304,27 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 
 ### release-archive-provenance
 
-[cost: event/low] [surface: installer] [observed-by: publish]
+[cost: event/low] [surface: installer]
 
 The platform archives have no published `.sha256` sidecar and no build attestation: the attest step (.github/workflows/publish.yml) names the npm tgz alone, and each archive's sha256 sits inside the archive it vouches for, so a consumer cannot pin an archive without trusting that file.
 
-**Deliverable:** design-pending, a feature: a sidecar per archive and each archive in the attestation's `subject-path`, `check-release-assets` holding both. The observe half reads the next release's `publish` run, for this and `release-archive-binary-mode`'s 0755.
+**Deliverable:** design-pending, a feature: a sidecar per archive and each archive in the attestation's `subject-path`, `check-release-assets` holding both.
+
+**First-run risk (2026-11-27, lead decision):** the publish.yml edits first execute on the tag's `publish` run; close's procedure for a red publish run, a re-run or a hotfix push inside the budget, is the backstop.
 
 **Cost while deferred:** a binary-only consumer verifies nothing it downloads. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: `subject-path` names `checkwright-*.tgz`. Observed at v0.41.0's publish: the x86_64-unknown-linux-gnu archive's binary is `-rwxr-xr-x`, and no archive has a sidecar on the Release. Owner lookup: `sidecar`, `attest`, `subject-path` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The dependency boundary.
 
-### verdict-key-version-token
+Its observe half is [archive-provenance-observe](#archive-provenance-observe), split at scope 2026-11-27 since only a release run reads it.
 
-[cost: event/low] [surface: gate-sdk]
+### archive-provenance-observe
 
-`--verdict-key` can print a `tool.version` that `--verdict-lookup` refuses. The release stamp keeps any `CHECKWRIGHT_BUILD_VERSION` bytes after a leading `v` (`stamp` in native/src/release_stamp.rs), while `version_token` in native/src/verdict_store.rs admits only ASCII alphanumerics and `.+-`. So a build stamped `v1.2.3_review` keys and stores under a version the lookup refuses at exit 2, against gate-sdk/SPEC.md §run-gates naming the key's fields the lookup's operands.
+[cost: event/low] [surface: installer] [observed-by: publish]
 
-**Deliverable:** debt: one grammar for the stamp and the lookup's version operand, so every key a stamped build prints is a lookup's operand, with a case.
+The observe half of [release-archive-provenance](#release-archive-provenance): the first release `publish` run after it lands is the only run that attaches the per-archive sidecars and attests the archives.
 
-**Cost while deferred:** a verdict stored under such a stamp is unreachable by lookup, so an adopter keying CI runs with `--verdict-key` re-runs what it stored. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: `stamp` returns its input trimmed and `v`-stripped, unfiltered. Owner lookup: `version_token`, `release_stamp`, `verdict-key` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+**Deliverable:** debt: read that run's Release assets and attestation, each platform archive carrying its `.sha256` sidecar and verifying with `gh attestation verify`; a miss is filed as a defect.
 
-### turbofish-fn-pointer-arrow
-
-[cost: event/low] [surface: gate-sdk]
-
-The Rust code reader drops a turbofish call whose type argument holds a fn-pointer arrow: `back_over_angles` in native/src/rust_code.rs counts the `>` of `->` as a closing angle, so `f::<fn() -> ()>()` reads as no call and `check-exec-write` passes such a site, against gate-sdk/SPEC.md §The Rust code reader reading each call with its turbofish removed.
-
-**Deliverable:** debt: the backward angle scan skips the `>` of `->`, with a case.
-
-**Cost while deferred:** an exec or write call spelled with such a turbofish escapes the gates the reader feeds. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: the scan counts every `>`. Owner lookup: `back_over_angles`, `turbofish` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The Rust code reader.
+**Cost while deferred:** until read, the produce half's guarantee to a binary-only consumer is unwitnessed on a real Release. Filed 2026-11-27 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner gate-sdk/SPEC.md §Consumer payload.
 
 ## Icebox
 
