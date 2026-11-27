@@ -3,3 +3,4 @@ payload.md:7: template 'notes.txt' lacks the required {version}
 publish.yml: no step invokes check-release-assets with --dist, so no tag's asset set is held
 dist: declared asset 'app-gates-0.1.0-aarch64-apple-darwin.tar.gz' is absent
 dist: entry 'stray.txt' is declared by no template
+dist: archive 'app-gates-0.1.0-x86_64-unknown-linux-gnu.tar.gz' carries its binary 'app-gates-0.1.0-x86_64-unknown-linux-gnu/app-gates' at mode -rw-r--r--, not -rwxr-xr-x, so an adopter must chmod it before it runs

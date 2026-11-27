@@ -1,7 +1,7 @@
 // spec: gate-sdk/SPEC.md §check-release-assets — what a Release carries is declared once in
 // §Consumer payload and held at the tag, before the Release exists
 use crate::exit::Fault;
-use crate::{fresh, registry, walk};
+use crate::{fresh, proc, programs, registry, walk};
 use std::collections::BTreeSet;
 use std::path::Path;
 
@@ -188,6 +188,54 @@ fn publish_half(
     }
 }
 
+fn binary_archives(templates: &[&str], version: &str, targets: &[String]) -> BTreeSet<String> {
+    let per_target: Vec<&str> = templates
+        .iter()
+        .copied()
+        .filter(|t| t.contains("{target}") && t.ends_with(".tar.gz"))
+        .collect();
+    expand(&per_target, version, targets)
+}
+
+// spec: gate-sdk/SPEC.md §check-release-assets — the archive's binary is its one regular entry not
+// named `*.sha256`, the packer's own discovery rule, and it ships at exactly `-rwxr-xr-x`
+fn binary_mode_fault(dir: &str, archive: &str, listing: &str) -> Option<String> {
+    let binaries: Vec<(&str, &str)> = listing
+        .lines()
+        .filter_map(|l| {
+            let mut words = l.split_whitespace();
+            let mode = words.next()?;
+            let path = words.last()?;
+            (mode.starts_with('-') && !path.ends_with(".sha256")).then_some((mode, path))
+        })
+        .collect();
+    match binaries.as_slice() {
+        [(mode, _)] if *mode == "-rwxr-xr-x" => None,
+        [(mode, path)] => Some(format!(
+            "{}: archive '{}' carries its binary '{}' at mode {}, not -rwxr-xr-x, so an adopter must chmod it before it runs",
+            dir, archive, path, mode
+        )),
+        other => Some(format!(
+            "{}: archive '{}' holds {} regular entr(ies) beside its sidecars, and a per-target archive holds exactly one binary",
+            dir,
+            archive,
+            other.len()
+        )),
+    }
+}
+
+fn archive_listing(path: &str) -> Result<String, Fault> {
+    let done = proc::run(&programs::TAR, &["-tvzf", path]).map_err(Fault::input)?;
+    match done.stdout() {
+        Some(out) => Ok(String::from_utf8_lossy(out).into_owned()),
+        None => Err(Fault::input(format!(
+            "cannot list archive {}: {}",
+            path,
+            done.failure_report().unwrap_or_default()
+        ))),
+    }
+}
+
 fn read(path: &str, what: &str) -> Result<String, Fault> {
     if !Path::new(path).is_file() {
         return Err(Fault::refused(format!("{} not found: {}", what, path)));
@@ -233,11 +281,22 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         let targets = roster(&read(&roster_path, "target roster")?, &roster_path).map_err(Fault::input)?;
         let declared = expand(&templates, version, &targets);
         publish_half(dir, &declared, &entries, &mut findings);
+        let present: BTreeSet<&str> = entries.iter().filter(|(_, d)| !d).map(|(n, _)| n.as_str()).collect();
+        let mut read_archives = 0usize;
+        for archive in binary_archives(&templates, version, &targets) {
+            if !present.contains(archive.as_str()) {
+                continue;
+            }
+            let listing = archive_listing(&format!("{}/{}", dir.trim_end_matches('/'), archive))?;
+            findings.extend(binary_mode_fault(dir, &archive, &listing));
+            read_archives += 1;
+        }
         dist_note = format!(
-            "; {} carries exactly the {} declared asset(s) for version {}",
+            "; {} carries exactly the {} declared asset(s) for version {}, {} archive binar(ies) at -rwxr-xr-x",
             dir,
             declared.len(),
-            version
+            version,
+            read_archives
         );
     }
 
@@ -246,7 +305,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         for f in &findings {
             println!("  {}", f);
         }
-        println!("  help: keep exactly one well-formed release-assets line in §Consumer payload, keep the --dist call in the publish workflow's pack job, and make the pack output and the line name the same files.");
+        println!("  help: keep exactly one well-formed release-assets line in §Consumer payload, keep the --dist call in the publish workflow's pack job, make the pack output and the line name the same files, and draw each archive's binary from the packed payload, whose packer sets its mode.");
         return Ok(1);
     }
     println!(
@@ -337,6 +396,33 @@ mod tests {
         );
     }
 
+    // spec: gate-sdk/SPEC.md §check-release-assets — only a per-target `.tar.gz` holds a binary
+    #[test]
+    fn only_a_per_target_tar_gz_is_read_for_its_binary() {
+        let got = binary_archives(&["p-{version}.tgz", "g-{version}-{target}.tar.gz", "z-{version}-{target}.zip"], "1", &s(&["t"]));
+        assert_eq!(got, s(&["g-1-t.tar.gz"]).into_iter().collect::<BTreeSet<String>>());
+    }
+
+    // spec: gate-sdk/SPEC.md §check-release-assets — GNU's and bsdtar's listings both lead with the
+    // mode and end with the path
+    #[test]
+    fn the_binary_entry_ships_at_exactly_0755() {
+        let gnu = "drwxr-xr-x 0/0 0 2026-01-01 00:00 g/\n-rwxr-xr-x 0/0 5 2026-01-01 00:00 g/bin\n-rw-r--r-- 0/0 70 2026-01-01 00:00 g/bin.sha256\n";
+        assert_eq!(binary_mode_fault("d", "g.tar.gz", gnu), None);
+        let bsd = "-rwxr-xr-x  0 0      0           5 Jan  1  2026 g/bin.exe\n-rw-r--r--  0 0      0          70 Jan  1  2026 g/bin.exe.sha256\n";
+        assert_eq!(binary_mode_fault("d", "g.tar.gz", bsd), None);
+        let flat = gnu.replace("-rwxr-xr-x 0/0 5", "-rw-r--r-- 0/0 5");
+        assert_eq!(
+            binary_mode_fault("d", "g.tar.gz", &flat).unwrap(),
+            "d: archive 'g.tar.gz' carries its binary 'g/bin' at mode -rw-r--r--, not -rwxr-xr-x, so an adopter must chmod it before it runs"
+        );
+        assert!(binary_mode_fault("d", "g.tar.gz", "-rwxr--r-- 0/0 5 x y g/bin\n").unwrap().contains("-rwxr--r--"));
+        let none = "-rw-r--r-- 0/0 70 2026-01-01 00:00 g/bin.sha256\n";
+        assert!(binary_mode_fault("d", "g.tar.gz", none).unwrap().contains("holds 0 regular"));
+        let two = format!("{}-rwxr-xr-x 0/0 5 2026-01-01 00:00 g/other\n", gnu);
+        assert!(binary_mode_fault("d", "g.tar.gz", &two).unwrap().contains("holds 2 regular"));
+    }
+
     #[test]
     fn a_commented_or_flagless_line_is_no_call() {
         assert!(is_call("  bash gate-sdk/bin/run-gates.sh --only check-release-assets -- --dist \"$out\" \"$version\""));
@@ -356,6 +442,7 @@ mod tests {
         assert_eq!(run(&s(&["--dist", "src"])), 2);
         assert_eq!(run(&s(&["--bogus"])), 2);
         assert_eq!(run(&s(&["a", "b", "c"])), 2);
+        assert_eq!(archive_listing("Cargo.toml").err().map(|e| e.status()), Some(crate::exit::INPUT));
         assert!(roster("# only a comment\n\n", "r").is_err());
         assert_eq!(roster("# c\nt1\n", "r").unwrap(), s(&["t1"]));
     }

@@ -1754,7 +1754,7 @@ pub const REGISTRY: &[GateEntry] = &[
         &[],
         &["GATE_SDK_NATIVE_PUBLISH_WORKFLOW", "GATE_SDK_NATIVE_TARGETS_FILE"],
         "-",
-        &[],
+        &[("tar", "")],
     ),
     // spec: gate-sdk/SPEC.md §check-reads-couples — no walk root: the members come from the
     // registry, the crate files from their derived cuts, and the tracked set from git

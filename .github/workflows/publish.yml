@@ -161,13 +161,14 @@ jobs:
           ( cd "$out" && sha256sum "$(basename "$tarball")" > "$(basename "$tarball").sha256" )
           echo "packed $(basename "$tarball") at version $packed"
 
-          # spec: gate-sdk/SPEC.md §Consumer payload — one archive per roster target, archived where the roster is held
+          # spec: gate-sdk/SPEC.md §Consumer payload — one archive per roster target, drawn from the packed payload so the packer's mode restore reaches it
           stage="$RUNNER_TEMP/release-archives"
           while IFS= read -r target; do
             name="$binary$(gate_exe_suffix "$target")"
             dir="$binary-$version-$target"
             mkdir -p "$stage/$dir"
-            cp "$art/$target/$name" "$art/$target/$name.sha256" "$stage/$dir/"
+            tar -xzpf "$tarball" -C "$stage/$dir" --strip-components=4 \
+              "package/payload/artifact/$target/$name" "package/payload/artifact/$target/$name.sha256"
             tar -czf "$out/$dir.tar.gz" -C "$stage" "$dir"
           done < <(gate_native_targets)
 

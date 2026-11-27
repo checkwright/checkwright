@@ -46,14 +46,6 @@ An outside engine can look a verdict up (`--verdict-lookup`) only by computing i
 
 ## Technical Debt
 
-### release-archive-binary-mode
-
-The platform archives ship the gate binary at mode 0644, so a consumer must chmod it before an `-x` check passes. The publish workflow tars the copy `download-artifact` lands (.github/workflows/publish.yml, the archive loop), and an artifact keeps no mode.
-
-**Deliverable:** debt: the binary packed 0755, and `check-release-assets` asserting each archive's binary mode, with its case. The observe half rides [release-archive-provenance](#release-archive-provenance).
-
-**Cost while deferred:** a binary-only consumer meets a non-executable binary. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, adopter-measured, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: the loop runs `cp` then `tar` with no chmod. Owner lookup: `0755`, `chmod`, `archive` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload.
-
 ### run-arm-smoke-fixes
 
 Two `--run` faults the adopter's v0.40.0 consumer smoke found. The binary's usage line spells `--run [--gates-dir <dir>]` (native/src/main.rs) while `--run --help` spells a positional `[gates-dir]`, both accepted. And outside a git repository `--run` exits 0 with a pass document carrying no `treeId` and no `worktree`, an unkeyed pass a caller can read as a judged tree, where gate-sdk/SPEC.md §Output contract gives a run outside a git repository exit 2.
@@ -342,7 +334,7 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 
 The platform archives have no published `.sha256` sidecar and no build attestation: the attest step (.github/workflows/publish.yml) names the npm tgz alone, and each archive's sha256 sits inside the archive it vouches for, so a consumer cannot pin an archive without trusting that file.
 
-**Deliverable:** design-pending, a feature: a sidecar per archive and each archive in the attestation's `subject-path`, `check-release-assets` holding both. The observe half reads the next release's `publish` run, for this and [release-archive-binary-mode](#release-archive-binary-mode)'s 0755.
+**Deliverable:** design-pending, a feature: a sidecar per archive and each archive in the attestation's `subject-path`, `check-release-assets` holding both. The observe half reads the next release's `publish` run, for this and `release-archive-binary-mode`'s 0755.
 
 **Cost while deferred:** a binary-only consumer verifies nothing it downloads. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: `subject-path` names `checkwright-*.tgz`. Owner lookup: `sidecar`, `attest`, `subject-path` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The dependency boundary.
 
@@ -1095,4 +1087,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - test-hermetic-rerun-mkdir
 - rust-reader-turbofish-spacing
 - pipefail-fix-redirected-grep
+- release-archive-binary-mode
 
