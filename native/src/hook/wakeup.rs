@@ -9,17 +9,15 @@ const NAME: &str = "wakeup-guard";
 const LOG_KNOB: &str = "GUARD_KIT_WAKEUP_LOG";
 
 pub fn run(payload: Option<&Value>) -> i32 {
-    // spec: guard-kit/SPEC.md §wakeup-guard — the deny stands even where the log path does not
-    // resolve: the block is unconditional, so a knob fault costs the record and not the rule, and
-    // with no repository the denial names what cost it
-    match record_target() {
-        Ok(log) => {
-            append_attempt(&log, payload);
-            hook::block(NAME, &denial(None))
-        }
-        Err(fault) if hook::tree_free() => hook::block(NAME, &denial(Some(&fault))),
-        Err(_) => hook::block(NAME, &denial(None)),
-    }
+    // spec: guard-kit/SPEC.md §wakeup-guard — the deny stands even where the record is lost: the
+    // block is unconditional, so a knob fault or a failed append costs the record and not the rule,
+    // and the denial names what cost it
+    hook::block(NAME, &record_and_deny(payload))
+}
+
+fn record_and_deny(payload: Option<&Value>) -> String {
+    let logged = record_target().and_then(|log| append_attempt(&log, payload));
+    denial(logged.err().as_deref())
 }
 
 // spec: guard-kit/SPEC.md §wakeup-guard — the log the record goes to: the carried `--knobs` fault
@@ -47,13 +45,16 @@ fn denial(unlogged: Option<&str>) -> String {
 }
 
 // spec: guard-kit/SPEC.md §wakeup-guard — the attempt record: a local-zone stamp, then the three
-// payload fields that identify the attempt. Best-effort throughout, the shell form's `|| true`.
-fn append_attempt(log: &str, payload: Option<&Value>) {
+// payload fields that identify the attempt; a log it cannot open or write is the fault returned
+fn append_attempt(log: &str, payload: Option<&Value>) -> Result<(), String> {
     use std::io::Write;
     let line = format!("{} {}\n", local_stamp(), summary(payload));
-    if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(log) {
-        let _ = f.write_all(line.as_bytes());
-    }
+    std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(log)
+        .and_then(|mut f| f.write_all(line.as_bytes()))
+        .map_err(|e| format!("cannot write {}: {}", log, e))
 }
 
 // spec: guard-kit/SPEC.md §wakeup-guard — GNU `date -Is`'s shape, built in-process from the offset
@@ -185,6 +186,22 @@ mod tests {
         let log = std::env::temp_dir().join("wakeup-attempts.log").display().to_string();
         let _m = hook::Marked::new("wakeup-abs", Some(&format!("{} = {}\n", LOG_KNOB, log)));
         assert_eq!(record_target(), Ok(log));
+    }
+
+    // spec: guard-kit/SPEC.md §wakeup-guard — a log the append cannot open costs the record, and the
+    // denial names the file and the fault in place of the logged sentence
+    #[test]
+    fn an_unwritable_log_is_denied_as_unlogged() {
+        let dir = std::env::temp_dir().join(format!("wakeup-unwritable-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let log = dir.join("absent").join("wakeup-attempts.log").display().to_string();
+        let _m = hook::Marked::new("wakeup-unwritable", Some(&format!("{} = {}\n", LOG_KNOB, log)));
+        let text = record_and_deny(None);
+        assert!(text.contains("This attempt went unlogged: cannot write") && text.contains(&log), "{}", text);
+        assert!(!text.contains("Attempt logged"), "{}", text);
+        std::fs::create_dir_all(dir.join("absent")).expect("cannot make the log dir");
+        assert!(record_and_deny(None).ends_with("Attempt logged."), "a written record was reported lost");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: guard-kit/SPEC.md §wakeup-guard — the stamp is GNU `date -Is`'s bytes at a fixed epoch
