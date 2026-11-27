@@ -34,7 +34,7 @@ Its observe half is [archive-provenance-observe](#archive-provenance-observe), s
 
 `--verdict-key` can print a `tool.version` that `--verdict-lookup` refuses. The release stamp keeps any `CHECKWRIGHT_BUILD_VERSION` bytes after a leading `v` (`stamp` in native/src/release_stamp.rs), while `version_token` in native/src/verdict_store.rs admits only ASCII alphanumerics and `.+-`. So a build stamped `v1.2.3_review` keys and stores under a version the lookup refuses at exit 2, against gate-sdk/SPEC.md §run-gates naming the key's fields the lookup's operands.
 
-**Deliverable:** debt: one grammar for the stamp and the lookup's version operand, so every key a stamped build prints is a lookup's operand, with a case.
+**Deliverable:** debt: one grammar for the stamp and the lookup's version operand, enforced where the build stamps (lead decision 2026-11-27): `version_token`'s grammar moves beside `stamp` in native/src/release_stamp.rs, which the lookup then reads, and the build refuses a `CHECKWRIGHT_BUILD_VERSION` outside it, naming the value, while a `git describe` answer outside it leaves the stamp empty, as a failed describe does. So every key a stamped build prints is a lookup's operand, with a case for each side, and gate-sdk/SPEC.md §run-gates' *Where the release stamp comes from* states the grammar and the refusal beside the lookup's `<kit-ver>` sentence.
 
 **Cost while deferred:** a verdict stored under such a stamp is unreachable by lookup, so an adopter keying CI runs with `--verdict-key` re-runs what it stored. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: `stamp` returns its input trimmed and `v`-stripped, unfiltered. Owner lookup: `version_token`, `release_stamp`, `verdict-key` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
@@ -52,11 +52,11 @@ The Rust code reader drops a turbofish call whose type argument holds a fn-point
 
 The front-door package route's readiness poll (`npm view <package>@<version> version` in scripts/ci-front-door.sh and its PowerShell twin) named 0.38.0 at the registry's publish time while the tarball still answered 404, so all seven legs of publish run 45592369014 redded at `npx` init on E404, green on a re-run once the tarball served.
 
-**Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers.
+**Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers, and RELEASING.md §The front-door rehearsal's package-route sentence, which names the `npm view` poll, says what the poll now reads.
 
 **First-run risk (2026-11-27, lead decision):** no local host runs the PowerShell twin, so its edit first executes on the tag's `publish` run; close's procedure for a red publish run, a re-run or a hotfix push inside the budget, is the backstop.
 
-**Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner installer/SPEC.md and scripts/ci-front-door.sh.
+**Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner RELEASING.md §The front-door rehearsal, which names the poll, and scripts/ci-front-door.sh with its twin.
 
 Its observe half is [registry-readiness-observe](#registry-readiness-observe), split at scope 2026-11-27 since only a release run reads it.
 

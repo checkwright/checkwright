@@ -9,7 +9,7 @@ Pairs `release-archive-provenance`. A Release's per-target archive carries its b
 - The `pack` job carries one digest emission, the tarball's `sha256sum` in the assemble step. `scripts/ci-pack-extension.sh` hashes through `"${hasher[@]}"`, an expansion assertion F does not count (`grep -n 'sha256sum\|shasum\|hasher' .github/workflows/publish.yml scripts/ci-pack-extension.sh`). Assertion F reds a job whose count exceeds one (`grep -n 'j.computed > 1' native/src/gates/gate_substrate_parity.rs`), so a second `sha256sum` for the archives would red it.
 - The `release` job verifies the tarball's attestation alone, with `--repo`, `--signer-workflow` and `--source-ref` (`grep -n 'gh attestation verify' -A2 .github/workflows/publish.yml`).
 - The install page's attestation recipe prints `.statement.subject[0].name` in both twins (`git grep -n 'subject\[0\]' -- docs/manual-install.md`, two hits). A multi-subject attestation over the tarball would leave that first subject unspecified.
-- `actions/attest-build-provenance` from v4 wraps `actions/attest`, whose `subject-path` takes a glob or a comma- or newline-separated list and mints **one** attestation naming every subject (the two actions' READMEs). *Inferred:* whether a glob matching no file fails the step; nothing in this design rests on it, since the `release` job's verify of every asset fails such a tag.
+- `actions/attest-build-provenance` from v4 wraps `actions/attest`, whose `subject-path` takes a glob or a comma- or newline-separated list and mints **one** attestation naming every subject (the two actions' READMEs). In `actions/attest`'s `src/subject.ts` on its default branch, a literal path matching no file fails the step, a glob matching nothing is permitted beside another that matches, and a subject list empty after the expansion fails it (read from the source, not the pinned revision). So one glob of the second step's two matching nothing fails no step, and nothing in this design rests on it, since the `release` job's verify of every asset fails such a tag.
 - The crate hashes a file in process (`grep -n 'pub fn file_hex' native/src/sha256.rs`) and matches a whole-string glob (`grep -n 'pub fn glob_match' native/src/walk.rs`).
 
 ## What changes
@@ -18,7 +18,7 @@ Pairs `release-archive-provenance`. A Release's per-target archive carries its b
 
 **Not yet applied** — gate-sdk/SPEC.md §Consumer payload. The paragraph **One producer, two publications, and no recomputation anywhere.** becomes:
 
-> **One producer per digest, and no recomputation anywhere.** A digest is computed once, in the job that produced the bytes it vouches for, and every later hop moves the file rather than re-deriving it. The build leg hashes the binary, which the payload carries and the Release's archive carries again. The `pack` job hashes what it cuts, the tarball and each per-target archive, at one site. A second `sha256sum` on a later job would let a published and an installed digest diverge while both look computed. §check-gate-substrate-parity assertion F holds the rule mechanically, **within its reach: the text of each workflow the knob names and the scripts its steps call, one hop deep.** A build body factored into a called script stays inside that reach. A body a second hop down, or a hasher reached through an expansion, rests on construction alone.
+> **One producer per digest, and no recomputation anywhere.** A digest is computed once, in the job that produced the bytes it vouches for, and every later hop moves the file rather than re-deriving it. The build leg hashes the binary, which the payload carries and the Release's archive carries again. The `pack` job hashes what it cuts, the tarball and each per-target archive, at one site, and its called extension packer hashes its own archive's sidecar through an expansion the rule does not count. A second `sha256sum` on a later job would let a published and an installed digest diverge while both look computed. §check-gate-substrate-parity assertion F holds the rule mechanically, **within its reach: the text of each workflow the knob names and the scripts its steps call, one hop deep.** A build body factored into a called script stays inside that reach. A body a second hop down, or a hasher reached through an expansion, rests on construction alone.
 
 In the paragraph after it, "so a build attestation can later land beside these files with no migration and no digest changing" becomes "so the build attestation over the Release's assets, below, names the digest each sidecar carries, with no migration and no digest changing". Its other two sentences stand.
 
@@ -42,7 +42,7 @@ In **What the digest proves, at its honest bound.**, "the build attestation on t
 
 - **The `pack` job's assemble step** drops the tarball's own `sha256sum` line. The per-target archive loop records each archive name it writes. After that loop, one loop over the tarball's name and the recorded names writes each file's `<name>.sha256` from inside `$out`, so each sidecar carries a bare name. That is the job's one emission, and it lands before the `check-release-assets --dist` call. Its `# spec:` line keeps the §Consumer payload citation the old line carried.
 - **A second `actions/attest-build-provenance` step**, at the same pinned revision and directly after the tarball's, carries the `subject-path` block `${{ runner.temp }}/dist/checkwright-gates-*.tar.gz` and `${{ runner.temp }}/dist/checkwright-companion-*.zip`, one entry per line, under a `# spec:` line citing gate-sdk/SPEC.md §Consumer payload. The tarball's step is unchanged. The job's `id-token` and `attestations` permissions already cover both.
-- **The `release` job** runs the verify it runs on the tarball, `--repo`, `--signer-workflow` and `--source-ref` unchanged, over every asset in its attach list not ending `.sha256`, once that list is complete and before `gh release list`. So a tag whose assets miss an attestation has no Release. The `-le 2` guard stays.
+- **The `release` job** runs the verify it runs on the tarball, `--repo`, `--signer-workflow` and `--source-ref` unchanged, over every asset in its attach list not ending `.sha256`, once that list is complete and before `gh release list`. That one loop replaces the tarball's own verify ahead of the list, so the tarball is verified once, and its `# spec:` line cites the rule for every asset. So a tag whose assets miss an attestation has no Release. The `-le 2` guard stays.
 
 ### (3) `check-release-assets` holds the sidecars and the attestation subjects {design-bearing}
 
@@ -79,7 +79,7 @@ The honest-limits paragraph gains: "The subject read checks the step's text, not
 
 **Not yet applied** — installer/README.md. "holds the gate binary and its sidecar alone, so on its own it runs" becomes "holds the gate binary and its sidecar alone, and from the first release after v0.41.0 the Release carries the archive's own `.sha256` and build attestation beside it. On its own it runs".
 
-`.workflow/release-declarations.md`: the behavior section gains a bullet naming the archive sidecars, the archives' attestation and the `release` job's verify of every asset.
+`.workflow/release-declarations.md`: the file holds its header alone since the last drain, so a `## Behavior changes` section opens with a bullet naming the archive sidecars, the archives' attestation and the `release` job's verify of every asset.
 
 ## Producers and consumers
 
@@ -94,7 +94,7 @@ The honest-limits paragraph gains: "The subject read checks the step's text, not
 
 Roster probe: `git grep -n 'release-assets\|subject-path\|attestation verify\|checkwright-gates-\|attests\? the tarball\|attestation on the tarball' -- ':!docs/llms-full.txt' ':!docs/*/SPEC.md' ':!docs/posts' ':!TASK-QUEUE.md' ':!.workflow/survey-record.md'`, over the tracked tree, read hit by hit. The install-page and hosted-script hits name the tarball, whose attestation and sidecar do not move, and the guard-kit hits name the sidecar inside an archive, which does not move either.
 
-- `gate-sdk/SPEC.md` — §Consumer payload's four passages and the declaration line (delta 1), §check-gate-substrate-parity assertion F's third bullet (delta 1), §check-release-assets (delta 3).
+- `gate-sdk/SPEC.md` — §Consumer payload's five passages and the declaration line (delta 1), §check-gate-substrate-parity assertion F's third bullet (delta 1), §check-release-assets (delta 3).
 - `.github/workflows/publish.yml` — the assemble step, the second attest step and the `release` job's verify loop (delta 2).
 - `native/src/gates/release_assets.rs` — the battery rules, the subject read and the sidecar check (delta 3), their unit tests (delta 4).
 - `scripts/check-release-assets.gate` — the one-line invariant (delta 3).
