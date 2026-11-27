@@ -25,6 +25,7 @@ impl Scratch {
         std::fs::write(dir.join("gates").join("gates.list"), "check-queue-sections\n")
             .expect("cannot write the scratch registry");
         std::fs::write(dir.join("TASK-QUEUE.md"), queue).expect("cannot write the scratch queue");
+        common::git_init(&dir);
         Scratch(dir)
     }
 

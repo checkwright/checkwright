@@ -46,14 +46,6 @@ An outside engine can look a verdict up (`--verdict-lookup`) only by computing i
 
 ## Technical Debt
 
-### run-arm-smoke-fixes
-
-Two `--run` faults the adopter's v0.40.0 consumer smoke found. The binary's usage line spells `--run [--gates-dir <dir>]` (native/src/main.rs) while `--run --help` spells a positional `[gates-dir]`, both accepted. And outside a git repository `--run` exits 0 with a pass document carrying no `treeId` and no `worktree`, an unkeyed pass a caller can read as a judged tree, where gate-sdk/SPEC.md §Output contract gives a run outside a git repository exit 2.
-
-**Deliverable:** debt: one spelling in both texts, the other kept as an accepted alias; and `--run` outside a repository refused at 2 as §Output contract states, with a case each.
-
-**Cost while deferred:** a binary-only consumer reads two usages and can take an unkeyed pass for a verdict. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of v0.40.0, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: both usage spellings print. Re-verified at spec: in a directory whose `GIT_CEILING_DIRECTORIES` stops git's discovery, `--run --json --gates-dir .` over a one-member registry exits 0 with a pass document carrying no `treeId` and no `worktree`. Owner lookup: `gates-dir`, `unkeyed`, `treeId` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates and §Output contract.
-
 ### binary-only-doc-gaps
 
 Two statements a binary-only consumer misses. The platform archive carries no gate registry or kits, so it has nothing to `--run` without a gates dir of its own, and installer/README.md does not say the registry ships only in the npm package. And `kits[].version` is absent off a lock (gate-sdk/SPEC.md §run-gates' honest limits say so), while the provenance table's row and `docs/contracts/run/v1/pass.json` show it, so a reader typed from the golden takes the key as required.
@@ -1088,4 +1080,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - rust-reader-turbofish-spacing
 - pipefail-fix-redirected-grep
 - release-archive-binary-mode
+- run-arm-smoke-fixes
 

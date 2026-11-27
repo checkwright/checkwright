@@ -21,7 +21,7 @@ const TOOL: &str = "run-gates";
 // spec: gate-sdk/SPEC.md §run-gates — the one usage text, the stdout body of a help request and the
 // stderr body of an unrecognized-option refusal, per §The bin/-tool contract. It lives beside the
 // arm table it describes, because it grows by a paragraph per configured arm.
-pub const USAGE: &str = r#"usage: --run [--json] [gates-dir]              run every registered gate
+pub const USAGE: &str = r#"usage: --run [--json] [--gates-dir <dir>]      run every registered gate
        --only <name> [<name>...]               run only the named gates
        --only <name> -- <arg>...               run one named gate, forwarding <arg>...
        --for <path> [<path>...]                run only gates coupling to those paths
@@ -53,15 +53,19 @@ pub const USAGE: &str = r#"usage: --run [--json] [gates-dir]              run ev
   --run   exits 0 pass, every member green; 1 fail, a member red; 3 error, a
           member that could not judge the tree with none red. Fail outranks
           error. A request the runner refuses (an argument, a knob, an
-          unknown gate) is 2. Every form below states its own statuses; an
-          arm's "unavailable" is the front end's absent binary, exit 3.
+          unknown gate) is 2, and so is a run outside a git repository. Every
+          form below states its own statuses; an arm's "unavailable" is the
+          front end's absent binary, exit 3.
+  --gates-dir  names the registry to run in place of GATE_SDK_GATES_DIR. A
+          bare <dir> after the leading options is the same request, kept as
+          an accepted alias.
   --only  runs the named members in registry order whatever order they were
           typed; duplicates collapse. A name unknown to the registry is a
           refusal, except that a *sole* name is also looked up in the check
           dirs and selected if a gate declares it there; a name found in
           neither is the refusal.
-          The [gates-dir] positional is unavailable in this form — point
-          GATE_SDK_GATES_DIR at another registry instead. A `--` separator ends
+          The bare <dir> alias is unavailable in this form, since every token
+          after --only is a name — lead with --gates-dir <dir>. A `--` separator ends
           the name list and forwards every remaining argument to the selected
           gate, which requires the selection to resolve to exactly one member:
           two or more with a `--` is a refusal, never a broadcast.
@@ -256,7 +260,7 @@ pub const USAGE: &str = r#"usage: --run [--json] [gates-dir]              run ev
 
 Each form is an argument list for the gate binary, the battery its `--run`
 arm; a leading --only or --for reaches that arm unnamed. The pre-build front
-end takes the same forms, and a bare [gates-dir] or -h there as well.
+end takes the same forms, and a bare <dir> or -h there as well.
 
 GATE_SDK_VERBOSE (any non-empty value) restores the per-gate banner roll the
 quiet-green output contract suppresses; GATE_SDK_JOBS sets the worker count
@@ -939,6 +943,19 @@ fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
     // spec: gate-sdk/SPEC.md §run-gates — under `--json` the transcript moves to stderr, so stdout
     // carries the document alone
     let mut w: Box<dyn Write> = if json { Box::new(std::io::stderr()) } else { Box::new(std::io::stdout()) };
+    // spec: gate-sdk/SPEC.md §Output contract — a run outside a git repository is refused at 2 before
+    // anything is read, since its pass would carry no tree to key it
+    match walk::toplevel_fault() {
+        Ok(_) => {}
+        Err(f) if f.kind == exit::Kind::Refused => {
+            eprintln!("{}: not inside a git repository", TOOL);
+            return Err(f.kind);
+        }
+        Err(f) => {
+            eprintln!("{}: {}", TOOL, f);
+            return Err(f.kind);
+        }
+    }
     let knob = |n: &str| walk::knob_scalar(n);
     let configured_dir = match knob("GATE_SDK_GATES_DIR") {
         Ok(v) => v,

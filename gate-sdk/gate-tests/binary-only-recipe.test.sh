@@ -95,6 +95,21 @@ assert_rc "run" "$rc" 0 "$out"
 [[ -s "$sarif" ]] || { echo "FAIL [run]: no SARIF log at $sarif"; fails=$((fails + 1)); }
 assert_clean run
 
+# spec: gate-sdk/SPEC.md §run-gates — one usage spelling, the bare dir kept as its alias
+out="$(cd "$repo" && container GATE_SDK_TMP_DIR="$scratch/run" "$BIN" --run "$gates" 2>&1)"; rc=$?
+assert_rc "run, bare dir alias" "$rc" 0 "$out"
+out="$(container "$BIN" --run --help 2>&1)"; rc=$?
+assert_rc "run, help" "$rc" 0 "$out"
+head -n1 <<<"$out" | grep -qF -- '--run [--json] [--gates-dir <dir>]' \
+    || { echo "FAIL [run, help]: the usage line does not spell --gates-dir <dir>"; head -n1 <<<"$out"; fails=$((fails + 1)); }
+
+# spec: gate-sdk/SPEC.md §Output contract — outside a git repository the run is refused at 2, its
+# document the error one, rather than a pass carrying no tree
+out="$(cd "$scratch/nogit" && container GATE_SDK_TMP_DIR="$scratch/run" "$BIN" --run --json --gates-dir "$gates" 2>&1)"; rc=$?
+assert_rc "run, no worktree" "$rc" 2 "$out"
+grep -qF 'run-gates: not inside a git repository' <<<"$out" && grep -qF '"refused"' <<<"$out" \
+    || { echo "FAIL [run, no worktree]: no refusal line and refused error document"; printf '%s\n' "$out"; fails=$((fails + 1)); }
+
 # spec: gate-sdk/SPEC.md §The install disposition — a registered member scans from the tree's root, so
 # an action gate is scoped inside the battery by a member of the adopter's own calling the direct form
 printf 'check-action-pinning\n' > "$gates/gates.list"
@@ -121,5 +136,5 @@ grep -qF '(unresolved)' <<<"$out" || { echo "FAIL [run, no descriptor]: no membe
 assert_clean "run, no descriptor"
 
 [[ "$fails" -eq 0 ]] || { echo "binary-only-recipe.test: $fails assertion(s) failed"; exit 1; }
-echo "binary-only-recipe.test: clean (the direct form's four kit-free gates green on a read-only checkout, a finding at exit 1, a missing knob file and a worktree-less tree at exit 2, the root positional narrowing an action gate's scan to the owned directory, a knob file outside the checkout read, a top-level checks/ directory scanned once GATE_SDK_KIT_DIRS names the kit set, and --run over an out-of-tree registry writing its SARIF log outside a checkout left clean, an action gate scoped there by a member of the adopter's own, its members unresolved once its descriptors are gone)"
+echo "binary-only-recipe.test: clean (the direct form's four kit-free gates green on a read-only checkout, a finding at exit 1, a missing knob file and a worktree-less tree at exit 2, the root positional narrowing an action gate's scan to the owned directory, a knob file outside the checkout read, a top-level checks/ directory scanned once GATE_SDK_KIT_DIRS names the kit set, and --run over an out-of-tree registry writing its SARIF log outside a checkout left clean, the bare dir its alias, its usage spelling --gates-dir <dir>, refused at exit 2 outside a worktree, an action gate scoped there by a member of the adopter's own, its members unresolved once its descriptors are gone)"
 exit 0

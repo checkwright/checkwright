@@ -27,6 +27,7 @@ fn scratch(case: &str) -> PathBuf {
     .expect("fail descriptor");
     std::fs::write(gates.join("check-pspass.ps1"), PASS).expect("pass target");
     std::fs::write(gates.join("check-psfail.ps1"), FAIL).expect("fail target");
+    common::git_init(&dir);
     dir
 }
 
@@ -118,6 +119,7 @@ fn consumer(case: &str, members: &[&str]) -> PathBuf {
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(dir.join("gates")).expect("cannot create the scratch gates dir");
     std::fs::write(dir.join("gates/gates.list"), members.join("\n") + "\n").expect("registry");
+    common::git_init(&dir);
     dir
 }
 

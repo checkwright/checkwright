@@ -40,6 +40,17 @@ fn stripped(program: impl AsRef<OsStr>, drop: impl Fn(&str) -> bool) -> Command 
     c
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — a scratch a `--run` reaches is a git repository, since the
+// arm refuses outside one
+pub fn git_init(dir: &std::path::Path) {
+    let ok = without_git_env("git")
+        .args(["init", "-q"])
+        .current_dir(dir)
+        .status()
+        .is_ok_and(|s| s.success());
+    assert!(ok, "git init failed in {}", dir.display());
+}
+
 // spec: gate-sdk/SPEC.md §run-gates — the tests' own private temp dir, made mode 700 and
 // owner-checked before use as the binary's is; one that is not private stops the test run
 fn private_dir() -> std::path::PathBuf {
