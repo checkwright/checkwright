@@ -55,15 +55,17 @@ fn back_over_space(code: &[u8], mut k: usize) -> usize {
     k
 }
 
-// spec: gate-sdk/SPEC.md §The Rust code reader — a `<…>` group read backwards from its `>`; None
-// where no `<` balances it
+// spec: gate-sdk/SPEC.md §The Rust code reader — a `<…>` group read backwards from its `>`, the `>`
+// of a `->` closing nothing; None where no `<` balances it
 fn back_over_angles(code: &[u8], close: usize) -> Option<usize> {
     let mut depth = 0usize;
     let mut k = close;
     while k > 0 {
         k -= 1;
         match code[k] {
+            b'>' if k > 0 && code[k - 1] == b'-' => {}
             b'>' => depth += 1,
+            b'<' if depth == 0 => return None,
             b'<' => {
                 depth -= 1;
                 if depth == 0 {
@@ -98,7 +100,7 @@ fn keyword_before(code: &[u8], end: usize) -> bool {
 
 // spec: gate-sdk/SPEC.md §The Rust code reader — the callee a `(` closes over, read backwards: a
 // `::` path whose head may be a qualified `<…>`, a turbofish dropped, `.` marking a method. A macro,
-// a `fn` definition and a bare group are no call
+// a `fn` definition, a `fn` pointer type and a bare group are no call
 fn callee(code: &[u8], open: usize) -> Option<(usize, String)> {
     let mut end = back_over_space(code, open);
     if end > 0 && code[end - 1] == b'>' {
@@ -144,7 +146,7 @@ fn callee(code: &[u8], open: usize) -> Option<(usize, String)> {
     while w > 0 && ident(code[w - 1]) {
         w -= 1;
     }
-    if &code[w..before] == b"fn" {
+    if &code[w..before] == b"fn" || path == "fn" {
         return None;
     }
     Some((start, path.to_string()))
@@ -271,6 +273,9 @@ mod tests {
         let v = read("std::fs::copy:: <&str, &str>(a, b);\nstd::fs::copy ::<&str, &str>(a, b);\nstd::fs::copy :: <&str>\n  (a);\n").expect("reads");
         let paths: Vec<_> = v.calls.iter().map(|c| (c.path.as_str(), c.line)).collect();
         assert_eq!(paths, [("std::fs::copy", 1), ("std::fs::copy", 2), ("std::fs::copy", 3)]);
+        let v = read("f::<fn() -> ()>(a);\nstd::fs::copy::<fn(u8) -> Vec<u8>, &str>(a, b);\n").expect("reads");
+        let paths: Vec<_> = v.calls.iter().map(|c| (c.path.as_str(), c.line)).collect();
+        assert_eq!(paths, [("f", 1), ("std::fs::copy", 2)]);
     }
 
     // spec: gate-sdk/SPEC.md §The Rust code reader — an unterminated literal or block comment, or

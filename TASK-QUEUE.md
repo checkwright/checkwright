@@ -24,14 +24,6 @@
 
 **Cost while deferred:** a verdict stored under such a stamp is unreachable by lookup, so an adopter keying CI runs with `--verdict-key` re-runs what it stored. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: `stamp` returns its input trimmed and `v`-stripped, unfiltered. Owner lookup: `version_token`, `release_stamp`, `verdict-key` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
-### turbofish-fn-pointer-arrow
-
-The Rust code reader drops a turbofish call whose type argument holds a fn-pointer arrow: `back_over_angles` in native/src/rust_code.rs counts the `>` of `->` as a closing angle, so `f::<fn() -> ()>()` reads as no call and `check-exec-write` passes such a site, against gate-sdk/SPEC.md §The Rust code reader reading each call with its turbofish removed.
-
-**Deliverable:** debt: the backward angle scan skips the `>` of `->`, with a case.
-
-**Cost while deferred:** an exec or write call spelled with such a turbofish escapes the gates the reader feeds. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: the scan counts every `>`. Owner lookup: `back_over_angles`, `turbofish` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The Rust code reader.
-
 ### front-door-registry-readiness
 
 [recurrence: 2026-11-26]
@@ -1060,4 +1052,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - codex-plugin-version-pin
 - release-archive-provenance
+- turbofish-fn-pointer-arrow
 
