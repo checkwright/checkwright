@@ -876,6 +876,13 @@ pub const ARMS: &[(&str, Arm, &[&str])] = &[
         Arm::Run(crate::verdict_store::lookup),
         crate::verdict_store::KNOBS,
     ),
+    // spec: gate-sdk/SPEC.md §run-gates — an `Arm::Run` for the lookup's split; its roster is the
+    // registry resolution's, which it shares with `--run`
+    (
+        "--verdict-key",
+        Arm::Run(crate::verdict_store::key_arm),
+        &["GATE_SDK_GATES_DIR", "GATE_SDK_KIT_DIRS"],
+    ),
     // spec: gate-sdk/SPEC.md §The non-gate arm — the one dispatching harness-integration arm; its
     // roster is a sentinel because the answer is one member's knobs, scoped by its own argv
     (

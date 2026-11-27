@@ -24,16 +24,6 @@ A gate that parses a child's output, git's stderr wording or a tool's message, r
 
 **Cost while deferred:** a localized host can turn a recognized git answer into an unrecognized one. Surfaced 2026-11-27 as the orchestrator adopter's first ask, adopter direction, lead-relayed; filed at this scope. Owner lookup: `LC_ALL`, `locale` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Fail-closed contract.
 
-### verdict-key-arm
-
-[spec: SPEC-verdict-key.md]
-
-An outside engine can look a verdict up (`--verdict-lookup`) only by computing its key itself, `treeId`, `tool.version` and `gateSet`, which needs the registry run's own resolution.
-
-**Deliverable:** design-pending, a feature: `--verdict-key --json [--gates-dir D]`, printing `{contract, treeId, tool.version, gateSet}` for the clean tree a bare registry run would judge and running nothing, its exit mapping as `--verdict-lookup`'s, with a golden. Registry scope only, no `--only` or `--for`, since `gateSet` digests the scope and argv and only registry runs store. Spec settles the `--json` spelling against gate-sdk/SPEC.md §The non-gate arm's rule that a machine-only arm takes no option.
-
-**Cost while deferred:** the adopter re-derives the key, and a drift from the binary's misses every stored verdict. Surfaced 2026-11-27 as the orchestrator adopter's fifth ask, its scoping confirmed by it, adopter direction, lead-relayed; filed at this scope. Owner lookup: `verdict-key`, `verdict-lookup` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
-
 ## Technical Debt
 
 ## Deferred
@@ -1065,4 +1055,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - run-arm-smoke-fixes
 - binary-only-doc-gaps
 - migration-guard-silent-skips
+- verdict-key-arm
 

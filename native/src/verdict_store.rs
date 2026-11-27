@@ -33,9 +33,17 @@ pub fn configured() -> Result<Option<PathBuf>, Fault> {
     Ok(Some(PathBuf::from(dir)))
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — the three key fields, shared by the file name and
+// `--verdict-key`'s document; the first one absent is named with its remedy
+fn fields(p: &Provenance) -> Result<(&str, &str, &str), (&'static str, &'static str)> {
+    let tree = p.tree_id.as_deref().filter(|_| p.clean).ok_or(("treeId", "commit or clean the worktree"))?;
+    let version = p.tool_version.as_deref().ok_or(("tool.version", "run a stamped build"))?;
+    let set = p.gate_set.as_deref().ok_or(("gateSet", "make each member's file readable"))?;
+    Ok((tree, version, set))
+}
+
 fn key(p: &Provenance) -> Option<String> {
-    let tree = p.tree_id.as_deref().filter(|_| p.clean)?;
-    Some(file_name(tree, p.tool_version.as_deref()?, p.gate_set.as_deref()?))
+    fields(p).ok().map(|(tree, version, set)| file_name(tree, version, set))
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the key read before the first member and after the last name
@@ -149,6 +157,61 @@ pub fn lookup(args: &[String]) -> i32 {
             print!("{}", exit::error_document(CONTRACT, e.kind));
             e.status()
         }
+    }
+}
+
+const KEY_TAG: &str = "verdict-key";
+
+fn key_document(p: &Provenance) -> Result<String, Fault> {
+    let (tree, version, set) =
+        fields(p).map_err(|(field, fix)| Fault::refused(format!("the tree has no key: {} is absent — {}", field, fix)))?;
+    let mut tool = Map::new();
+    tool.insert("version".into(), version.into());
+    let mut doc = Map::new();
+    doc.insert("contract".into(), CONTRACT.into());
+    doc.insert("gateSet".into(), set.into());
+    doc.insert("tool".into(), Value::Object(tool));
+    doc.insert("treeId".into(), tree.into());
+    Ok(format!("{}\n", Value::Object(doc)))
+}
+
+fn key_operands(args: &[String]) -> Result<Option<&str>, Fault> {
+    match args {
+        [] => Ok(None),
+        [flag, dir] if flag == "--gates-dir" => Ok(Some(dir)),
+        _ => Err(Fault::usage(format!(
+            "takes no operand but one --gates-dir <dir>, got: {}\nusage: --verdict-key [--gates-dir <dir>]",
+            args.join(" ")
+        ))),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the key a bare registry run would store under, read by the
+// run's own resolution and provenance, its document on every path
+pub fn key_arm(args: &[String]) -> i32 {
+    let refuse = |e: Fault| {
+        eprintln!("{}: {}", KEY_TAG, e);
+        print!("{}", exit::error_document(CONTRACT, e.kind));
+        e.status()
+    };
+    let gates_dir = match key_operands(args) {
+        Ok(d) => d,
+        Err(e) => return refuse(e),
+    };
+    let reg = match crate::runner::registry_of(KEY_TAG, gates_dir) {
+        Ok(r) => r,
+        Err(kind) => {
+            print!("{}", exit::error_document(CONTRACT, kind));
+            return kind.status();
+        }
+    };
+    let p = crate::runner::provenance_of(Scope::Registry, &crate::runner::bare(&reg.members), &reg.resolve_dirs);
+    match key_document(&p) {
+        Ok(doc) => {
+            print!("{}", doc);
+            0
+        }
+        Err(e) => refuse(e),
     }
 }
 
@@ -288,6 +351,55 @@ mod tests {
         assert_eq!(
             exit::error_document(CONTRACT, err.kind),
             include_str!("../../docs/contracts/verdict-lookup/v1/error.json")
+        );
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the key document and the file name read one triple, and a
+    // provenance missing a field is refused naming the first one absent
+    #[test]
+    fn the_key_document_names_the_stored_key_or_its_first_absent_field() {
+        let p = fixed();
+        let doc: Value = serde_json::from_str(&key_document(&p).unwrap()).unwrap();
+        let (tree, version, set) = (doc["treeId"].as_str(), doc["tool"]["version"].as_str(), doc["gateSet"].as_str());
+        assert_eq!(Some(file_name(tree.unwrap(), version.unwrap(), set.unwrap())), super::key(&p));
+        let refusal = |p: &Provenance| key_document(p).unwrap_err();
+        let mut modified = fixed();
+        modified.clean = false;
+        modified.tool_version = None;
+        let e = refusal(&modified);
+        assert_eq!(e.kind, Kind::Refused);
+        assert!(e.to_string().contains("treeId is absent — commit or clean the worktree"), "{}", e);
+        let mut unstamped = fixed();
+        unstamped.tool_version = None;
+        unstamped.gate_set = None;
+        assert!(refusal(&unstamped).to_string().contains("tool.version is absent — run a stamped build"));
+        let mut setless = fixed();
+        setless.gate_set = None;
+        assert!(refusal(&setless).to_string().contains("gateSet is absent — make each member's file readable"));
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — no operand or one `--gates-dir <dir>`; anything else is usage
+    #[test]
+    fn the_key_arm_takes_one_gates_dir_alone() {
+        let a = |v: &[&str]| v.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        assert_eq!(key_operands(&a(&[])).unwrap(), None);
+        assert_eq!(key_operands(&a(&["--gates-dir", "x"])).unwrap(), Some("x"));
+        for bad in [&["--json"][..], &["--gates-dir"], &["x"], &["--gates-dir", "x", "y"], &["--only", "x"]] {
+            assert_eq!(key_operands(&a(bad)).unwrap_err().kind, Kind::Usage, "{:?}", bad);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — the goldens are the key over a fixed provenance and a
+    // modified worktree's refusal
+    #[test]
+    fn the_key_goldens_are_the_documents() {
+        assert_eq!(key_document(&fixed()).unwrap(), include_str!("../../docs/contracts/verdict-key/v1/key.json"));
+        let mut modified = fixed();
+        modified.clean = false;
+        let e = key_document(&modified).unwrap_err();
+        assert_eq!(
+            exit::error_document(CONTRACT, e.kind),
+            include_str!("../../docs/contracts/verdict-key/v1/error.json")
         );
     }
 }

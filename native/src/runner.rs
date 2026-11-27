@@ -48,6 +48,7 @@ pub const USAGE: &str = r#"usage: --run [--json] [--gates-dir <dir>]      run ev
        --verify-gate-run [--json] [<file> | -] judge a gate-run Statement against this tree
        --import-gate-run [<file> | -]          verify a Statement and record its suites
        --verdict-lookup <tree> <kit-ver> <digest>  the verdict a run stored under that key
+       --verdict-key [--gates-dir <dir>]       the key a registry run would store this tree under
        --run -h | --help                      this text, on stdout, exit 0
 
   --run   exits 0 pass, every member green; 1 fail, a member red; 3 error, a
@@ -255,6 +256,13 @@ pub const USAGE: &str = r#"usage: --run [--json] [--gates-dir <dir>]      run ev
           an answer, a stored fail included; 2 an operand of the wrong count
           or shape, or no absolute store set; 3 a record that could not be
           read or does not answer for its key; unavailable is 3.
+  --verdict-key  prints the treeId, tool.version and gateSet a bare registry
+          run would store this tree under, as one JSON object on stdout, for
+          --verdict-lookup; runs no member. Exit 0 the key; 2 an operand other
+          than --gates-dir <dir>, no repository, a modified worktree, an
+          unborn HEAD, an unstamped binary, an unreadable member file, or a
+          refused registry; 3 a registry that could not be read or a git
+          failure; unavailable is 3.
   --      ends option processing, so a gates-dir spelled with a leading dash
           is still reachable.
 
@@ -936,6 +944,87 @@ fn answer(json: bool, result: Result<(i32, String), exit::Kind>) -> i32 {
     }
 }
 
+// spec: gate-sdk/SPEC.md §run-gates — the registry resolution `--run` and `--verdict-key` share
+pub(crate) struct Registry {
+    pub(crate) list: String,
+    pub(crate) list_text: String,
+    pub(crate) explicit: bool,
+    pub(crate) kit_roots: Vec<String>,
+    pub(crate) resolve_dirs: Vec<String>,
+    pub(crate) members: Vec<String>,
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — each refusal and failure names its kind, under the caller's tag
+pub(crate) fn registry_of(tag: &str, gates_dir: Option<&str>) -> Result<Registry, exit::Kind> {
+    // spec: gate-sdk/SPEC.md §Output contract — a run outside a git repository is refused at 2 before
+    // anything is read, since its pass would carry no tree to key it
+    match walk::toplevel_fault() {
+        Ok(_) => {}
+        Err(f) if f.kind == exit::Kind::Refused => {
+            eprintln!("{}: not inside a git repository", tag);
+            return Err(f.kind);
+        }
+        Err(f) => {
+            eprintln!("{}: {}", tag, f);
+            return Err(f.kind);
+        }
+    }
+    let configured_dir = match walk::knob_scalar("GATE_SDK_GATES_DIR") {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("{}: {}", tag, e);
+            return Err(exit::Kind::Refused);
+        }
+    };
+    let gates_dir = gates_dir.map_or_else(|| configured_dir.clone(), str::to_string);
+    let explicit = gates_dir != configured_dir;
+    let list = registry::list_path(&gates_dir);
+    let list_text = match exit::read_configured(&list, "registry") {
+        Ok(t) => t,
+        Err(f) => {
+            eprintln!("{}: {}", tag, f);
+            if explicit && f.kind == exit::Kind::Refused {
+                steer(tag, &gates_dir, &configured_dir);
+            }
+            return Err(f.kind);
+        }
+    };
+    let members = registry::members(&list_text);
+    if members.is_empty() {
+        eprintln!("{}: {} names no gates", tag, list);
+        return Err(exit::Kind::Refused);
+    }
+    // spec: gate-sdk/SPEC.md §Layout and configuration — the kit roots absolutized, so the
+    // unresolved-member report names the paths every dispatcher resolves
+    let kit_roots = match walk::kit_roots_abs() {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("{}: {}", tag, e);
+            return Err(exit::Kind::Refused);
+        }
+    };
+    let resolve_dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
+    Ok(Registry {
+        list,
+        list_text,
+        explicit,
+        kit_roots,
+        resolve_dirs,
+        members,
+    })
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — a bare run's selection: every member, with no arguments
+pub(crate) fn bare(members: &[String]) -> Vec<Selected> {
+    members
+        .iter()
+        .map(|m| Selected {
+            name: m.clone(),
+            args: Vec::new(),
+        })
+        .collect()
+}
+
 // spec: gate-sdk/SPEC.md §run-gates — the run itself: its verdict status and, under `--json`, its
 // document; every refusal and failure before the verdict names its kind
 fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
@@ -943,57 +1032,15 @@ fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
     // spec: gate-sdk/SPEC.md §run-gates — under `--json` the transcript moves to stderr, so stdout
     // carries the document alone
     let mut w: Box<dyn Write> = if json { Box::new(std::io::stderr()) } else { Box::new(std::io::stdout()) };
-    // spec: gate-sdk/SPEC.md §Output contract — a run outside a git repository is refused at 2 before
-    // anything is read, since its pass would carry no tree to key it
-    match walk::toplevel_fault() {
-        Ok(_) => {}
-        Err(f) if f.kind == exit::Kind::Refused => {
-            eprintln!("{}: not inside a git repository", TOOL);
-            return Err(f.kind);
-        }
-        Err(f) => {
-            eprintln!("{}: {}", TOOL, f);
-            return Err(f.kind);
-        }
-    }
     let knob = |n: &str| walk::knob_scalar(n);
-    let configured_dir = match knob("GATE_SDK_GATES_DIR") {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("{}: {}", TOOL, e);
-            return Err(exit::Kind::Refused);
-        }
-    };
-    let gates_dir = parsed.gates_dir.clone().unwrap_or_else(|| configured_dir.clone());
-    let explicit = gates_dir != configured_dir;
-    let list = registry::list_path(&gates_dir);
-
-    let list_text = match exit::read_configured(&list, "registry") {
-        Ok(t) => t,
-        Err(f) => {
-            eprintln!("{}: {}", TOOL, f);
-            if explicit && f.kind == exit::Kind::Refused {
-                steer(&gates_dir, &configured_dir);
-            }
-            return Err(f.kind);
-        }
-    };
-    let members = registry::members(&list_text);
-    if members.is_empty() {
-        eprintln!("{}: {} names no gates", TOOL, list);
-        return Err(exit::Kind::Refused);
-    }
-
-    // spec: gate-sdk/SPEC.md §Layout and configuration — the kit roots absolutized, so the
-    // unresolved-member report names the paths every dispatcher resolves
-    let kit_roots = match walk::kit_roots_abs() {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("{}: {}", TOOL, e);
-            return Err(exit::Kind::Refused);
-        }
-    };
-    let resolve_dirs = registry::resolve_dirs(&gates_dir, &kit_roots);
+    let Registry {
+        list,
+        list_text,
+        explicit,
+        kit_roots,
+        resolve_dirs,
+        members,
+    } = registry_of(TOOL, parsed.gates_dir.as_deref())?;
 
     // spec: gate-sdk/SPEC.md §run-gates — the selection is read only where a log is written, and a
     // value it refuses stops the run before the first member, an empty `--for` selection included
@@ -1047,13 +1094,7 @@ fn battery(parsed: &Args) -> Result<(i32, String), exit::Kind> {
         }
         s
     } else {
-        members
-            .iter()
-            .map(|m| Selected {
-                name: m.clone(),
-                args: Vec::new(),
-            })
-            .collect()
+        bare(&members)
     };
 
     let tmp_dir = match knob("GATE_SDK_TMP_DIR") {
@@ -1290,7 +1331,7 @@ fn set_members(selected: &[Selected], resolve_dirs: &[String]) -> Option<Vec<cra
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the block collected once per run, for the log and the store
-fn provenance_of(scope: sarif::Scope, selected: &[Selected], resolve_dirs: &[String]) -> Provenance {
+pub(crate) fn provenance_of(scope: sarif::Scope, selected: &[Selected], resolve_dirs: &[String]) -> Provenance {
     let set = set_members(selected, resolve_dirs);
     // spec: gate-sdk/SPEC.md §run-gates — the block's kit roots in their repo-relative spelling
     let roots_here = walk::kit_roots().unwrap_or_default();
@@ -1338,7 +1379,7 @@ pub(crate) fn trim_trailing_newlines(b: &[u8]) -> &[u8] {
 
 // spec: gate-sdk/SPEC.md §run-gates — the `--only` steer: a positional that is really a member of
 // the *default* registry earns the remedy beside the refusal, never a run it did not ask for
-fn steer(arg: &str, configured_dir: &str) {
+fn steer(tag: &str, arg: &str, configured_dir: &str) {
     let default_list = registry::list_path(configured_dir);
     let Ok(text) = std::fs::read_to_string(&default_list) else {
         return;
@@ -1349,7 +1390,7 @@ fn steer(arg: &str, configured_dir: &str) {
     if let Ok(door) = gates::door_command(&format!("--only {}", arg)) {
         eprintln!(
             "{}: '{}' is a gate registered in {}, not a gates dir — run it with: {}",
-            TOOL, arg, default_list, door
+            tag, arg, default_list, door
         );
     }
 }

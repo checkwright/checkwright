@@ -10,6 +10,8 @@
 
 ## Behavior changes
 
+- **`--verdict-key [--gates-dir <dir>]`** — new arm: prints the key a bare registry run would store this tree under, `{"contract":"1.0.0","gateSet":…,"tool":{"version":…},"treeId":…}`, and runs no member, so a caller hands the three fields to `--verdict-lookup` without re-deriving them. Exit 0 the key; 2 the `usage` error document for any other operand, and the `refused` one for no repository, an unborn `HEAD`, a modified worktree, an unstamped binary, an unreadable member file or a refused registry; 3 the `input` document for an unreadable registry, the `tool` one for a refused repository. The goldens are published at `/contracts/verdict-key/v1/`. Nothing to do unless you derive the key yourself: read it here instead.
+
 - **`check-migration-guard` names an unrelated ref** — a ref the clash check skips for sharing no merge base with the base ref is now named on the clean line, `, <j> unrelated ref(s) skipped: <ref> …` after the count of refs read, and on a red run's header before its closing colon, where it was skipped silently. A shallow CI clone now shows the siblings its clash check never read. Nothing to do; a line parser keyed on the clean line's end reads one more clause.
 
 - **`--emit pipefail-fix` and a redirected `grep`** — leaves a quiet or bounded `grep` stage carrying a redirection as a hand fix, where the rewrite reordered it: `grep -m1 x >out` became `grep x >out | sed -n '1,1p'`, writing every match to `out`, and `grep -q x 2>&1` became `grep x >/dev/null 2>&1`, discarding its errors. Such a hit still reds, now without `[auto-fix]`; fix it by hand.

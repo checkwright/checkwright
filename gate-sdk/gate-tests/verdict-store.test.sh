@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # spec: gate-sdk/SPEC.md §run-gates — the verdict store end to end through the front end: a
 # registry run on a clean tree keeps its verdict under the key its SARIF log's provenance carries,
-# --verdict-lookup answers it there and answers absent under another digest, a tree that moves while
+# --verdict-lookup answers it there and answers absent under another digest, --verdict-key prints
+# that key, a tree that moves while
 # members run or a modified tree keeps nothing, and an unset store is refused with its error
 # document. Run by the --run-gate-tests arm.
 set -uo pipefail
@@ -65,6 +66,24 @@ got="$(lookup GATE_SDK_VERDICT_STORE="$store")"; rc=$?
 [[ "$rc" -eq 0 && "$got" == '{"contract":"1.0.0","verdict":"pass"}' ]] || fail "lookup pass" "exit $rc: $got"
 pass_key=("${key[@]}")
 
+# verdict_key [args] — the front end's --verdict-key on the scratch registry, its document alone
+verdict_key() {
+    (cd "$repo" && env GATE_SDK_GATES_DIR="$gates" GATE_SDK_KIT_DIRS="$gates" bash "$RUN" --verdict-key "$@" 2>/dev/null)
+}
+# spec: gate-sdk/SPEC.md §run-gates — --verdict-key prints the key the run stored under, and its
+# three fields handed to --verdict-lookup answer the stored verdict
+doc="$(verdict_key)"; rc=$?
+key=(
+    "$(grep -oE '"treeId":"[0-9a-f]+"' <<<"$doc" | grep -oE '[0-9a-f]{40,64}')"
+    "$(grep -oE '"tool":\{"version":"[^"]+"' <<<"$doc" | sed 's/.*"version":"//; s/"$//')"
+    "$(grep -oE '"gateSet":"[0-9a-f]+"' <<<"$doc" | grep -oE '[0-9a-f]{64}')"
+)
+[[ "$rc" -eq 0 && "${key[*]}" == "${pass_key[*]}" ]] || fail "verdict-key" "exit $rc: the key differs from the run's: ${key[*]} vs ${pass_key[*]}" "$doc"
+got="$(lookup GATE_SDK_VERDICT_STORE="$store")"; rc=$?
+[[ "$rc" -eq 0 && "$got" == '{"contract":"1.0.0","verdict":"pass"}' ]] || fail "verdict-key lookup" "exit $rc: $got"
+got="$(verdict_key --json)"; rc=$?
+[[ "$rc" -eq 2 && "$got" == '{"contract":"1.0.0","error":"usage"}' ]] || fail "verdict-key operand" "exit $rc: $got"
+
 printf 'r\n' > "$repo/red"
 git -C "$repo" add red
 git -C "$repo" -c user.name=t -c user.email=t@e.invalid commit -qm red
@@ -89,11 +108,13 @@ printf 'b\n' >> "$repo/a.txt"
 out="$(battery GATE_SDK_VERDICT_STORE="$scratch/modified")"; rc=$?
 [[ "$rc" -eq 1 ]] || fail "modified run" "expected exit 1, got $rc" "$out"
 [[ ! -e "$scratch/modified" ]] || fail "modified run" "a modified tree kept a verdict" "$(ls -A "$scratch/modified")"
+got="$(verdict_key)"; rc=$?
+[[ "$rc" -eq 2 && "$got" == '{"contract":"1.0.0","error":"refused"}' ]] || fail "verdict-key modified" "a modified tree has no key: exit $rc: $got"
 
 key=("${pass_key[@]}")
 got="$(lookup)"; rc=$?
 [[ "$rc" -eq 2 && "$got" == '{"contract":"1.0.0","error":"refused"}' ]] || fail "unset store" "exit $rc: $got"
 
 [[ "$fails" -eq 0 ]] || { echo "verdict-store.test: $fails assertion(s) failed"; exit 1; }
-echo "verdict-store.test: clean (a registry run on a clean tree kept its pass and its fail under the SARIF log's key, --verdict-lookup answered each at exit 0 and absent under another digest, a tree moved mid-run and a modified tree kept nothing, and an unset store was refused at exit 2 with its error document)"
+echo "verdict-store.test: clean (a registry run on a clean tree kept its pass and its fail under the SARIF log's key, --verdict-lookup answered each at exit 0 and absent under another digest, --verdict-key printed the stored key, refused a modified tree and an unknown operand at exit 2, a tree moved mid-run and a modified tree kept nothing, and an unset store was refused at exit 2 with its error document)"
 exit 0
