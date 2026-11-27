@@ -27,7 +27,7 @@
 3397cp delegation-kit/templates/dispatch-checklists.md
 3468cp docs/agent-index.md
 2563cp docs/authoring-gates.md
-6623cp docs/binary-only.md
+8576cp docs/binary-only.md
 1308cp docs/canon-kit/index.md
 6022cp docs/choosing.md
 1677cp docs/context-kit/index.md

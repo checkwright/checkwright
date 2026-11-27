@@ -726,7 +726,37 @@ Both forms below are held by [`gate-sdk/gate-tests/binary-only-recipe.test.sh`](
 
 ## Getting the binary
 
-Download and verify the Release tarball as [Installing step by step](https://checkwright.dev/manual-install.html) does, into `$cw`, outside the checkout, and run no `init`. The binary is `package/payload/artifact/<target>/checkwright-gates`, `<target>` naming your system ([`installer/SPEC.md` §Layout](https://checkwright.dev/installer/SPEC.html#layout)); [Requirements](https://checkwright.dev/requirements.html#supported-systems) lists the systems a binary is published for. A per-target archive carries no descriptor. The commands below take it from `cwg`, set here for a Linux runner on x86_64:
+A Release carries the binary two ways: alone, in one archive per target, and inside the whole tarball beside every kit's descriptors. Take the archive for [Running one gate](https://checkwright.dev/binary-only.html#running-one-gate), and the tarball for [Running a set](https://checkwright.dev/binary-only.html#running-a-set-with-a-sarif-verdict), which copies descriptors. `<target>` names your system ([`installer/SPEC.md` §Layout](https://checkwright.dev/installer/SPEC.html#layout)); [Requirements](https://checkwright.dev/requirements.html#supported-systems) lists the systems a binary is published for. Put a version from the [releases](https://github.com/checkwright/checkwright/releases) page in place of `X.Y.Z`. Each route downloads into `$cw`, outside the checkout, and runs no `init`. The commands below take the binary from `cwg`.
+
+### The archive: the binary alone
+
+Download the archive and its digest, verify the digest and extract, here for a Linux runner on x86_64:
+
+```sh
+v=X.Y.Z
+t=x86_64-unknown-linux-gnu
+a="checkwright-gates-$v-$t.tar.gz"
+cw="$(mktemp -d)" \
+  && curl -fsSLo "$cw/$a" "https://github.com/checkwright/checkwright/releases/download/v$v/$a" \
+  && curl -fsSLo "$cw/$a.sha256" "https://github.com/checkwright/checkwright/releases/download/v$v/$a.sha256" \
+  && ( cd "$cw" \
+    && { sha256sum -c "$a.sha256" || shasum -a 256 -c "$a.sha256"; } \
+    && tar -xzf "$a" ) \
+  && cwg="$cw/checkwright-gates-$v-$t/checkwright-gates"
+```
+
+The archive holds one directory, the binary at mode `0755` and the binary's own `checkwright-gates.sha256` beside it. Where `gh` and `jq` are installed and `gh` is signed in, check the archive's build attestation too; a release older than the archives has none:
+
+```sh
+gh attestation verify "$cw/$a" --repo checkwright/checkwright --source-ref "refs/tags/v$v" --format json > "$cw/attestation.json" \
+  && jq -r --arg a "$a" '.[] | .verificationResult | (.statement.subject[] | select(.name == $a)) as $s | "verified \($s.name) sha256:\($s.digest.sha256) signed by \(.signature.certificate.buildSignerURI)"' "$cw/attestation.json"
+```
+
+One attestation covers every archive, so the filter picks your archive's entry out of it. A passing check prints one `verified` line naming the archive, its digest and `publish.yml` at the version's tag; a failing one prints its error and stops with a non-zero exit.
+
+### The tarball: the binary and the descriptors
+
+Download and verify the Release tarball as [Installing step by step](https://checkwright.dev/manual-install.html) does, into `$cw`. The binary is `package/payload/artifact/<target>/checkwright-gates`, set here for a Linux runner on x86_64:
 
 ```sh
 cwg="$cw/package/payload/artifact/x86_64-unknown-linux-gnu/checkwright-gates"
