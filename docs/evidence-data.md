@@ -322,3 +322,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | migration-parity-pass | sc sp a b v c | 4f/5d | 2 · ≤0d | 21s clean | 168 |
 | locale-verdict-key-pass | sc sp a b v c | 3f/5d | 3 · ≤0d | 21s clean | 168 |
 | release-provenance-pass | sc sp a b v c | 1f/3d | 1 · ≤0d | 21s clean | 168 |
+| uninstall-containment-pass | sc · · b v c | 0f/5d | 0 | 21s clean | 168 |

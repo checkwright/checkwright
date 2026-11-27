@@ -968,10 +968,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- wakeup-log-write-unreported
-- weekly-pair-shape-check
-- price-row-shape-strictness
-- release-assets-coverage
-- binary-only-archive-route
-- user-uninstall-containment
-
