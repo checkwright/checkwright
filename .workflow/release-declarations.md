@@ -6,4 +6,6 @@
 
 ## Behavior changes
 
+- **`--emit pipefail-fix` and a redirected `grep`** — leaves a quiet or bounded `grep` stage carrying a redirection as a hand fix, where the rewrite reordered it: `grep -m1 x >out` became `grep x >out | sed -n '1,1p'`, writing every match to `out`, and `grep -q x 2>&1` became `grep x >/dev/null 2>&1`, discarding its errors. Such a hit still reds, now without `[auto-fix]`; fix it by hand.
+
 - **`lib/test-hermetic.sh` sourced twice** — a second source in one shell under errexit reaches the private-dir checks, where the `mkdir` of the directory already present stopped it at exit 1 with no message. Nothing to do.

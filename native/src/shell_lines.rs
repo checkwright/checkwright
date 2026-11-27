@@ -1251,7 +1251,7 @@ const COUNT_KEEPS_LONG: &[&str] = &[
 
 // spec: gate-sdk/SPEC.md §The shell reader — `grep` with `-q`, `-m` or `-l`, long or in a short
 // cluster; a lone quiet form, and a lone nonzero digit max-count over its input alone with no flag
-// shaping the output around the count, are fixable
+// shaping the output around the count, are fixable where the stage carries no redirection
 fn grep(cmd: &Command, stage: &Stage, rest: &[&Word]) -> Option<(&'static str, Option<Vec<Edit>>)> {
     let mut quiet: Vec<(usize, Option<String>)> = Vec::new();
     let mut count: Vec<(usize, Option<String>)> = Vec::new();
@@ -1349,7 +1349,7 @@ fn grep(cmd: &Command, stage: &Stage, rest: &[&Word]) -> Option<(&'static str, O
     let base = words.len() - rest.len();
     let prev_end = |k: usize| words[base + k - 1].end;
     let fix = || -> Option<Vec<Edit>> {
-        if !fixable || list || (!quiet.is_empty() && max.is_some()) {
+        if !fixable || list || (!quiet.is_empty() && max.is_some()) || cmd.words.iter().any(|w| w.redir) {
             return None;
         }
         let (removed, tail) = if quiet.is_empty() {
@@ -1630,7 +1630,7 @@ mod tests {
     #[test]
     fn fixable_hits_rewrite() {
         assert_eq!(fixed("a | grep -q x\n"), "a | grep x >/dev/null\n");
-        assert_eq!(fixed("a | grep -Fq x 2>&1\n"), "a | grep -F x >/dev/null 2>&1\n");
+        assert_eq!(fixed("a | grep -Fq x\n"), "a | grep -F x >/dev/null\n");
         assert_eq!(fixed("a | grep -m 1 x\n"), "a | grep x | sed -n '1,1p'\n");
         assert_eq!(fixed("if a | grep -Em2 x; then\n"), "if a | grep -E x | sed -n '1,2p'; then\n");
         assert_eq!(fixed("a | head -n 3\n"), "a | sed -n '1,3p'\n");
@@ -1642,7 +1642,8 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §The shell reader — a count of zero, a flag shaping the output around
-    // the count and a file operand are hits with no rewrite, since `sed -n` would change the output
+    // the count, a file operand and a redirected `grep` are hits with no rewrite, since the rewrite
+    // would change the output
     #[test]
     fn a_count_the_rewrite_would_change_is_no_fix() {
         let shapes = [
@@ -1660,6 +1661,12 @@ mod tests {
             "a | head -n0\n",
             "a | head -n 0\n",
             "a | head -0\n",
+            "a | grep -m1 x >out\n",
+            "a | grep -m1 x 2>err\n",
+            "a | grep -q x >out\n",
+            "a | grep -Fq x 2>&1\n",
+            "a | grep -q x &>out\n",
+            "a | grep -m1 x <<<y\n",
         ];
         for text in shapes {
             let hits = early_exits(&lib(text), &[], 1);

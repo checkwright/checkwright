@@ -46,14 +46,6 @@ An outside engine can look a verdict up (`--verdict-lookup`) only by computing i
 
 ## Technical Debt
 
-### pipefail-fix-redirected-grep
-
-`--emit pipefail-fix`'s bounded-grep rewrite (`grep` in native/src/shell_lines.rs) checks the stage's flags and operands but not its redirections, and appends `| sed -n '1,Np'` at the stage's end, so `grep -m1 x >out` becomes `grep x >out | sed -n '1,1p'` and writes every match to `out`. gate-sdk/SPEC.md §check-pipefail-readers names the rewrite as `grep … | sed -n '1,Np'`, the same output.
-
-**Deliverable:** debt: a grep stage carrying a redirection left as a hand fix, with a case.
-
-**Cost while deferred:** the fix arm can change what a script writes. Surfaced 2026-11-26 by migration-parity-pass' close second-vendor review, the equivalent rewrite probed there in bash, carried from its close; filed at this scope. Re-verified here at source: the tail edit sits at `stage.end`, with no redirection test. Owner lookup: `pipefail-fix`, `redirect` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-pipefail-readers.
-
 ### release-archive-binary-mode
 
 The platform archives ship the gate binary at mode 0644, so a consumer must chmod it before an `-x` check passes. The publish workflow tars the copy `download-artifact` lands (.github/workflows/publish.yml, the archive loop), and an artifact keeps no mode.
@@ -1102,4 +1094,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - test-hermetic-rerun-mkdir
 - rust-reader-turbofish-spacing
+- pipefail-fix-redirected-grep
 
