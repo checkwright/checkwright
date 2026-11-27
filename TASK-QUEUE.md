@@ -130,16 +130,6 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-25 on 0.164.0 in a scratch home: still none beside the root manifest; with it moved aside the hooks are discovered, marked untrusted, since 0.164.0 gates plugin hooks on trust. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
-### codex-plugin-version-pin
-
-[cost: event/low] [surface: plugin] [observed-by: publish] [not-icebox-eligible: 2026-10-26 its check runs at the next release's pin move]
-
-Codex keys an installed plugin at version `1.0.0`, since neither manifest carries `version` (plugin/SPEC.md §The manifests) and Codex does not take the marketplace entry's, so whether a pin move reaches an installed copy through `codex plugin marketplace upgrade` is unrun.
-
-**Deliverable:** run it at the next release's pin move, and fix the manifest stance if it does not reach.
-
-**Cost while deferred:** a Codex user may stay on an old package after a release. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's limit and no `version` key in `plugin/plugin.json`. Owner lookup: `codex`, `marketplace upgrade` in this file, none; owner plugin/SPEC.md §The manifests.
-
 ### npm-trusted-publishing
 
 [cost: event/high] [surface: .github] [observed-by: publish]
@@ -1037,4 +1027,6 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- codex-plugin-version-pin
 

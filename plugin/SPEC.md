@@ -138,7 +138,7 @@ A build that changes the package runs the same commands locally, then installs i
 
 - Claude Code's, Codex's and Antigravity's installs are run; every other harness in §The harnesses is read off its own documentation.
 - Codex runs no guard from this package, and once it discovers them, still no wakeup guard (§The guards).
-- Codex records an install at version `1.0.0`, since neither manifest carries `version` (§The manifests). Whether a pin move reaches an installed copy through `codex plugin marketplace upgrade` is unrun.
+- Codex records an install at version `1.0.0`, since neither manifest carries `version` (§The manifests), though `codex plugin marketplace upgrade` refetches it at a moved pin.
 - Cursor and Muse Code run no guard from this package, and Antigravity none on native Windows.
 - A write through an Antigravity file-write tool whose arguments carry neither `Path` nor `TargetFile` reaches `workflow-state-guard` with an empty path, and the guard allows it; which tools have never fired is the Antigravity table's measured record (gate-sdk/SPEC.md §The hook contract). Any edit tool the matcher does not name is unguarded.
 - Under Antigravity the guards neither grant nor advise: a grant becomes no decision, its safety resting on the shipped binding's matcher, and no advise channel was found (gate-sdk/SPEC.md §The harness-integration arm). The prefix's `sed` fails on a workspace path whose JSON escapes a quote or backslash, or a multi-line payload (live ones were compact), unguarding that session.
