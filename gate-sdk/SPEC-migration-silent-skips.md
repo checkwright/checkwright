@@ -42,7 +42,7 @@ and the paragraph's closing sentence "The clean line counts the refs read, `, <k
 
 ### (3) The sandbox cases and the declarations {mechanical}
 
-- **Sandbox cases** in `gate-sdk/gate-tests/check-migration-guard.test.sh`, the section's list bullet "a detached `HEAD`, an orphan ref skipped, …" becoming "a detached `HEAD`, an orphan ref skipped and named on the clean line, the same ref at 3 under `error`, a shallow clone whose sibling's merge base is cut, named, `none`, a narrowing glob, and a glob opening with `-` and an unknown `GATE_SDK_MIGRATION_UNRELATED_REFS` value, each at 2". The orphan case's existing clean-line expectation follows.
+- **Sandbox cases** in `gate-sdk/gate-tests/check-migration-guard.test.sh`, the section's list bullet "a detached `HEAD`, an orphan ref skipped, …" becoming "a detached `HEAD`, an orphan ref skipped and named on the clean line, the same ref at 3 under `error`, a shallow clone whose sibling's merge base is cut, named, `none`, a narrowing glob, and a glob opening with `-` and an unknown `GATE_SDK_MIGRATION_UNRELATED_REFS` value, both at 2", the `error` case alone at 3 and the cases not so marked clean at 0. The orphan case's existing clean-line expectation follows.
 - **Unit tests** in `native/src/knobs/gate_sdk.rs` for the value check, beside `GATE_SDK_MIGRATION_REFS`' own.
 - `.workflow/release-declarations.md`: *Behavior changes* gains the named unrelated refs on the verdict lines; *Knob changes* gains `GATE_SDK_MIGRATION_UNRELATED_REFS`.
 
