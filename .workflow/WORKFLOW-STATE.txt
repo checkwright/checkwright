@@ -5,3 +5,4 @@
 ---
 
 release-provenance-pass scope a33d5397 2026-11-27 5cb0c5571
+release-provenance-pass spec a1bd833f 2026-11-27 7eded767e
