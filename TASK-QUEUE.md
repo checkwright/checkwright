@@ -26,16 +26,6 @@
 
 **Push need (2026-11-27, inside the budget):** one mid-iteration push after its build batch, since the Windows junction case runs only on the remote Windows legs; the batch's other native fixes ride the same push.
 
-### binary-only-archive-route
-
-docs/binary-only.md takes the binary out of the whole Release tarball, since a per-target archive carries no `.gate` descriptor. Once the install pin names a release whose archives carry `.sha256` sidecars and an attestation, the page can offer the archive for the binary with `sha256sum -c` and `gh attestation verify`, and the tarball for the descriptors alone.
-
-**Deliverable:** debt: the archive route on docs/binary-only.md beside the tarball route, each command run against the pinned release.
-
-**Cost while deferred:** a binary-only reader downloads the whole tarball to take one binary. Its trigger is the pin moving past the first release carrying the sidecars. Filed 2026-11-27 by release-provenance-pass' close from a build inbox bullet. Re-verified: the page downloads the tarball and states the archive carries no descriptor. Owner lookup: `binary-only`, `archive route` in this file and the disposed-findings record, none; owner docs/binary-only.md and installer/SPEC.md §Layout.
-
-Reclassed debt at uninstall-containment-pass' scope by the new-names litmus: the route documents assets the Release already declares and adds no governed name. Its trigger fired when the close moved the pins to v0.42.0, whose archives carry sidecars and attestations.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -992,4 +982,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - weekly-pair-shape-check
 - price-row-shape-strictness
 - release-assets-coverage
+- binary-only-archive-route
 
