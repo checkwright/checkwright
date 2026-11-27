@@ -84,9 +84,7 @@ Two `--run` faults the adopter's v0.40.0 consumer smoke found. The binary's usag
 
 **Deliverable:** debt: one spelling in both texts, the other kept as an accepted alias; and `--run` outside a repository refused at 2 as §Output contract states, with a case each.
 
-**Cost while deferred:** a binary-only consumer reads two usages and can take an unkeyed pass for a verdict. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of v0.40.0, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: both usage spellings print. Owner lookup: `gates-dir`, `unkeyed`, `treeId` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates and §Output contract.
-
-**Inferred, not run:** `--run` outside a repository exits 0 with an unkeyed pass, adopter-measured — this scope's shell guard refuses a working directory outside the checkout; build's case runs it.
+**Cost while deferred:** a binary-only consumer reads two usages and can take an unkeyed pass for a verdict. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of v0.40.0, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: both usage spellings print. Re-verified at spec: in a directory whose `GIT_CEILING_DIRECTORIES` stops git's discovery, `--run --json --gates-dir .` over a one-member registry exits 0 with a pass document carrying no `treeId` and no `worktree`. Owner lookup: `gates-dir`, `unkeyed`, `treeId` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates and §Output contract.
 
 ### binary-only-doc-gaps
 
