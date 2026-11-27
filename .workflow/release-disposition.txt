@@ -1,4 +1,3 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
-locale-verdict-key-pass release v0.41.0 — minor by the declarations (the C-locale pin with the caller-locale restore, the --verdict-key arm and its verdict-key/v1 golden, check-migration-guard's named unrelated refs and GATE_SDK_MIGRATION_UNRELATED_REFS, --run refusing outside a repository at exit 2, the archives' binary at 0755, check-exec-write's spaced turbofish), no decommission; the front-door trigger fires on --verdict-key, and the cut is a lead decision under the operator's delegation 2026-11-27, granted in the close dispatch

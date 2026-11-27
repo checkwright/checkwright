@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: locale-verdict-key-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-27, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** the orchestrator adopter's ordered asks 1, 2, 3 and 5 (adopter direction 2026-11-27, lead-relayed), with migration-parity-pass' review debt and the cheap halves of the adopter's v0.40.0 consumer smoke. Debt: `test-hermetic-rerun-mkdir`, `rust-reader-turbofish-spacing`, `pipefail-fix-redirected-grep`, `release-archive-binary-mode`, `run-arm-smoke-fixes`, `binary-only-doc-gaps`. Features for spec to author: `parsed-output-c-locale`, `migration-guard-silent-skips` and `verdict-key-arm`. `release-archive-provenance`, `release-record-gates` and `user-uninstall-containment` lead the next set, on the release and installer surface.
-
-  **The release and pushes (2026-11-27, lead decision under the same delegation, not a ruling):** a cut at this iteration's close where the set's declarations price one, expected a minor for the new arm and the guard's visible skip. Push need 2 against 2, inside the budget: the closing push, which also carries the v0.40.0 pin drain and the adopter-ask filing already on master, and the release tag. `codex-plugin-version-pin`'s check is due at the push landing the pin drain.
 
 ---
 
