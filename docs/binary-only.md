@@ -15,7 +15,7 @@ Both forms below are held by [`gate-sdk/gate-tests/binary-only-recipe.test.sh`](
 
 ## Getting the binary
 
-Download and verify the Release tarball as [Installing step by step](manual-install.md) does, into `$cw`, outside the checkout, and run no `init`. The binary is `package/payload/artifact/<target>/checkwright-gates`, `<target>` naming your system ([`installer/SPEC.md` §Layout](installer/SPEC.md#layout)); [Requirements](requirements.md#supported-systems) lists the systems a binary is published for. The commands below take it from `cwg`, set here for a Linux runner on x86_64:
+Download and verify the Release tarball as [Installing step by step](manual-install.md) does, into `$cw`, outside the checkout, and run no `init`. The binary is `package/payload/artifact/<target>/checkwright-gates`, `<target>` naming your system ([`installer/SPEC.md` §Layout](installer/SPEC.md#layout)); [Requirements](requirements.md#supported-systems) lists the systems a binary is published for. A per-target archive carries no descriptor. The commands below take it from `cwg`, set here for a Linux runner on x86_64:
 
 ```sh
 cwg="$cw/package/payload/artifact/x86_64-unknown-linux-gnu/checkwright-gates"

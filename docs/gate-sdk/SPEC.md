@@ -2598,7 +2598,7 @@ The arm never exits 1, because a stored `fail` is an answer and not a finding ag
 | `tool.version` | the binary's release stamp | the build (below) |
 | `tool.sourceStamp` | the content hash [§check-gate-binary-fresh](#check-gate-binary-fresh) compares | the build's content stamp ([§check-gate-binary-fresh](#check-gate-binary-fresh)) |
 | `tool.target` | the triple the binary was built for | the build's target triple |
-| `kits[]` | one `{name, root, version}` per resolved kit root, in `GATE_SDK_KIT_DIRS` order: `name` the root's last path component, `root` its repo-relative path, `version` the lock's `version` where `checkwright.lock` names the kit in `kits` | the kit-root resolution and the lock, read through `installer::lock`'s accessors |
+| `kits[]` | one `{name, root, version}` per resolved kit root, in `GATE_SDK_KIT_DIRS` order: `name` the root's last path component, `root` its repo-relative path, `version` the lock's `version` where `checkwright.lock` names the kit in `kits`, and **optional**: absent off a lock, as the honest limits below state, though the golden shows it | the kit-root resolution and the lock, read through `installer::lock`'s accessors |
 | `commit` | `HEAD`, 40 or 64 lowercase hex characters (a SHA-1 or a SHA-256 object format) | `git rev-parse HEAD`; absent on an unborn branch |
 | `worktree` | `clean` when tracked content matches `HEAD`, else `modified` | `git status --porcelain --untracked-files=no`; absent with `commit` |
 | `treeId` | the tree object `HEAD` names, in `commit`'s format | `git rev-parse HEAD^{tree}`; absent unless `worktree` is `clean`, since a modified worktree's content is no tree object |

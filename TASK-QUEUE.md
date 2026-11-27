@@ -46,14 +46,6 @@ An outside engine can look a verdict up (`--verdict-lookup`) only by computing i
 
 ## Technical Debt
 
-### binary-only-doc-gaps
-
-Two statements a binary-only consumer misses. The platform archive carries no gate registry or kits, so it has nothing to `--run` without a gates dir of its own, and installer/README.md does not say the registry ships only in the npm package. And `kits[].version` is absent off a lock (gate-sdk/SPEC.md §run-gates' honest limits say so), while the provenance table's row and `docs/contracts/run/v1/pass.json` show it, so a reader typed from the golden takes the key as required.
-
-**Deliverable:** debt: the registry's absence stated in installer/README.md beside docs/binary-only.md's forms, and the `kits[]` row marking `version` optional; no golden byte change, which would bump contract 1.0.0.
-
-**Cost while deferred:** a binary-only consumer finds nothing to run and a typed reader rejects a real run. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of v0.40.0, filed to the inbox after migration-parity-pass' close; filed at this scope. Owner lookup: `binary-only`, `kits[]`, `registry` in this file and the disposed-findings record, none; owner installer/README.md and gate-sdk/SPEC.md §run-gates.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -1081,4 +1073,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - pipefail-fix-redirected-grep
 - release-archive-binary-mode
 - run-arm-smoke-fixes
+- binary-only-doc-gaps
 

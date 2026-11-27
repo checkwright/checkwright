@@ -27,7 +27,7 @@
 3397cp delegation-kit/templates/dispatch-checklists.md
 3468cp docs/agent-index.md
 2563cp docs/authoring-gates.md
-6579cp docs/binary-only.md
+6691cp docs/binary-only.md
 1308cp docs/canon-kit/index.md
 6022cp docs/choosing.md
 1677cp docs/context-kit/index.md
@@ -112,7 +112,7 @@
 2698cp drift-kit/templates/close-knowledge.md
 4680cp drift-kit/templates/economics.md
 128674cp evidence-kit/SPEC.md
-1193383cp gate-sdk/SPEC.md
+1193482cp gate-sdk/SPEC.md
 3130cp gate-sdk/templates/adopt.md
 356868cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
