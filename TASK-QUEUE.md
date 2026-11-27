@@ -1,14 +1,76 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: uninstall-containment-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-27, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** debt only, so no authoring stage walks. `user-uninstall-containment` leads, as the one adopter-facing data-safety defect on the board. It is joined by three verified defects from second-vendor reviews: `wakeup-log-write-unreported`, `weekly-pair-shape-check` and `price-row-shape-strictness`. It is also joined by the release-provenance follow-through: `release-assets-coverage`, promoted from both carried inbox bullets, and `binary-only-archive-route`, whose trigger fired when the pins moved to v0.42.0. The adopter has no open asks. `release-record-gates` stays deferred, since it is a feature whose second half needs design, and adding it would walk the authoring stage for an event/low cost. `exit-status-funnel-typing` stays deferred, since its fix spans some 520 call sites and no in-tree reader branches on 2 against 3.
+
+  **The pushes (2026-11-27, lead decision under the same delegation, not a ruling):** push need 2 against 2, inside the budget. The first is the mid-iteration push recorded on `user-uninstall-containment`. The second is the closing push, which also carries the two close commits already on master locally. No release cut is priced.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### user-uninstall-containment
+
+`uninstall --user --force` follows a directory symlink inside the data dir: a `user.lock` files key `escape/victim` passes the lexical component check in native/src/installer/user.rs, and removal deletes a file outside the install when `<data>/escape` links out (a junction on Windows), where installer/SPEC.md §The user manifest states containment.
+
+**Deliverable:** debt: a resolved-path containment check before each removal, with a case per host.
+
+**Cost while deferred:** a tampered or corrupted user manifest can delete a file outside the install. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence on POSIX), carried from its close; filed at the next scope. Owner lookup: `symlink`, `containment` in this file, none; owner installer/SPEC.md §The user manifest.
+
+**Push need (2026-11-27, inside the budget):** one mid-iteration push after its build batch, since the Windows junction case runs only on the remote Windows legs; the batch's other native fixes ride the same push.
+
+### wakeup-log-write-unreported
+
+wakeup-guard's denial says 'Attempt logged.' when `append_attempt` (native/src/hook/wakeup.rs) cannot open or write the log, since it discards both errors, so a tree-free absolute log under a missing directory loses the record while the denial claims it. guard-kit/SPEC.md §wakeup-guard names only knob and `--knobs` faults as unlogged.
+
+**Deliverable:** debt: the denial's wording follows the append's outcome, with a case for an unwritable log.
+
+**Cost while deferred:** an adopter's attempt log misses denied attempts while the model is told they were logged. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: both results discarded. Owner lookup: `append_attempt`, `Attempt logged` in this file, none; owner guard-kit/SPEC.md §wakeup-guard.
+
+### weekly-pair-shape-check
+
+[not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
+
+The weekly-pair producers check presence, not shape: `usage::is_utilization` (native/src/hook/usage.rs) admits `1..2`, and the statusline producer writes a non-scalar `resets_at` rendered `{}`, each a fresh snapshot the verdict reads with the weekly axis unarmed. The poller also composes a pair from a flat utilization and a nested reset, a rule delegation-kit/SPEC.md does not state.
+
+**Deliverable:** debt: shape checks at both producers, and the composition rule stated or removed.
+
+**Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
+
+### price-row-shape-strictness
+
+[not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
+
+The price-table row check is lexical: `kpi::is_iso_day` (native/src/emit/kpi/mod.rs) admits `2026-00-00`, and its float parse admits `NaN` and `inf`, so such a row counts as priced with no unpriced-row line, against drift-kit/SPEC.md §The stage-economics meter's ISO-day and numeric-price shape.
+
+**Deliverable:** debt: a calendar-valid day and a finite non-negative price, each with a case.
+
+**Cost while deferred:** a malformed row prices silently. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_iso_day` tests digit positions only. Owner lookup: `is_iso_day`, `NaN` in this file, none; owner drift-kit/SPEC.md §The stage-economics meter.
+
+### release-assets-coverage
+
+`check-release-assets` attests less than gate-sdk/SPEC.md §check-release-assets says. A `>` folded `subject-path` block is read line by line (native/src/gates/release_assets.rs `key_value`), though YAML folds it into one space-joined value the action does not split, so the gate passes a block the attest step fails. And the attest arm proves overlap, not coverage: a glob narrowed to one target or version satisfies the whole template, and the publish half never matches the expanded names against the globs.
+
+**Deliverable:** debt: read a `>` block as one folded entry, and under `--dist` match each expanded non-sidecar asset name against the globs, with the SPEC's subject read restated to match and a case for each.
+
+**Cost while deferred:** none ships wrong today, since publish.yml uses `|` and globs naming every target; a narrowed or folded subject would ship an asset unattested, caught only by the release job's per-asset verify. Surfaced 2026-11-27 as two inbox bullets from release-provenance-pass' close second-vendor review; filed at the next scope. Re-verified: `key_value` treats `|` and `>` alike, and `subject_matches` matches template text. Owner lookup: `check-release-assets`, `subject-path`, `folded` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-release-assets.
+
+### binary-only-archive-route
+
+docs/binary-only.md takes the binary out of the whole Release tarball, since a per-target archive carries no `.gate` descriptor. Once the install pin names a release whose archives carry `.sha256` sidecars and an attestation, the page can offer the archive for the binary with `sha256sum -c` and `gh attestation verify`, and the tarball for the descriptors alone.
+
+**Deliverable:** debt: the archive route on docs/binary-only.md beside the tarball route, each command run against the pinned release.
+
+**Cost while deferred:** a binary-only reader downloads the whole tarball to take one binary. Its trigger is the pin moving past the first release carrying the sidecars. Filed 2026-11-27 by release-provenance-pass' close from a build inbox bullet. Re-verified: the page downloads the tarball and states the archive carries no descriptor. Owner lookup: `binary-only`, `archive route` in this file and the disposed-findings record, none; owner docs/binary-only.md and installer/SPEC.md §Layout.
+
+Reclassed debt at uninstall-containment-pass' scope by the new-names litmus: the route documents assets the Release already declares and adds no governed name. Its trigger fired when the close moved the pins to v0.42.0, whose archives carry sidecars and attestations.
 
 ## Deferred
 
@@ -166,36 +228,6 @@ A declared mode where an outside tool renders the queue file and the iteration h
 
 **Cost while deferred:** an outside state owner keeps the queue and stamps in step by hand. Surfaced 2026-11-15 by a design review the operator relayed at this scope. Owner lookup: `state owner`, `rendered by` in this file, none; owner lifecycle-kit/SPEC.md §The state machine.
 
-### user-uninstall-containment
-
-[cost: event/high] [surface: installer]
-
-`uninstall --user --force` follows a directory symlink inside the data dir: a `user.lock` files key `escape/victim` passes the lexical component check in native/src/installer/user.rs, and removal deletes a file outside the install when `<data>/escape` links out (a junction on Windows), where installer/SPEC.md §The user manifest states containment.
-
-**Deliverable:** debt: a resolved-path containment check before each removal, with a case per host.
-
-**Cost while deferred:** a tampered or corrupted user manifest can delete a file outside the install. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence on POSIX), carried from its close; filed at the next scope. Owner lookup: `symlink`, `containment` in this file, none; owner installer/SPEC.md §The user manifest.
-
-### price-row-shape-strictness
-
-[cost: event/low] [surface: drift-kit] [not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
-
-The price-table row check is lexical: `kpi::is_iso_day` (native/src/emit/kpi/mod.rs) admits `2026-00-00`, and its float parse admits `NaN` and `inf`, so such a row counts as priced with no unpriced-row line, against drift-kit/SPEC.md §The stage-economics meter's ISO-day and numeric-price shape.
-
-**Deliverable:** debt: a calendar-valid day and a finite non-negative price, each with a case.
-
-**Cost while deferred:** a malformed row prices silently. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_iso_day` tests digit positions only. Owner lookup: `is_iso_day`, `NaN` in this file, none; owner drift-kit/SPEC.md §The stage-economics meter.
-
-### weekly-pair-shape-check
-
-[cost: event/low] [surface: delegation-kit] [not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
-
-The weekly-pair producers check presence, not shape: `usage::is_utilization` (native/src/hook/usage.rs) admits `1..2`, and the statusline producer writes a non-scalar `resets_at` rendered `{}`, each a fresh snapshot the verdict reads with the weekly axis unarmed. The poller also composes a pair from a flat utilization and a nested reset, a rule delegation-kit/SPEC.md does not state.
-
-**Deliverable:** debt: shape checks at both producers, and the composition rule stated or removed.
-
-**Cost while deferred:** a malformed snapshot disarms the weekly budget axis unseen. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_utilization` admits any digit-and-dot string. Owner lookup: `is_utilization`, `resets_at` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
-
 ### brief-payload-reader
 
 [cost: event/high] [surface: delegation-kit]
@@ -205,16 +237,6 @@ The weekly-pair producers check presence, not shape: `usage::is_utilization` (na
 **Deliverable:** feature: a rule on `agent-dispatch-guard` reading the dispatch prompt through the same `DELEGATION_KIT_BRIEF_RULES` grammar and matcher, with its own decision class (advise or deny) and its own resolution of the rule file where the hook runs with no repository.
 
 **Cost while deferred:** every inline dispatch, the common form and this repo's stage dispatches included, is linted only if the dispatcher writes it out and runs the gate first. Filed 2026-11-25 at adopter-followthrough-pass' close from two inbox bullets, the spec session's and build batch 4's. Owner lookup: `payload`, `inline`, `agent-dispatch-guard` in this file, none; owner delegation-kit/SPEC.md §check-brief-authority and §The delegation model.
-
-### wakeup-log-write-unreported
-
-[cost: event/low] [surface: guard-kit]
-
-wakeup-guard's denial says 'Attempt logged.' when `append_attempt` (native/src/hook/wakeup.rs) cannot open or write the log, since it discards both errors, so a tree-free absolute log under a missing directory loses the record while the denial claims it. guard-kit/SPEC.md §wakeup-guard names only knob and `--knobs` faults as unlogged.
-
-**Deliverable:** debt: the denial's wording follows the append's outcome, with a case for an unwritable log.
-
-**Cost while deferred:** an adopter's attempt log misses denied attempts while the model is told they were logged. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: both results discarded. Owner lookup: `append_attempt`, `Attempt logged` in this file, none; owner guard-kit/SPEC.md §wakeup-guard.
 
 ### manifest-name-deny-terms
 
@@ -255,16 +277,6 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 **Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
 
 **Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
-
-### binary-only-archive-route
-
-[cost: event/low] [surface: docs]
-
-docs/binary-only.md takes the binary out of the whole Release tarball, since a per-target archive carries no `.gate` descriptor. Once the install pin names a release whose archives carry `.sha256` sidecars and an attestation, the page can offer the archive for the binary with `sha256sum -c` and `gh attestation verify`, and the tarball for the descriptors alone.
-
-**Deliverable:** feature: the archive route on docs/binary-only.md beside the tarball route, each command run against the pinned release.
-
-**Cost while deferred:** a binary-only reader downloads the whole tarball to take one binary. Its trigger is the pin moving past the first release carrying the sidecars. Filed 2026-11-27 by release-provenance-pass' close from a build inbox bullet. Re-verified: the page downloads the tarball and states the archive carries no descriptor. Owner lookup: `binary-only`, `archive route` in this file and the disposed-findings record, none; owner docs/binary-only.md and installer/SPEC.md §Layout.
 
 ## Icebox
 
