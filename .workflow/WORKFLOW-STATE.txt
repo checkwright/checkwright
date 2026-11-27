@@ -9,3 +9,4 @@ release-provenance-pass spec a1bd833f 2026-11-27 7eded767e
 release-provenance-pass align a13bde0d 2026-11-27 cdcd83f59
 release-provenance-pass build aab494f4 2026-11-27 14b3b76cb
 release-provenance-pass validate ae010eea 2026-11-27 0a2559d20
+release-provenance-pass close abef76bb 2026-11-27 9ae0e6ed3
