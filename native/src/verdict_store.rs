@@ -84,10 +84,6 @@ pub fn write(dir: &Path, name: &str, body: &str) -> Result<(), String> {
     })
 }
 
-fn version_token(v: &str) -> bool {
-    !v.is_empty() && v.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'+' | b'-'))
-}
-
 fn operands(args: &[String]) -> Result<(&str, &str, &str), Fault> {
     let usage = "usage: --verdict-lookup <tree> <kit-ver> <digest>";
     let [tree, ver, set] = args else {
@@ -96,7 +92,7 @@ fn operands(args: &[String]) -> Result<(&str, &str, &str), Fault> {
     if !crate::provenance::object_id(tree) {
         return Err(Fault::usage(format!("<tree> is not a tree object id: '{}'\n{}", tree, usage)));
     }
-    if !version_token(ver) {
+    if !crate::release_stamp::version_token(ver) {
         return Err(Fault::usage(format!("<kit-ver> is not a release stamp: '{}'\n{}", ver, usage)));
     }
     if !crate::evidence::is_hex64(set) {

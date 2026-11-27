@@ -119,7 +119,8 @@ fn main() {
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — the release stamp and its exactness; a describe that fails
-// on a tagless or shallow checkout empties the stamp and never fails the build
+// on a tagless or shallow checkout empties the stamp and never fails the build, while a build
+// input outside the version grammar fails it
 fn release(dir: &str) {
     let input = std::env::var("CHECKWRIGHT_BUILD_VERSION").ok();
     let described = Command::new("git")
@@ -131,7 +132,10 @@ fn release(dir: &str) {
         .ok()
         .filter(|o| o.status.success())
         .and_then(|o| String::from_utf8(o.stdout).ok());
-    let (stamp, exact) = release_stamp::stamp(input.as_deref(), described.as_deref());
+    let (stamp, exact) = match release_stamp::stamp(input.as_deref(), described.as_deref()) {
+        Ok(s) => s,
+        Err(e) => panic!("checkwright-gates build: {}", e),
+    };
     println!("cargo:rustc-env=CHECKWRIGHT_RELEASE={}", stamp);
     println!("cargo:rustc-env=CHECKWRIGHT_RELEASE_EXACT={}", if exact { "1" } else { "" });
     println!("cargo:rerun-if-env-changed=CHECKWRIGHT_BUILD_VERSION");

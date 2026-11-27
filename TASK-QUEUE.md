@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### verdict-key-version-token
-
-`--verdict-key` can print a `tool.version` that `--verdict-lookup` refuses. The release stamp keeps any `CHECKWRIGHT_BUILD_VERSION` bytes after a leading `v` (`stamp` in native/src/release_stamp.rs), while `version_token` in native/src/verdict_store.rs admits only ASCII alphanumerics and `.+-`. So a build stamped `v1.2.3_review` keys and stores under a version the lookup refuses at exit 2, against gate-sdk/SPEC.md §run-gates naming the key's fields the lookup's operands.
-
-**Deliverable:** debt: one grammar for the stamp and the lookup's version operand, enforced where the build stamps (lead decision 2026-11-27): `version_token`'s grammar moves beside `stamp` in native/src/release_stamp.rs, which the lookup then reads, and the build refuses a `CHECKWRIGHT_BUILD_VERSION` outside it, naming the value, while a `git describe` answer outside it leaves the stamp empty, as a failed describe does. So every key a stamped build prints is a lookup's operand, with a case for each side, and gate-sdk/SPEC.md §run-gates' *Where the release stamp comes from* states the grammar and the refusal beside the lookup's `<kit-ver>` sentence.
-
-**Cost while deferred:** a verdict stored under such a stamp is unreachable by lookup, so an adopter keying CI runs with `--verdict-key` re-runs what it stored. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: `stamp` returns its input trimmed and `v`-stripped, unfiltered. Owner lookup: `version_token`, `release_stamp`, `verdict-key` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
-
 ### front-door-registry-readiness
 
 [recurrence: 2026-11-26]
@@ -1053,4 +1045,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - codex-plugin-version-pin
 - release-archive-provenance
 - turbofish-fn-pointer-arrow
+- verdict-key-version-token
 

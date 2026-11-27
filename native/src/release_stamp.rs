@@ -3,19 +3,29 @@
 // `cargo test` never compiles a build script's own tests
 
 // spec: gate-sdk/SPEC.md §run-gates — the build input outranks the describe answer, each loses a
-// leading `v`, and the stamp is exact for a build input or a describe answer with no distance
+// leading `v`; outside the version grammar the build input is refused and describe empties
 #[cfg_attr(not(test), allow(dead_code))]
-pub fn stamp(build_input: Option<&str>, describe: Option<&str>) -> (String, bool) {
+pub fn stamp(build_input: Option<&str>, describe: Option<&str>) -> Result<(String, bool), String> {
     if let Some(v) = build_input.map(str::trim).filter(|v| !v.is_empty()) {
-        return (strip_v(v).to_string(), true);
-    }
-    match describe.map(str::trim).filter(|d| !d.is_empty()) {
-        Some(d) => {
-            let s = strip_v(d);
-            (s.to_string(), !has_distance(s))
+        let s = strip_v(v);
+        if !version_token(s) {
+            return Err(format!(
+                "CHECKWRIGHT_BUILD_VERSION '{}' is not a release version: after a leading 'v' it takes ASCII letters, digits, '.', '+' and '-' only",
+                v
+            ));
         }
-        None => (String::new(), false),
+        return Ok((s.to_string(), true));
     }
+    match describe.map(str::trim).map(strip_v).filter(|d| version_token(d)) {
+        Some(s) => Ok((s.to_string(), !has_distance(s))),
+        None => Ok((String::new(), false)),
+    }
+}
+
+// spec: gate-sdk/SPEC.md §run-gates — the version grammar the stamp and `--verdict-lookup`'s
+// `<kit-ver>` share
+pub fn version_token(v: &str) -> bool {
+    !v.is_empty() && v.bytes().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'+' | b'-'))
 }
 
 fn strip_v(s: &str) -> &str {
@@ -43,24 +53,51 @@ mod tests {
     // and is exact whatever describe answered
     #[test]
     fn the_build_input_outranks_describe_and_is_exact() {
-        assert_eq!(stamp(Some("v0.36.0"), Some("v0.35.0-6-gabc1234")), ("0.36.0".into(), true));
-        assert_eq!(stamp(Some("0.36.0"), None), ("0.36.0".into(), true));
-        assert_eq!(stamp(Some(""), Some("v0.36.0")), ("0.36.0".into(), true));
+        assert_eq!(stamp(Some("v0.36.0"), Some("v0.35.0-6-gabc1234")), Ok(("0.36.0".into(), true)));
+        assert_eq!(stamp(Some("0.36.0"), None), Ok(("0.36.0".into(), true)));
+        assert_eq!(stamp(Some(""), Some("v0.36.0")), Ok(("0.36.0".into(), true)));
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — a describe answer is exact only with no distance suffix
     #[test]
     fn a_describe_answer_is_exact_only_on_the_tag_itself() {
-        assert_eq!(stamp(None, Some("v0.36.0")), ("0.36.0".into(), true));
-        assert_eq!(stamp(None, Some("v0.36.0-6-gabc1234\n")), ("0.36.0-6-gabc1234".into(), false));
-        assert_eq!(stamp(None, Some("v1.0.0-rc.1")), ("1.0.0-rc.1".into(), true));
-        assert_eq!(stamp(None, Some("v1.0.0-rc-12-g0f3")), ("1.0.0-rc-12-g0f3".into(), false));
+        assert_eq!(stamp(None, Some("v0.36.0")), Ok(("0.36.0".into(), true)));
+        assert_eq!(stamp(None, Some("v0.36.0-6-gabc1234\n")), Ok(("0.36.0-6-gabc1234".into(), false)));
+        assert_eq!(stamp(None, Some("v1.0.0-rc.1")), Ok(("1.0.0-rc.1".into(), true)));
+        assert_eq!(stamp(None, Some("v1.0.0-rc-12-g0f3")), Ok(("1.0.0-rc-12-g0f3".into(), false)));
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — no input and no describe answer is an empty stamp
     #[test]
     fn no_answer_is_an_empty_inexact_stamp() {
-        assert_eq!(stamp(None, None), (String::new(), false));
-        assert_eq!(stamp(None, Some("  ")), (String::new(), false));
+        assert_eq!(stamp(None, None), Ok((String::new(), false)));
+        assert_eq!(stamp(None, Some("  ")), Ok((String::new(), false)));
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — a build input outside the grammar is refused by name,
+    // so no stamped build prints a key the lookup refuses
+    #[test]
+    fn a_build_input_outside_the_grammar_is_refused_by_name() {
+        let err = stamp(Some("v1.2.3_review"), Some("v1.2.3")).expect_err("refused");
+        assert!(err.contains("'v1.2.3_review'"), "{}", err);
+        assert!(stamp(Some("v"), None).is_err());
+        assert!(stamp(Some("1.2.3 rc"), None).is_err());
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — a describe answer outside the grammar empties the stamp
+    #[test]
+    fn a_describe_answer_outside_the_grammar_empties_the_stamp() {
+        assert_eq!(stamp(None, Some("v1.2.3_review")), Ok((String::new(), false)));
+        assert_eq!(stamp(None, Some("v1.2.3/x-2-gabc")), Ok((String::new(), false)));
+        assert_eq!(stamp(None, Some("v")), Ok((String::new(), false)));
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — every stamp a build accepts is a lookup operand
+    #[test]
+    fn every_accepted_stamp_is_a_version_token() {
+        for (input, describe) in [(Some("v0.1.0+b.7"), None), (None, Some("v0.1.0-3-gabc"))] {
+            let (s, _) = stamp(input, describe).expect("accepted");
+            assert!(version_token(&s), "{}", s);
+        }
     }
 }
