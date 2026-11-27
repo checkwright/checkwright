@@ -16,20 +16,6 @@
 
 ## Technical Debt
 
-### front-door-registry-readiness
-
-[recurrence: 2026-11-26]
-
-The front-door package route's readiness poll (`npm view <package>@<version> version` in scripts/ci-front-door.sh and its PowerShell twin) named 0.38.0 at the registry's publish time while the tarball still answered 404, so all seven legs of publish run 45592369014 redded at `npx` init on E404, green on a re-run once the tarball served.
-
-**Deliverable:** debt: poll the tarball, or `npm pack` the version, rather than the metadata, or retry the fetch inside the bound, in both drivers, and RELEASING.md §The front-door rehearsal's package-route sentence, which names the `npm view` poll, says what the poll now reads.
-
-**First-run risk (2026-11-27, lead decision):** no local host runs the PowerShell twin, so its edit first executes on the tag's `publish` run; close's procedure for a red publish run, a re-run or a hotfix push inside the budget, is the backstop.
-
-**Cost while deferred:** a release's front-door verdict can red on registry lag, a re-run that reads as a broken front door. Surfaced 2026-11-25 at adopter-followthrough-pass' close; filed at the next scope. Owner lookup: `registry`, `npm view` in this file, none; owner RELEASING.md §The front-door rehearsal, which names the poll, and scripts/ci-front-door.sh with its twin.
-
-Its observe half is [registry-readiness-observe](#registry-readiness-observe), split at scope 2026-11-27 since only a release run reads it.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -240,7 +226,7 @@ wakeup-guard's denial says 'Attempt logged.' when `append_attempt` (native/src/h
 
 [cost: event/low] [surface: installer] [observed-by: publish]
 
-The observe half of [front-door-registry-readiness](#front-door-registry-readiness): the front-door legs run only in a release `publish` run, so the first release after the fix is the only run that shows the poll waiting for the tarball rather than the metadata.
+The observe half of `front-door-registry-readiness`: the front-door legs run only in a release `publish` run, so the first release after the fix is the only run that shows the poll waiting for the tarball rather than the metadata.
 
 **Deliverable:** debt: read that run's front-door legs in both drivers, green with no E404 re-run; a red on registry lag is filed as a defect.
 
@@ -1046,4 +1032,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - release-archive-provenance
 - turbofish-fn-pointer-arrow
 - verdict-key-version-token
+- front-door-registry-readiness
 

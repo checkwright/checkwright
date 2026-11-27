@@ -259,17 +259,18 @@ function Test-FirstUpgrade {
     return $true
 }
 
+# spec: RELEASING.md §The front-door rehearsal — the tarball itself, which the registry can serve after the metadata names the version
 function Test-RegistryVisible {
     param([string]$Npm)
     $waited = 0
+    $fetched = Join-Path $Base 'registry-fetch'
+    New-Item -ItemType Directory -Force -Path $fetched | Out-Null
     while ($true) {
         $script:Log.Clear()
-        $out = @(& $Npm 'view' '--prefer-online' "$Package@$Version" 'version' 2>&1)
-        $seen = ''
-        foreach ($line in $out) {
-            if ($line -is [System.Management.Automation.ErrorRecord]) { $script:Log.Add("$line") } else { $seen = "$line".Trim() }
-        }
-        if ($seen -eq $Version) { return $true }
+        $out = @(& $Npm 'pack' '--prefer-online' '--pack-destination' $fetched "$Package@$Version" 2>&1)
+        $code = $LASTEXITCODE
+        foreach ($line in $out) { $script:Log.Add("$line") }
+        if ($code -eq 0) { return $true }
         if ($waited -ge $RegistryBound) { return $false }
         Start-Sleep -Seconds $RegistryPoll
         $waited += $RegistryPoll
@@ -281,7 +282,7 @@ function Test-PackageRoute {
     $npm = Get-Command npm -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $npm) { Write-Bad 'registry' 'npm does not resolve on PATH'; return $false }
     if (-not (Test-RegistryVisible $npm.Source)) {
-        Write-Bad 'registry' "npm view $Package@$Version version named no $Version within $($RegistryBound)s of polling"
+        Write-Bad 'registry' "npm pack $Package@$Version fetched no tarball within $($RegistryBound)s of polling"
         return $false
     }
     Write-Ok 'registry'

@@ -189,11 +189,13 @@ first_upgrade() {
     commit_lands 'commit after the update' || return 1
 }
 
+# spec: RELEASING.md §The front-door rehearsal — the tarball itself, which the registry can serve after the metadata names the version
 registry_visible() {
-    local waited=0
+    local waited=0 fetched="$base/registry-fetch"
+    mkdir -p "$fetched" || return 1
     while :; do
         : > "$log"
-        [ "$(npm view --prefer-online "$package@$version" version 2>> "$log")" = "$version" ] && return 0
+        npm pack --prefer-online --pack-destination "$fetched" "$package@$version" >> "$log" 2>&1 && return 0
         [ "$waited" -ge "$registry_bound" ] && return 1
         sleep "$registry_poll"
         waited=$((waited + registry_poll))
@@ -202,7 +204,7 @@ registry_visible() {
 
 package_route() {
     new_repo 'package' package || { bad 'repository' 'git init failed'; return 1; }
-    registry_visible || { bad 'registry' "npm view $package@$version version named no $version within ${registry_bound}s of polling"; return 1; }
+    registry_visible || { bad 'registry' "npm pack $package@$version fetched no tarball within ${registry_bound}s of polling"; return 1; }
     ok 'registry'
     run npx --yes "$package@$version" init || { bad 'init' "npx $package@$version init exited non-zero"; return 1; }
     [ -f "$repo/$lock" ] || { bad 'init' "the install left no $lock"; return 1; }
