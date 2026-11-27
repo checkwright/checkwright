@@ -26,14 +26,6 @@
 
 **Push need (2026-11-27, inside the budget):** one mid-iteration push after its build batch, since the Windows junction case runs only on the remote Windows legs; the batch's other native fixes ride the same push.
 
-### wakeup-log-write-unreported
-
-wakeup-guard's denial says 'Attempt logged.' when `append_attempt` (native/src/hook/wakeup.rs) cannot open or write the log, since it discards both errors, so a tree-free absolute log under a missing directory loses the record while the denial claims it. guard-kit/SPEC.md §wakeup-guard names only knob and `--knobs` faults as unlogged.
-
-**Deliverable:** debt: the denial's wording follows the append's outcome, with a case for an unwritable log.
-
-**Cost while deferred:** an adopter's attempt log misses denied attempts while the model is told they were logged. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: both results discarded. Owner lookup: `append_attempt`, `Attempt logged` in this file, none; owner guard-kit/SPEC.md §wakeup-guard.
-
 ### weekly-pair-shape-check
 
 [not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
@@ -1023,4 +1015,6 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- wakeup-log-write-unreported
 
