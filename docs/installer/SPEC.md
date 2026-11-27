@@ -669,7 +669,11 @@ The trim runs through the payload's own copy of doctrine-kit's installer ([doctr
 
 **The commit** is one commit naming the profile and the version, staging the removals and the manifest disposition. Files kept for you are never staged, on the reasoning that keeps `init`'s written set and its recorded roster apart. A run with nothing to remove says so and exits 0 without narrowing the manifest: the install is still there, so disowning it would be false. A failed commit leaves the removal staged and relays git's account, as `init`'s does ([§init](#init)), and names the hook that judged it under the same reads: `the commit failed, and your <hook> hook in <dir> judged it — the removal is staged`. Its help names the removed kit directories and offers no `--no-commit`, since a re-run has nothing left to remove: the manifest is already gone or narrowed to the kept files. It prints no follow-up block. The gate hooks directory is removed before this commit while `core.hooksPath` may still name it, so git runs no hook from it, the trace records none, and the line stays as it is.
 
-**`uninstall --user`** reverses a user install ([§The user install](#the-user-install)) against `user.lock`, and requires it as `update --user` does, at exit 1. It reads no repository and commits nothing. In order, it:
+**`uninstall --user`** reverses a user install ([§The user install](#the-user-install)) against `user.lock`, and requires it as `update --user` does, at exit 1. It reads no repository and commits nothing.
+
+**Nothing is removed through a link.** The binary's path, the knobs directory and each `files` key are read below the data dir before the first removal, `--dry-run` and `--force` alike. A link or junction at any component, the last included, refuses at exit 2 naming the path and the link. A key passing [§The user manifest](#the-user-manifest)'s shape check still reaches outside the install through a directory link. The data dir itself is the adopter's to point.
+
+In order, it:
 
 - removes the binary whatever its hash, because the install owns that path and an edited binary is no adopter's work; a removal that fails, as over a running image on Windows, refuses at exit 1 before anything else is removed;
 - removes each knob file whose hash matches `user.lock`, and keeps and names one that differs unless `--force` is given;

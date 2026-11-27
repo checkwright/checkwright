@@ -255,8 +255,12 @@ fn spell(p: &Path) -> String {
     p.to_string_lossy().into_owned()
 }
 
+fn binary_rel() -> String {
+    format!("{}/{}{}", BIN_DIR, env!("CARGO_PKG_NAME"), std::env::consts::EXE_SUFFIX)
+}
+
 fn binary(d: &Dirs) -> PathBuf {
-    d.data.join(BIN_DIR).join(format!("{}{}", env!("CARGO_PKG_NAME"), std::env::consts::EXE_SUFFIX))
+    at_rel(d, &binary_rel())
 }
 
 fn knob_rel(member: &str) -> String {
@@ -635,6 +639,20 @@ fn update(d: &Dirs, f: &Flags, out: &mut dyn Write) -> Result<i32, Refusal> {
 fn uninstall(d: &Dirs, f: &Flags, out: &mut dyn Write) -> Result<i32, Refusal> {
     let lock_path = d.data.join(LOCK_FILE);
     let lock = UserLock::read(&lock_path)?.ok_or_else(|| no_lock("uninstall", d))?;
+    let bin_rel = binary_rel();
+    // spec: installer/SPEC.md §uninstall — every path the user form removes or prunes, read for a
+    // link or junction below the data dir before the first removal
+    for rel in [bin_rel.as_str(), BIN_DIR, KNOBS_DIR].into_iter().chain(lock.files.keys().map(String::as_str)) {
+        let link = super::link_below(&d.data, rel)
+            .map_err(|e| refuse(format!("could not read where {} lands: {}", spell(&at_rel(d, rel)), e), "", exit::INPUT))?;
+        if let Some(at) = link {
+            return Err(refuse(
+                format!("{} reaches through a link at {}", spell(&at_rel(d, rel)), spell(&at_rel(d, &at))),
+                "uninstall --user removes only what lies inside the data dir, and a link or junction there could reach a file outside it. Replace the link with the directory or file itself, or remove it, then re-run.",
+                exit::REFUSED,
+            ));
+        }
+    }
     let bin = binary(d);
     let mut remove: Vec<PathBuf> = Vec::new();
     let mut kept: BTreeMap<String, String> = BTreeMap::new();
@@ -1018,6 +1036,72 @@ mod tests {
         }
         std::fs::write(&lock_path, &good).expect("restore");
         uninstall(&d, &flags(false, true), &mut Vec::new()).expect("the restored manifest refused");
+        assert!(!d.data.exists() && victim.is_file());
+    }
+
+    fn link_dir(target: &Path, at: &Path) {
+        #[cfg(unix)]
+        std::os::unix::fs::symlink(target, at).expect("cannot link a directory");
+        #[cfg(windows)]
+        {
+            let status = std::process::Command::new("cmd")
+                .args(["/C", "mklink", "/J"])
+                .arg(at)
+                .arg(target)
+                .status()
+                .expect("cmd did not spawn");
+            assert!(status.success(), "mklink /J failed: {}", status);
+        }
+    }
+
+    fn unlink_dir(at: &Path) {
+        #[cfg(unix)]
+        std::fs::remove_file(at).expect("cannot remove the link");
+        #[cfg(windows)]
+        std::fs::remove_dir(at).expect("cannot remove the junction");
+    }
+
+    // spec: installer/SPEC.md §uninstall — a link or junction below the data dir on a path the user
+    // form removes or prunes refuses at exit 2 before anything is removed, a forced or dry run
+    // included, and nothing outside the data dir is touched
+    #[test]
+    fn a_link_inside_the_data_dir_refuses_the_removal() {
+        let s = Scratch::new("contained");
+        let d = s.dirs();
+        init(&s, &d, "1.2.0", &flags(false, false)).expect("init");
+        let outside = s.0.join("outside");
+        std::fs::create_dir_all(&outside).expect("outside");
+        let victim = outside.join("victim");
+        std::fs::write(&victim, b"not the install's\n").expect("victim");
+        let hash = sha256::file_hex(&victim).expect("hash");
+        let lock_path = d.data.join(LOCK_FILE);
+        let good = std::fs::read_to_string(&lock_path).expect("lock");
+        let mut doc: Value = serde_json::from_str(&good).expect("lock JSON");
+        doc["files"]["escape/victim"] = Value::String(hash);
+        std::fs::write(&lock_path, doc.to_string()).expect("tamper");
+        let escape = d.data.join("escape");
+        link_dir(&outside, &escape);
+        for f in [flags(false, true), flags(true, true), flags(false, false)] {
+            let mut out = Vec::new();
+            let r = uninstall(&d, &f, &mut out).expect_err("a removal through a link passed");
+            assert!(r.code == exit::REFUSED && r.message.contains(&format!("a link at {}", spell(&escape))), "{}", r.message);
+            assert!(out.is_empty() && victim.is_file() && binary(&d).is_file(), "a refused removal wrote or removed");
+        }
+        unlink_dir(&escape);
+        std::fs::write(&lock_path, &good).expect("restore");
+        for (dir, rel) in [(BIN_DIR, binary_rel()), (KNOBS_DIR, knob_rel(MEMBER))] {
+            let real = d.data.join(dir);
+            let aside = s.0.join(format!("aside-{}", dir));
+            std::fs::rename(&real, &aside).expect("move the dir aside");
+            link_dir(&aside, &real);
+            let r = uninstall(&d, &flags(false, true), &mut Vec::new()).expect_err(dir);
+            assert!(r.code == exit::REFUSED && r.message.contains(&format!("a link at {}", spell(&real))), "{}: {}", dir, r.message);
+            let leaf = rel.rsplit('/').next().expect("a leaf");
+            assert!(aside.join(leaf).is_file(), "{}: the link's target lost {}", dir, leaf);
+            unlink_dir(&real);
+            std::fs::rename(&aside, &real).expect("move the dir back");
+        }
+        uninstall(&d, &flags(false, false), &mut Vec::new()).expect("the plain install refused");
         assert!(!d.data.exists() && victim.is_file());
     }
 
