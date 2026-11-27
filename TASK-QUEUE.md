@@ -276,6 +276,26 @@ The platform archives have no published `.sha256` sidecar and no build attestati
 
 **Cost while deferred:** a binary-only consumer verifies nothing it downloads. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: `subject-path` names `checkwright-*.tgz`. Observed at v0.41.0's publish: the x86_64-unknown-linux-gnu archive's binary is `-rwxr-xr-x`, and no archive has a sidecar on the Release. Owner lookup: `sidecar`, `attest`, `subject-path` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The dependency boundary.
 
+### verdict-key-version-token
+
+[cost: event/low] [surface: gate-sdk]
+
+`--verdict-key` can print a `tool.version` that `--verdict-lookup` refuses. The release stamp keeps any `CHECKWRIGHT_BUILD_VERSION` bytes after a leading `v` (`stamp` in native/src/release_stamp.rs), while `version_token` in native/src/verdict_store.rs admits only ASCII alphanumerics and `.+-`. So a build stamped `v1.2.3_review` keys and stores under a version the lookup refuses at exit 2, against gate-sdk/SPEC.md §run-gates naming the key's fields the lookup's operands.
+
+**Deliverable:** debt: one grammar for the stamp and the lookup's version operand, so every key a stamped build prints is a lookup's operand, with a case.
+
+**Cost while deferred:** a verdict stored under such a stamp is unreachable by lookup, so an adopter keying CI runs with `--verdict-key` re-runs what it stored. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: `stamp` returns its input trimmed and `v`-stripped, unfiltered. Owner lookup: `version_token`, `release_stamp`, `verdict-key` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
+### turbofish-fn-pointer-arrow
+
+[cost: event/low] [surface: gate-sdk]
+
+The Rust code reader drops a turbofish call whose type argument holds a fn-pointer arrow: `back_over_angles` in native/src/rust_code.rs counts the `>` of `->` as a closing angle, so `f::<fn() -> ()>()` reads as no call and `check-exec-write` passes such a site, against gate-sdk/SPEC.md §The Rust code reader reading each call with its turbofish removed.
+
+**Deliverable:** debt: the backward angle scan skips the `>` of `->`, with a case.
+
+**Cost while deferred:** an exec or write call spelled with such a turbofish escapes the gates the reader feeds. Surfaced 2026-11-27 by locale-verdict-key-pass' close second-vendor review, source-read; filed at the next scope. Re-verified here: the scan counts every `>`. Owner lookup: `back_over_angles`, `turbofish` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The Rust code reader.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
