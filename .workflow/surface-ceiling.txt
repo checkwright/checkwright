@@ -11,7 +11,7 @@
 9572cp .claude/commands/close.md
 2355cp .claude/commands/consult.md
 1451cp .claude/commands/economics.md
-5275cp .claude/commands/lead.md
+5237cp .claude/commands/lead.md
 714cp .claude/commands/release-sweep.md
 6970cp .claude/commands/scope.md
 1155cp .claude/commands/spec.md
@@ -113,11 +113,11 @@
 2698cp drift-kit/templates/close-knowledge.md
 4680cp drift-kit/templates/economics.md
 128674cp evidence-kit/SPEC.md
-1203402cp gate-sdk/SPEC.md
+1206698cp gate-sdk/SPEC.md
 3130cp gate-sdk/templates/adopt.md
 356868cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
-332930cp installer/SPEC.md
+333277cp installer/SPEC.md
 412820cp lifecycle-kit/SPEC.md
 8155cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
@@ -133,7 +133,7 @@
 10536cp lifecycle-kit/templates/stages/spec.md
 6518cp lifecycle-kit/templates/stages/validate.md
 2830cp lifecycle-kit/templates/upgrade.md
-25257cp plugin/SPEC.md
+25230cp plugin/SPEC.md
 160137cp queue-kit/SPEC.md
 1392cp queue-kit/templates/TASK-QUEUE.md
 63268cp site-kit/SPEC.md

@@ -3,3 +3,13 @@ jobs:
     steps:
       - run: |
           bash gate-sdk/bin/run-gates.sh --only check-release-assets -- --dist "$out" "$version"
+
+      - uses: actions/attest-build-provenance@0000000000000000000000000000000000000000 # v4
+        with:
+          subject-path: ${{ runner.temp }}/dist/app-*.tgz
+
+      - name: attest the archives
+        uses: actions/attest-build-provenance@0000000000000000000000000000000000000000 # v4
+        with:
+          subject-path: |
+            ${{ runner.temp }}/dist/app-gates-*.tar.gz

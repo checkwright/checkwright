@@ -157,12 +157,11 @@ jobs:
             exit 1
           fi
 
-          # spec: gate-sdk/SPEC.md §Consumer payload — the digest, computed where the bytes are produced
-          ( cd "$out" && sha256sum "$(basename "$tarball")" > "$(basename "$tarball").sha256" )
           echo "packed $(basename "$tarball") at version $packed"
 
           # spec: gate-sdk/SPEC.md §Consumer payload — one archive per roster target, drawn from the packed payload so the packer's mode restore reaches it
           stage="$RUNNER_TEMP/release-archives"
+          archives=()
           while IFS= read -r target; do
             name="$binary$(gate_exe_suffix "$target")"
             dir="$binary-$version-$target"
@@ -170,7 +169,11 @@ jobs:
             tar -xzpf "$tarball" -C "$stage/$dir" --strip-components=4 \
               "package/payload/artifact/$target/$name" "package/payload/artifact/$target/$name.sha256"
             tar -czf "$out/$dir.tar.gz" -C "$stage" "$dir"
+            archives+=("$dir.tar.gz")
           done < <(gate_native_targets)
+
+          # spec: gate-sdk/SPEC.md §Consumer payload — each digest, computed where the bytes are produced
+          ( cd "$out" && for f in "$(basename "$tarball")" "${archives[@]}"; do sha256sum "$f" > "$f.sha256"; done )
 
           # spec: companion/SPEC.md §Packing the extension — the Spec Kit extension's archive and sidecar, stamped with the tag's version
           bash scripts/ci-pack-extension.sh "$version" "$out"
@@ -181,6 +184,13 @@ jobs:
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: ${{ runner.temp }}/dist/checkwright-*.tgz
+
+      # spec: gate-sdk/SPEC.md §Consumer payload — every Release asset other than a sidecar is attested, the archives in one attestation
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            ${{ runner.temp }}/dist/checkwright-gates-*.tar.gz
+            ${{ runner.temp }}/dist/checkwright-companion-*.zip
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -299,11 +309,6 @@ jobs:
           name="$(basename "${tarballs[0]}")"
           assets=("dist/$name" "dist/$name.sha256")
 
-          # spec: installer/SPEC.md §The dependency boundary — no Release exists for a tarball that fails its own attestation
-          gh attestation verify "dist/$name" --repo "$GH_REPO" \
-            --signer-workflow "$GH_REPO/.github/workflows/publish.yml" \
-            --source-ref "refs/tags/$TAG"
-
           # spec: gate-sdk/SPEC.md §Consumer payload — the per-target archives, a digest source outside the payload
           for f in dist/*; do
             case "${f##*/}" in
@@ -316,6 +321,14 @@ jobs:
             ls -l dist >&2
             exit 1
           fi
+
+          # spec: gate-sdk/SPEC.md §Consumer payload — no Release exists for an asset that fails its own attestation
+          for f in "${assets[@]}"; do
+            case "$f" in *.sha256) continue ;; esac
+            gh attestation verify "$f" --repo "$GH_REPO" \
+              --signer-workflow "$GH_REPO/.github/workflows/publish.yml" \
+              --source-ref "refs/tags/$TAG"
+          done
 
           # spec: RELEASING.md §The front-door rehearsal — the release before this one, read before this one is created or edited; empty where none is published
           previous="$(gh release list --exclude-drafts --limit 30 --json tagName,publishedAt \

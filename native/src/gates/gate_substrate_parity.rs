@@ -1024,7 +1024,7 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         for j in workflow_digests(&text, &mut wf_followed).map_err(Fault::input)? {
             wf_jobs += 1;
             if j.computed > 1 {
-                ctx.findings.push(format!("digest recomputed: job '{}' in {} computes {} digests — each is emitted once, where its bytes are produced, and moved thereafter", j.job, workflow, j.computed));
+                ctx.findings.push(format!("digest recomputed: job '{}' in {} carries {} digest emissions — each is emitted once, where its bytes are produced, and moved thereafter", j.job, workflow, j.computed));
             } else if j.computed > 0 && j.downloads && !j.uploads {
                 ctx.findings.push(format!("digest computed by a consumer: job '{}' in {} downloads a run artifact, produces none, and still computes a digest — it must move the sidecar it received, never re-derive it", j.job, workflow));
             }

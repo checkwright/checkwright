@@ -14,20 +14,6 @@
 
 ## New Features
 
-### release-archive-provenance
-
-[spec: SPEC-archive-provenance.md]
-
-The platform archives have no published `.sha256` sidecar and no build attestation: the attest step (.github/workflows/publish.yml) names the npm tgz alone, and each archive's sha256 sits inside the archive it vouches for, so a consumer cannot pin an archive without trusting that file.
-
-**Deliverable:** the amendment's five deltas: a `.sha256` beside every Release asset and a build attestation over every non-sidecar asset (the tarball's unchanged, the archives' a second), the `release` job verifying each before the Release exists, and `check-release-assets` holding the sidecar templates and attest subjects in its battery half and each sidecar's content in its publish half, with fixtures.
-
-**First-run risk (2026-11-27, lead decision):** the publish.yml edits first execute on the tag's `publish` run; close's procedure for a red publish run, a re-run or a hotfix push inside the budget, is the backstop.
-
-**Cost while deferred:** a binary-only consumer verifies nothing it downloads. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: `subject-path` names `checkwright-*.tgz`. Observed at v0.41.0's publish: the x86_64-unknown-linux-gnu archive's binary is `-rwxr-xr-x`, and no archive has a sidecar on the Release. Owner lookup: `sidecar`, `attest`, `subject-path` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The dependency boundary.
-
-Its observe half is [archive-provenance-observe](#archive-provenance-observe), split at scope 2026-11-27 since only a release run reads it.
-
 ## Technical Debt
 
 ### verdict-key-version-token
@@ -320,7 +306,7 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 
 [cost: event/low] [surface: installer] [observed-by: publish]
 
-The observe half of [release-archive-provenance](#release-archive-provenance): the first release `publish` run after it lands is the only run that attaches the per-archive sidecars and attests the archives.
+The observe half of `release-archive-provenance`: the first release `publish` run after it lands is the only run that attaches the per-archive sidecars and attests the archives.
 
 **Deliverable:** debt: read that run's Release assets and attestation, each platform archive carrying its `.sha256` sidecar and verifying with `gh attestation verify`; a miss is filed as a defect.
 
@@ -1073,4 +1059,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - codex-plugin-version-pin
+- release-archive-provenance
 
