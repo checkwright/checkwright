@@ -26,14 +26,6 @@
 
 **Push need (2026-11-27, inside the budget):** one mid-iteration push after its build batch, since the Windows junction case runs only on the remote Windows legs; the batch's other native fixes ride the same push.
 
-### release-assets-coverage
-
-`check-release-assets` attests less than gate-sdk/SPEC.md §check-release-assets says. A `>` folded `subject-path` block is read line by line (native/src/gates/release_assets.rs `key_value`), though YAML folds it into one space-joined value the action does not split, so the gate passes a block the attest step fails. And the attest arm proves overlap, not coverage: a glob narrowed to one target or version satisfies the whole template, and the publish half never matches the expanded names against the globs.
-
-**Deliverable:** debt: read a `>` block as one folded entry, and under `--dist` match each expanded non-sidecar asset name against the globs, with the SPEC's subject read restated to match and a case for each.
-
-**Cost while deferred:** none ships wrong today, since publish.yml uses `|` and globs naming every target; a narrowed or folded subject would ship an asset unattested, caught only by the release job's per-asset verify. Surfaced 2026-11-27 as two inbox bullets from release-provenance-pass' close second-vendor review; filed at the next scope. Re-verified: `key_value` treats `|` and `>` alike, and `subject_matches` matches template text. Owner lookup: `check-release-assets`, `subject-path`, `folded` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-release-assets.
-
 ### binary-only-archive-route
 
 docs/binary-only.md takes the binary out of the whole Release tarball, since a per-target archive carries no `.gate` descriptor. Once the install pin names a release whose archives carry `.sha256` sidecars and an attestation, the page can offer the archive for the binary with `sha256sum -c` and `gh attestation verify`, and the tarball for the descriptors alone.
@@ -999,4 +991,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - wakeup-log-write-unreported
 - weekly-pair-shape-check
 - price-row-shape-strictness
+- release-assets-coverage
 
