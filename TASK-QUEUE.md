@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: release-provenance-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-27, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** the two carried gap-inbox debts and the release-surface units the adopter's archive ask leads. Debt: `verdict-key-version-token`, `turbofish-fn-pointer-arrow` and `front-door-registry-readiness`. Feature for spec to author: `release-archive-provenance`. Both release units' observe halves, `archive-provenance-observe` and `registry-readiness-observe`, are split off deferred, since only a release `publish` run reads them. `release-record-gates`, `user-uninstall-containment` and `exit-status-funnel-typing` stay deferred against the budget.
-
-  **The release and pushes (2026-11-27, lead decision under the same delegation, not a ruling):** a cut at this iteration's close is granted, which `release-archive-provenance` needs for its proof. Push need 1 against 2, inside the budget: the closing push, which also carries the two close commits already on master locally; the release tag push is the cut's.
 
 ---
 
