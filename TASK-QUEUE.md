@@ -24,16 +24,6 @@ A gate that parses a child's output, git's stderr wording or a tool's message, r
 
 **Cost while deferred:** a localized host can turn a recognized git answer into an unrecognized one. Surfaced 2026-11-27 as the orchestrator adopter's first ask, adopter direction, lead-relayed; filed at this scope. Owner lookup: `LC_ALL`, `locale` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Fail-closed contract.
 
-### migration-guard-silent-skips
-
-[spec: SPEC-migration-silent-skips.md]
-
-Three readings of check-migration-guard (native/src/gates/migration_guard.rs) pass unseen. Its clash check skips a ref sharing no merge base with the base ref (`ref_additions`, `merge-base` exit 1), and the clean line counts the refs read, never the refs skipped, so a shallow consumer CI loses CLASH without a word. Its already-landed skip is grounded on a same-named addition stopping at an add/add conflict, which `merge=union` on `*.sql` merges cleanly, so branch-only destructive SQL can land unread. And both attribute readings inherit `core.attributesFile` as well as `.git/info/attributes`, while the section's honest limit names the second alone.
-
-**Deliverable:** design-pending, a feature: the skipped refs visible, a line naming them or exit 3 under a strict flag, the adopter's two options, fixed and not only stated; and both other limits stated in gate-sdk/SPEC.md §check-migration-guard, with sandbox cases for the skip.
-
-**Cost while deferred:** a shallow CI clone judges no clash and says nothing. Surfaced 2026-11-27 as the orchestrator adopter's second and third asks, adopter direction, lead-relayed, and 2026-11-26 by migration-parity-pass' close second-vendor review and baked-calibration audit, three inbox bullets carried from its close; filed at this scope. Re-verified here at source: the `Some(1)` arm continues, and the section grounds the skip on add/add. Owner lookup: `merge=union`, `attributesFile`, `shallow` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
-
 ### verdict-key-arm
 
 [spec: SPEC-verdict-key.md]
@@ -1074,4 +1064,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - release-archive-binary-mode
 - run-arm-smoke-fixes
 - binary-only-doc-gaps
+- migration-guard-silent-skips
 

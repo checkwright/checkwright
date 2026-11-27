@@ -211,7 +211,7 @@ expect precedence-dup 1 'db/migrations/0003_b.sql: [MIGRATION-DUP] 0003 also 000
 expect precedence-clash 1 'db/migrations/0003_a.sql: [MIGRATION-CLASH] 0003 refs/heads/sib 0003_q.sql' "$rc" "$out"
 refute precedence-one 'db/migrations/0003_b.sql: [MIGRATION-CLASH]' "$out"
 
-# --- the ref set: a detached HEAD excludes no ref, an orphan is skipped, `none` turns the check
+# --- the ref set: a detached HEAD excludes no ref, an orphan is skipped and named, `none` turns the check
 # off, a glob narrows it, and a glob opening with '-' is refused at 2.
 r="$(fresh detached)"
 on "$r" topic 0003_c.sql 'CREATE TABLE c (id INTEGER);'
@@ -231,7 +231,41 @@ git -C "$r" fetch -q "$o" main:refs/heads/lone
 printf 'CREATE TABLE m (id INTEGER);\n' > "$r/db/migrations/0003_mine.sql"
 out="$(guard "$r")"; rc=$?
 expect orphan 0 'clean (3 migration(s), 1 added, against merge base' "$rc" "$out"
-expect orphan-unread 0 ', 0 other ref(s) read' "$rc" "$out"
+expect orphan-named 0 ', 0 other ref(s) read, 1 unrelated ref(s) skipped: refs/heads/lone)' "$rc" "$out"
+
+# --- an unrelated ref under each GATE_SDK_MIGRATION_UNRELATED_REFS value: named on a red run's
+# header under the default, refused at 3 under `error`, and an unknown value refused at 2.
+unrelated() {  # unrelated <repo> <value> — the gate in <repo> under GATE_SDK_MIGRATION_UNRELATED_REFS=<value>
+    ( cd "$1" && gate_env GATE_SDK_MIGRATION_DIR=db/migrations GATE_SDK_MIGRATION_DESTRUCTIVE="$LIST" \
+        GATE_SDK_MIGRATION_UNRELATED_REFS="$2" && gate_run check-migration-guard "$CHECKS" 2>&1 )
+}
+out="$(unrelated "$r" error)"; rc=$?
+expect orphan-error 3 '1 ref(s) share no merge base with the base ref, so their additions cannot be read: refs/heads/lone' "$rc" "$out"
+expect orphan-remedy 3 'fetch the history their merge base needs, or narrow GATE_SDK_MIGRATION_REFS past them' "$rc" "$out"
+refute orphan-error-clean 'clean (' "$out"
+out="$(unrelated "$r" strict)"; rc=$?
+expect unrelated-unknown 2 "GATE_SDK_MIGRATION_UNRELATED_REFS must be off|error (got 'strict')" "$rc" "$out"
+printf 'CREATE TABLE z (id INTEGER);\n' > "$r/db/migrations/0001_z.sql"
+out="$(unrelated "$r" off)"; rc=$?
+expect orphan-red-header 1 ', 1 unrelated ref(s) skipped: refs/heads/lone:' "$rc" "$out"
+rm "$r/db/migrations/0001_z.sql"
+
+# --- a shallow clone: a sibling forked before the base's last commit has its merge base cut, so it
+# is named rather than read.
+o="$(fresh shallow-src)"
+git -C "$o" checkout -q main
+on "$o" sib 0003_t.sql 'CREATE TABLE t (id INTEGER);'
+git -C "$o" checkout -q main
+printf 'later\n' > "$o/LATER"
+git -C "$o" add LATER && git -C "$o" -c user.name=t -c user.email=t@e.invalid commit -qm later
+r="$SANDBOX/shallow"
+git clone -q --depth 1 --no-single-branch --branch main "file://$o" "$r"
+git -C "$r" branch -q sib origin/sib && git -C "$r" checkout -qb topic
+printf 'CREATE TABLE m (id INTEGER);\n' > "$r/db/migrations/0003_mine.sql"
+out="$(guard "$r")"; rc=$?
+expect shallow-named 0 ', 0 other ref(s) read, 1 unrelated ref(s) skipped: refs/heads/sib)' "$rc" "$out"
+out="$(unrelated "$r" error)"; rc=$?
+expect shallow-error 3 'refs/heads/sib' "$rc" "$out"
 r="$SANDBOX/clash"
 refs() {  # refs <value> — the gate in the clash repository under GATE_SDK_MIGRATION_REFS=<value>
     ( cd "$r" && gate_env GATE_SDK_MIGRATION_DIR=db/migrations GATE_SDK_MIGRATION_DESTRUCTIVE="$LIST" \

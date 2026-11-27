@@ -11,6 +11,7 @@ const NAME: &str = "check-migration-guard";
 const DIR_KNOB: &str = "GATE_SDK_MIGRATION_DIR";
 const LIST_KNOB: &str = "GATE_SDK_MIGRATION_DESTRUCTIVE";
 const REFS_KNOB: &str = "GATE_SDK_MIGRATION_REFS";
+const UNRELATED_KNOB: &str = "GATE_SDK_MIGRATION_UNRELATED_REFS";
 const USAGE: &str = "usage: check-migration-guard [--base <ref> | --base-dir <dir>]";
 const WAIVER: &str = "migration-ok:";
 
@@ -154,10 +155,11 @@ fn git_failed(c: &proc::Completed, what: &str) -> Fault {
     Fault::tool(c.failure_report().map_or_else(|| format!("{} failed", what), |r| format!("{} failed: {}", what, r)))
 }
 
-// spec: gate-sdk/SPEC.md §check-migration-guard — the ref set: each ref the globs match that the base
-// ref's commit lacks, less `HEAD`'s own, an orphan or a shallow cut skipped; a ref's additions are
-// its directory's files its merge base with the base ref lacks
-fn ref_additions(b: &since_base::Base, dir_top: &str, globs: &[String]) -> Result<Vec<(String, Files)>, Fault> {
+type RefSet = (Vec<(String, Files)>, Vec<String>);
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — the ref set and each ref's additions; a ref sharing
+// no merge base with the base ref is returned apart, as unrelated
+fn ref_additions(b: &since_base::Base, dir_top: &str, globs: &[String]) -> Result<RefSet, Fault> {
     let head = git(&b.top, &["symbolic-ref", "-q", "HEAD"])?;
     let own = match (head.stdout(), head.code()) {
         (Some(o), _) => Some(String::from_utf8_lossy(o).trim().to_string()),
@@ -169,18 +171,31 @@ fn ref_additions(b: &since_base::Base, dir_top: &str, globs: &[String]) -> Resul
     let listed = git(&b.top, &args)?;
     let refs = listed.stdout().ok_or_else(|| git_failed(&listed, "git for-each-ref"))?;
     let mut out = Vec::new();
+    let mut unrelated = Vec::new();
     for r in String::from_utf8_lossy(refs).lines().filter(|r| !r.is_empty() && Some(*r) != own.as_deref()) {
         let mb = git(&b.top, &["merge-base", r, &b.tip])?;
         let mb = match (mb.stdout(), mb.code()) {
             (Some(o), _) => String::from_utf8_lossy(o).trim().to_string(),
-            (None, Some(1)) => continue,
+            (None, Some(1)) => {
+                unrelated.push(r.to_string());
+                continue;
+            }
             (None, _) => return Err(git_failed(&mb, &format!("git merge-base {}", r))),
         };
         let names = listing::names(Some(&b.top), &["diff", "--name-only", "-z", "--no-renames", "--diff-filter=A", &mb, r, "--", dir_top])
             .map_err(|e| Fault::tool(e.text()))?;
         out.push((r.to_string(), readable(under(names, dir_top))));
     }
-    Ok(out)
+    Ok((out, unrelated))
+}
+
+// spec: gate-sdk/SPEC.md §check-migration-guard — the clause naming each unrelated ref, on the clean
+// line after the count of refs read and on a red run's header before its closing colon
+fn unrelated_clause(unrelated: &[String]) -> String {
+    if unrelated.is_empty() {
+        return String::new();
+    }
+    format!(", {} unrelated ref(s) skipped: {}", unrelated.len(), unrelated.join(" "))
 }
 
 #[derive(Debug, PartialEq)]
@@ -472,7 +487,7 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
     let dir_top = format!("{}{}", prefix()?, dir);
     let work = files(&dir, working(&top, &dir_top)?)?;
 
-    let (base, edited, drift, tip, refs, what, clash) = match against {
+    let (base, edited, drift, tip, refs, what, clash, skipped) = match against {
         Against::Base(flag) => {
             let b = since_base::resolve(flag.as_deref())?;
             let base = files(&dir, under(b.files_at_base(&dir_top)?, &dir_top))?;
@@ -480,18 +495,30 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
             let (edited, drift) = checkout_edits(&b, &dir, &dir_top, &base, &work)?;
             let tip = readable(under(b.files_at_tip(&dir_top)?, &dir_top));
             let globs = walk::knob_words(REFS_KNOB).map_err(Fault::refused)?;
-            let (refs, clash) = if globs == ["none"] {
-                (Vec::new(), format!("; clash check off: {} is none", REFS_KNOB))
+            let (refs, clash, skipped) = if globs == ["none"] {
+                (Vec::new(), format!("; clash check off: {} is none", REFS_KNOB), String::new())
             } else {
-                let refs = ref_additions(&b, &dir_top, &globs)?;
+                let policy = walk::knob_scalar(UNRELATED_KNOB).map_err(Fault::refused)?;
+                let (refs, unrelated) = ref_additions(&b, &dir_top, &globs)?;
+                if policy == "error" && !unrelated.is_empty() {
+                    return Err(Fault::input(format!(
+                        "{} ref(s) share no merge base with the base ref, so their additions cannot be read: {} — fetch the history \
+                         their merge base needs, or narrow {} past them ({} is error)",
+                        unrelated.len(),
+                        unrelated.join(" "),
+                        REFS_KNOB,
+                        UNRELATED_KNOB
+                    )));
+                }
                 let read = format!(", {} other ref(s) read", refs.len());
-                (refs, read)
+                (refs, read, unrelated_clause(&unrelated))
             };
-            (base, edited, drift, tip, refs, format!("merge base {}", b.short()), clash)
+            (base, edited, drift, tip, refs, format!("merge base {}", b.short()), clash, skipped)
         }
         Against::Dir(d) => {
             let (base, edited) = from_dir(&d, &dir, &work)?;
-            (base, edited, Vec::new(), Files::new(), Vec::new(), d, "; clash check off: no base ref under --base-dir".to_string())
+            let off = "; clash check off: no base ref under --base-dir".to_string();
+            (base, edited, Vec::new(), Files::new(), Vec::new(), d, off, String::new())
         }
     };
 
@@ -509,12 +536,12 @@ fn inner(args: &[String]) -> Result<i32, Fault> {
 
     if out.is_empty() {
         let off = if list.is_none() { format!("; destructive check off: no list at {}", list_path) } else { String::new() };
-        println!("MIGRATION-GUARD: clean ({} migration(s), {} added, against {}{}{})", work.len(), added.len(), what, clash, off);
+        println!("MIGRATION-GUARD: clean ({} migration(s), {} added, against {}{}{}{})", work.len(), added.len(), what, clash, skipped, off);
         return Ok(0);
     }
     println!(
-        "{}: migration(s) under {} edited, out of order, duplicated, clashing, destructive or re-attributed against {}:",
-        NAME, dir, what
+        "{}: migration(s) under {} edited, out of order, duplicated, clashing, destructive or re-attributed against {}{}:",
+        NAME, dir, what, skipped
     );
     for r in &out {
         println!("{}", r);

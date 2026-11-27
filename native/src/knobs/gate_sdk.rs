@@ -187,6 +187,14 @@ fn refs_refusals(v: &Values) -> Vec<String> {
     errs
 }
 
+// spec: gate-sdk/SPEC.md §Layout and configuration — what an unrelated ref costs takes its two
+// values only, so a misspelt `error` refuses rather than reads as `off`
+fn unrelated_refs_refusal(v: &Values) -> Option<String> {
+    scalar(v, "GATE_SDK_MIGRATION_UNRELATED_REFS")
+        .filter(|s| !matches!(*s, "off" | "error"))
+        .map(|s| format!("GATE_SDK_MIGRATION_UNRELATED_REFS must be off|error (got '{}')", s))
+}
+
 // spec: installer/SPEC.md §The update notice — the interval takes its three values only, so a
 // misspelt `off` refuses rather than reads as the default
 fn validate(v: &Values) -> Vec<String> {
@@ -203,6 +211,7 @@ fn validate(v: &Values) -> Vec<String> {
     }
     errs.extend(floor_refusals(v));
     errs.extend(refs_refusals(v));
+    errs.extend(unrelated_refs_refusal(v));
     // spec: installer/SPEC.md §The upgrade contract — the refusals are the roster module's, so the
     // validator and every reader share one reading of an element
     errs.extend(crate::release_sections::refusals(
@@ -296,6 +305,7 @@ pub const KIT: Kit = Kit {
         Row::scalar("GATE_SDK_MIGRATION_DIR", ""),
         Row::derived("GATE_SDK_MIGRATION_DESTRUCTIVE", Shape::Scalar, migration_destructive, GATES).empty_takes_default(),
         Row::scalar("GATE_SDK_MIGRATION_REFS", "refs/heads/**").empty_takes_default().words(),
+        Row::scalar("GATE_SDK_MIGRATION_UNRELATED_REFS", "off").empty_takes_default(),
         Row::scalar("GATE_SDK_EXEC_WRITE_PATHS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_EXEC_WRITE_HELPERS", "").empty_takes_default().words(),
         Row::scalar("GATE_SDK_TEST_GLOBS", "tests/ fixtures/ tests.rs *_tests.rs tests_*.rs test_* *_test.*").words(),
@@ -434,6 +444,23 @@ mod tests {
             assert_eq!(resolve("GATE_SDK_MIGRATION_REFS").is_ok(), ok, "{}", value);
         }
         env.remove("GATE_SDK_MIGRATION_REFS");
+        reset(&env);
+    }
+
+    // spec: gate-sdk/SPEC.md §Layout and configuration — an unrelated ref is named or refused, and
+    // any third value refuses; empty takes the default
+    #[test]
+    fn the_unrelated_ref_policy_takes_off_or_error_alone() {
+        let env = knobenv::lock();
+        for (value, ok) in [("off", true), ("error", true), ("", true), ("strict", false), ("Error", false)] {
+            env.set("GATE_SDK_MIGRATION_UNRELATED_REFS", value);
+            reset(&env);
+            assert_eq!(resolve("GATE_SDK_MIGRATION_UNRELATED_REFS").is_ok(), ok, "{}", value);
+        }
+        env.set("GATE_SDK_MIGRATION_UNRELATED_REFS", "");
+        reset(&env);
+        assert_eq!(resolved("GATE_SDK_MIGRATION_UNRELATED_REFS"), "off");
+        env.remove("GATE_SDK_MIGRATION_UNRELATED_REFS");
         reset(&env);
     }
 
