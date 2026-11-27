@@ -2,7 +2,7 @@ Execute the template at lifecycle-kit/templates/lead.md, applying the bindings b
 
 ## Bindings
 
-**open-authorization-channel** — the lead skill's own invocation. Typing `/lead` here *is* the operator's grant; no separate act is looked for and none is asked for. Cardinality: **the number the argument states** (`/lead 3 iterations …`), **else one**; a later operator grant in the session states its own. Each iteration spends one, and a lead with none left stops and reports.
+**open-authorization-channel** — the lead skill's own invocation. Typing `/lead` here *is* the operator's grant; no separate act is looked for and none is asked for. Cardinality: **the number the argument states** (`/lead 3 iterations …`), **else open**: iterate until scope finds nothing worth one or the budget runs low, then report which.
 
 **ruling-config** — `.claude/agents/stage-session.md` (dispatch `subagent_type: stage-session`); its §Ruling classes holds the escalate-vs-decide roster. The hotfix type is `.claude/agents/hotfix-session.md` (dispatch `subagent_type: hotfix-session`); its §Stop on a design question is its escalation roster. Posture: **Split** (template §The lead model). Lead and every stage — scope included — ride the judgment class, the stage agent's generated `model:` default, so no stage inherits the dispatcher's tier (measured leakage was the largest budget drain). Three stages depart from the judgment-class default, and by the per-batch tiering the template §Economics "Tier each batch to its work class" rule now names, each reading the mechanical class's model from `--emit knob-values DELEGATION_KIT_TIER_MODEL` at dispatch:
 
