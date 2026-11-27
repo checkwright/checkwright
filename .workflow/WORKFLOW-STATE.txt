@@ -4,4 +4,4 @@
 
 ---
 
-— scope a1c0ea06 2026-11-27 d8dc2cd00
+locale-verdict-key-pass scope a1c0ea06 2026-11-27 d8dc2cd00

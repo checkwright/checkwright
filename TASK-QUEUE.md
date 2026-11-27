@@ -1,14 +1,70 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: locale-verdict-key-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-27, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** the orchestrator adopter's ordered asks 1, 2, 3 and 5 (adopter direction 2026-11-27, lead-relayed), with migration-parity-pass' review debt and the cheap halves of the adopter's v0.40.0 consumer smoke. Debt: `test-hermetic-rerun-mkdir`, `rust-reader-turbofish-spacing`, `pipefail-fix-redirected-grep`, `release-archive-binary-mode`, `run-arm-smoke-fixes`, `binary-only-doc-gaps`. Features for spec to author: `parsed-output-c-locale`, `migration-guard-silent-skips` and `verdict-key-arm`. `release-archive-provenance`, `release-record-gates` and `user-uninstall-containment` lead the next set, on the release and installer surface.
+
+  **The release and pushes (2026-11-27, lead decision under the same delegation, not a ruling):** a cut at this iteration's close where the set's declarations price one, expected a minor for the new arm and the guard's visible skip. Push need 2 against 2, inside the budget: the closing push, which also carries the v0.40.0 pin drain and the adopter-ask filing already on master, and the release tag. `codex-plugin-version-pin`'s check is due at the push landing the pin drain.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### test-hermetic-rerun-mkdir
+
+gate-sdk/lib/test-hermetic.sh runs `mkdir -m 700` of its private directory unguarded (line 13), so under errexit a second source with the directory already present exits 1 before the privacy checks and the config pinning. gate-sdk/SPEC.md §lib/test-hermetic.sh refuses only a link, a non-directory, another user's directory or an open one.
+
+**Deliverable:** debt: the mkdir guarded, the checks below it deciding, with a case sourcing the library twice under `bash -e`.
+
+**Cost while deferred:** a suite that sources the library twice in one shell dies at exit 1 with no message. Surfaced 2026-11-26 by migration-parity-pass' close second-vendor review, carried from its close; filed at this scope. Re-verified here: `bash -ec` sourcing it twice exits 1 without reaching the next command. Owner lookup: `test-hermetic`, `mkdir` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
+
+### rust-reader-turbofish-spacing
+
+The Rust code reader's `callee` (native/src/rust_code.rs) wants `::` directly before a turbofish's `<` and an identifier directly before that `::`, so `std::fs::copy:: <&str, &str>(a, b)` and `std::fs::copy ::<&str, &str>(a, b)` read as no call and check-exec-write never sees them. gate-sdk/SPEC.md §The Rust code reader promises both the turbofish dropped and the whitespace around each `::` dropped.
+
+**Deliverable:** debt: whitespace skipped on both sides of a turbofish's `::`, with a case per spelling.
+
+**Cost while deferred:** a spaced turbofish call evades check-exec-write. Surfaced 2026-11-26 by migration-parity-pass' close second-vendor review, carried from its close; filed at this scope. Re-verified here at source: the `lt - 2` test reads the two bytes before `<` with no space skip, and the first segment loop returns `None` on a space. Owner lookup: `turbofish`, `rust_code` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The Rust code reader.
+
+### pipefail-fix-redirected-grep
+
+`--emit pipefail-fix`'s bounded-grep rewrite (`grep` in native/src/shell_lines.rs) checks the stage's flags and operands but not its redirections, and appends `| sed -n '1,Np'` at the stage's end, so `grep -m1 x >out` becomes `grep x >out | sed -n '1,1p'` and writes every match to `out`. gate-sdk/SPEC.md §check-pipefail-readers names the rewrite as `grep … | sed -n '1,Np'`, the same output.
+
+**Deliverable:** debt: a grep stage carrying a redirection left as a hand fix, with a case.
+
+**Cost while deferred:** the fix arm can change what a script writes. Surfaced 2026-11-26 by migration-parity-pass' close second-vendor review, the equivalent rewrite probed there in bash, carried from its close; filed at this scope. Re-verified here at source: the tail edit sits at `stage.end`, with no redirection test. Owner lookup: `pipefail-fix`, `redirect` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-pipefail-readers.
+
+### release-archive-binary-mode
+
+The platform archives ship the gate binary at mode 0644, so a consumer must chmod it before an `-x` check passes. The publish workflow tars the copy `download-artifact` lands (.github/workflows/publish.yml, the archive loop), and an artifact keeps no mode.
+
+**Deliverable:** debt: the binary packed 0755, and `check-release-assets` asserting each archive's binary mode, with its case. The observe half rides [release-archive-provenance](#release-archive-provenance).
+
+**Cost while deferred:** a binary-only consumer meets a non-executable binary. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, adopter-measured, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: the loop runs `cp` then `tar` with no chmod. Owner lookup: `0755`, `chmod`, `archive` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload.
+
+### run-arm-smoke-fixes
+
+Two `--run` faults the adopter's v0.40.0 consumer smoke found. The binary's usage line spells `--run [--gates-dir <dir>]` (native/src/main.rs) while `--run --help` spells a positional `[gates-dir]`, both accepted. And outside a git repository `--run` exits 0 with a pass document carrying no `treeId` and no `worktree`, an unkeyed pass a caller can read as a judged tree, where gate-sdk/SPEC.md §Output contract gives a run outside a git repository exit 2.
+
+**Deliverable:** debt: one spelling in both texts, the other kept as an accepted alias; and `--run` outside a repository refused at 2 as §Output contract states, with a case each.
+
+**Cost while deferred:** a binary-only consumer reads two usages and can take an unkeyed pass for a verdict. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of v0.40.0, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: both usage spellings print. Owner lookup: `gates-dir`, `unkeyed`, `treeId` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates and §Output contract.
+
+**Inferred, not run:** `--run` outside a repository exits 0 with an unkeyed pass, adopter-measured — this scope's shell guard refuses a working directory outside the checkout; build's case runs it.
+
+### binary-only-doc-gaps
+
+Two statements a binary-only consumer misses. The platform archive carries no gate registry or kits, so it has nothing to `--run` without a gates dir of its own, and installer/README.md does not say the registry ships only in the npm package. And `kits[].version` is absent off a lock (gate-sdk/SPEC.md §run-gates' honest limits say so), while the provenance table's row and `docs/contracts/run/v1/pass.json` show it, so a reader typed from the golden takes the key as required.
+
+**Deliverable:** debt: the registry's absence stated in installer/README.md beside docs/binary-only.md's forms, and the `kits[]` row marking `version` optional; no golden byte change, which would bump contract 1.0.0.
+
+**Cost while deferred:** a binary-only consumer finds nothing to run and a typed reader rejects a real run. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of v0.40.0, filed to the inbox after migration-parity-pass' close; filed at this scope. Owner lookup: `binary-only`, `kits[]`, `registry` in this file and the disposed-findings record, none; owner installer/README.md and gate-sdk/SPEC.md §run-gates.
 
 ## Deferred
 
@@ -275,6 +331,46 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 **Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
 
 **Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
+
+### parsed-output-c-locale
+
+[cost: event/low] [surface: gate-sdk]
+
+A gate that parses a child's output, git's stderr wording or a tool's message, reads it in the invoking locale, since `proc::command` (native/src/proc.rs) builds every child with the inherited environment; a localized git answers in a form no matcher expects.
+
+**Deliverable:** design-pending, a feature: the locale contract for parsed child output, `LC_ALL=C` on every child whose output a gate parses, its home in gate-sdk/SPEC.md §Fail-closed contract, with which spawns it reaches (a consumer gate or a hook a gate only runs is not parsed) and a case under a non-C locale. A shared `native/src` module, so every kit's suite runs.
+
+**Cost while deferred:** a localized host can turn a recognized git answer into an unrecognized one. Surfaced 2026-11-27 as the orchestrator adopter's first ask, adopter direction, lead-relayed; filed at this scope. Owner lookup: `LC_ALL`, `locale` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Fail-closed contract.
+
+### migration-guard-silent-skips
+
+[cost: event/low] [surface: gate-sdk]
+
+Three readings of check-migration-guard (native/src/gates/migration_guard.rs) pass unseen. Its clash check skips a ref sharing no merge base with the base ref (`ref_additions`, `merge-base` exit 1), and the clean line counts the refs read, never the refs skipped, so a shallow consumer CI loses CLASH without a word. Its already-landed skip is grounded on a same-named addition stopping at an add/add conflict, which `merge=union` on `*.sql` merges cleanly, so branch-only destructive SQL can land unread. And both attribute readings inherit `core.attributesFile` as well as `.git/info/attributes`, while the section's honest limit names the second alone.
+
+**Deliverable:** design-pending, a feature: the skipped refs visible, a line naming them or exit 3 under a strict flag, the adopter's two options, fixed and not only stated; and both other limits stated in gate-sdk/SPEC.md §check-migration-guard, with sandbox cases for the skip.
+
+**Cost while deferred:** a shallow CI clone judges no clash and says nothing. Surfaced 2026-11-27 as the orchestrator adopter's second and third asks, adopter direction, lead-relayed, and 2026-11-26 by migration-parity-pass' close second-vendor review and baked-calibration audit, three inbox bullets carried from its close; filed at this scope. Re-verified here at source: the `Some(1)` arm continues, and the section grounds the skip on add/add. Owner lookup: `merge=union`, `attributesFile`, `shallow` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
+
+### verdict-key-arm
+
+[cost: event/low] [surface: gate-sdk]
+
+An outside engine can look a verdict up (`--verdict-lookup`) only by computing its key itself, `treeId`, `tool.version` and `gateSet`, which needs the registry run's own resolution.
+
+**Deliverable:** design-pending, a feature: `--verdict-key --json [--gates-dir D]`, printing `{contract, treeId, tool.version, gateSet}` for the clean tree a bare registry run would judge and running nothing, its exit mapping as `--verdict-lookup`'s, with a golden. Registry scope only, no `--only` or `--for`, since `gateSet` digests the scope and argv and only registry runs store. Spec settles the `--json` spelling against gate-sdk/SPEC.md §The non-gate arm's rule that a machine-only arm takes no option.
+
+**Cost while deferred:** the adopter re-derives the key, and a drift from the binary's misses every stored verdict. Surfaced 2026-11-27 as the orchestrator adopter's fifth ask, its scoping confirmed by it, adopter direction, lead-relayed; filed at this scope. Owner lookup: `verdict-key`, `verdict-lookup` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
+### release-archive-provenance
+
+[cost: event/low] [surface: installer] [observed-by: publish]
+
+The platform archives have no published `.sha256` sidecar and no build attestation: the attest step (.github/workflows/publish.yml) names the npm tgz alone, and each archive's sha256 sits inside the archive it vouches for, so a consumer cannot pin an archive without trusting that file.
+
+**Deliverable:** design-pending, a feature: a sidecar per archive and each archive in the attestation's `subject-path`, `check-release-assets` holding both. The observe half reads the next release's `publish` run, for this and [release-archive-binary-mode](#release-archive-binary-mode)'s 0755.
+
+**Cost while deferred:** a binary-only consumer verifies nothing it downloads. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: `subject-path` names `checkwright-*.tgz`. Owner lookup: `sidecar`, `attest`, `subject-path` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The dependency boundary.
 
 ## Icebox
 
