@@ -14,6 +14,36 @@
 
 ## New Features
 
+### parsed-output-c-locale
+
+[spec: SPEC-child-locale.md]
+
+A gate that parses a child's output, git's stderr wording or a tool's message, reads it in the invoking locale, since `proc::command` (native/src/proc.rs) builds every child with the inherited environment; a localized git answers in a form no matcher expects.
+
+**Deliverable:** design-pending, a feature: the locale contract for parsed child output, `LC_ALL=C` on every child whose output a gate parses, its home in gate-sdk/SPEC.md §Fail-closed contract, with which spawns it reaches (a consumer gate or a hook a gate only runs is not parsed) and a case under a non-C locale. A shared `native/src` module, so every kit's suite runs.
+
+**Cost while deferred:** a localized host can turn a recognized git answer into an unrecognized one. Surfaced 2026-11-27 as the orchestrator adopter's first ask, adopter direction, lead-relayed; filed at this scope. Owner lookup: `LC_ALL`, `locale` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Fail-closed contract.
+
+### migration-guard-silent-skips
+
+[spec: SPEC-migration-silent-skips.md]
+
+Three readings of check-migration-guard (native/src/gates/migration_guard.rs) pass unseen. Its clash check skips a ref sharing no merge base with the base ref (`ref_additions`, `merge-base` exit 1), and the clean line counts the refs read, never the refs skipped, so a shallow consumer CI loses CLASH without a word. Its already-landed skip is grounded on a same-named addition stopping at an add/add conflict, which `merge=union` on `*.sql` merges cleanly, so branch-only destructive SQL can land unread. And both attribute readings inherit `core.attributesFile` as well as `.git/info/attributes`, while the section's honest limit names the second alone.
+
+**Deliverable:** design-pending, a feature: the skipped refs visible, a line naming them or exit 3 under a strict flag, the adopter's two options, fixed and not only stated; and both other limits stated in gate-sdk/SPEC.md §check-migration-guard, with sandbox cases for the skip.
+
+**Cost while deferred:** a shallow CI clone judges no clash and says nothing. Surfaced 2026-11-27 as the orchestrator adopter's second and third asks, adopter direction, lead-relayed, and 2026-11-26 by migration-parity-pass' close second-vendor review and baked-calibration audit, three inbox bullets carried from its close; filed at this scope. Re-verified here at source: the `Some(1)` arm continues, and the section grounds the skip on add/add. Owner lookup: `merge=union`, `attributesFile`, `shallow` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
+
+### verdict-key-arm
+
+[spec: SPEC-verdict-key.md]
+
+An outside engine can look a verdict up (`--verdict-lookup`) only by computing its key itself, `treeId`, `tool.version` and `gateSet`, which needs the registry run's own resolution.
+
+**Deliverable:** design-pending, a feature: `--verdict-key --json [--gates-dir D]`, printing `{contract, treeId, tool.version, gateSet}` for the clean tree a bare registry run would judge and running nothing, its exit mapping as `--verdict-lookup`'s, with a golden. Registry scope only, no `--only` or `--for`, since `gateSet` digests the scope and argv and only registry runs store. Spec settles the `--json` spelling against gate-sdk/SPEC.md §The non-gate arm's rule that a machine-only arm takes no option.
+
+**Cost while deferred:** the adopter re-derives the key, and a drift from the binary's misses every stored verdict. Surfaced 2026-11-27 as the orchestrator adopter's fifth ask, its scoping confirmed by it, adopter direction, lead-relayed; filed at this scope. Owner lookup: `verdict-key`, `verdict-lookup` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
+
 ## Technical Debt
 
 ### test-hermetic-rerun-mkdir
@@ -331,36 +361,6 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 **Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
 
 **Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
-
-### parsed-output-c-locale
-
-[cost: event/low] [surface: gate-sdk]
-
-A gate that parses a child's output, git's stderr wording or a tool's message, reads it in the invoking locale, since `proc::command` (native/src/proc.rs) builds every child with the inherited environment; a localized git answers in a form no matcher expects.
-
-**Deliverable:** design-pending, a feature: the locale contract for parsed child output, `LC_ALL=C` on every child whose output a gate parses, its home in gate-sdk/SPEC.md §Fail-closed contract, with which spawns it reaches (a consumer gate or a hook a gate only runs is not parsed) and a case under a non-C locale. A shared `native/src` module, so every kit's suite runs.
-
-**Cost while deferred:** a localized host can turn a recognized git answer into an unrecognized one. Surfaced 2026-11-27 as the orchestrator adopter's first ask, adopter direction, lead-relayed; filed at this scope. Owner lookup: `LC_ALL`, `locale` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Fail-closed contract.
-
-### migration-guard-silent-skips
-
-[cost: event/low] [surface: gate-sdk]
-
-Three readings of check-migration-guard (native/src/gates/migration_guard.rs) pass unseen. Its clash check skips a ref sharing no merge base with the base ref (`ref_additions`, `merge-base` exit 1), and the clean line counts the refs read, never the refs skipped, so a shallow consumer CI loses CLASH without a word. Its already-landed skip is grounded on a same-named addition stopping at an add/add conflict, which `merge=union` on `*.sql` merges cleanly, so branch-only destructive SQL can land unread. And both attribute readings inherit `core.attributesFile` as well as `.git/info/attributes`, while the section's honest limit names the second alone.
-
-**Deliverable:** design-pending, a feature: the skipped refs visible, a line naming them or exit 3 under a strict flag, the adopter's two options, fixed and not only stated; and both other limits stated in gate-sdk/SPEC.md §check-migration-guard, with sandbox cases for the skip.
-
-**Cost while deferred:** a shallow CI clone judges no clash and says nothing. Surfaced 2026-11-27 as the orchestrator adopter's second and third asks, adopter direction, lead-relayed, and 2026-11-26 by migration-parity-pass' close second-vendor review and baked-calibration audit, three inbox bullets carried from its close; filed at this scope. Re-verified here at source: the `Some(1)` arm continues, and the section grounds the skip on add/add. Owner lookup: `merge=union`, `attributesFile`, `shallow` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §check-migration-guard.
-
-### verdict-key-arm
-
-[cost: event/low] [surface: gate-sdk]
-
-An outside engine can look a verdict up (`--verdict-lookup`) only by computing its key itself, `treeId`, `tool.version` and `gateSet`, which needs the registry run's own resolution.
-
-**Deliverable:** design-pending, a feature: `--verdict-key --json [--gates-dir D]`, printing `{contract, treeId, tool.version, gateSet}` for the clean tree a bare registry run would judge and running nothing, its exit mapping as `--verdict-lookup`'s, with a golden. Registry scope only, no `--only` or `--for`, since `gateSet` digests the scope and argv and only registry runs store. Spec settles the `--json` spelling against gate-sdk/SPEC.md §The non-gate arm's rule that a machine-only arm takes no option.
-
-**Cost while deferred:** the adopter re-derives the key, and a drift from the binary's misses every stored verdict. Surfaced 2026-11-27 as the orchestrator adopter's fifth ask, its scoping confirmed by it, adopter direction, lead-relayed; filed at this scope. Owner lookup: `verdict-key`, `verdict-lookup` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates.
 
 ### release-archive-provenance
 
