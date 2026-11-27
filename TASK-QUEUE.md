@@ -26,16 +26,6 @@
 
 **Push need (2026-11-27, inside the budget):** one mid-iteration push after its build batch, since the Windows junction case runs only on the remote Windows legs; the batch's other native fixes ride the same push.
 
-### price-row-shape-strictness
-
-[not-icebox-eligible: 2026-11-24 a verified live defect with its debt fix named, owed a build rather than dormancy]
-
-The price-table row check is lexical: `kpi::is_iso_day` (native/src/emit/kpi/mod.rs) admits `2026-00-00`, and its float parse admits `NaN` and `inf`, so such a row counts as priced with no unpriced-row line, against drift-kit/SPEC.md §The stage-economics meter's ISO-day and numeric-price shape.
-
-**Deliverable:** debt: a calendar-valid day and a finite non-negative price, each with a case.
-
-**Cost while deferred:** a malformed row prices silently. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence), carried from its close; filed at the next scope. Re-verified here: `is_iso_day` tests digit positions only. Owner lookup: `is_iso_day`, `NaN` in this file, none; owner drift-kit/SPEC.md §The stage-economics meter.
-
 ### release-assets-coverage
 
 `check-release-assets` attests less than gate-sdk/SPEC.md §check-release-assets says. A `>` folded `subject-path` block is read line by line (native/src/gates/release_assets.rs `key_value`), though YAML folds it into one space-joined value the action does not split, so the gate passes a block the attest step fails. And the attest arm proves overlap, not coverage: a glob narrowed to one target or version satisfies the whole template, and the publish half never matches the expanded names against the globs.
@@ -1008,4 +998,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - wakeup-log-write-unreported
 - weekly-pair-shape-check
+- price-row-shape-strictness
 
