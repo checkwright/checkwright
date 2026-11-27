@@ -14,6 +14,20 @@
 
 ## New Features
 
+### release-archive-provenance
+
+[spec: SPEC-archive-provenance.md]
+
+The platform archives have no published `.sha256` sidecar and no build attestation: the attest step (.github/workflows/publish.yml) names the npm tgz alone, and each archive's sha256 sits inside the archive it vouches for, so a consumer cannot pin an archive without trusting that file.
+
+**Deliverable:** the amendment's five deltas: a `.sha256` beside every Release asset and a build attestation over every non-sidecar asset (the tarball's unchanged, the archives' a second), the `release` job verifying each before the Release exists, and `check-release-assets` holding the sidecar templates and attest subjects in its battery half and each sidecar's content in its publish half, with fixtures.
+
+**First-run risk (2026-11-27, lead decision):** the publish.yml edits first execute on the tag's `publish` run; close's procedure for a red publish run, a re-run or a hotfix push inside the budget, is the backstop.
+
+**Cost while deferred:** a binary-only consumer verifies nothing it downloads. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: `subject-path` names `checkwright-*.tgz`. Observed at v0.41.0's publish: the x86_64-unknown-linux-gnu archive's binary is `-rwxr-xr-x`, and no archive has a sidecar on the Release. Owner lookup: `sidecar`, `attest`, `subject-path` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The dependency boundary.
+
+Its observe half is [archive-provenance-observe](#archive-provenance-observe), split at scope 2026-11-27 since only a release run reads it.
+
 ## Technical Debt
 
 ### verdict-key-version-token
@@ -301,20 +315,6 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 **Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
 
 **Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
-
-### release-archive-provenance
-
-[cost: event/low] [surface: installer]
-
-The platform archives have no published `.sha256` sidecar and no build attestation: the attest step (.github/workflows/publish.yml) names the npm tgz alone, and each archive's sha256 sits inside the archive it vouches for, so a consumer cannot pin an archive without trusting that file.
-
-**Deliverable:** design-pending, a feature: a sidecar per archive and each archive in the attestation's `subject-path`, `check-release-assets` holding both.
-
-**First-run risk (2026-11-27, lead decision):** the publish.yml edits first execute on the tag's `publish` run; close's procedure for a red publish run, a re-run or a hotfix push inside the budget, is the backstop.
-
-**Cost while deferred:** a binary-only consumer verifies nothing it downloads. Surfaced 2026-11-27 by the orchestrator adopter's consumer smoke of the v0.40.0 archives, filed to the inbox after migration-parity-pass' close; filed at this scope. Re-verified here: `subject-path` names `checkwright-*.tgz`. Observed at v0.41.0's publish: the x86_64-unknown-linux-gnu archive's binary is `-rwxr-xr-x`, and no archive has a sidecar on the Release. Owner lookup: `sidecar`, `attest`, `subject-path` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §Consumer payload and installer/SPEC.md §The dependency boundary.
-
-Its observe half is [archive-provenance-observe](#archive-provenance-observe), split at scope 2026-11-27 since only a release run reads it.
 
 ### archive-provenance-observe
 
