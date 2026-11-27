@@ -5,3 +5,4 @@
 ---
 
 locale-verdict-key-pass scope a1c0ea06 2026-11-27 d8dc2cd00
+locale-verdict-key-pass spec aee83420 2026-11-27 b22f9c5b8
