@@ -16,16 +16,6 @@
 
 ## Technical Debt
 
-### user-uninstall-containment
-
-`uninstall --user --force` follows a directory symlink inside the data dir: a `user.lock` files key `escape/victim` passes the lexical component check in native/src/installer/user.rs, and removal deletes a file outside the install when `<data>/escape` links out (a junction on Windows), where installer/SPEC.md §The user manifest states containment.
-
-**Deliverable:** debt: a resolved-path containment check before each removal, with a case per host.
-
-**Cost while deferred:** a tampered or corrupted user manifest can delete a file outside the install. Surfaced 2026-11-16 by the second-vendor review of input-shape-refusal-pass (high confidence on POSIX), carried from its close; filed at the next scope. Owner lookup: `symlink`, `containment` in this file, none; owner installer/SPEC.md §The user manifest.
-
-**Push need (2026-11-27, inside the budget):** one mid-iteration push after its build batch, since the Windows junction case runs only on the remote Windows legs; the batch's other native fixes ride the same push.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -983,4 +973,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - price-row-shape-strictness
 - release-assets-coverage
 - binary-only-archive-route
+- user-uninstall-containment
 
