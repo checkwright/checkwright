@@ -103,21 +103,23 @@ pub fn run(args: &[String]) -> i32 {
     0
 }
 
-// spec: delegation-kit/SPEC.md §The usage.txt contract — no rate-limit window, or half the weekly
-// pair, writes nothing, so the last good reading survives and still ages into STALE; `true` only
-// for a completed write
+// spec: delegation-kit/SPEC.md §The usage.txt contract — no rate-limit window, or a half or
+// malformed pair, writes nothing, so the last good reading survives and still ages into STALE;
+// `true` only for a completed write
 fn record(payload: Option<&Value>, paths: &usage::Paths) -> bool {
     let at = |path: &[&str]| hook::field(payload, path);
-    let five = at(&["rate_limits", "five_hour", "used_percentage"]);
-    let seven = at(&["rate_limits", "seven_day", "used_percentage"]);
-    let seven_resets = at(&["rate_limits", "seven_day", "resets_at"]);
-    if (five.is_empty() && seven.is_empty()) || seven.is_empty() != seven_resets.is_empty() {
+    let pair = |name: &str| usage::window(&at(&["rate_limits", name, "used_percentage"]), &at(&["rate_limits", name, "resets_at"]));
+    let (Ok(five), Ok(seven)) = (pair("five_hour"), pair("seven_day")) else {
+        return false;
+    };
+    if five.is_none() && seven.is_none() {
         return false;
     }
+    let [(five_pct, five_resets), (seven_pct, seven_resets)] = [five.unwrap_or_default(), seven.unwrap_or_default()];
     Snapshot {
-        five_hour_used_pct: five,
-        five_hour_resets_at: at(&["rate_limits", "five_hour", "resets_at"]),
-        seven_day_used_pct: seven,
+        five_hour_used_pct: five_pct,
+        five_hour_resets_at: five_resets,
+        seven_day_used_pct: seven_pct,
         seven_day_resets_at: seven_resets,
         account: usage::json_field(&paths.account_config, &["oauthAccount", "accountUuid"]),
         tier: usage::json_field(&paths.cred_file, &["claudeAiOauth", "subscriptionType"]),
@@ -374,8 +376,8 @@ mod tests {
     }
 
     // spec: delegation-kit/SPEC.md §The usage.txt contract — a render carrying a window rewrites
-    // the snapshot, a weekly-only one with the five-hour pair empty; none, half the weekly pair or
-    // no payload leaves the last good snapshot byte-identical, `updated_at` included
+    // the snapshot, a weekly-only one with the five-hour pair empty; none, a half or malformed pair
+    // or no payload leaves the last good snapshot byte-identical, `updated_at` included
     #[test]
     fn a_render_without_rate_limits_keeps_the_last_snapshot() {
         let dir = std::env::temp_dir().join(format!("checkwright-statusline.{}", std::process::id()));
@@ -412,6 +414,18 @@ mod tests {
             serde_json::json!({"rate_limits": {
                 "five_hour": {"used_percentage": 12.5, "resets_at": 1756600000},
                 "seven_day": {"resets_at": 1756656000}
+            }}),
+            serde_json::json!({"rate_limits": {
+                "five_hour": {"used_percentage": 12.5, "resets_at": 1756600000},
+                "seven_day": {"used_percentage": "1..2", "resets_at": 1756656000}
+            }}),
+            serde_json::json!({"rate_limits": {
+                "five_hour": {"used_percentage": 12.5, "resets_at": 1756600000},
+                "seven_day": {"used_percentage": 91, "resets_at": {}}
+            }}),
+            serde_json::json!({"rate_limits": {
+                "five_hour": {"used_percentage": 12.5},
+                "seven_day": {"used_percentage": 91, "resets_at": 1756656000}
             }}),
         ] {
             assert!(!record(Some(&bare), &paths), "{} must not write", bare);

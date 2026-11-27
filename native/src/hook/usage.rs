@@ -123,10 +123,36 @@ pub fn epoch_of(v: &str) -> String {
     kpi::date_epoch(v).map(|e| e.to_string()).unwrap_or_default()
 }
 
-// spec: delegation-kit/SPEC.md §The usage.txt contract — a utilization reading is digits and dots
-// and nothing else, the shell form's `[[ "$v" =~ ^[0-9.]+$ ]]`; anything else is no reading.
+// spec: delegation-kit/SPEC.md §The usage.txt contract — a utilization reading is digits with at
+// most one dot between digits; anything else is no reading
 pub fn is_utilization(v: &str) -> bool {
-    !v.is_empty() && v.bytes().all(|b| b.is_ascii_digit() || b == b'.')
+    let digits = |s: &str| !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit());
+    match v.split_once('.') {
+        Some((whole, frac)) => digits(whole) && digits(frac),
+        None => digits(v),
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Half {
+    Utilization,
+    Reset,
+}
+
+// spec: delegation-kit/SPEC.md §The usage.txt contract — one window's pair held to its shape: both
+// empty is no window, a utilization beside a reset epoch is the pair with the reset normalised,
+// and anything else is the half or malformed pair a producer writes nothing for
+pub fn window(pct: &str, resets: &str) -> Result<Option<(String, String)>, Half> {
+    if pct.is_empty() && resets.is_empty() {
+        return Ok(None);
+    }
+    if !is_utilization(pct) {
+        return Err(Half::Utilization);
+    }
+    match epoch_of(resets) {
+        e if e.is_empty() => Err(Half::Reset),
+        e => Ok(Some((pct.to_string(), e))),
+    }
 }
 
 #[cfg(test)]
@@ -173,14 +199,30 @@ mod tests {
         assert_eq!(epoch_of("not a time at all"), "");
     }
 
-    // spec: delegation-kit/SPEC.md §The usage.txt contract — a utilization reading is digits and
-    // dots, so a null, an empty field and a word are all no reading
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — a utilization reading is a decimal, so
+    // a null, an empty field, a word and a stray or doubled dot are all no reading
     #[test]
-    fn only_digits_and_dots_are_a_reading() {
+    fn only_a_decimal_is_a_reading() {
         assert!(is_utilization("91"));
         assert!(is_utilization("12.5"));
         assert!(!is_utilization(""));
         assert!(!is_utilization("null"));
         assert!(!is_utilization("91%"));
+        for malformed in ["1..2", ".", "1.", ".5", "1.2.3"] {
+            assert!(!is_utilization(malformed), "{:?}", malformed);
+        }
+    }
+
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — a pair is both halves in shape or
+    // neither; a non-scalar reset, which a JSON reader renders `{}`, is no epoch
+    #[test]
+    fn a_window_is_both_halves_in_shape_or_neither() {
+        assert_eq!(window("", ""), Ok(None));
+        assert_eq!(window("56", "1756656000"), Ok(Some(("56".to_string(), "1756656000".to_string()))));
+        assert_eq!(window("56", "1970-01-02T00:00:00Z"), Ok(Some(("56".to_string(), "86400".to_string()))));
+        assert_eq!(window("1..2", "1756656000"), Err(Half::Utilization));
+        assert_eq!(window("", "1756656000"), Err(Half::Utilization));
+        assert_eq!(window("56", "{}"), Err(Half::Reset));
+        assert_eq!(window("56", ""), Err(Half::Reset));
     }
 }

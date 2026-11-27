@@ -2,7 +2,7 @@
 // cycle per invocation, an atomic snapshot rewrite, fail-soft. Its caller is a refresh command or a
 // session rather than a gate on a tool call, so it keeps exit 2 where the guard arms fail open.
 use crate::exit;
-use crate::hook::usage::{self, Snapshot};
+use crate::hook::usage::{self, Half, Snapshot};
 use crate::{proc, programs};
 use crate::walk;
 use serde_json::Value;
@@ -100,33 +100,21 @@ pub fn run(args: &[String]) -> i32 {
 // axes; no five-hour window writes that pair empty beside an armed weekly pair, and neither axis,
 // or half of either, is unparseable.
 fn axes(payload: &Value) -> Result<[String; 4], &'static str> {
-    let five = axis(payload, "five_hour");
-    let seven = axis(payload, "seven_day");
-    let [seven_pct, seven_resets] = if seven.0.is_empty() && seven.1.is_empty() {
-        [String::new(), String::new()]
-    } else if !usage::is_utilization(&seven.0) {
-        return Err("no weekly utilization");
-    } else {
-        let resets = usage::epoch_of(&seven.1);
-        if resets.is_empty() {
-            return Err("no weekly reset epoch");
-        }
-        [seven.0, resets]
-    };
-    if five.0.is_empty() && five.1.is_empty() {
-        if seven_pct.is_empty() {
-            return Err("no five-hour and no weekly window");
-        }
-        return Ok([String::new(), String::new(), seven_pct, seven_resets]);
+    let (p, r) = axis(payload, "seven_day");
+    let seven = usage::window(&p, &r).map_err(|half| match half {
+        Half::Utilization => "no weekly utilization",
+        Half::Reset => "no weekly reset epoch",
+    })?;
+    let (p, r) = axis(payload, "five_hour");
+    let five = usage::window(&p, &r).map_err(|half| match half {
+        Half::Utilization => "no five-hour utilization",
+        Half::Reset => "no five-hour reset epoch",
+    })?;
+    if five.is_none() && seven.is_none() {
+        return Err("no five-hour and no weekly window");
     }
-    if !usage::is_utilization(&five.0) {
-        return Err("no five-hour utilization");
-    }
-    let five_resets = usage::epoch_of(&five.1);
-    if five_resets.is_empty() {
-        return Err("no five-hour reset epoch");
-    }
-    Ok([five.0, five_resets, seven_pct, seven_resets])
+    let [(fp, fr), (sp, sr)] = [five.unwrap_or_default(), seven.unwrap_or_default()];
+    Ok([fp, fr, sp, sr])
 }
 
 fn fetch(token: &str, endpoint: &str) -> Option<Value> {
@@ -147,9 +135,8 @@ fn fetch(token: &str, endpoint: &str) -> Option<Value> {
     serde_json::from_slice(out.stdout()?).ok()
 }
 
-// spec: delegation-kit/SPEC.md §The usage.txt contract — one axis's utilization and reset stamp,
-// read as strings whatever the source spelled them as, because the snapshot's own contract is text
-// and a number re-rendered through a float would change the reading it carries.
+// spec: delegation-kit/SPEC.md §The usage.txt contract — one axis's pair, whole from one shape and
+// read as strings, because a number re-rendered through a float would change the reading it carries
 fn axis(payload: &Value, name: &str) -> (String, String) {
     let at = |parent: Option<&Value>, key: &str| -> String {
         match parent.and_then(|p| p.get(key)) {
@@ -159,19 +146,12 @@ fn axis(payload: &Value, name: &str) -> (String, String) {
         }
     };
     let flat = payload.get(name);
+    let pair = (at(flat, "utilization"), at(flat, "resets_at"));
+    if !pair.0.is_empty() || !pair.1.is_empty() {
+        return pair;
+    }
     let nested = payload.get("rate_limits").and_then(|r| r.get(name));
-    let pick = |flat_key: &str, nested_key: &str| -> String {
-        let v = at(flat, flat_key);
-        if v.is_empty() {
-            at(nested, nested_key)
-        } else {
-            v
-        }
-    };
-    (
-        pick("utilization", "used_percentage"),
-        pick("resets_at", "resets_at"),
-    )
+    (at(nested, "used_percentage"), at(nested, "resets_at"))
 }
 
 #[cfg(test)]
@@ -206,6 +186,18 @@ mod tests {
             r#"{"five_hour":{"utilization":"1"},"rate_limits":{"five_hour":{"used_percentage":"2"}}}"#,
         );
         assert_eq!(axis(&both, "five_hour").0, "1");
+    }
+
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — a pair is never composed across the two
+    // shapes, and a malformed half in either is unparseable rather than an unarmed axis
+    #[test]
+    fn a_pair_comes_whole_from_one_shape_and_in_shape() {
+        let five = r#""five_hour":{"utilization":4,"resets_at":"1756656000"}"#;
+        let with = |rest: &str| axes(&doc(&format!("{{{},{}}}", five, rest)));
+        let mixed = r#""seven_day":{"utilization":56},"rate_limits":{"seven_day":{"resets_at":1756656000}}"#;
+        assert_eq!(with(mixed), Err("no weekly reset epoch"));
+        assert_eq!(with(r#""seven_day":{"utilization":"1..2","resets_at":"1756656000"}"#), Err("no weekly utilization"));
+        assert_eq!(with(r#""seven_day":{"utilization":56,"resets_at":{}}"#), Err("no weekly reset epoch"));
     }
 
     // spec: delegation-kit/SPEC.md §The usage.txt contract — no five-hour window maps to the empty
