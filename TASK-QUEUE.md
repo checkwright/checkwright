@@ -1038,13 +1038,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- test-hermetic-rerun-mkdir
-- rust-reader-turbofish-spacing
-- pipefail-fix-redirected-grep
-- release-archive-binary-mode
-- run-arm-smoke-fixes
-- binary-only-doc-gaps
-- migration-guard-silent-skips
-- verdict-key-arm
-- parsed-output-c-locale
-
