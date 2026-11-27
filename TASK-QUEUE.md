@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: migration-parity-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-26, lead decision under the operator's delegation of that date, not a ruling, on scope's recommendation):** the orchestrator adopter's asks on the gate-sdk content gates it retires its own checks onto. Debt: `migration-guard-byte-identity`, `shared-temp-fixed-names`, `content-gate-reading-limits`, `pipefail-reader-semantic-gaps`. Features for spec to author: `migration-guard-lint-parity` and `content-gate-calibrations`. The locale contract for parsed child output and `release-record-gates` lead the second granted iteration; no front-door rider.
-
-  **The release and pushes (2026-11-26, lead decision under the same delegation, not a ruling):** cut v0.40.0 at this iteration's close, a minor carrying the two fixes already on master (the quoted-identifier read and the optional lists' exit 3) and this set. Push need 2 against 2, inside the budget: the closing push, and the release tag whose publish run ships them.
 
 ---
 
