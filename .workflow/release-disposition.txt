@@ -1,3 +1,4 @@
 # contract: lifecycle-kit/SPEC.md §bin/enter-stage.sh — the release-disposition boundary record (RELEASING.md's close-stage release procedure).
 # One line per iteration at its release boundary, close-written; the line grammar is
 # lifecycle-kit/SPEC.md §templates/stages/'s and the cadence basis the close skill's release-policy binding's, neither restated here.
+release-provenance-pass release v0.42.0 — minor by the declarations (check-exec-write's fn-pointer turbofish, the platform archives' sidecars and attestation, the release stamp's grammar), no decommission; a supply-chain change whose proof needs the cut, granted as a lead decision under the operator's delegation 2026-11-27 in the scope set record
