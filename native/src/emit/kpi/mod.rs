@@ -261,14 +261,9 @@ pub fn days_ago(days: i64) -> Option<String> {
     Some(iso_day(civil_days(&today_iso())? - days))
 }
 
+// spec: drift-kit/SPEC.md §The stage-economics meter — an ISO day is a calendar-valid one
 pub fn is_iso_day(s: &str) -> bool {
-    let b = s.as_bytes();
-    b.len() == 10
-        && b[4] == b'-'
-        && b[7] == b'-'
-        && [0, 1, 2, 3, 5, 6, 8, 9]
-            .iter()
-            .all(|i| b[*i].is_ascii_digit())
+    crate::queue::is_calendar_date(s)
 }
 
 // spec: drift-kit/SPEC.md §Bundled KPIs — the awk section walk every queue-reading member shares:
@@ -322,6 +317,10 @@ mod tests {
         assert!(!is_iso_day("2026-8-29"));
         assert!(!is_iso_day("2026-08-291"));
         assert!(!is_iso_day("not-a-date"));
+        assert!(is_iso_day("2028-02-29"));
+        for impossible in ["2026-00-00", "2026-13-01", "2026-02-29", "2026-04-31", "2026-08-00"] {
+            assert!(!is_iso_day(impossible), "{}", impossible);
+        }
     }
 
     // spec: drift-kit/SPEC.md §Bundled KPIs — a written zone is applied as written, whatever the

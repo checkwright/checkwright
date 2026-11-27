@@ -161,8 +161,8 @@ type Dated = (Option<String>, [f64; 4]);
 
 impl Prices {
     // spec: drift-kit/SPEC.md §The stage-economics meter — input 3's row shape: several rows per
-    // model, a repeated (model, date) replacing the first; a row short of four price cells, a cell
-    // that is not a number, or a non-ISO date prices nothing and is kept by its 1-based line.
+    // model, a repeated (model, date) replacing the first; a short row, a cell that is no finite
+    // non-negative number, or a non-ISO date prices nothing and is kept by its 1-based line
     pub fn parse(text: &str) -> Prices {
         let mut rows: HashMap<String, Vec<Dated>> = HashMap::new();
         let mut malformed = Vec::new();
@@ -174,7 +174,7 @@ impl Prices {
             }
             let from = f.get(5).map(|v| v.trim()).filter(|v| !v.is_empty());
             let cells: Option<Vec<f64>> = (1..5)
-                .map(|i| f.get(i).and_then(|v| v.trim().parse::<f64>().ok()))
+                .map(|i| f.get(i).and_then(|v| v.trim().parse::<f64>().ok()).filter(|p| p.is_finite() && *p >= 0.0))
                 .collect();
             let (Some(cells), false) = (cells, from.is_some_and(|d| !super::kpi::is_iso_day(d))) else {
                 malformed.push(n + 1);
@@ -1353,6 +1353,28 @@ mod tests {
         }
         assert_eq!(p.cell("ok", t, "2026-01-01").as_deref(), Some("1.0000"));
         assert_eq!(p.malformed, vec![1, 2, 3]);
+    }
+
+    // spec: drift-kit/SPEC.md §The stage-economics meter — a price that parses as a float but is no
+    // finite non-negative price, and a date shaped like a day but on no calendar, price nothing
+    #[test]
+    fn a_non_finite_negative_or_impossible_dated_row_prices_nothing_and_is_counted() {
+        let p = Prices::parse(
+            "nan\tNaN\t0\t0\t0\n\
+             inf\t1\tinf\t0\t0\n\
+             neg\t1\t0\t-1\t0\n\
+             nodate\t1\t0\t0\t0\t2026-00-00\n\
+             ok\t1\t0\t0\t0\t2026-02-28\n",
+        );
+        let t = Tokens {
+            input: 1,
+            ..Tokens::default()
+        };
+        for id in ["nan", "inf", "neg", "nodate"] {
+            assert_eq!(p.cell(id, t, "2026-03-01"), None, "{id}");
+        }
+        assert_eq!(p.cell("ok", t, "2026-03-01").as_deref(), Some("1.0000"));
+        assert_eq!(p.malformed, vec![1, 2, 3, 4]);
     }
 
     // spec: drift-kit/SPEC.md §The stage-economics meter — Degradation: four zero counts price
