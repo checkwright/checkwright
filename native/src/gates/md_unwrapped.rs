@@ -279,7 +279,7 @@ fn corpus(include: &[String], exclude: &[String]) -> Result<Vec<String>, String>
     let mut specs: Vec<String> = include.to_vec();
     specs.extend(exclude.iter().map(|e| format!(":(exclude){}", e)));
     let refs: Vec<&str> = specs.iter().map(String::as_str).collect();
-    crate::listing::tracked(None, &refs).map_err(|e| {
+    crate::listing::tracked(None, &refs).map(|l| crate::listing::on_disk(None, l)).map_err(|e| {
         e.text_or(|code| {
             format!(
                 "git ls-files exited {} — the governed markdown set could not be enumerated",

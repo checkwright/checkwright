@@ -307,11 +307,14 @@ fn rule(args: &[String]) -> Result<i32, Fault> {
         }
     }
     let prune = walk::prune_dirs().map_err(Fault::refused)?;
-    let md: Vec<String> = tracked
-        .iter()
-        .filter(|t| t.ends_with(".md") && !under_any(&kit_roots, t) && !walk::path_pruned(t, &prune))
-        .cloned()
-        .collect();
+    let md: Vec<String> = crate::listing::on_disk(
+        None,
+        tracked
+            .iter()
+            .filter(|t| t.ends_with(".md") && !under_any(&kit_roots, t) && !walk::path_pruned(t, &prune))
+            .cloned()
+            .collect(),
+    );
     let headings = index_headings(&md).map_err(Fault::input)?;
 
     let mut findings: Vec<String> = Vec::new();

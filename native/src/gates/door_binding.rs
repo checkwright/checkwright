@@ -250,7 +250,7 @@ fn doors_on(line: &str, base: &str) -> Vec<(usize, usize)> {
 fn tracked_under(root: &str, entry: &str) -> Result<Vec<String>, String> {
     use crate::listing::Refusal;
     match crate::listing::tracked(Some(root), &[entry]) {
-        Ok(names) => Ok(names),
+        Ok(names) => Ok(crate::listing::on_disk(Some(root), names)),
         Err(Refusal::Failed(_)) => Ok(Vec::new()),
         Err(other) => Err(other.text()),
     }

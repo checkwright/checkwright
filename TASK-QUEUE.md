@@ -282,6 +282,16 @@ The observe half of `release-archive-provenance`: the first release `publish` ru
 
 **Cost while deferred:** until read, the produce half's guarantee to a binary-only consumer is unwitnessed on a real Release. Filed 2026-11-27 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner gate-sdk/SPEC.md §Consumer payload.
 
+### binary-only-archive-route
+
+[cost: event/low] [surface: docs]
+
+docs/binary-only.md takes the binary out of the whole Release tarball, since a per-target archive carries no `.gate` descriptor. Once the install pin names a release whose archives carry `.sha256` sidecars and an attestation, the page can offer the archive for the binary with `sha256sum -c` and `gh attestation verify`, and the tarball for the descriptors alone.
+
+**Deliverable:** feature: the archive route on docs/binary-only.md beside the tarball route, each command run against the pinned release.
+
+**Cost while deferred:** a binary-only reader downloads the whole tarball to take one binary. Its trigger is the pin moving past the first release carrying the sidecars. Filed 2026-11-27 by release-provenance-pass' close from a build inbox bullet. Re-verified: the page downloads the tarball and states the archive carries no descriptor. Owner lookup: `binary-only`, `archive route` in this file and the disposed-findings record, none; owner docs/binary-only.md and installer/SPEC.md §Layout.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).

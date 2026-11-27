@@ -29,6 +29,17 @@ pub fn tracked(top: Option<&str>, pathspecs: &[&str]) -> Result<Vec<String>, Ref
     names(top, &argv)
 }
 
+// spec: gate-sdk/SPEC.md §Fail-closed contract — a listed name the working tree has deleted is absent, never unreadable
+pub fn on_disk(top: Option<&str>, names: Vec<String>) -> Vec<String> {
+    names
+        .into_iter()
+        .filter(|n| {
+            let p = top.map_or_else(|| std::path::PathBuf::from(n), |t| std::path::Path::new(t).join(n));
+            !matches!(std::fs::symlink_metadata(p), Err(e) if e.kind() == std::io::ErrorKind::NotFound)
+        })
+        .collect()
+}
+
 // spec: gate-sdk/SPEC.md §Fail-closed contract — any NUL-terminated name read: the caller's argv carries `-z`
 pub fn names(top: Option<&str>, args: &[&str]) -> Result<Vec<String>, Refusal> {
     decode(&raw(top, args)?)
@@ -246,6 +257,20 @@ mod tests {
         let want = [("R ", "c d.md"), (" M", "na\u{ef}ve.md")];
         assert_eq!(got.iter().map(|s| (s.code.as_str(), s.path.as_str())).collect::<Vec<_>>(), want);
         assert!(opened);
+    }
+
+    #[test]
+    fn a_tracked_name_the_working_tree_deleted_drops_and_a_present_one_stays() {
+        let (base, top) = scratch("deleted");
+        for n in ["gone.md", "kept.md"] {
+            std::fs::write(base.join(n), "x\n").expect("write");
+        }
+        assert!(git(&["-C", &top, "add", "--", "."]));
+        std::fs::remove_file(base.join("gone.md")).expect("remove");
+        let listed = tracked(Some(&top), &["."]);
+        let kept = listed.map(|l| on_disk(Some(&top), l));
+        let _ = std::fs::remove_dir_all(&base);
+        assert_eq!(kept.expect("the listing succeeds"), ["kept.md"]);
     }
 
     #[test]
