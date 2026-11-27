@@ -102,7 +102,7 @@ The gate binary is one file and differs per target, so it is measured at each re
 
 <!-- install-binary:begin -->
 
-On `linux x86_64`, the gate binary `init` placed is **13.6 MB**, measured at v0.41.0.
+On `linux x86_64`, the gate binary `init` placed is **13.7 MB**, measured at v0.42.0.
 
 <!-- install-binary:end -->
 
@@ -112,7 +112,7 @@ The pre-commit hook runs the gates your profile registers whose triggers match t
 
 <!-- commit-cost:begin -->
 
-On `linux x86_64` with `14` logical CPUs, the hook ran `44` pre-commit gates over every tracked file in **265 ms**, the median of three, measured at v0.41.0.
+On `linux x86_64` with `14` logical CPUs, the hook ran `44` pre-commit gates over every tracked file in **190 ms**, the median of three, measured at v0.42.0.
 
 <!-- commit-cost:end -->
 

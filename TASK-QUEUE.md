@@ -222,16 +222,6 @@ wakeup-guard's denial says 'Attempt logged.' when `append_attempt` (native/src/h
 
 **Cost while deferred:** an adopter's attempt log misses denied attempts while the model is told they were logged. Surfaced 2026-11-25 by adopter-followthrough-pass' close second-vendor review, carried from its close; filed at the next scope. Re-verified here: both results discarded. Owner lookup: `append_attempt`, `Attempt logged` in this file, none; owner guard-kit/SPEC.md §wakeup-guard.
 
-### registry-readiness-observe
-
-[cost: event/low] [surface: installer] [observed-by: publish]
-
-The observe half of `front-door-registry-readiness`: the front-door legs run only in a release `publish` run, so the first release after the fix is the only run that shows the poll waiting for the tarball rather than the metadata.
-
-**Deliverable:** debt: read that run's front-door legs in both drivers, green with no E404 re-run; a red on registry lag is filed as a defect.
-
-**Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-27 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner installer/SPEC.md and scripts/ci-front-door.sh.
-
 ### manifest-name-deny-terms
 
 [cost: event/low] [surface: gate-sdk]
@@ -271,16 +261,6 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 **Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
 
 **Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
-
-### archive-provenance-observe
-
-[cost: event/low] [surface: installer] [observed-by: publish]
-
-The observe half of `release-archive-provenance`: the first release `publish` run after it lands is the only run that attaches the per-archive sidecars and attests the archives.
-
-**Deliverable:** debt: read that run's Release assets and attestation, each platform archive carrying its `.sha256` sidecar and verifying with `gh attestation verify`; a miss is filed as a defect.
-
-**Cost while deferred:** until read, the produce half's guarantee to a binary-only consumer is unwitnessed on a real Release. Filed 2026-11-27 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner gate-sdk/SPEC.md §Consumer payload.
 
 ### binary-only-archive-route
 
@@ -1037,4 +1017,7 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- archive-provenance-observe
+- registry-readiness-observe
 
