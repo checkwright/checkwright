@@ -10,7 +10,8 @@ case "${OSTYPE:-}" in msys* | cygwin* | win32*) _th_sep=';' ;; esac
 # spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — the empty files live in a directory private to this
 # user, made mode 700 and owner-checked before use; a name that is not private is refused, never used
 _th_dir="${TMPDIR:-/tmp}/gate-sdk-hermetic.$(id -u)"
-mkdir -m 700 "$_th_dir" 2>/dev/null
+# spec: gate-sdk/SPEC.md §lib/test-hermetic.sh — a name already present is left to the checks below, never an errexit death
+mkdir -m 700 "$_th_dir" 2>/dev/null || :
 _th_why=
 if [[ -L "$_th_dir" || ! -d "$_th_dir" ]]; then
     _th_why='is not a directory'

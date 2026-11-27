@@ -46,14 +46,6 @@ An outside engine can look a verdict up (`--verdict-lookup`) only by computing i
 
 ## Technical Debt
 
-### test-hermetic-rerun-mkdir
-
-gate-sdk/lib/test-hermetic.sh runs `mkdir -m 700` of its private directory unguarded (line 13), so under errexit a second source with the directory already present exits 1 before the privacy checks and the config pinning. gate-sdk/SPEC.md §lib/test-hermetic.sh refuses only a link, a non-directory, another user's directory or an open one.
-
-**Deliverable:** debt: the mkdir guarded, the checks below it deciding, with a case sourcing the library twice under `bash -e`.
-
-**Cost while deferred:** a suite that sources the library twice in one shell dies at exit 1 with no message. Surfaced 2026-11-26 by migration-parity-pass' close second-vendor review, carried from its close; filed at this scope. Re-verified here: `bash -ec` sourcing it twice exits 1 without reaching the next command. Owner lookup: `test-hermetic`, `mkdir` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/test-hermetic.sh.
-
 ### rust-reader-turbofish-spacing
 
 The Rust code reader's `callee` (native/src/rust_code.rs) wants `::` directly before a turbofish's `<` and an identifier directly before that `::`, so `std::fs::copy:: <&str, &str>(a, b)` and `std::fs::copy ::<&str, &str>(a, b)` read as no call and check-exec-write never sees them. gate-sdk/SPEC.md §The Rust code reader promises both the turbofish dropped and the whitespace around each `::` dropped.
@@ -1115,4 +1107,6 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- test-hermetic-rerun-mkdir
 

@@ -73,4 +73,9 @@ TMPDIR="$fresh" bash -c 'source "$1"' bash "$GATE_SDK_TEST_LIB_DIR/test-hermetic
     echo 'FAIL: the empty files are not under the private dir'
     exit 1
 }
-echo 'LIB-TEST-HERMETIC: clean (inherited kit variables cleared, binary kept, library and later pins applied, host git config unread, a non-private temp name refused)'
+twice="$(TMPDIR="$fresh" bash -ec 'source "$1"; source "$1"; echo twice' bash "$GATE_SDK_TEST_LIB_DIR/test-hermetic.sh")"
+[[ "$twice" == twice ]] || {
+    echo 'FAIL: a second source under errexit died on the private dir already present'
+    exit 1
+}
+echo 'LIB-TEST-HERMETIC: clean (inherited kit variables cleared, binary kept, library and later pins applied, host git config unread, a non-private temp name refused, a second source under errexit survived)'
