@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: install-link-safety-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-28, lead decision under the operator's delegation of 2026-11-26, not a ruling):** five debt entries on the native crate, in build order: `marker-target-lossy-resolve` first, so `block-seed-before-resolve` and `init-agent-seed-dangling-link` call the fixed resolver; then `knobenv-closure-barrier-gaps` and `audit-trigger-dod-citation`, the last joining because an align run or a waiver per amendment-bearing iteration outweighs one gate fix. No `session` or `iteration` row and no threshold recurrence stood; the adopter has no open asks, and the peer channel and the GitHub lanes hold nothing.
-
-  **The release (2026-11-28, lead decision under the same delegation, not a ruling):** a cut at this close is granted, its bump set by close's release policy; init's new refusal is a Behavior-changes candidate. `npm-trusted-publishing-observe` stays deferred, the lead asking the operator to register the trusted publisher before the tag.
-
-  **Push need (2026-11-28, inside the budget):** 2 of 2, the closing push and the release tag push; no entry is observed-by.
 
 ---
 

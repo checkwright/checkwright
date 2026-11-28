@@ -4,7 +4,4 @@
 
 ---
 
-install-link-safety-pass scope a2cbaaa8 2026-11-28 52808e3c4
-install-link-safety-pass build a3b90356 2026-11-28 3587feadc
-install-link-safety-pass validate a87c7c6f 2026-11-28 575ab741a
-install-link-safety-pass close a1e78814 2026-11-28 7f8353c8b
+— scope a467fb09 2026-11-28 770caa1b6
