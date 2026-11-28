@@ -1,14 +1,46 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: trusted-publish-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-28, scope decision under the operator's delegation of 2026-11-26, relayed by the lead's dispatch, not a ruling):** `npm-trusted-publishing` leads, the one tree-actionable `high` row on the board and the only one on a clock, its stored token lapsing by 2027-01-23 under npm's write-token cap (inferred); its observe half splits to Deferred, and the spec stage authors its amendment. `front-door-retry-marker` joins it on the release surface, and `doctrine-install-atomic-write` and `knob-lock-taker-exemption` take the last close's other two inbox bullets on the native crate. The three bullets alone were refused as an iteration: two are residue of a residue, worth a batch and not a fixed cost. The adopter has no open asks, and the peer channel and the GitHub lanes hold nothing. The trusted-publisher registration is an operator act under the operator's npm login; the produce half keeps the stored token as its fallback, so the set lands whether or not it is done by close.
+
+  **The release (2026-11-28, scope decision under the same delegation, not a ruling):** a cut at this close is granted where the set's declarations price one; the agent-file write fix is adopter-facing.
+
+  **The pushes (2026-11-28, scope decision under the same delegation, not a ruling):** push need 2 against 2, inside the grant: the closing push, and the tag push that fires `publish`, the first run of the changed `npm` job and of the retry marker. No unit needs a mid-iteration push.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### front-door-retry-marker
+
+`scripts/ci-front-door.sh`'s `npx_init` and its PowerShell twin in `ci-front-door.ps1` retry an ETARGET answer silently: npx's output goes only to the scratch log, truncated on the next attempt, so a green publish run cannot show whether the retry fired, and [npx-resolution-observe](#npx-resolution-observe) is read only by inference from the registry-to-init step latency (v0.44.0 publish run 46112266019).
+
+**Deliverable:** debt: one stdout line per retried attempt in both drivers, in their `front-door:` line form, with RELEASING.md §The front-door rehearsal naming it, so the next publish run's legs show whether the retry fired.
+
+**Cost while deferred:** the observe entry cannot be discharged on evidence, every release reading the retry by inference. Surfaced 2026-11-28 by crate-flake-write-residue-pass' close, its release watch; promoted at the next scope. Re-verified: both drivers' `npx_init` print nothing on the retry branch. Owner lookup: `ETARGET`, `ci-front-door` in this file, the observe entry; owner RELEASING.md §The front-door rehearsal.
+
+### doctrine-install-atomic-write
+
+init's doctrine recipe rewrites the agent file in place: `native/src/installer/recipe.rs` calls `doctrine::install_in`, whose `marker::install_block` ends in the in-place `std::fs::write` of `native/src/marker.rs`, so an interrupted install can tear the adopter's agent file and a hard link at it is written through; `init.rs` stages only the agent file's seed. `install.rs`'s `no_install_writer_writes_a_file_in_place` scans the install, init, recipe, user and uninstall sources but not `doctrine.rs` or `marker.rs`, the check class that missed it.
+
+**Deliverable:** debt: `marker::install_block` writes by the replace-by-rename path `install::write_atomically` already takes, the scan widened to `doctrine.rs` and `marker.rs`, installer/SPEC.md §The install boundary's narrowing to the seed lifted, and a release declaration. The writer is also gate-sdk/SPEC.md §lib/inject.sh's, so `--inject`'s callers take the same change.
+
+**Cost while deferred:** rare and harmful: an interrupted `init` or `--inject` can leave the adopter's always-loaded agent file torn. Surfaced 2026-11-28 by crate-flake-write-residue-pass' close, its second-vendor review, source-read confirmed; promoted at the next scope. Re-verified: `marker.rs` writes in place and `install.rs` holds `write_atomically`. Owner lookup: `marker.rs`, `install_block` in this file, none; owner installer/SPEC.md §The install boundary.
+
+### knob-lock-taker-exemption
+
+`native/src/knobenv.rs`'s `every_case_reaching_a_knob_reading_walk_holds_the_lock` exempts a test wholesale once it calls any lock-taking function, but a taker such as `emit/queue_index.rs`'s test helper `render` takes the guard locally and releases it on return, so a case calling a taker and then an unheld walk reader (`walk::find_files`) escapes the check. gate-sdk/SPEC.md §lib/gate.sh's "a case reaching one is held" overstates what the closure proves.
+
+**Deliverable:** debt: the check holds a case only where the guard spans its walk readers, so a released taker no longer exempts it, with a case proving a call-then-walk sequence reds; the SPEC sentence then holds as written.
+
+**Cost while deferred:** no live offender was shown, so the cost is a future crate-test flake the check would not catch. Surfaced 2026-11-28 by crate-flake-write-residue-pass' close, its second-vendor review, source-read confirmed; promoted at the next scope. Owner lookup: `knobenv`, `guard taker` in this file, none; owner gate-sdk/SPEC.md §lib/gate.sh.
 
 ## Deferred
 
@@ -126,13 +158,27 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 ### npm-trusted-publishing
 
-[cost: event/high] [surface: .github] [observed-by: publish]
+[cost: event/high] [surface: .github]
 
 The publish workflow's npm job authenticates with a stored `NPM_TOKEN` secret, which expired under the v0.34.0 publish (run 40193208238): E404 on the registry PUT after provenance signing, a release left half-out. Rotation then hit two more traps RELEASING.md step 5 does not name: a fresh token failed EOTP until npm-side 2FA settings changed, and a `gh secret set` fed an empty non-interactive stdin set the secret empty with no 'Set Actions secret' line. npm's 90-day write-token cap is the release session's understanding, unverified.
 
-**Deliverable:** design-pending, a feature: npm trusted publishing from GitHub Actions (OIDC), which stores no token and removes all three failure modes, with RELEASING.md and the publish workflow's spec rewritten to it; its npm-side registration is the operator's. The observe half reads the next release's `publish` run.
+**Deliverable:** design-pending, a feature: npm trusted publishing from GitHub Actions (OIDC), which stores no token and removes all three failure modes, with RELEASING.md and the publish workflow's spec rewritten to it; its npm-side registration is the operator's, a `npm trust github` act under the operator's npm login, since this box's npm CLI holds none (2026-11-28, `npm whoami` E401). **Inferred, not run:** that npm 11.5.1+ tries OIDC before `NODE_AUTH_TOKEN`, so the stored token can stay as the fallback until the first OIDC publish is read.
 
-**Cost while deferred:** each token period ends in a release halted half-out, and each rotation can fail silently. Surfaced 2026-10-25 by the v0.34.0 release session; filed at the next scope. Owner lookup: `NPM`, `trusted publish` in this file, none; owner RELEASING.md step 5.
+**Cost while deferred:** each token period ends in a release halted half-out, and each rotation can fail silently. The current secret was set 2026-10-25, so under npm's 90-day write-token cap (inferred, as above) it lapses by 2027-01-23. Surfaced 2026-10-25 by the v0.34.0 release session; filed at the next scope. Owner lookup: `NPM`, `trusted publish` in this file, none; owner RELEASING.md step 5.
+
+**Push need (2026-11-28, inside the budget):** none of its own; its changed `npm` job first runs in the release tag push close cuts, the set record's second push.
+
+Its observe half is [npm-trusted-publishing-observe](#npm-trusted-publishing-observe), split at scope 2026-11-28, the observation being release-run-only.
+
+### npm-trusted-publishing-observe
+
+[cost: event/high] [surface: .github] [observed-by: publish]
+
+The observe half of [npm-trusted-publishing](#npm-trusted-publishing): the npm job runs only in a release `publish` run, so the first release after the trusted-publisher registration is the only run that shows the package publishing over OIDC.
+
+**Deliverable:** debt: read that run's `npm` job, published with provenance and no `NODE_AUTH_TOKEN` read, then delete the `NPM_TOKEN` secret; a red is filed as a defect.
+
+**Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner RELEASING.md step 5.
 
 ### site-documents-unreleased
 
