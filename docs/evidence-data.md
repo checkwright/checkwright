@@ -327,3 +327,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | crate-flake-write-residue-pass | sc · · b v c | 0f/3d | 0 | 21s clean | 168 |
 | trusted-publish-pass | sc sp · b v c | 2f/4d | 1 · ≤0d | 21s clean | 168 |
 | install-link-safety-pass | sc · · b v c | 0f/5d | 0 | 21s clean | 168 |
+| cross-file-duplicate-pass | sc sp · b v c | 2f/4d | 1 · ≤0d | 21s clean | 169 |

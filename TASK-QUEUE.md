@@ -132,18 +132,6 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-25 on 0.164.0 in a scratch home: still none beside the root manifest; with it moved aside the hooks are discovered, marked untrusted, since 0.164.0 gates plugin hooks on trust. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
-### npm-trusted-publishing-observe
-
-[cost: event/high] [surface: .github]
-
-The observe half of `npm-trusted-publishing`: the npm job runs only in a release `publish` run, so the first release after the trusted-publisher registration is the only run that shows the package publishing over OIDC.
-
-**Deliverable:** debt: the read is done (below). Build points RELEASING.md step 5's sentence on deleting the secret at the closing session, a GitHub write after the account step. Close deletes the `NPM_TOKEN` secret before the release tag push, so that publish run is the first with no stored fallback; a red is filed as a defect. `publish.yml`'s fallback branch stays, since it reads an absent secret as unset. **Delete at close (2026-11-28, operator direction, lead-relayed, not a ruling):** the closing session deletes it after the account step, the fallback proven unneeded.
-
-**Push need (2026-11-28, inside the budget):** the release tag push at close, whose publish run witnesses the trusted publisher alone.
-
-**Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.46.0 publish run 46136462075: the `npm` job green under npm 11.19.1, a signed provenance statement published, and `_npmUser` reading `GitHub Actions <npm-oidc-no-reply@github.com>`, so the trusted publisher published while `NPM_TOKEN` was still set; the read is done and only the secret's deletion remains. Owner lookup: the parent's; owner RELEASING.md step 5.
-
 ### site-documents-unreleased
 
 [cost: event/low] [surface: docs] [not-icebox-eligible: 2026-11-14 its since: lever landed at liveness-arm-adoption-pass, and which pages it widens to is the next scope's call]
@@ -245,6 +233,16 @@ An adopter finding, relayed by the lead from the orchestrator adopter and measur
 **Deliverable:** design-pending, a feature: either a key field digesting every knob file the run read, or a refusal to store or emit a keyed verdict while an untracked knob layer is read, with the verdict-key goldens moved and a fixture per arm.
 
 **Cost while deferred:** a verdict looked up or carried between hosts can be a pass one host's local overlay bought. About one iteration with a spec stage, the key's contract version and goldens moving with it. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Re-verified by reading §run-gates' verdict store's key paragraph and the `worktree` row. Owner lookup: `verdict key`, `local.knobs`, `treeId` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates' verdict store.
+
+### drain-exempt-successor-shape
+
+[cost: event/low] [surface: lifecycle-kit]
+
+A scope promoted an active entry carrying the drain-exempt tag whose remaining work was close's, not the drain stage's. `check-stage-entry` assertion B's backstop refused close's entry on it (lifecycle-kit/SPEC.md §check-stage-entry), and validate had to demote it after an escalation round trip. The filer's premise that the scope template offers the shape fell on re-verification: lifecycle-kit/templates/stages/scope.md already keeps later-stage work deferred with the obligation in the set record. What is missing is a refusal at scope, since the tag's reason is free text and no arm can tell drain-stage work from a later stage's.
+
+**Deliverable:** design-pending, a feature: a scope-time refusal over a decidable signal, or that honest limit stated at assertion B.
+
+**Cost while deferred:** a misplaced tag surfaces only at the drain stage's successor read, costing one escalation and a demotion. Filed 2026-11-28 by cross-file-duplicate-pass' close from the lead's relayed inbox bullet. Owner lookup: `drain-exempt` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
 
 ## Icebox
 
@@ -998,4 +996,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - seed-write-link-race
 - knobenv-struct-comment-scan
 - rewrite-lossy-operand-identity
+- npm-trusted-publishing-observe
 
