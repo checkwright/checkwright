@@ -324,3 +324,4 @@ Knowledge-friction counts are excluded: their log is gitignored per-iteration sc
 | release-provenance-pass | sc sp a b v c | 1f/3d | 1 · ≤0d | 21s clean | 168 |
 | uninstall-containment-pass | sc · · b v c | 0f/5d | 0 | 21s clean | 168 |
 | link-shape-residue-pass | sc · · b v c | 0f/2d | 0 | 21s clean | 168 |
+| crate-flake-write-residue-pass | sc · · b v c | 0f/3d | 0 | 21s clean | 168 |
