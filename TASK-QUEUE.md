@@ -224,6 +224,46 @@ The observe half of `front-door-npx-resolution`: the front-door legs run only in
 
 **Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.44.0 publish run 46112266019: every front-door leg of both drivers green on the run's first attempt, and no lag seen, the package route's registry-to-init gap matching the v0.43.0 pre-fix run's, so the fix is still unwitnessed and the entry stays. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
 
+### marker-target-admission-gaps
+
+[cost: event/low] [surface: gate-sdk]
+
+`marker::target` (`native/src/marker.rs`) checks only the final component, and only that it resolves inside the repository. A target whose leaf is no link returns unchecked, so a seed or block reached through a linked parent directory (`profiles -> ../outside` under the env-profile knob, or a linked `.git/info`) writes outside the repository. And a leaf link resolving to a directory inside the repository is admitted, so `init`, whose agent-file seed guard is `!is_file()`, renames its seed over a `CLAUDE.md` link to a directory.
+
+**Deliverable:** debt: refuse a link resolving to anything but a regular file, and resolve the target's parent so a linked directory component is contained too, with gate-sdk/SPEC.md §lib/inject.sh widened to say so and a unit case each.
+
+**Cost while deferred:** a target under a linked directory naming one outside the repository has the install write there, and a `CLAUDE.md` link to a directory is replaced by init's seed, the directory itself untouched. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `target`'s early return on a leaf that is no link, and `agent_file_resolves` admitting a contained directory ahead of the `is_file` seed guard and `write_atomically`. Owner lookup: `linked parent`, `parent directory`, `regular file` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh and installer/SPEC.md §What init seeds.
+
+### seed-write-link-race
+
+[cost: event/low] [surface: gate-sdk]
+
+The three seeding arms resolve the target, test its absence and then seed it with `fs::write` (`native/src/emit/install_lifecycle.rs`, `emit/env_probe.rs`, `installer/personal.rs`), which follows a link. A link planted between the resolve and the seed has the seed create the file it names outside the repository before the block writer refuses, and at `--install-lifecycle` the agent-file block is already written by then.
+
+**Deliverable:** debt: seed with an exclusive create (`OpenOptions::create_new`), which fails on any entry at the path, a link included, in all three arms, with one unit case.
+
+**Cost while deferred:** the window needs a concurrent writer in the adopter's own tree and opens on an absent target only, so nothing is overwritten; at worst an empty file is created outside the repository. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `marker::target`, then the `is_file` test, then `fs::write` in install_lifecycle.rs. Owner lookup: `create_new`, `race`, `TOCTOU` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
+### knobenv-struct-comment-scan
+
+[cost: event/low] [surface: gate-sdk]
+
+The guard-owning struct scan in `native/src/knobenv.rs` ends a declaration on its own line only when that line ends in `;` or `}`, so `struct Empty; // note` runs on to the next bare `}` and takes a later struct's `KnobEnv` field as its own. A releasing taker returning `Empty` then reads as handing the guard back, so a test calling it reads held and an unlocked reader passes. gate-sdk/SPEC.md §lib/gate.sh's honest limits name aliases, generics and macros, never this.
+
+**Deliverable:** debt: drop a trailing line comment before the boundary test, with a unit case.
+
+**Cost while deferred:** a false negative only where a unit or one-line struct carries a trailing comment and a guard struct follows it; no such declaration is in the crate (`struct <name>; //` grepped over native/src at the close head, none). Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read of `guard_types`. Owner lookup: `trailing comment`, `guard_types` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/gate.sh.
+
+### rewrite-lossy-operand-identity
+
+[cost: event/low] [surface: guard-kit]
+
+`check_operand` in `native/src/emit/rewrite.rs` writes to the operand's resolved path with its bytes kept, but tests containment and duplicates on the lossy spelling, the working directory's included. Two operands resolving to distinct files whose names differ only in bytes that are not UTF-8 read as one file and refuse the run, and under a working directory whose name is not UTF-8, a link to a sibling directory differing only in those bytes passes containment. guard-kit/SPEC.md §rewrite refuses only an operand naming the same canonical file as an earlier one, and one outside the working directory.
+
+**Deliverable:** debt: resolve the working directory as a path and compare and contain on paths, with a unix case for each half.
+
+**Cost while deferred:** a false refusal of two such operands, and a containment escape reachable only from a working directory whose name is not UTF-8. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `seen` compares `canonical`, the display string, and `root` is `walk::canonicalize` of the working directory. Owner lookup: `lossy`, `same canonical file` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §rewrite.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
