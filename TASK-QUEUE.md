@@ -244,6 +244,26 @@ A scope promoted an active entry carrying the drain-exempt tag whose remaining w
 
 **Cost while deferred:** a misplaced tag surfaces only at the drain stage's successor read, costing one escalation and a demotion. Filed 2026-11-28 by cross-file-duplicate-pass' close from the lead's relayed inbox bullet. Owner lookup: `drain-exempt` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
 
+### duplicate-text-reader-defects
+
+[cost: event/low] [surface: canon-kit]
+
+Close's second-vendor review found `check-duplicate-text` departing from canon-kit/SPEC.md §check-duplicate-text, each case probed on a scratch tree. One file named by two spellings, such as `a.md` and `./a.md`, or reached through a symlink alias, compares as two files and reds against itself, because the file set dedupes relative strings, not file identity. An earlier repeated prefix splits a shared six-word run into runs of 5 and 3, because the window index keeps only a window's first occurrence, against the full-length reporting sentence. A `~~~` fence counts as prose, because the reader's fence state starts with tilde fences off. A front-matter block scalar holding a line that opens a backtick fence leaves the walker inside the fence, so the body is never compared. Smaller: the unreadable-file test prints its full coverage claim after a SKIP, and the default's grounds cite runs of 8 to 11 words where the amendment sampled 8 to 10.
+
+**Deliverable:** a fix with a fixture case for each, the full-length search taking every earlier occurrence of a window.
+
+**Cost while deferred:** the gate is off until a consumer sets its globs; an armed one gets a false finding on an aliased file and on a tilde fence, a short report on a repeated prefix, and a miss behind such front matter. Filed 2026-11-28 by cross-file-duplicate-pass' close. Owner lookup: `duplicate-text` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md §check-duplicate-text.
+
+### marker-parent-swap-race
+
+[cost: event/low] [surface: gate-sdk]
+
+The marker writers check a target's containment, then create or rename by path. A parent directory swapped for a link pointing outside the repository between the two lands the write outside it: the exclusive create holds the leaf only. gate-sdk/SPEC.md §lib/inject.sh says no write escapes the repository, without that limit. Close's second-vendor review found it by reading the code; it is a race, not reproduced.
+
+**Deliverable:** design-pending, a decision: directory-handle-relative creates on unix with a stated Windows limit, or the race stated as the section's honest limit.
+
+**Cost while deferred:** exploiting it needs a process already writing inside the repository to win a race against an install, in the ordinary case the installing user's own. Filed 2026-11-28 by cross-file-duplicate-pass' close. Owner lookup: `marker` races in this file and the disposed-findings record, none beyond the landed seed-write-link-race; owner gate-sdk/SPEC.md §lib/inject.sh.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
