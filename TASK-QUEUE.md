@@ -1,18 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: crate-flake-write-residue-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-28, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** debt only, so no authoring stage walks. `crate-test-corpus-read-flake` leads, the one per-run cost in the intake; `install-boundary-write-residue` takes the three install-boundary bullets of the last close; `front-door-npx-resolution` takes the lead-observed red of the v0.43.0 publish run, its observe half split to Deferred. The adopter has no open asks, the peer channel and the GitHub lanes hold nothing, and the price table's re-check horizon is rolled at this scope, its page hash unchanged. `audit-trigger-dod-citation` stays deferred, since narrowing assertion C changes what lifecycle-kit/SPEC.md §check-stage-entry states it reads; `release-record-gates` and `ruling-claim-outside-ledger` stay deferred as features the debt-only walk does not carry.
-
-  **The release (2026-11-28, lead decision under the same delegation, not a ruling):** a patch cut at this close is granted where the set's declarations price one; the install-boundary fixes are adopter-facing.
-
-  **The pushes (2026-11-28, lead decision under the same delegation, not a ruling):** push need 2 against 2, inside the grant: the closing push, and the tag push that fires `publish`. No unit needs a mid-iteration push: the fixes are portable std, the PowerShell twin is parsed on every push, and its run waits for the tag.
-
-  **The close hotfix (2026-11-28, lead decision under the same delegation, not a ruling):** the closing push red on both `crate-tests-windows` legs, two new race tests asserting past their contract; they are fixed in this close as the push-budget binding's first hotfix push, the tag push following inside that envelope. A Windows PermissionDenied on the install race test's reader open is retried and a torn body still fails; the usage race test compares with `updated_at` stripped and checks its shape. A second red escalates before any further hotfix push. The version is the derived minor, v0.44.0.
 
 ---
 
