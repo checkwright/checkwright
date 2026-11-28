@@ -105,6 +105,7 @@
 3621cp docs/posts/2026-11-28-checkwright-v0-44-0.md
 2795cp docs/posts/2026-11-28-checkwright-v0-45-0.md
 3807cp docs/posts/2026-11-28-checkwright-v0-46-0.md
+5170cp docs/posts/2026-11-28-checkwright-v0-47-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 8559cp docs/requirements.md
