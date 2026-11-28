@@ -244,6 +244,36 @@ The observe half of `front-door-npx-resolution`: the front-door legs run only in
 
 **Cost while deferred:** an adopter whose agent file is a dangling link has the link replaced by init's seed with no notice, so a later fix of the link's target forks from it. The bug predates this iteration. Its preflight costs one `marker::target` read. Filed 2026-11-28 by trusted-publish-pass' close from build's inbox bullet. Re-verified: the seed guard is `!root.join(AGENT_FILE).is_file()` and the write is `install::write_atomically`, read at the close entry head, and `Path::is_file` reads false on a dangling link, probed with a scratch binary. Owner lookup: `dangling`, `agent-file seed`, `seeds_agent` in this file and the disposed-findings record, none; owner installer/SPEC.md §What init seeds.
 
+### block-seed-before-resolve
+
+[cost: event/low] [surface: lifecycle-kit]
+
+`--install-lifecycle` seeds an absent `.gitattributes` with `fs::write` (`native/src/emit/install_lifecycle.rs`) before `marker::install_block` resolves that target. `fs::write` follows a link, so a `.gitattributes` link to an absent path outside the repository creates the external file, and only then does the writer refuse. `emit/env_probe.rs` and `installer/personal.rs` seed in the same order. gate-sdk/SPEC.md §lib/inject.sh rules that an escaping or dangling link refuses every writer with nothing written.
+
+**Deliverable:** run `marker::target` on every block target before any seed of it, in all three arms, with one unit case per arm.
+
+**Cost while deferred:** a planted `.gitattributes` link can make an install create an empty file at an absent path outside the repository. Nothing is overwritten, since an existing target is never seeded. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Re-verified by source read at the close head: the `is_file` guard, then `fs::write`, then `install_block`. Owner lookup: `gitattributes`, `marker::target` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
+### knobenv-closure-barrier-gaps
+
+[cost: event/low] [surface: gate-sdk]
+
+The knob-lock case check in `native/src/knobenv.rs` misreads two shapes. A false negative: the reader closure's barrier is the transitive set of guard takers, so a function that calls a releasing taker and then walks (`render(); walk::find_files();`) counts as a taker, and a test calling only it passes unheld. A false positive: the guard-owning struct scan starts on the line after the struct's declaration, so `struct Held { env: KnobEnv }` on one line, or `struct Held(KnobEnv);`, goes unrecognised, and a test holding one reds.
+
+**Deliverable:** bar the closure at direct takers only, so a releasing taker leaves its caller a reader, and read a struct's fields from its declaration line, tuple fields included. Add one unit fixture per shape, and widen the honest-limit line in gate-sdk/SPEC.md §lib/gate.sh to the shapes that remain.
+
+**Cost while deferred:** a crate test can walk unheld through a wrapper without the check catching it, and the sibling-write race it guards against can recur under it. A false red costs a rewrite of the struct. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Re-verified by source read at the close head. Owner lookup: `knobenv`, `lockers` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/gate.sh.
+
+### marker-target-lossy-resolve
+
+[cost: event/low] [surface: gate-sdk]
+
+`marker::target` (`native/src/marker.rs`) rebuilds the resolved path from `walk::canonicalize`'s string, which goes through the lossy `Path::display`. On Unix, a link to an in-repository filename with invalid UTF-8 can then resolve to a different file whose name has replacement characters in those positions, and the writer rewrites that file.
+
+**Deliverable:** keep the resolved `PathBuf` through resolution, or refuse a target that has no UTF-8 representation, with one Unix unit case.
+
+**Cost while deferred:** this needs two crafted filenames in the adopter's own tree, so it is reachable only by deliberate construction. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Owner lookup: `canonicalize`, `lossy` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
