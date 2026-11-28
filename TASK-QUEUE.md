@@ -990,11 +990,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- cross-file-duplicate-text
-- gates-dir-knob-resolution
-- marker-target-admission-gaps
-- seed-write-link-race
-- knobenv-struct-comment-scan
-- rewrite-lossy-operand-identity
-- npm-trusted-publishing-observe
-
