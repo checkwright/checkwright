@@ -72,16 +72,19 @@ pub fn entry(scope: Scope, status: i32, p: &Provenance) -> Option<(String, Strin
 }
 
 // spec: gate-sdk/SPEC.md §run-gates — a temporary file in the store renamed over the key, so a
-// reader never sees a partial record
+// reader never sees a partial record; the temporary is installer/SPEC.md §The install boundary's
+// exclusive create, so a link standing at its name is unlinked, never written through
 pub fn write(dir: &Path, name: &str, body: &str) -> Result<(), String> {
-    let fail = |e: std::io::Error| format!("cannot write the verdict store {}: {}", dir.display(), e);
-    std::fs::create_dir_all(dir).map_err(fail)?;
+    let fail = |e: String| format!("cannot write the verdict store {}: {}", dir.display(), e);
+    std::fs::create_dir_all(dir).map_err(|e| fail(e.to_string()))?;
     let tmp = dir.join(format!(".{}.{}.tmp", name, std::process::id()));
-    std::fs::write(&tmp, body).map_err(fail)?;
-    std::fs::rename(&tmp, dir.join(name)).map_err(|e| {
+    let stored = crate::install::create_tmp(&tmp)
+        .and_then(|mut f| std::io::Write::write_all(&mut f, body.as_bytes()).map_err(|e| e.to_string()))
+        .and_then(|()| std::fs::rename(&tmp, dir.join(name)).map_err(|e| e.to_string()));
+    if stored.is_err() {
         let _ = std::fs::remove_file(&tmp);
-        fail(e)
-    })
+    }
+    stored.map_err(fail)
 }
 
 fn operands(args: &[String]) -> Result<(&str, &str, &str), Fault> {
@@ -279,6 +282,30 @@ mod tests {
         let want = crate::sha256::hex(b"verdict-key v1\nt\n1.0.0\ns\n");
         assert_eq!(file_name("t", "1.0.0", "s"), format!("{}.json", want));
         assert_ne!(file_name("t", "1.0.0", "s"), file_name("t", "1.0.1", "s"));
+    }
+
+    // spec: gate-sdk/SPEC.md §run-gates — a hard link, or a symbolic one on unix, at the store's
+    // temporary is unlinked and the file it reaches left byte-identical
+    #[test]
+    fn a_link_at_the_store_temporary_is_never_written_through() {
+        let dir = scratch("link");
+        std::fs::create_dir_all(&dir).expect("scratch");
+        let name = "key.json";
+        let tmp = dir.join(format!(".{}.{}.tmp", name, std::process::id()));
+        let outside = dir.join("outside");
+        std::fs::write(&outside, "not the store's\n").expect("cannot write the victim");
+        #[cfg_attr(not(unix), allow(unused_mut))]
+        let mut plants: Vec<fn(&Path, &Path) -> std::io::Result<()>> = vec![|v, t| std::fs::hard_link(v, t)];
+        #[cfg(unix)]
+        plants.push(|v, t| std::os::unix::fs::symlink(v, t));
+        for plant in plants {
+            plant(&outside, &tmp).expect("cannot plant the link");
+            write(&dir, name, "{}").expect("the store write failed");
+            assert_eq!(std::fs::read_to_string(&outside).expect("the victim went"), "not the store's\n");
+            assert_eq!(std::fs::read_to_string(dir.join(name)).expect("no record"), "{}");
+            assert!(std::fs::symlink_metadata(&tmp).is_err(), "the temporary stayed");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: gate-sdk/SPEC.md §run-gates — the arm's table: an answer at 0, a malformed operand at 2

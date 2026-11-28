@@ -41,15 +41,7 @@ impl Snapshot {
     // read by a second process, so a partial write must never be observable. A failed write leaves
     // the previous snapshot untouched, which the reader grades as STALE rather than as green.
     pub fn write(&self, usage_file: &str) -> bool {
-        let tmp = format!("{}.tmp", usage_file);
-        if std::fs::write(&tmp, self.render()).is_err() {
-            return false;
-        }
-        if std::fs::rename(&tmp, usage_file).is_err() {
-            let _ = std::fs::remove_file(&tmp);
-            return false;
-        }
-        true
+        crate::install::write_atomically(std::path::Path::new(usage_file), self.render().as_bytes()).is_ok()
     }
 }
 
@@ -191,6 +183,40 @@ mod tests {
         assert!(text.trim_end().ends_with("\ntier=max"));
         assert!(!text.contains("seven_day"), "an absent axis must not be written");
         assert!(!text.contains("account="), "an absent account must not be written");
+    }
+
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — a hard link, or a symbolic one on unix,
+    // at the snapshot's temporary is unlinked and the file it reaches left byte-identical
+    #[test]
+    fn a_link_at_the_snapshot_temporary_is_never_written_through() {
+        let dir = std::env::temp_dir().join(format!("cw-usage-link-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("scratch");
+        let usage = dir.join("usage.txt");
+        let tmp = crate::install::sibling_tmp(&usage);
+        let outside = dir.join("outside");
+        std::fs::write(&outside, "not the snapshot\n").expect("cannot write the victim");
+        let s = Snapshot {
+            five_hour_used_pct: "12".to_string(),
+            five_hour_resets_at: "1756656000".to_string(),
+            seven_day_used_pct: String::new(),
+            seven_day_resets_at: String::new(),
+            account: String::new(),
+            tier: String::new(),
+        };
+        #[cfg_attr(not(unix), allow(unused_mut))]
+        let mut plants: Vec<fn(&std::path::Path, &std::path::Path) -> std::io::Result<()>> =
+            vec![|v, t| std::fs::hard_link(v, t)];
+        #[cfg(unix)]
+        plants.push(|v, t| std::os::unix::fs::symlink(v, t));
+        for plant in plants {
+            plant(&outside, &tmp).expect("cannot plant the link");
+            assert!(s.write(&usage.to_string_lossy()), "the snapshot write failed");
+            assert_eq!(std::fs::read_to_string(&outside).expect("the victim went"), "not the snapshot\n");
+            assert!(std::fs::read_to_string(&usage).expect("no snapshot").starts_with("five_hour_used_pct=12\n"));
+            assert!(std::fs::symlink_metadata(&tmp).is_err(), "the temporary stayed");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: delegation-kit/SPEC.md §The usage.txt contract — an epoch passes through and a

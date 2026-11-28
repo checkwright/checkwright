@@ -675,7 +675,7 @@ The `--usage-poll` arm is the poll producer, closing the push producer's blind s
 1. read the harness OAuth token from `DELEGATION_KIT_CRED_FILE`; the token goes into the request header and nowhere else, never logged, echoed or written to the snapshot;
 2. query the account usage source;
 3. map the payload onto the contract, the three mandatory lines plus whichever optional keys the source exposes, with **no new key**. Each pair comes whole from one shape, the flat window object wherever it carries either half, else the nested `rate_limits` one, never composed across the two. No five-hour window writes that pair empty (§usage-verdict, Two pause axes); neither axis, or half of one or one out of shape, is unparseable;
-4. atomically rewrite the snapshot (`tmp` + `mv`).
+4. atomically rewrite the snapshot (`tmp` + `mv`), the `tmp` created exclusively at both producers (installer/SPEC.md §The install boundary).
 
 No daemon, no loop: scheduling belongs to the consumer, and two modes are sanctioned. **Demand-driven** (§usage-verdict): point `DELEGATION_KIT_REFRESH_CMD` at the poller, and it runs at verdict time with the freshest reading at the decision point. **Timer-driven**: a cron line such as `*/5 * * * * bash gate-sdk/bin/run-gates.sh --usage-poll`, or a systemd timer, for continuous trend density independent of verdict calls. Either entry is the enabling config; with neither, the producer is dead.
 

@@ -164,9 +164,18 @@ fn store(cache: &Path, text: &str) -> std::io::Result<()> {
         std::process::id(),
         STORE_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     ));
-    let stored = std::fs::write(&tmp, text).and_then(|()| std::fs::rename(&tmp, cache));
+    store_through(cache, &tmp, text)
+}
+
+// spec: installer/SPEC.md §The install boundary — the temporary is created exclusively, so a link
+// standing at its name is unlinked, never written through
+fn store_through(cache: &Path, tmp: &Path, text: &str) -> std::io::Result<()> {
+    let stored = crate::install::create_tmp(tmp)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
+        .and_then(|mut f| std::io::Write::write_all(&mut f, text.as_bytes()))
+        .and_then(|()| std::fs::rename(tmp, cache));
     if stored.is_err() {
-        let _ = std::fs::remove_file(&tmp);
+        let _ = std::fs::remove_file(tmp);
     }
     stored
 }
@@ -382,6 +391,29 @@ mod tests {
         for d in [dir, blocked] {
             let _ = std::fs::remove_dir_all(&d);
         }
+    }
+
+    // spec: installer/SPEC.md §The install boundary — a hard link, or a symbolic one on unix, at the
+    // store's temporary is unlinked and the file it reaches left byte-identical
+    #[test]
+    fn a_link_at_the_store_temporary_is_never_written_through() {
+        let dir = scratch("store-link");
+        let cache = dir.join(CACHE_FILE);
+        let tmp = dir.join(format!("{}.planted.tmp", CACHE_FILE));
+        let outside = dir.join("outside");
+        std::fs::write(&outside, "not the cache's\n").expect("cannot write the victim");
+        #[cfg_attr(not(unix), allow(unused_mut))]
+        let mut plants: Vec<fn(&Path, &Path) -> std::io::Result<()>> = vec![|v, t| std::fs::hard_link(v, t)];
+        #[cfg(unix)]
+        plants.push(|v, t| std::os::unix::fs::symlink(v, t));
+        for plant in plants {
+            plant(&outside, &tmp).expect("cannot plant the link");
+            store_through(&cache, &tmp, &record(4, Some("4.0.0"), "u")).expect("store");
+            assert_eq!(std::fs::read_to_string(&outside).expect("the victim went"), "not the cache's\n");
+            assert_eq!(std::fs::read_to_string(&cache).expect("record"), "4 4.0.0 u\n");
+            assert!(std::fs::symlink_metadata(&tmp).is_err(), "the temporary stayed");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: installer/SPEC.md §The update notice — a record that cannot be stored still answers its
