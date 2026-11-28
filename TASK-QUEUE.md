@@ -970,7 +970,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- atomic-write-temp-link
-- uninstall-check-remove-window
-- usage-pair-shape-residue
-
