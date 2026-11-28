@@ -1,14 +1,46 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: link-shape-residue-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-28, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** debt only, so no authoring stage walks. The four carried second-vendor-review bullets are the set, as three entries: `atomic-write-temp-link` leads, as the one adopter-facing data-safety defect on the board, widened to the two sites sharing its shape; `uninstall-check-remove-window` states the limit rather than removing handle-relative; `usage-pair-shape-residue` takes both producer-shape bullets. The adopter has no open asks, and the peer channel holds no request. `exit-status-funnel-typing` stays deferred, since its 527 call sites buy an exit-code cut no in-tree reader branches on; `release-record-gates` and `audit-trigger-dod-citation` stay deferred, since each needs a design call the set's debt-only walk does not carry.
+
+  **The release (2026-11-28, lead decision under the same delegation, not a ruling):** v0.43.0 is cut at this close, carrying the last close's four Behavior-changes declarations, the uninstall data-safety fix among them, and this set's fixes.
+
+  **The pushes (2026-11-28, lead decision under the same delegation, not a ruling):** push need 2 against 2, inside the grant: the closing push, and the v0.43.0 tag push that fires `publish`. No unit needs a mid-iteration push: each fix is portable std or pure parsing with no per-host branch, and the closing push's Windows legs read green before the tag is cut.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### atomic-write-temp-link
+
+`write_atomically` in native/src/installer/user.rs writes its sibling temporary (`<file>.tmp`) with `std::fs::write`, which follows a link already standing at that path, so a link at `user.lock.tmp` makes every user-form lock write, `uninstall --user`'s narrowing included, overwrite a file outside the data dir; the link preflight never reads the temporary. Two more sites share the shape: `place_binary`'s `fs::copy` onto the same sibling temporary, and native/src/install.rs `write_atomically`, the repo-scope seam write, where a link committed in the adopter's tree stands at the temporary.
+
+**Deliverable:** debt: each temporary created exclusively (any stale entry at the path removed first, the create refusing an existing one), with a case per site for a link at the temporary.
+
+**Cost while deferred:** a planted or stale link at a temporary turns an install write into an overwrite outside the install. Surfaced 2026-11-28 by the second-vendor review at uninstall-containment-pass' close, carried from its close; filed at the next scope. Re-verified: all three sites open the temporary following links. Owner lookup: `write_atomically`, `sibling_tmp` in this file, none; owner installer/SPEC.md §The user install and §The install boundary.
+
+### uninstall-check-remove-window
+
+`uninstall --user` reads each path for a link once, then removes by path, so a component swapped for a link between the check and the `remove_file` still removes through it, while installer/SPEC.md §uninstall states 'Nothing is removed through a link' unqualified.
+
+**Deliverable:** debt: the section states the check-then-remove limit, that the preflight refuses a link standing when it runs and not one swapped in during the run, with the ground: the only party able to swap one is a same-user writer of the data dir. Handle-relative removal is not taken, since it needs per-host code the remote legs alone reach.
+
+**Cost while deferred:** the SPEC promises a containment the code gives only against a link present at preflight. Surfaced 2026-11-28 by the second-vendor review at uninstall-containment-pass' close, carried from its close; filed at the next scope. Owner lookup: `link_below`, `through a link` in this file, none; owner installer/SPEC.md §uninstall.
+
+### usage-pair-shape-residue
+
+Two producer paths still admit shapes delegation-kit/SPEC.md §The usage.txt contract excludes. The poller's `axis()` (native/src/hook/poll.rs) reads a non-string non-number value as empty, so a pair present with object values reads as no window and a fresh snapshot is written without that axis, where a malformed pair writes nothing; the same mapping lets a malformed flat pair fall through to the nested shape. And `usage::epoch_of` reads a non-digit reset through `kpi::date_epoch`, which accepts a bare calendar day at local midnight, where the contract states an epoch or an ISO datetime.
+
+**Deliverable:** debt: a present non-scalar half is out of shape and blocks the nested fallback, and a reset needs a time of day, each with a case.
+
+**Cost while deferred:** a malformed source payload disarms an axis or arms it at a guessed instant, unseen. Surfaced 2026-11-28 as two bullets from the second-vendor review at uninstall-containment-pass' close, carried from its close; filed at the next scope. Re-verified: both mappings as stated. Owner lookup: `axis`, `epoch_of`, `date_epoch` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
 
 ## Deferred
 

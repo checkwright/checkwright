@@ -4,4 +4,4 @@
 
 ---
 
-— scope ac5dcb41 2026-11-28 45a5c3654
+link-shape-residue-pass scope ac5dcb41 2026-11-28 45a5c3654
