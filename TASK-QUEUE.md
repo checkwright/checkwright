@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### uninstall-check-remove-window
-
-`uninstall --user` reads each path for a link once, then removes by path, so a component swapped for a link between the check and the `remove_file` still removes through it, while installer/SPEC.md §uninstall states 'Nothing is removed through a link' unqualified.
-
-**Deliverable:** debt: the section states the check-then-remove limit, that the preflight refuses a link standing when it runs and not one swapped in during the run, with the ground: the only party able to swap one is a same-user writer of the data dir. Handle-relative removal is not taken, since it needs per-host code the remote legs alone reach.
-
-**Cost while deferred:** the SPEC promises a containment the code gives only against a link present at preflight. Surfaced 2026-11-28 by the second-vendor review at uninstall-containment-pass' close, carried from its close; filed at the next scope. Owner lookup: `link_below`, `through a link` in this file, none; owner installer/SPEC.md §uninstall.
-
 ### usage-pair-shape-residue
 
 Two producer paths still admit shapes delegation-kit/SPEC.md §The usage.txt contract excludes. The poller's `axis()` (native/src/hook/poll.rs) reads a non-string non-number value as empty, so a pair present with object values reads as no window and a fresh snapshot is written without that axis, where a malformed pair writes nothing; the same mapping lets a malformed flat pair fall through to the nested shape. And `usage::epoch_of` reads a non-digit reset through `kpi::date_epoch`, which accepts a bare calendar day at local midnight, where the contract states an epoch or an ISO datetime.
@@ -987,4 +979,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - atomic-write-temp-link
+- uninstall-check-remove-window
 

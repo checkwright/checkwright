@@ -673,7 +673,7 @@ The trim runs through the payload's own copy of doctrine-kit's installer ([doctr
 
 **`uninstall --user`** reverses a user install ([§The user install](#the-user-install)) against `user.lock`, and requires it as `update --user` does, at exit 1. It reads no repository and commits nothing.
 
-**Nothing is removed through a link.** The binary's path, the knobs directory and each `files` key are read below the data dir before the first removal, `--dry-run` and `--force` alike. A link or junction at any component, the last included, refuses at exit 2 naming the path and the link. A key passing [§The user manifest](#the-user-manifest)'s shape check still reaches outside the install through a directory link. The data dir itself is the adopter's to point.
+**Nothing is removed through a link the preflight meets.** The binary's path, the knobs directory and each `files` key are read below the data dir before the first removal, `--dry-run` and `--force` alike. A link or junction at any component, the last included, refuses at exit 2 naming the path and the link. A key passing [§The user manifest](#the-user-manifest)'s shape check still reaches outside the install through a directory link. The data dir itself is the adopter's to point. **Honest limit:** removal is by path, so a link swapped in after the read is removed through, a swap only a same-user writer to the data dir can make. Removing through a held directory handle would need per-host code only the remote legs exercise.
 
 In order, it:
 
