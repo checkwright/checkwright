@@ -26,14 +26,6 @@ init's doctrine recipe rewrites the agent file in place: `native/src/installer/r
 
 **Cost while deferred:** rare and harmful: an interrupted `init` or `--inject` can leave the adopter's always-loaded agent file torn. Surfaced 2026-11-28 by crate-flake-write-residue-pass' close, its second-vendor review, source-read confirmed; promoted at the next scope. Re-verified: `marker.rs` writes in place and `install.rs` holds `write_atomically`. Owner lookup: `marker.rs`, `install_block` in this file, none; owner installer/SPEC.md §The install boundary.
 
-### knob-lock-taker-exemption
-
-`native/src/knobenv.rs`'s `every_case_reaching_a_knob_reading_walk_holds_the_lock` exempts a test wholesale once it calls any lock-taking function, but a taker such as `emit/queue_index.rs`'s test helper `render` takes the guard locally and releases it on return, so a case calling a taker and then an unheld walk reader (`walk::find_files`) escapes the check. gate-sdk/SPEC.md §lib/gate.sh's "a case reaching one is held" overstates what the closure proves.
-
-**Deliverable:** debt: the check holds a case only where the guard spans its walk readers, so a released taker no longer exempts it, with a case proving a call-then-walk sequence reds; the SPEC sentence then holds as written.
-
-**Cost while deferred:** no live offender was shown, so the cost is a future crate-test flake the check would not catch. Surfaced 2026-11-28 by crate-flake-write-residue-pass' close, its second-vendor review, source-read confirmed; promoted at the next scope. Owner lookup: `knobenv`, `guard taker` in this file, none; owner gate-sdk/SPEC.md §lib/gate.sh.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -998,4 +990,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - npm-trusted-publishing
 - front-door-retry-marker
+- knob-lock-taker-exemption
 

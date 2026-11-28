@@ -250,6 +250,67 @@ mod tests {
         own: bool,
         reads: bool,
         held: bool,
+        returns: String,
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a type owning the guard by value, so a function
+    // returning one hands its caller the lock rather than releasing it
+    fn guard_types(text: &str) -> Vec<String> {
+        let lines: Vec<&str> = text.lines().collect();
+        let mut out = Vec::new();
+        for (i, l) in lines.iter().enumerate() {
+            let t = l.trim_start();
+            let t = t.strip_prefix("pub(crate) ").or_else(|| t.strip_prefix("pub ")).unwrap_or(t);
+            let Some(rest) = t.strip_prefix("struct ") else { continue };
+            let name: String = rest.chars().take_while(|c| ident(*c)).collect();
+            let close = format!("{}}}", &l[..indent(l)]);
+            let fields = lines[i + 1..].iter().take_while(|f| **f != close);
+            if !name.is_empty() && fields.into_iter().any(|f| f.contains("KnobEnv") && !f.contains('&')) {
+                out.push(name);
+            }
+        }
+        out
+    }
+
+    fn returns_guard(f: &Func, guards: &[String]) -> bool {
+        let named = |n: &str| {
+            f.returns.match_indices(n).any(|(at, _)| {
+                let before = !matches!(f.returns[..at].chars().next_back(), Some(c) if ident(c));
+                let after = !matches!(f.returns[at + n.len()..].chars().next(), Some(c) if ident(c));
+                before && after
+            })
+        };
+        named("KnobEnv") || guards.iter().any(|g| named(g))
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a taker whose return type carries the guard holds it
+    // for its caller, as does a function returning one it was handed; any other taker releases it
+    // on return, so calling it holds nothing after
+    fn handers(all: &[Func], guards: &[String]) -> BTreeSet<String> {
+        let mut set: BTreeSet<String> =
+            all.iter().filter(|f| !f.case && f.held && returns_guard(f, guards)).map(|f| f.key.clone()).collect();
+        loop {
+            let more: Vec<String> = all
+                .iter()
+                .filter(|f| !f.case && !set.contains(&f.key) && returns_guard(f, guards))
+                .filter(|f| f.calls.iter().any(|n| set.contains(n)))
+                .map(|f| f.key.clone())
+                .collect();
+            if more.is_empty() {
+                return set;
+            }
+            set.extend(more);
+        }
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a case reaching a reader is held only where the guard
+    // spans the reader: taken in the case, or handed to it by a taker's return value
+    fn unheld(all: &[Func], readers: &BTreeSet<String>, guards: &[String]) -> Vec<String> {
+        let handers = handers(all, guards);
+        all.iter()
+            .filter(|f| f.case && !f.held && !f.calls.iter().any(|n| handers.contains(n)))
+            .filter_map(|f| f.calls.iter().find(|n| readers.contains(*n)).map(|r| format!("{} calls {}", f.key, r)))
+            .collect()
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a fn runs from its `fn` line to the first `}` line at its
@@ -271,7 +332,13 @@ mod tests {
                 continue;
             };
             let body = lines[i..=end].join("\n");
+            let signature = body.split('{').next().unwrap_or_default();
             let ty = impl_type(&lines, i);
+            let returns = signature.split_once("->").map_or("", |(_, r)| r).trim();
+            let returns = match &ty {
+                Some(t) if returns == "Self" => t.clone(),
+                _ => returns.to_string(),
+            };
             let key = match &ty {
                 Some(t) => format!("{}::{}::{}", module, t, name),
                 None => format!("{}::{}", module, name),
@@ -283,6 +350,7 @@ mod tests {
                 own: indent(l) == 0 || ty.is_some(),
                 reads: KNOB_READS.iter().any(|r| body.contains(r)),
                 held: body.contains(concat!("knobenv::", "lock()")) || (home && body.contains(concat!("= ", "lock()"))),
+                returns,
             });
         }
         out
@@ -317,6 +385,28 @@ mod tests {
         closure(all, roots, lockers)
     }
 
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a taker releasing the guard on return holds nothing for
+    // the walk its caller makes next, and one handing the guard back holds it
+    #[test]
+    fn a_released_taker_leaves_the_walk_after_it_unheld() {
+        let src = Path::new("/probe/src");
+        let walk = concat!("pub fn find_files() {\n    let _ = std::env::", "var(\"K\");\n}\n");
+        let probe = concat!(
+            "struct Held {\n    env: KnobEnv,\n}\n",
+            "fn render() -> String {\n    let _k = crate::knobenv::", "lock();\n    String::new()\n}\n",
+            "fn hold() -> Held {\n    let env = crate::knobenv::", "lock();\n    Held { env }\n}\n",
+            "#[test]\nfn released() {\n    render();\n    walk::", "find_files();\n}\n",
+            "#[test]\nfn handed() {\n    let _h = hold();\n    walk::", "find_files();\n}\n",
+        );
+        let mut all = fns(src, &src.join("walk.rs"), walk, true);
+        all.extend(fns(src, &src.join("probe.rs"), probe, false));
+        let guards = guard_types(probe);
+        assert_eq!(guards, vec!["Held".to_string()]);
+        let lockers = closure(&all, all.iter().filter(|f| !f.case && f.held).map(|f| f.key.clone()).collect(), &BTreeSet::new());
+        let readers = knob_readers(&all, &lockers);
+        assert_eq!(unheld(&all, &readers, &guards), vec!["probe::released calls walk::find_files".to_string()]);
+    }
+
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a walk reads the knob set, so a case walking unlocked,
     // directly or through any function in the crate, reads it mid-write of a sibling's temporary
     // knobs and refuses; every case calling a reader holds the guard
@@ -327,9 +417,14 @@ mod tests {
         let files = crate::walk::find_files(&src, &["rs"]).expect("cannot enumerate the sources");
         let walk = src.join("walk.rs");
         let mut all: Vec<Func> = Vec::new();
+        let mut guards: Vec<String> = Vec::new();
         for f in &files {
             let text = std::fs::read_to_string(f).unwrap_or_else(|e| panic!("cannot read {}: {}", f.display(), e));
             all.extend(fns(&src, f, &text, *f == walk));
+            guards.extend(guard_types(&text));
+        }
+        for known in ["Marked", "Sandbox"] {
+            assert!(guards.iter().any(|g| g == known), "the guard types lost {}", known);
         }
         let lockers = closure(&all, all.iter().filter(|f| !f.case && f.held).map(|f| f.key.clone()).collect(), &BTreeSet::new());
         let readers = knob_readers(&all, &lockers);
@@ -357,11 +452,7 @@ mod tests {
              take the guard in one of the two",
             reentrant
         );
-        let offenders: Vec<String> = all
-            .iter()
-            .filter(|f| f.case && !f.held && !f.calls.iter().any(|n| lockers.contains(n)))
-            .filter_map(|f| f.calls.iter().find(|n| readers.contains(*n)).map(|r| format!("{} calls {}", f.key, r)))
-            .collect();
+        let offenders = unheld(&all, &readers, &guards);
         assert!(
             offenders.is_empty(),
             "a case reaching a knob-reading walk without the knob lock races a sibling's knob write: \
