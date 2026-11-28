@@ -170,6 +170,9 @@ pub fn write(root: &Path, recorded: &[String], kits: &[String]) -> Result<Exclud
     let mut e = exclude(root)?;
     let wt = worktree(root)?;
     let text = body(root, recorded, kits)?;
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — the target resolves before the directory and the seed
+    // are made, so a link that refuses is never followed
+    crate::marker::target(&e.path.to_string_lossy())?;
     if let Some(dir) = e.path.parent() {
         std::fs::create_dir_all(dir).map_err(|err| format!("cannot create {}: {}", dir.display(), err))?;
     }
@@ -182,10 +185,11 @@ pub fn write(root: &Path, recorded: &[String], kits: &[String]) -> Result<Exclud
     Ok(e)
 }
 
-// spec: installer/SPEC.md §The personal install — the writer's begin-without-end refusal, read over
-// this worktree's pair before the run's first write
+// spec: installer/SPEC.md §The personal install — the writer's refusals, of a link and of a begin
+// without its end, read over this worktree's pair before the run's first write
 pub fn check(root: &Path) -> Result<(), String> {
     let e = exclude(root)?;
+    crate::marker::target(&e.path.to_string_lossy())?;
     if !e.path.is_file() {
         return Ok(());
     }
@@ -379,5 +383,29 @@ mod tests {
         );
         assert!(read().ends_with(&stray), "the out-of-order block was rewritten");
         std::fs::remove_dir_all(&main).ok();
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — an exclude-file link to an absent path outside the
+    // repository refuses at the check and at the write, and the seed never creates the external file
+    #[cfg(unix)]
+    #[test]
+    fn an_escaping_exclude_link_refuses_before_the_seed() {
+        let dir = std::env::temp_dir().join(format!("cw-personal-seed-{}", std::process::id()));
+        std::fs::remove_dir_all(&dir).ok();
+        let repo = dir.join("repo");
+        std::fs::create_dir_all(&repo).expect("cannot make the scratch repo");
+        crate::proc::run(&programs::GIT, &["-C", &repo.to_string_lossy(), "init", "-q"]).expect("git did not spawn");
+        let e = exclude(&repo).expect("no exclude file");
+        std::fs::create_dir_all(e.path.parent().expect("an info dir")).expect("cannot make info/");
+        std::fs::remove_file(&e.path).ok();
+        std::os::unix::fs::symlink(dir.join("outside"), &e.path).expect("cannot link");
+        let checked = check(&repo);
+        let wrote = write(&repo, &["x.txt".to_string()], &[]).map(|_| ());
+        let outside = dir.join("outside").exists();
+        std::fs::remove_dir_all(&dir).ok();
+        for (name, got) in [("check", checked), ("write", wrote)] {
+            assert!(got.is_err_and(|m| m.contains("refusing to write through it")), "{} did not refuse the escaping link", name);
+        }
+        assert!(!outside, "the seed created the file outside the repository");
     }
 }

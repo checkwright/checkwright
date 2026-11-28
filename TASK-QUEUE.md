@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### block-seed-before-resolve
-
-`--install-lifecycle` seeds an absent `.gitattributes` with `fs::write` (`native/src/emit/install_lifecycle.rs`) before `marker::install_block` resolves that target. `fs::write` follows a link, so a `.gitattributes` link to an absent path outside the repository creates the external file, and only then does the writer refuse. `emit/env_probe.rs` and `installer/personal.rs` seed in the same order. gate-sdk/SPEC.md §lib/inject.sh rules that an escaping or dangling link refuses every writer with nothing written.
-
-**Deliverable:** run `marker::target` on every block target before any seed of it, in all three arms, with one unit case per arm.
-
-**Cost while deferred:** a planted `.gitattributes` link can make an install create an empty file at an absent path outside the repository. Nothing is overwritten, since an existing target is never seeded. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Re-verified by source read at the close head: the `is_file` guard, then `fs::write`, then `install_block`. Owner lookup: `gitattributes`, `marker::target` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
 ### init-agent-seed-dangling-link
 
 `init`'s agent-file seed (`native/src/installer/init.rs`) guards on `is_file`, which a dangling `CLAUDE.md` link fails, so the seed's atomic write renames over the link and leaves a regular file. installer/SPEC.md §The install boundary rules that an ordinary atomic write replaces a link at its target, and the marker-block exception, which follows one, does not reach the seed.
@@ -1003,4 +995,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - marker-target-lossy-resolve
+- block-seed-before-resolve
 

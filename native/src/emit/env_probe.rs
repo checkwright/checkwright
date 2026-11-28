@@ -268,11 +268,7 @@ pub fn emit(_args: &[String]) -> Result<String, Fault> {
     let derived = toolfloor::derived_audience_here().map_err(Fault::input)?;
     let new_body = body(&roster, &date, &derived);
 
-    // spec: context-kit/SPEC.md §bin/env-probe — seed the gotchas scaffold once, outside the
-    // markers; every re-probe replaces only the block.
-    if !std::path::Path::new(&file).is_file() {
-        std::fs::write(&file, SEED).map_err(|e| Fault::tool(format!("cannot write {}: {}", file, e)))?;
-    }
+    seed(&file)?;
 
     if unchanged(&file, &new_body)? {
         return Ok(format!(
@@ -287,6 +283,17 @@ pub fn emit(_args: &[String]) -> Result<String, Fault> {
         "env-probe: {} the env profile block in {}\n",
         action, file
     ))
+}
+
+// spec: context-kit/SPEC.md §bin/env-probe — seed the gotchas scaffold once, outside the markers;
+// every re-probe replaces only the block. The target resolves first, so a link that refuses is
+// never followed by the seed (gate-sdk/SPEC.md §lib/inject.sh).
+fn seed(file: &str) -> Result<(), Fault> {
+    crate::marker::target(file).map_err(|e| Fault::input(format!("failed to write profile block: {}", e)))?;
+    if !std::path::Path::new(file).is_file() {
+        std::fs::write(file, SEED).map_err(|e| Fault::tool(format!("cannot write {}: {}", file, e)))?;
+    }
+    Ok(())
 }
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the writer's refusal of markers that do not pair runs
@@ -371,6 +378,24 @@ mod tests {
             assert!(refusal, "{}: malformed markers around an unchanged block read as unchanged", name);
             assert!(untouched, "{}: the refusal wrote", name);
         }
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a profile link to an absent path outside the
+    // repository refuses before the seed, which never creates the external file
+    #[cfg(unix)]
+    #[test]
+    fn an_escaping_profile_link_refuses_before_the_seed() {
+        let d = std::env::temp_dir().join(format!("checkwright-env-probe-seed.{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        let repo = d.join("repo");
+        std::fs::create_dir_all(repo.join(".git")).expect("scratch");
+        let link = repo.join("ENV.local.md");
+        std::os::unix::fs::symlink("../outside.md", &link).expect("link");
+        let got = seed(&link.display().to_string());
+        let outside = d.join("outside.md").exists();
+        let _ = std::fs::remove_dir_all(&d);
+        assert!(got.is_err_and(|e| e.to_string().contains("refusing to write through it")), "the escaping link did not refuse");
+        assert!(!outside, "the seed created the file outside the repository");
     }
 
     // spec: context-kit/SPEC.md §bin/env-probe — the block's five bullets, the absent list's

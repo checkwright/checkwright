@@ -3,3 +3,4 @@
 ## Behavior changes
 
 - **every arm that writes a marker block** — a symlinked agent file naming a file whose name is not UTF-8 now has that file rewritten, where the writer used to resolve the link through a lossy spelling and could rewrite another file, one whose name carries replacement characters in those positions. Nothing to do.
+- **`--install-lifecycle`, `--emit env-probe` and the personal install** — a `.gitattributes`, env-profile or `info/exclude` link that resolves to no file, or outside its repository, is now refused before anything is written, where the arm used to seed the absent target through the link, creating the file it named outside the repository, and only then refuse; `--install-lifecycle` also no longer writes the agent-file block before that refusal. Nothing to do, unless such a target is a link: point it at a file inside the repository.

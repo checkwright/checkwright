@@ -55,10 +55,19 @@ fn agent_file(args: &[String]) -> Result<String, Fault> {
 
 fn install(args: &[String]) -> Result<(), Fault> {
     let agent = agent_file(args)?;
-    marker::target(&agent).map_err(Fault::input)?;
+    install_blocks(&agent, ATTRS)?;
+    register_driver();
+    Ok(())
+}
+
+fn install_blocks(agent: &str, attrs: &str) -> Result<(), Fault> {
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — both targets resolve before the first write, so a
+    // link that refuses leaves nothing written and the `.gitattributes` seed never follows one
+    marker::target(agent).map_err(Fault::input)?;
+    marker::target(attrs).map_err(Fault::input)?;
     // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the installer edits an always-loaded
     // file, it does not mint one, so an absent agent file is a refusal and not a create
-    if !Path::new(&agent).is_file() {
+    if !Path::new(agent).is_file() {
         return Err(Fault::refused(format!(
             "agent file not found: {} — nothing to install into",
             agent
@@ -66,7 +75,7 @@ fn install(args: &[String]) -> Result<(), Fault> {
     }
 
     let block = stages::registration_block().map_err(Fault::refused)?;
-    let action = marker::install_block(&agent, BEGIN, END, &format!("{}\n", block)).map_err(Fault::input)?;
+    let action = marker::install_block(agent, BEGIN, END, &format!("{}\n", block)).map_err(Fault::input)?;
     println!(
         "install-lifecycle: {} the lifecycle registration block in {}",
         action, agent
@@ -75,17 +84,15 @@ fn install(args: &[String]) -> Result<(), Fault> {
     // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — `.gitattributes` is legitimately
     // minted when absent: it is not an always-loaded file the consumer authored. The opposite
     // disposition to the agent file above, one call apart, and neither is the other's default.
-    if !Path::new(ATTRS).is_file() {
-        std::fs::write(ATTRS, "").map_err(|e| Fault::tool(format!("cannot create {}: {}", ATTRS, e)))?;
+    if !Path::new(attrs).is_file() {
+        std::fs::write(attrs, "").map_err(|e| Fault::tool(format!("cannot create {}: {}", attrs, e)))?;
     }
     let attrs_block = stages::merge_attrs_block().map_err(Fault::refused)?;
-    let aaction = marker::install_block(ATTRS, ABEGIN, AEND, &attrs_block).map_err(Fault::input)?;
+    let aaction = marker::install_block(attrs, ABEGIN, AEND, &attrs_block).map_err(Fault::input)?;
     println!(
         "install-lifecycle: {} the iteration-scoped merge attributes in {}",
-        aaction, ATTRS
+        aaction, attrs
     );
-
-    register_driver();
     Ok(())
 }
 
@@ -132,5 +139,28 @@ mod tests {
         assert_eq!(run(std::slice::from_ref(&p)), exit::REFUSED);
         assert!(!Path::new(&p).exists(), "the refusal minted the agent file");
         assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a `.gitattributes` link to an absent path outside
+    // the repository refuses before the seed, so the external file is never created and the agent
+    // file is untouched
+    #[cfg(unix)]
+    #[test]
+    fn an_escaping_attributes_link_refuses_before_any_write() {
+        let _knobs = crate::knobenv::lock();
+        let dir = std::env::temp_dir().join(format!("cw-install-lifecycle-seed-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let repo = dir.join("repo");
+        std::fs::create_dir_all(repo.join(".git")).expect("cannot make the scratch repository");
+        let agent = repo.join("AGENTS.md");
+        std::fs::write(&agent, "# agent\n").expect("cannot seed the agent file");
+        std::os::unix::fs::symlink("../outside.txt", repo.join(ATTRS)).expect("cannot link");
+        let got = install_blocks(&agent.display().to_string(), &repo.join(ATTRS).display().to_string());
+        let outside = dir.join("outside.txt").exists();
+        let kept = std::fs::read_to_string(&agent).expect("read");
+        let _ = std::fs::remove_dir_all(&dir);
+        assert!(got.is_err_and(|e| e.to_string().contains("refusing to write through it")), "the escaping link did not refuse");
+        assert!(!outside, "the seed created the file outside the repository");
+        assert_eq!(kept, "# agent\n", "the refusal wrote the agent file");
     }
 }
