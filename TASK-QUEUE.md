@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### gates-dir-knob-resolution
-
-An adopter finding, relayed by the lead from the orchestrator adopter and measured on v0.45.0: `--run --gates-dir <dir>` selects the registry only, while every knob layer still resolves under `GATE_SDK_GATES_DIR` (default `scripts`), so a knob file placed beside an outside registry is never read. gate-sdk/SPEC.md §The knob file writes the layers as `<gates-dir>/<stem>-config.knobs`, which a reader of §run-gates' `--gates-dir` can take to mean the flag's directory, and no section says which.
-
-**Deliverable:** debt: state in §The knob file, and at §run-gates' `--gates-dir`, that the flag selects the registry alone and every knob layer still resolves under `GATE_SDK_GATES_DIR`. No resolution moves (scope decision 2026-11-28, lead-delegated, not a ruling, matching the adopter's docs-only ask), so no release declaration is owed.
-
-**Cost while deferred:** an adopter running an outside registry sets knobs where they are silently unread and gets the defaults. A one-paragraph SPEC edit if the current behaviour stands. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Re-verified by source read: `registry_of` in `native/src/runner.rs` takes the flag for the registry alone, and `knobs::gates_dir` reads only `GATE_SDK_GATES_DIR`. Owner lookup: `gates-dir`, `knob file` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The knob file.
-
 ### marker-target-admission-gaps
 
 `marker::target` (`native/src/marker.rs`) checks only the final component, and only that it resolves inside the repository. A target whose leaf is no link returns unchecked, so a seed or block reached through a linked parent directory (`profiles -> ../outside` under the env-profile knob, or a linked `.git/info`) writes outside the repository. And a leaf link resolving to a directory inside the repository is admitted, so `init`, whose agent-file seed guard is `!is_file()`, renames its seed over a `CLAUDE.md` link to a directory.
@@ -1031,4 +1023,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - cross-file-duplicate-text
+- gates-dir-knob-resolution
 
