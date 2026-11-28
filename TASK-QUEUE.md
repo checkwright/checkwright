@@ -16,6 +16,20 @@
 
 ## New Features
 
+### npm-trusted-publishing
+
+[spec: SPEC-npm-trusted-publishing.md]
+
+The publish workflow's npm job authenticates with a stored `NPM_TOKEN` secret, which expired under the v0.34.0 publish (run 40193208238): E404 on the registry PUT after provenance signing, a release left half-out. Rotation then hit two more traps RELEASING.md step 5 does not name: a fresh token failed EOTP until npm-side 2FA settings changed, and a `gh secret set` fed an empty non-interactive stdin set the secret empty with no 'Set Actions secret' line.
+
+**Deliverable:** a feature, the amendment's: the `npm` job publishes through npm trusted publishing (OIDC), which stores no token and removes all three failure modes, with the stored token kept as npm's own fallback and RELEASING.md step 5 rewritten to it. The npm-side registration is the operator's, under the operator's npm login with 2FA, since this box's npm holds none (2026-11-28, `npm whoami` E401); the amendment's §The operator step states it.
+
+**Cost while deferred:** each token period ends in a release halted half-out, and each rotation can fail silently. The current secret was set 2026-10-25, a granular write token under npm's 90-day cap (the amendment's sources), so it lapses no later than 2027-01-23. Surfaced 2026-10-25 by the v0.34.0 release session; filed at the next scope. Owner lookup: `NPM`, `trusted publish` in this file, none; owner RELEASING.md step 5.
+
+**Push need (2026-11-28, inside the budget):** none of its own; its changed `npm` job first runs in the release tag push close cuts, the set record's second push.
+
+Its observe half is [npm-trusted-publishing-observe](#npm-trusted-publishing-observe), split at scope 2026-11-28, the observation being release-run-only.
+
 ## Technical Debt
 
 ### front-door-retry-marker
@@ -156,27 +170,13 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-25 on 0.164.0 in a scratch home: still none beside the root manifest; with it moved aside the hooks are discovered, marked untrusted, since 0.164.0 gates plugin hooks on trust. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
-### npm-trusted-publishing
-
-[cost: event/high] [surface: .github]
-
-The publish workflow's npm job authenticates with a stored `NPM_TOKEN` secret, which expired under the v0.34.0 publish (run 40193208238): E404 on the registry PUT after provenance signing, a release left half-out. Rotation then hit two more traps RELEASING.md step 5 does not name: a fresh token failed EOTP until npm-side 2FA settings changed, and a `gh secret set` fed an empty non-interactive stdin set the secret empty with no 'Set Actions secret' line. npm's 90-day write-token cap is the release session's understanding, unverified.
-
-**Deliverable:** design-pending, a feature: npm trusted publishing from GitHub Actions (OIDC), which stores no token and removes all three failure modes, with RELEASING.md and the publish workflow's spec rewritten to it; its npm-side registration is the operator's, a `npm trust github` act under the operator's npm login, since this box's npm CLI holds none (2026-11-28, `npm whoami` E401). **Inferred, not run:** that npm 11.5.1+ tries OIDC before `NODE_AUTH_TOKEN`, so the stored token can stay as the fallback until the first OIDC publish is read.
-
-**Cost while deferred:** each token period ends in a release halted half-out, and each rotation can fail silently. The current secret was set 2026-10-25, so under npm's 90-day write-token cap (inferred, as above) it lapses by 2027-01-23. Surfaced 2026-10-25 by the v0.34.0 release session; filed at the next scope. Owner lookup: `NPM`, `trusted publish` in this file, none; owner RELEASING.md step 5.
-
-**Push need (2026-11-28, inside the budget):** none of its own; its changed `npm` job first runs in the release tag push close cuts, the set record's second push.
-
-Its observe half is [npm-trusted-publishing-observe](#npm-trusted-publishing-observe), split at scope 2026-11-28, the observation being release-run-only.
-
 ### npm-trusted-publishing-observe
 
 [cost: event/high] [surface: .github] [observed-by: publish]
 
 The observe half of [npm-trusted-publishing](#npm-trusted-publishing): the npm job runs only in a release `publish` run, so the first release after the trusted-publisher registration is the only run that shows the package publishing over OIDC.
 
-**Deliverable:** debt: read that run's `npm` job, published with provenance and no `NODE_AUTH_TOKEN` read, then delete the `NPM_TOKEN` secret; a red is filed as a defect.
+**Deliverable:** debt: read that run's `npm` job and the version's `_npmUser`, published with provenance by the trusted publisher (RELEASING.md step 5 names the witness), then delete the `NPM_TOKEN` secret; a red is filed as a defect.
 
 **Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner RELEASING.md step 5.
 
