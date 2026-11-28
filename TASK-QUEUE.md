@@ -14,6 +14,18 @@
 
 ## New Features
 
+### cross-file-duplicate-text
+
+[spec: SPEC-duplicate-text.md]
+
+An adopter request, relayed by the lead from the orchestrator adopter: a general cross-file duplicate-text gate, holding that no run of N or more normalized words is shared across a declared file set, its knobs the file-set globs and N. The closest coverage today is narrower: `check-docs-page-repeat` reads within one page, and `check-shim-restatement` reads one binding-shim corpus and installs `never`.
+
+**Deliverable:** design-pending, a feature: a canon-kit gate over a consumer-declared glob set and run length, off by default, with its fixture pair; the spec stage settles normalization, the run-length default and whether `check-shim-restatement`'s n-gram reading is shared or folded in.
+
+**Scope's seam decision (2026-11-28, lead-delegated, not a ruling):** the mechanism ships as one canon-kit gate; the file globs and run length are consumer knobs, the globs empty by default so the gate is off. Every file set is consumer config and no kit literal names one. That `check-shim-restatement` is lifecycle-kit's (`native/src/gates/shim_restatement.rs`) favours lifting its word reading into a shared crate module over folding the gate in. A refactor of `native/` adds no component, so the amendment stays canon-kit's alone. A run repeated within one file stays §check-docs-page-repeat's. The amendment must reconcile that section's *a repeat across pages* not-asserted sentence: verbatim runs across a declared set are asserted, and a paraphrase still is not.
+
+**Cost while deferred:** a restatement spanning two files drifts with no gate to catch it, the SSOT rule left to review in the requesting adopter's tree. About one iteration with a spec stage, the n-gram reading already in the crate. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Owner lookup: `duplicate`, `cross-file`, `n-gram` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md, beside §check-docs-page-repeat.
+
 ## Technical Debt
 
 ### gates-dir-knob-resolution
@@ -263,18 +275,6 @@ The observe half of `front-door-npx-resolution`: the front-door legs run only in
 **Deliverable:** debt: read that run's front-door legs in both drivers, the package route green on the first attempt; a red on registry lag is filed as a defect.
 
 **Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.44.0 publish run 46112266019: every front-door leg of both drivers green on the run's first attempt, and no lag seen, the package route's registry-to-init gap matching the v0.43.0 pre-fix run's, so the fix is still unwitnessed and the entry stays. Read again at the v0.46.0 publish run 46136462075: all seven front-door legs green on the first attempt, no lag seen. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
-
-### cross-file-duplicate-text
-
-[cost: event/low] [surface: canon-kit]
-
-An adopter request, relayed by the lead from the orchestrator adopter: a general cross-file duplicate-text gate, holding that no run of N or more normalized words is shared across a declared file set, its knobs the file-set globs and N. The closest coverage today is narrower: `check-docs-page-repeat` reads within one page, and `check-shim-restatement` reads one binding-shim corpus and installs `never`.
-
-**Deliverable:** design-pending, a feature: a canon-kit gate over a consumer-declared glob set and run length, off by default, with its fixture pair; the spec stage settles normalization, the run-length default and whether `check-shim-restatement`'s n-gram reading is shared or folded in.
-
-**Scope's seam decision (2026-11-28, lead-delegated, not a ruling):** the mechanism ships as one canon-kit gate; the file globs and run length are consumer knobs, the globs empty by default so the gate is off. Every file set is consumer config and no kit literal names one. That `check-shim-restatement` is lifecycle-kit's (`native/src/gates/shim_restatement.rs`) favours lifting its word reading into a shared crate module over folding the gate in. A refactor of `native/` adds no component, so the amendment stays canon-kit's alone. A run repeated within one file stays §check-docs-page-repeat's. The amendment must reconcile that section's *a repeat across pages* not-asserted sentence: verbatim runs across a declared set are asserted, and a paraphrase still is not.
-
-**Cost while deferred:** a restatement spanning two files drifts with no gate to catch it, the SSOT rule left to review in the requesting adopter's tree. About one iteration with a spec stage, the n-gram reading already in the crate. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Owner lookup: `duplicate`, `cross-file`, `n-gram` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md, beside §check-docs-page-repeat.
 
 ### prose-command-liveness
 
