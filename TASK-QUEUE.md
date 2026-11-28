@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### usage-pair-shape-residue
-
-Two producer paths still admit shapes delegation-kit/SPEC.md §The usage.txt contract excludes. The poller's `axis()` (native/src/hook/poll.rs) reads a non-string non-number value as empty, so a pair present with object values reads as no window and a fresh snapshot is written without that axis, where a malformed pair writes nothing; the same mapping lets a malformed flat pair fall through to the nested shape. And `usage::epoch_of` reads a non-digit reset through `kpi::date_epoch`, which accepts a bare calendar day at local midnight, where the contract states an epoch or an ISO datetime.
-
-**Deliverable:** debt: a present non-scalar half is out of shape and blocks the nested fallback, and a reset needs a time of day, each with a case.
-
-**Cost while deferred:** a malformed source payload disarms an axis or arms it at a guessed instant, unseen. Surfaced 2026-11-28 as two bullets from the second-vendor review at uninstall-containment-pass' close, carried from its close; filed at the next scope. Re-verified: both mappings as stated. Owner lookup: `axis`, `epoch_of`, `date_epoch` in this file, none; owner delegation-kit/SPEC.md §The usage.txt contract.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -980,4 +972,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - atomic-write-temp-link
 - uninstall-check-remove-window
+- usage-pair-shape-residue
 

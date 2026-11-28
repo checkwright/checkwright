@@ -112,13 +112,17 @@ pub fn json_field(file: &str, path: &[&str]) -> String {
 }
 
 // spec: delegation-kit/SPEC.md §The usage.txt contract — the reset stamp normalised to an epoch: an
-// all-digit value is already one, anything else is drift-kit's ISO datetime reading.
+// all-digit value is already one, anything else is drift-kit's ISO datetime reading, a bare calendar
+// day, which that reading takes at local midnight, being no datetime
 pub fn epoch_of(v: &str) -> String {
     if v.is_empty() {
         return String::new();
     }
     if v.bytes().all(|b| b.is_ascii_digit()) {
         return v.to_string();
+    }
+    if v.get(10..).map_or(true, str::is_empty) {
+        return String::new();
     }
     kpi::date_epoch(v).map(|e| e.to_string()).unwrap_or_default()
 }
@@ -197,6 +201,15 @@ mod tests {
         assert_eq!(epoch_of(""), "");
         assert_eq!(epoch_of("1970-01-02T00:00:00Z"), "86400");
         assert_eq!(epoch_of("not a time at all"), "");
+    }
+
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — a reset needs a time of day, so a bare
+    // calendar day is no epoch rather than a guess at local midnight
+    #[test]
+    fn a_bare_calendar_day_is_no_reset() {
+        assert_eq!(epoch_of("1970-01-02"), "");
+        assert_eq!(window("56", "2026-11-28"), Err(Half::Reset));
+        assert_eq!(epoch_of("1970-01-02T00:00Z"), "86400");
     }
 
     // spec: delegation-kit/SPEC.md §The usage.txt contract — a utilization reading is a decimal, so

@@ -136,22 +136,14 @@ fn fetch(token: &str, endpoint: &str) -> Option<Value> {
 }
 
 // spec: delegation-kit/SPEC.md §The usage.txt contract — one axis's pair, whole from one shape and
-// read as strings, because a number re-rendered through a float would change the reading it carries
+// read as the push producer reads it, so a present non-scalar half renders out of shape
 fn axis(payload: &Value, name: &str) -> (String, String) {
-    let at = |parent: Option<&Value>, key: &str| -> String {
-        match parent.and_then(|p| p.get(key)) {
-            Some(Value::String(s)) => s.clone(),
-            Some(Value::Number(n)) => n.to_string(),
-            _ => String::new(),
-        }
-    };
-    let flat = payload.get(name);
-    let pair = (at(flat, "utilization"), at(flat, "resets_at"));
+    let at = |path: &[&str]| crate::hook::field(Some(payload), path);
+    let pair = (at(&[name, "utilization"]), at(&[name, "resets_at"]));
     if !pair.0.is_empty() || !pair.1.is_empty() {
         return pair;
     }
-    let nested = payload.get("rate_limits").and_then(|r| r.get(name));
-    (at(nested, "used_percentage"), at(nested, "resets_at"))
+    (at(&["rate_limits", name, "used_percentage"]), at(&["rate_limits", name, "resets_at"]))
 }
 
 #[cfg(test)]
@@ -198,6 +190,19 @@ mod tests {
         assert_eq!(with(mixed), Err("no weekly reset epoch"));
         assert_eq!(with(r#""seven_day":{"utilization":"1..2","resets_at":"1756656000"}"#), Err("no weekly utilization"));
         assert_eq!(with(r#""seven_day":{"utilization":56,"resets_at":{}}"#), Err("no weekly reset epoch"));
+    }
+
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — a present non-scalar half is out of
+    // shape, so a pair of objects is no missing axis and a malformed flat pair blocks the nested one
+    #[test]
+    fn a_non_scalar_half_is_out_of_shape_and_blocks_the_fallback() {
+        let five = r#""five_hour":{"utilization":4,"resets_at":"1756656000"}"#;
+        let with = |rest: &str| axes(&doc(&format!("{{{},{}}}", five, rest)));
+        assert_eq!(with(r#""seven_day":{"utilization":{},"resets_at":{}}"#), Err("no weekly utilization"));
+        assert_eq!(with(r#""seven_day":{"utilization":[56],"resets_at":true}"#), Err("no weekly utilization"));
+        let nested = r#""rate_limits":{"seven_day":{"used_percentage":3,"resets_at":1756656000}}"#;
+        assert_eq!(with(&format!(r#""seven_day":{{"resets_at":{{}}}},{}"#, nested)), Err("no weekly utilization"));
+        assert_eq!(with(&format!(r#""seven_day":{{"utilization":null}},{}"#, nested)).map(|a| a[2].clone()), Ok("3".to_string()));
     }
 
     // spec: delegation-kit/SPEC.md §The usage.txt contract — no five-hour window maps to the empty
