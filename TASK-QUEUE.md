@@ -6,9 +6,9 @@
 
   **Set record**
 
-  **The unit set (2026-11-28, scope, lead-delegated, not a ruling, following the adopter's ranked asks):** feature for spec to author: `cross-file-duplicate-text`, the adopter's first ask. Debt: `gates-dir-knob-resolution` as docs only, its third; the four second-vendor link-safety fixes; and `npm-trusted-publishing-observe`, its read done, riding to close. Kept deferred: `verdict-key-knob-files`, the adopter's second, which the adopter covers in its own CI step and whose key change shares no design with the feature; and `prose-command-liveness`, its last, a second feature design. Both are left to keep the set lean against last close's health readings.
+  **The unit set (2026-11-28, scope, lead-delegated, not a ruling, following the adopter's ranked asks):** feature for spec to author: `cross-file-duplicate-text`, the adopter's first ask. Debt: `gates-dir-knob-resolution` as docs only, its third; the four second-vendor link-safety fixes; and `npm-trusted-publishing-observe`, its read done, riding to close, where the operator directed the secret's deletion (2026-11-28, lead-relayed). Kept deferred: `verdict-key-knob-files`, the adopter's second, which the adopter covers in its own CI step and whose key change shares no design with the feature; and `prose-command-liveness`, its last, a second feature design. Both are left to keep the set lean against last close's health readings.
 
-  **Pushes:** 2 against 2, inside the budget: the closing push, and the release tag push if the lead rules the minor cut scope recommends for the new gate.
+  **The release and pushes (2026-11-28, lead grant under the operator's delegation, not a ruling):** cut v0.47.0, a minor for the new gate, at this iteration's close. Push need 2 against 2, inside the budget: the closing push, and the release tag push.
 
 ---
 
@@ -62,7 +62,7 @@ The guard-owning struct scan in `native/src/knobenv.rs` ends a declaration on it
 
 The observe half of `npm-trusted-publishing`: the npm job runs only in a release `publish` run, so the first release after the trusted-publisher registration is the only run that shows the package publishing over OIDC.
 
-**Deliverable:** debt: the read is done (below). Build points RELEASING.md step 5's sentence on deleting the secret at the closing session, a GitHub write after the account step. Close deletes the `NPM_TOKEN` secret before the release tag push, so that publish run is the first with no stored fallback; a red is filed as a defect. `publish.yml`'s fallback branch stays, since it reads an absent secret as unset. The closing session deletes it by lead decision 2026-11-28 (operator-delegated, not a ruling): the fallback is proven unneeded.
+**Deliverable:** debt: the read is done (below). Build points RELEASING.md step 5's sentence on deleting the secret at the closing session, a GitHub write after the account step. Close deletes the `NPM_TOKEN` secret before the release tag push, so that publish run is the first with no stored fallback; a red is filed as a defect. `publish.yml`'s fallback branch stays, since it reads an absent secret as unset. **Delete at close (2026-11-28, operator direction, lead-relayed, not a ruling):** the closing session deletes it after the account step, the fallback proven unneeded.
 
 **Push need (2026-11-28, inside the budget):** the release tag push at close, whose publish run witnesses the trusted publisher alone.
 
