@@ -990,8 +990,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- npm-trusted-publishing
-- front-door-retry-marker
-- knob-lock-taker-exemption
-- doctrine-install-atomic-write
-
