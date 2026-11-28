@@ -162,6 +162,7 @@ pub fn install_in(
 ) -> Result<Report, String> {
     let agent_at = base.join(agent_file).to_string_lossy().into_owned();
     let doctrine_at = base.join(doctrine_file).to_string_lossy().into_owned();
+    marker::target(&agent_at)?;
     if !std::path::Path::new(&agent_at).is_file() {
         return Err(format!(
             "agent file not found: {} — nothing to install into",
@@ -292,6 +293,7 @@ pub fn install_in(
 // same marker pair. It harvests no trims and derives no digest — a removal has nothing to carry
 // forward — and reports what it did on the same channel the insert path reports on.
 pub fn remove(agent_file: &str) -> Result<String, String> {
+    marker::target(agent_file)?;
     if !std::path::Path::new(agent_file).is_file() {
         return Err(format!(
             "agent file not found: {} — nothing to remove",
@@ -405,6 +407,29 @@ mod tests {
         let got = std::fs::read_to_string(dir.join("CLAUDE.md")).expect("cannot read the agent file");
         assert!(got.contains("[doctrine-kit/DOCTRINE.md](doctrine-kit/DOCTRINE.md)"));
         assert!(!got.contains(&dir.to_string_lossy().into_owned()));
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — the CLAUDE.md-to-AGENTS.md link stands and its file
+    // carries the block, and a dangling one is the link refusal, not an absent agent file
+    #[cfg(unix)]
+    #[test]
+    fn a_linked_agent_file_takes_the_block_through_its_link() {
+        let dir = scratch("link");
+        std::fs::create_dir_all(dir.join(".git")).expect("cannot make the repository marker");
+        std::fs::create_dir_all(dir.join("doctrine-kit")).expect("cannot make the kit dir");
+        std::fs::write(dir.join("doctrine-kit/DOCTRINE.md"), DOCTRINE).expect("cannot seed doctrine");
+        std::fs::write(dir.join("AGENTS.md"), "# AGENTS.md\n").expect("cannot seed the agent file");
+        std::os::unix::fs::symlink("AGENTS.md", dir.join("CLAUDE.md")).expect("cannot link");
+        std::os::unix::fs::symlink("gone.md", dir.join("GONE.md")).expect("cannot link");
+        install_in(&dir, "CLAUDE.md", "doctrine-kit/DOCTRINE.md").expect("the install refused");
+        assert!(std::fs::symlink_metadata(dir.join("CLAUDE.md")).expect("stat").file_type().is_symlink());
+        let got = std::fs::read_to_string(dir.join("AGENTS.md")).expect("cannot read the agent file");
+        assert!(got.contains(BEGIN), "{}", got);
+        let Err(err) = install_in(&dir, "GONE.md", "doctrine-kit/DOCTRINE.md") else {
+            panic!("a dangling link installed");
+        };
+        assert!(err.contains("resolves to no file"), "{}", err);
         std::fs::remove_dir_all(&dir).ok();
     }
 

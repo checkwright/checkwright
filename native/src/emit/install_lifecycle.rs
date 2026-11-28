@@ -55,6 +55,7 @@ fn agent_file(args: &[String]) -> Result<String, Fault> {
 
 fn install(args: &[String]) -> Result<(), Fault> {
     let agent = agent_file(args)?;
+    marker::target(&agent).map_err(Fault::input)?;
     // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the installer edits an always-loaded
     // file, it does not mint one, so an absent agent file is a refusal and not a create
     if !Path::new(&agent).is_file() {

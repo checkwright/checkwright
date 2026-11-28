@@ -2,6 +2,7 @@
 // consumer, a writer that replaces a block in place, an installer that appends when absent, and a
 // remover. It is the whole of the mechanism; nothing holds a second copy.
 use crate::fresh;
+use std::path::{Path, PathBuf};
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — a line as a marker or blank-line test reads it: one
 // trailing carriage return dropped, so a CRLF-converted file keeps its blocks
@@ -41,8 +42,35 @@ pub fn read_block(text: &str, begin: &str, end: &str) -> String {
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — every writer reads and rewrites the file as bytes, so a
 // byte outside the block that is not UTF-8 is written back as it was read
-fn read_bytes(path: &str) -> Result<Vec<u8>, String> {
-    std::fs::read(path).map_err(|_| fresh::fail_closed("cat", Some(1)))
+fn read_bytes(path: &str) -> Result<(PathBuf, Vec<u8>), String> {
+    let file = target(path)?;
+    let text = std::fs::read(&file).map_err(|_| fresh::fail_closed("cat", Some(1)))?;
+    Ok((file, text))
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — a link at the path is followed to the file it names,
+// which is rewritten while the link stands; one resolving nowhere, or outside the repository the
+// link sits in, refuses before any read or write
+pub fn target(path: &str) -> Result<PathBuf, String> {
+    let at = Path::new(path);
+    if !std::fs::symlink_metadata(at).is_ok_and(|m| m.file_type().is_symlink()) {
+        return Ok(at.to_path_buf());
+    }
+    let real = crate::walk::canonicalize(at).map(PathBuf::from).ok_or_else(|| {
+        format!("{}: a link that resolves to no file — refusing to write through it or replace it", path)
+    })?;
+    let dir = at.parent().filter(|d| !d.as_os_str().is_empty()).unwrap_or(Path::new("."));
+    let root = crate::walk::canonicalize(dir).map(PathBuf::from).and_then(|d| {
+        d.ancestors().find(|a| std::fs::symlink_metadata(a.join(".git")).is_ok()).map(Path::to_path_buf)
+    });
+    match root {
+        Some(root) if real.starts_with(&root) => Ok(real),
+        _ => Err(format!(
+            "{}: a link resolving to {}, outside the repository it sits in — refusing to write through it or replace it",
+            path,
+            real.display()
+        )),
+    }
 }
 
 fn byte_lines(text: &[u8]) -> Vec<&[u8]> {
@@ -66,8 +94,8 @@ fn has_line(lines: &[&[u8]], marker: &str) -> bool {
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — every writer replaces the file whole, through a temporary
 // and a rename, never writing it in place
-fn write_bytes(path: &str, out: &[u8]) -> Result<(), String> {
-    crate::install::rewrite_atomically(std::path::Path::new(path), out)
+fn write_bytes(file: &Path, out: &[u8]) -> Result<(), String> {
+    crate::install::rewrite_atomically(file, out)
 }
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the one well-formedness test: once a begin marker is
@@ -109,7 +137,7 @@ fn paired(path: &str, lines: &[&[u8]], begin: &str, end: &str) -> Result<(), Str
 // file otherwise byte-untouched. Deliberately **tightens** the shell original, which appends a
 // fresh block on an absent begin marker where this refuses.
 pub fn write_block(path: &str, begin: &str, end: &str, body: &str) -> Result<(), String> {
-    let text = read_bytes(path)?;
+    let (file, text) = read_bytes(path)?;
     let lines = byte_lines(&text);
     if !has_line(&lines, begin) {
         return Err(if has_line(&lines, end) {
@@ -132,7 +160,7 @@ pub fn write_block(path: &str, begin: &str, end: &str, body: &str) -> Result<(),
     if text.ends_with(b"\n") {
         rendered.push(b'\n');
     }
-    write_bytes(path, &rendered)
+    write_bytes(&file, &rendered)
 }
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the installer half: `inject_marker_block`'s
@@ -141,7 +169,7 @@ pub fn write_block(path: &str, begin: &str, end: &str, body: &str) -> Result<(),
 // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — the action word is the return value
 // because the caller reports it; the begin-without-end refusal is exit 3 at that caller.
 pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<String, String> {
-    let text = read_bytes(path)?;
+    let (file, text) = read_bytes(path)?;
     let lines = byte_lines(&text);
     paired(path, &lines, begin, end)?;
     let mut block: Vec<u8> = Vec::new();
@@ -161,7 +189,7 @@ pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<S
         let mut out = text.clone();
         out.push(b'\n');
         out.extend_from_slice(&block);
-        write_bytes(path, &out)?;
+        write_bytes(&file, &out)?;
         return Ok("appended".to_string());
     }
 
@@ -185,7 +213,7 @@ pub fn install_block(path: &str, begin: &str, end: &str, body: &str) -> Result<S
     if !terminated(&text) {
         out.pop();
     }
-    write_bytes(path, &out)?;
+    write_bytes(&file, &out)?;
     Ok("replaced".to_string())
 }
 
@@ -198,7 +226,7 @@ fn terminated(text: &[u8]) -> bool {
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the writers' refusal, readable before a caller's first
 // write
 pub fn installable(path: &str, begin: &str, end: &str) -> Result<(), String> {
-    let text = read_bytes(path)?;
+    let (_, text) = read_bytes(path)?;
     paired(path, &byte_lines(&text), begin, end)
 }
 
@@ -206,7 +234,7 @@ pub fn installable(path: &str, begin: &str, end: &str) -> Result<(), String> {
 // and everything between it go, the rest of the file byte-identical. An absent begin marker is a
 // no-op reporting `false`; a target that does not pair is malformed on the writers' own terms.
 pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
-    let text = read_bytes(path)?;
+    let (file, text) = read_bytes(path)?;
     let lines = byte_lines(&text);
     if !has_line(&lines, begin) {
         return Ok(false);
@@ -236,7 +264,7 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
     if !terminated(&text) && last_kept {
         out.pop();
     }
-    write_bytes(path, &out)?;
+    write_bytes(&file, &out)?;
     Ok(true)
 }
 
@@ -244,7 +272,7 @@ pub fn remove_block(path: &str, begin: &str, end: &str) -> Result<bool, String> 
 // plus the separator `install_block`'s append put before the begin marker, so a file the
 // installer appended to reads its pre-install bytes again
 pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, String> {
-    let text = read_bytes(path)?;
+    let (file, text) = read_bytes(path)?;
     let lines = byte_lines(&text);
     let Some(b) = lines.iter().position(|l| is_line(l, begin)) else {
         return Ok(false);
@@ -280,7 +308,7 @@ pub fn uninstall_block(path: &str, begin: &str, end: &str) -> Result<bool, Strin
     } else if !terminated(&text) {
         out.pop();
     }
-    write_bytes(path, &out)?;
+    write_bytes(&file, &out)?;
     Ok(true)
 }
 
@@ -648,6 +676,53 @@ mod tests {
                 .filter(|n| n.ends_with(".tmp"))
                 .collect();
             assert!(left.is_empty(), "{} left {:?}", name, left);
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a link resolving inside its repository stands while
+    // the file it names is rewritten; one escaping the repository, or dangling, refuses every
+    // writer and nothing is written
+    #[cfg(unix)]
+    #[test]
+    fn a_linked_agent_file_keeps_its_link_or_refuses() {
+        use std::os::unix::fs::symlink;
+        let dir = std::env::temp_dir().join(format!("cw-marker-symlink-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let repo = dir.join("repo");
+        std::fs::create_dir_all(repo.join(".git")).expect("cannot make the scratch repository");
+        let seed = format!("head\n{}\nold\n{}\n", B, E);
+        let real = repo.join("AGENTS.md");
+        let outside = dir.join("outside.md");
+        std::fs::write(&real, &seed).expect("cannot seed");
+        std::fs::write(&outside, &seed).expect("cannot seed");
+        symlink("AGENTS.md", repo.join("CLAUDE.md")).expect("cannot link");
+        symlink("../outside.md", repo.join("ESCAPE.md")).expect("cannot link");
+        symlink("missing.md", repo.join("DANGLING.md")).expect("cannot link");
+        let at = |n: &str| repo.join(n).display().to_string();
+        let run = |name: &str, path: &str| -> Result<(), String> {
+            match name {
+                "install_block" => install_block(path, B, E, "new\n").map(|_| ()),
+                "write_block" => write_block(path, B, E, "newer\n"),
+                "uninstall_block" => uninstall_block(path, B, E).map(|_| ()),
+                "remove_block" => install_block(path, B, E, "again\n").and_then(|_| remove_block(path, B, E)).map(|_| ()),
+                _ => installable(path, B, E),
+            }
+        };
+        let is_link = |n: &str| std::fs::symlink_metadata(repo.join(n)).expect("stat").file_type().is_symlink();
+        for name in ["install_block", "write_block", "uninstall_block", "remove_block", "installable"] {
+            std::fs::write(&real, &seed).expect("cannot reseed");
+            run(name, &at("CLAUDE.md")).unwrap_or_else(|e| panic!("{} refused the in-repo link: {}", name, e));
+            assert!(is_link("CLAUDE.md"), "{} replaced the in-repo link", name);
+            let wrote = fresh::read_captured(&real.display().to_string()).expect("read");
+            assert_eq!(wrote != seed, name != "installable", "{} did not rewrite the link's file", name);
+            for (link, why) in [("ESCAPE.md", "outside the repository"), ("DANGLING.md", "resolves to no file")] {
+                let err = run(name, &at(link)).expect_err(&format!("{} wrote through {}", name, link));
+                assert!(err.contains(why), "{} on {}: {}", name, link, err);
+                assert!(is_link(link), "{} replaced {}", name, link);
+            }
+            assert_eq!(fresh::read_captured(&outside.display().to_string()).expect("read"), seed, "{} wrote outside", name);
+            assert!(!repo.join("missing.md").exists(), "{} created the dangling link's file", name);
         }
         let _ = std::fs::remove_dir_all(&dir);
     }
