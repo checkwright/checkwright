@@ -285,6 +285,7 @@ function Test-NpxInit {
         if ((Invoke-InRepo $Npx @('--yes', '--prefer-online', "$Package@$Version", 'init')) -eq 0) { return $true }
         if (-not ($script:Log | Where-Object { $_ -match 'code ETARGET' })) { return $false }
         if ($script:Waited -ge $RegistryBound) { return $false }
+        [Console]::Out.WriteLine("front-door: $($script:Session): init: npx answered ETARGET, retrying ($($script:Waited)s of $($RegistryBound)s waited)")
         Start-Sleep -Seconds $RegistryPoll
         $script:Waited += $RegistryPoll
     }

@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### front-door-retry-marker
-
-`scripts/ci-front-door.sh`'s `npx_init` and its PowerShell twin in `ci-front-door.ps1` retry an ETARGET answer silently: npx's output goes only to the scratch log, truncated on the next attempt, so a green publish run cannot show whether the retry fired, and [npx-resolution-observe](#npx-resolution-observe) is read only by inference from the registry-to-init step latency (v0.44.0 publish run 46112266019).
-
-**Deliverable:** debt: one stdout line per retried attempt in both drivers, in their `front-door:` line form, with RELEASING.md §The front-door rehearsal naming it, so the next publish run's legs show whether the retry fired.
-
-**Cost while deferred:** the observe entry cannot be discharged on evidence, every release reading the retry by inference. Surfaced 2026-11-28 by crate-flake-write-residue-pass' close, its release watch; promoted at the next scope. Re-verified: both drivers' `npx_init` print nothing on the retry branch. Owner lookup: `ETARGET`, `ci-front-door` in this file, the observe entry; owner RELEASING.md §The front-door rehearsal.
-
 ### doctrine-install-atomic-write
 
 init's doctrine recipe rewrites the agent file in place: `native/src/installer/recipe.rs` calls `doctrine::install_in`, whose `marker::install_block` ends in the in-place `std::fs::write` of `native/src/marker.rs`, so an interrupted install can tear the adopter's agent file and a hard link at it is written through; `init.rs` stages only the agent file's seed. `install.rs`'s `no_install_writer_writes_a_file_in_place` scans the install, init, recipe, user and uninstall sources but not `doctrine.rs` or `marker.rs`, the check class that missed it.
@@ -1005,4 +997,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - npm-trusted-publishing
+- front-door-retry-marker
 

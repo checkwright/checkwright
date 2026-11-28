@@ -210,6 +210,7 @@ npx_init() {
         run npx --yes --prefer-online "$package@$version" init && return 0
         grep -q 'code ETARGET' "$log" || return 1
         [ "$waited" -ge "$registry_bound" ] && return 1
+        printf 'front-door: %s: init: npx answered ETARGET, retrying (%ss of %ss waited)\n' "$session" "$waited" "$registry_bound"
         sleep "$registry_poll"
         waited=$((waited + registry_poll))
     done
