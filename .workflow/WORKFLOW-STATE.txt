@@ -8,3 +8,4 @@ cross-file-duplicate-pass scope a467fb09 2026-11-28 770caa1b6
 cross-file-duplicate-pass spec a17deb66 2026-11-28 1e1587639
 cross-file-duplicate-pass build a790c770 2026-11-28 15d2e255a
 cross-file-duplicate-pass validate a7ed426b 2026-11-28 9282b30a7
+cross-file-duplicate-pass close a264dcc9 2026-11-28 bbe6ed641
