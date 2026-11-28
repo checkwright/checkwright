@@ -202,7 +202,22 @@ mod tests {
             tier: String::new(),
         };
         let (a, b) = (snap("12"), snap("87"));
-        let whole = [a.render(), b.render()];
+        let unstamped = |text: &str| -> Option<String> {
+            let mut stamps = 0;
+            let rest: String = text
+                .lines()
+                .filter(|l| match l.strip_prefix("updated_at=") {
+                    Some(v) => {
+                        stamps += if !v.is_empty() && v.bytes().all(|c| c.is_ascii_digit()) { 1 } else { 2 };
+                        false
+                    }
+                    None => true,
+                })
+                .map(|l| format!("{}\n", l))
+                .collect();
+            (stamps == 1 && text.ends_with('\n')).then_some(rest)
+        };
+        let whole = [unstamped(&a.render()), unstamped(&b.render())];
         std::thread::scope(|s| {
             let writers: Vec<_> = [&a, &b].into_iter().map(|w| s.spawn(|| (0..200).all(|_| w.write(&usage)))).collect();
             for w in writers {
@@ -210,7 +225,8 @@ mod tests {
             }
         });
         let text = std::fs::read_to_string(&usage).expect("no snapshot");
-        assert!(whole.contains(&text), "a torn snapshot: {:?}", text);
+        let got = unstamped(&text);
+        assert!(got.is_some() && whole.contains(&got), "a torn snapshot: {:?}", text);
         let left = crate::walk::list_dir(&dir).expect("scratch");
         assert_eq!(left.len(), 1, "a temporary stayed: {:?}", left);
         let _ = std::fs::remove_dir_all(&dir);

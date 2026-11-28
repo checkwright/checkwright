@@ -12,6 +12,8 @@
 
   **The pushes (2026-11-28, lead decision under the same delegation, not a ruling):** push need 2 against 2, inside the grant: the closing push, and the tag push that fires `publish`. No unit needs a mid-iteration push: the fixes are portable std, the PowerShell twin is parsed on every push, and its run waits for the tag.
 
+  **The close hotfix (2026-11-28, lead decision under the same delegation, not a ruling):** the closing push red on both `crate-tests-windows` legs, two new race tests asserting past their contract; they are fixed in this close as the push-budget binding's first hotfix push, the tag push following inside that envelope. A Windows PermissionDenied on the install race test's reader open is retried and a torn body still fails; the usage race test compares with `updated_at` stripped and checks its shape. A second red escalates before any further hotfix push. The version is the derived minor, v0.44.0.
+
 ---
 
 ## New Features

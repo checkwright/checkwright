@@ -860,6 +860,7 @@ mod tests {
                     match std::fs::read(&target) {
                         Ok(got) if bodies.contains(&got) => {}
                         Ok(got) => return Some(format!("a torn body of {} bytes", got.len())),
+                        Err(e) if cfg!(windows) && e.kind() == std::io::ErrorKind::PermissionDenied => {}
                         Err(e) => return Some(format!("the target vanished: {}", e)),
                     }
                 }
