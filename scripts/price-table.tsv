@@ -2,7 +2,7 @@
 # Columns are USD per single token (a $/MTok price / 1,000,000), tab-separated.
 # One row per model id and effective date (`effective_from`, empty for an open start), the id as it appears in a transcript's message.model.
 #
-# priced-as-of: 2026-11-24 — transcribed from the published Anthropic model-pricing
+# priced-as-of: 2026-11-28 — transcribed from the published Anthropic model-pricing
 # table. Prices are a dated literal with no machine-readable feed to derive them from,
 # so nothing but this date says when it was last checked; re-verify against the
 # published table when kpi-price-table-age raises it. Every row below was re-verified
@@ -15,7 +15,7 @@
 # claude-fable-5-2 and claude-fable-5-1 and 0.05x on claude-opus-5-5 and
 # claude-sonnet-5-5, so never derive the column from input.
 #
-# prices-valid-through: 2026-11-30 — and the field's meaning is weaker here than its
+# prices-valid-through: 2026-12-31 — and the field's meaning is weaker here than its
 # wording, which is worth stating rather than leaving to be inferred. It normally names
 # a known cliff. No future change is announced for any row, so this date is a RE-CHECK
 # HORIZON: it says nobody has looked past it, not that a change lands on it.

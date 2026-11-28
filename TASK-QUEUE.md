@@ -1,14 +1,54 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: crate-flake-write-residue-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-28, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** debt only, so no authoring stage walks. `crate-test-corpus-read-flake` leads, the one per-run cost in the intake; `install-boundary-write-residue` takes the three install-boundary bullets of the last close; `front-door-npx-resolution` takes the lead-observed red of the v0.43.0 publish run, its observe half split to Deferred. The adopter has no open asks, the peer channel and the GitHub lanes hold nothing, and the price table's re-check horizon is rolled at this scope, its page hash unchanged. `audit-trigger-dod-citation` stays deferred, since narrowing assertion C changes what lifecycle-kit/SPEC.md §check-stage-entry states it reads; `release-record-gates` and `ruling-claim-outside-ledger` stay deferred as features the debt-only walk does not carry.
+
+  **The release (2026-11-28, lead decision under the same delegation, not a ruling):** a patch cut at this close is granted where the set's declarations price one; the install-boundary fixes are adopter-facing.
+
+  **The pushes (2026-11-28, lead decision under the same delegation, not a ruling):** push need 2 against 2, inside the grant: the closing push, and the tag push that fires `publish`. No unit needs a mid-iteration push: the fixes are portable std, the PowerShell twin is parsed on every push, and its run waits for the tag.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### crate-test-corpus-read-flake
+
+In close's full `cargo test` run at link-shape-residue-pass, `registry::tests::the_couples_knob_sentinel_expands_to_the_static_names_the_corpus_carries` panicked once at its `expect` that the descriptor corpus is readable: `couples_knob_names` returned Err from `walk::glob_files` over the repo's check dirs. It was green alone and on the full rerun. Build's single unreproduced `check-crate-arms` red, a gate that runs the crate's test arm, may be the same flake.
+
+**Deliverable:** debt: find the concurrent writer and make the test read a corpus no other test mutates, or make the read tolerate an entry vanishing mid-listing where the spec allows, with the cause named in the fix's commit.
+
+**Inferred, cannot run before build:** — the race reproduces only under load, so the writer is unidentified. Re-verified at scope: the walk's Err paths are `Descent::at` on the root and a `read_dir` entry error in `walk::expand`, so an entry under a check dir vanishing while it is listed fits.
+
+**Cost while deferred:** a commit or a CI leg reds at random on a green tree, and the red reads as a real crate-arm failure. Surfaced 2026-11-28 at link-shape-residue-pass' close; filed at the next scope. Owner lookup: `couples_knob`, `flake` in this file, none; owner gate-sdk/SPEC.md §The install disposition and the crate's test arm.
+
+### install-boundary-write-residue
+
+Three write paths fall short of installer/SPEC.md §The install boundary's 'A whole-file write goes through a temporary created exclusively'. (1) `install::sibling_tmp` gives every writer of a file the one temporary `<file>.tmp`, and the usage snapshot's two producers (`--usage-poll` and the statusline producer) both write it through `Snapshot::write` unserialized: writer B's `create_tmp` unlinks A's finished temporary, so A's rename publishes B's empty or partial file, and `write_atomically`'s cleanup can unlink the other writer's temporary. (2) Four temporaries are written with `std::fs::write`, which follows a link standing at the path: `peer_channel.rs` `create_exclusive`'s `.<id>.<pid>.tmp`, which also leaves a partial temporary behind on a write error, and `run_validate.rs`'s staged statement, staged manifest and lock record. (3) The repo install's kit-file placement (`install::place`, `fs::copy`) and init's writes into the adopter tree (`installer/init.rs`, the lock manifest and the registry, agent file and other direct writes) stage no temporary, so a failed write leaves the target torn.
+
+**Deliverable:** debt: a per-writer unique temporary (pid plus sequence, as `verdict_store.rs` and `emit/update_notice.rs` already use) with cleanup only of a temporary this call created; the four sites routed through `install::create_tmp`; placement and init's whole-file writes moved onto `write_atomically`; the section's `<target>.tmp` spelling and its enumeration brought to the code, with a case per site.
+
+**Cost while deferred:** concurrent snapshot writers can publish a torn usage file, a planted link at a scratch temporary is written through, and an interrupted install or init leaves a half-written file in the adopter's tree. Surfaced 2026-11-28 as three bullets from the second-vendor review at link-shape-residue-pass' close; filed at the next scope. Re-verified: every site as stated, and init carries more direct writes than the bullet's manifest. Concurrency inferred, not reproduced. Owner lookup: `write_atomically`, `create_tmp`, `sibling_tmp` in this file, none; owner installer/SPEC.md §The install boundary.
+
+### front-door-npx-resolution
+
+The front-door package route polls `npm pack --prefer-online <package>@<version>` until the tarball fetches, then runs `npx --yes` at the version (scripts/ci-front-door.sh and its PowerShell twin). On publish run 46096434361's first attempt, both x86 Ubuntu legs printed `package: registry: ok` after about three minutes of polling, then `npx checkwright@0.43.0 init` failed 1.4 s later on ETARGET, no matching version; the other legs passed and the re-run greened. The poll's predicate is not the document `npx` resolves the version through.
+
+**Deliverable:** debt: the readiness predicate is the route's own resolution, the `npx` step polled under the bound or the metadata it reads fetched fresh, in both drivers, and RELEASING.md §The front-door rehearsal's package-route sentence says which.
+
+**Inferred, cannot run before build:** — only a publish run meets the lag, so which document read stale, the abbreviated packument behind the registry's CDN or a cache entry the polls left, is unprobed.
+
+**First-run risk:** the PowerShell twin's edit first executes on a tag's `publish` run.
+
+**Cost while deferred:** a release's front-door verdict reds on registry lag, a re-run that reads as a broken front door, and it has now redded two releases running. Surfaced 2026-11-28 by the lead from that run at link-shape-residue-pass' close; filed at this scope as a new defect rather than a recurrence, since `front-door-registry-readiness` has no live entry (`--queue recur` refuses it) and its tarball poll passed here. Owner lookup: `npx`, `ETARGET`, `prefer-online` in this file, none; owner RELEASING.md §The front-door rehearsal.
+
+Its observe half is [npx-resolution-observe](#npx-resolution-observe), split at this scope since only a release run reads it.
 
 ## Deferred
 
@@ -215,6 +255,16 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 **Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
 
 **Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
+
+### npx-resolution-observe
+
+[cost: event/low] [surface: scripts] [observed-by: publish]
+
+The observe half of [front-door-npx-resolution](#front-door-npx-resolution): the front-door legs run only in a release `publish` run, so the first release after the fix is the only run that shows the package route waiting for what `npx` resolves.
+
+**Deliverable:** debt: read that run's front-door legs in both drivers, the package route green on the first attempt; a red on registry lag is filed as a defect.
+
+**Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
 
 ## Icebox
 
