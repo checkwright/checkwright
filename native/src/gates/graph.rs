@@ -859,6 +859,7 @@ mod tests {
     // none carrying a manifest, says not applicable; a root carrying one counts what it read
     #[test]
     fn amend_only_over_no_manifest_is_not_applicable() {
+        let _knobs = crate::knobenv::lock();
         let dir = std::env::temp_dir().join(format!("cw-graph-amend-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();

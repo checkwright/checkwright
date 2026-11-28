@@ -122,6 +122,7 @@ mod tests {
     // an absent one is exit 3 rather than a create; a flag in the positional slot is a refusal
     #[test]
     fn an_absent_agent_file_refuses_and_never_mints() {
+        let _knobs = crate::knobenv::lock();
         let p = std::env::temp_dir()
             .join(format!("no-such-agent-{}.md", std::process::id()))
             .display()

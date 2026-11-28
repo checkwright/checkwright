@@ -246,6 +246,7 @@ mod tests {
     // target by its value and never a placeholder's letters
     #[test]
     fn an_emitter_write_steer_names_a_quoted_target_by_its_value() {
+        let _knobs = crate::knobenv::lock();
         let host = host::Host::load(false).expect("the guard's knobs load");
         for cmd in ["echo x > \"README.md\"", "printf x >> 'README.md'", "cat >> \"README.md\" <<'EOF'\nx\nEOF"] {
             match engine::decide(&bash::Bash, engine::Shell::Bash, &host, &engine::Cmd::new(cmd)) {

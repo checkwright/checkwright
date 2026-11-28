@@ -57,6 +57,7 @@ mod tests {
     // which is what keeps it outside the added precondition.
     #[test]
     fn help_answers_from_any_position_and_before_the_precondition() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(super::run(&["--profile".to_string(), "starter".to_string(), "--help".to_string()]), 0);
     }
 }

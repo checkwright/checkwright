@@ -95,6 +95,7 @@ mod tests {
     // arity misuse is a refusal rather than a half-blank line appended to the log.
     #[test]
     fn arity_misuse_is_a_refusal() {
+        let _knobs = crate::knobenv::lock();
         assert!(emit(&argv(&[])).is_err());
         assert!(emit(&argv(&["a fact"])).is_err());
         assert!(emit(&argv(&["a fact", ""])).is_err());

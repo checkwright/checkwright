@@ -450,6 +450,7 @@ mod tests {
     // zeros and `n/a (<reason>)` where a statistic has no population, never to a missing block.
     #[test]
     fn an_empty_record_renders_every_block_with_a_counted_zero() {
+        let _knobs = crate::knobenv::lock();
         let events = parse("");
         assert!(installs(&events).contains(
             "| 0 | 0 | n/a (no install reached a first green) | 0 | n/a (no install reached a held proof) |"

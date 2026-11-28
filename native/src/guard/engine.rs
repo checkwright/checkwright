@@ -242,6 +242,7 @@ mod tests {
     // the call.
     #[test]
     fn a_grant_on_a_call_the_literal_test_refuses_is_a_decline() {
+        let _knobs = crate::knobenv::lock();
         let host = Host::load(false).expect("the guard's knobs load");
         let reader = super::super::bash::Bash;
         let ask = |table: &'static [Rule], c: &str| decide_over(table, &reader, Shell::Bash, &host, &Cmd::new(c));

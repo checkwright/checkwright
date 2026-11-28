@@ -262,6 +262,7 @@ mod tests {
     // at exit 2 before any file is read or curl is spawned
     #[test]
     fn a_surplus_argument_refuses_at_exit_2() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&["--bogus".to_string()]), 2);
         assert_eq!(run(&["--help".to_string()]), 2);
     }

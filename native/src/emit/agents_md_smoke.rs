@@ -538,6 +538,7 @@ mod tests {
     // anything else is a refusal rather than a silently ignored word.
     #[test]
     fn the_member_takes_only_keep() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }
 

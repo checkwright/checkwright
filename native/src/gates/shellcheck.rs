@@ -121,6 +121,7 @@ mod tests {
     // whole, which is what lets the fixture pair run hermetically on one directory
     #[test]
     fn positionals_replace_the_derived_set_rather_than_extending_it() {
+        let _knobs = crate::knobenv::lock();
         let args = vec!["alpha".to_string(), "beta".to_string()];
         let dirs = target_dirs(&args).expect("positional dirs need no knob");
         assert_eq!(

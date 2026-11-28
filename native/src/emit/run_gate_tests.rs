@@ -578,6 +578,7 @@ mod tests {
     // failure, and the runner's own error exits 3 beside a refused invocation's 2
     #[test]
     fn a_case_exiting_2_or_3_could_not_run() {
+        let _knobs = crate::knobenv::lock();
         assert!(could_not_run(2));
         assert!(could_not_run(3));
         assert!(!could_not_run(0));

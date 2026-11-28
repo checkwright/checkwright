@@ -371,6 +371,7 @@ mod tests {
     // left it.
     #[test]
     fn the_member_takes_only_update() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }
 

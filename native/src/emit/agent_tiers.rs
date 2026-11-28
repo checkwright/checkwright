@@ -194,6 +194,7 @@ mod tests {
     // the line as written
     #[test]
     fn the_rewrite_holds_the_effort_line_where_the_class_binds_one() {
+        let _knobs = crate::knobenv::lock();
         let deep = Some("deep");
         let stale = "---\ntier: judgment\nmodel: big\neffort: low\n---\nbody effort: x\n";
         assert_eq!(rewrite(stale, "big", deep), "---\ntier: judgment\nmodel: big\neffort: deep\n---\nbody effort: x\n");
@@ -219,6 +220,7 @@ mod tests {
     // `--write` leaving the current definition's bytes alone, and an untiered definition left out
     #[test]
     fn the_report_and_the_write_agree() {
+        let _knobs = crate::knobenv::lock();
         let dir = scratch("write");
         std::fs::write(format!("{}/a.md", dir), "---\ntier: judgment\nmodel: small\n---\n").unwrap();
         std::fs::write(format!("{}/b.md", dir), "---\ntier: mechanical\nmodel: small\n---\n").unwrap();
@@ -245,6 +247,7 @@ mod tests {
     // untouched and names the definition
     #[test]
     fn an_unbound_class_writes_nothing() {
+        let _knobs = crate::knobenv::lock();
         let dir = scratch("unbound");
         let stale = "---\ntier: judgment\nmodel: small\n---\n";
         std::fs::write(format!("{}/a.md", dir), stale).unwrap();

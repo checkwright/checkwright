@@ -358,6 +358,7 @@ mod tests {
 
     #[test]
     fn more_than_one_operand_or_a_flag_is_refused() {
+        let _knobs = crate::knobenv::lock();
         let two = ["a".to_string(), "b".to_string()];
         let err = read_input("--verify-gate-run", &two).unwrap_err();
         assert!(err.contains("at most one operand"));
@@ -370,6 +371,7 @@ mod tests {
     // Statement file, an input error at exit 3
     #[test]
     fn an_unreadable_statement_is_an_input_error_and_matches_its_golden() {
+        let _knobs = crate::knobenv::lock();
         let absent = std::env::temp_dir().join(format!("cw-verify-absent-{}.json", std::process::id()));
         let err = read_input("--verify-gate-run", &[absent.display().to_string()]).unwrap_err();
         assert_eq!((err.kind, err.status()), (Kind::Input, exit::INPUT));
@@ -382,6 +384,7 @@ mod tests {
     // second, and any other `--` word, reaches the operand rules and is refused there
     #[test]
     fn one_json_option_is_taken_and_a_second_is_refused() {
+        let _knobs = crate::knobenv::lock();
         let words = |w: &[&str]| w.iter().map(|s| s.to_string()).collect::<Vec<_>>();
         assert_eq!(json_option(&words(&["--json", "s.json"])), (true, words(&["s.json"])));
         assert_eq!(json_option(&words(&["s.json", "--json"])), (true, words(&["s.json"])));

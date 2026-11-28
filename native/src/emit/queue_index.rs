@@ -475,6 +475,7 @@ mod tests {
     // member's shape refusal, which carries the usage
     #[test]
     fn help_is_a_refusal_carrying_the_usage() {
+        let _knobs = crate::knobenv::lock();
         for help in ["--help", "-h"] {
             let err = emit(&[help.to_string()]).expect_err("help must refuse");
             assert!(err.contains(help) && err.contains(USAGE), "{}", err);

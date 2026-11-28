@@ -216,6 +216,7 @@ mod tests {
     // the extension is matched without regard to case
     #[test]
     fn positionals_replace_the_corpus_and_the_extension_ignores_case() {
+        let _knobs = crate::knobenv::lock();
         let d = std::env::temp_dir().join(format!("cw-pssa-corpus-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
         std::fs::create_dir_all(&d).expect("scratch");

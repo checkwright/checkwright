@@ -1732,6 +1732,7 @@ mod tests {
 
     #[test]
     fn the_roster_prints_one_line_per_element_and_an_empty_default_as_an_empty_field() {
+        let _knobs = crate::knobenv::lock();
         let r = roster().expect("renders");
         assert!(r.contains("SITE_KIT_CNAME\tscalar\tdocs/CNAME\n"));
         assert!(r.contains("SITE_KIT_ALIASES\tindexed\t\n"));
@@ -1822,6 +1823,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the word splitter refuses a row not declared `.words()`
     #[test]
     fn knob_words_refuses_an_undeclared_row() {
+        let _knobs = crate::knobenv::lock();
         let e = crate::walk::knob_words("GATE_SDK_QUEUE_FILE").unwrap_err();
         assert!(e.contains("GATE_SDK_QUEUE_FILE") && e.contains(".words()"), "{}", e);
     }
@@ -2001,6 +2003,7 @@ mod tests {
     // locator input as `${NAME}`
     #[test]
     fn the_roster_renders_a_sibling_default_and_a_locator_by_name() {
+        let _knobs = crate::knobenv::lock();
         let r = roster().expect("renders");
         assert!(r.contains("LIFECYCLE_KIT_STATE_FILE\tscalar\t.workflow/WORKFLOW-STATE.txt\n"), "{}", r);
         assert!(r.contains("LIFECYCLE_KIT_PERMANENT_SURFACE_GLOBS\tindexed\tTASK-QUEUE.md\n"), "{}", r);
@@ -2115,6 +2118,7 @@ mod tests {
     // roster's placeholder rather than an empty value true of no tree
     #[test]
     fn the_roster_renders_a_probing_default_through_the_placeholder() {
+        let _knobs = crate::knobenv::lock();
         let r = roster().expect("renders");
         assert!(r.contains("DRIFT_KIT_KPIS_FILE\tscalar\t${GATE_SDK_GATES_DIR}/kpis.list\n"), "{}", r);
         assert!(

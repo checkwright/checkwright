@@ -857,6 +857,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §check-release-assets — every exit-2 and exit-3 path
     #[test]
     fn each_refusal_exits_two_and_each_unread_input_three() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&s(&["no/such/doc.md", "no/such/wf.yml"])), crate::exit::REFUSED);
         assert_eq!(run(&s(&["Cargo.toml", "no/such/wf.yml"])), crate::exit::REFUSED);
         assert_eq!(run(&s(&["Cargo.toml", "Cargo.toml", "--dist", "no/such/dir", "1.0.0"])), crate::exit::INPUT);

@@ -1217,6 +1217,7 @@ mod tests {
     // root under a pruned ancestor indexes whole while a pruned leaf below it is still excluded
     #[test]
     fn corpus_prunes_below_its_target_never_above() {
+        let _knobs = crate::knobenv::lock();
         let base = std::env::temp_dir().join(format!("cw-corpus-prune-{}", std::process::id()));
         let root = base.join("build").join("r");
         std::fs::create_dir_all(root.join("target")).unwrap();
@@ -1240,6 +1241,7 @@ mod tests {
     // enters, so the walk below it answers in one dialect; a relative target stays relative
     #[test]
     fn a_given_target_crosses_into_the_declared_dialect() {
+        let _knobs = crate::knobenv::lock();
         let args = vec![r"C:\w\docs".to_string(), r"docs\sub".to_string(), "a/b.md".to_string()];
         assert_eq!(targets(&args, "").unwrap(), vec!["C:/w/docs", "docs/sub", "a/b.md"]);
         let base = std::env::temp_dir().join(format!("cw-corpus-cross-{}", std::process::id()));

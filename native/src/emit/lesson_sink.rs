@@ -88,6 +88,7 @@ mod tests {
     // a missing tag and an option are both refusals rather than a silent no-op
     #[test]
     fn the_argv_is_one_tag_and_a_missing_one_refuses() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&[]), exit::USAGE);
         assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }

@@ -346,6 +346,7 @@ mod tests {
     // declared name before its file stem, and a definition stating no model does not count
     #[test]
     fn a_type_counts_as_tiered_only_through_a_definition_stating_model() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(agent_tier_explicit::defined_type("---\nname: sweep\nmodel: x\n---\n", "file"), "sweep");
         assert_eq!(agent_tier_explicit::defined_type("---\nmodel: x\n---\n", "file"), "file");
         assert!(!agent_tier_explicit::has_explicit_model("---\nname: sweep\n---\n"));

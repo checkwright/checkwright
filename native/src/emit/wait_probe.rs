@@ -512,6 +512,7 @@ mod tests {
     // missing subcommand, an unknown one and a wrong arity are all exit 2 with the roster
     #[test]
     fn the_argv_shape_refusals_are_exit_two() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&[]), 2);
         assert_eq!(run(&["--help".to_string()]), 2);
         assert_eq!(run(&["nope".to_string()]), 2);
@@ -523,6 +524,7 @@ mod tests {
     // spelled with a leading dash is still unreachable as an option but reachable as an operand
     #[test]
     fn the_double_dash_escape_ends_option_processing() {
+        let _knobs = crate::knobenv::lock();
         let args = vec!["--".to_string(), "-weird".to_string()];
         assert!(dispatch(&args).is_err(), "no such subcommand, not an option refusal");
     }

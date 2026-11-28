@@ -61,6 +61,7 @@ mod tests {
     // and a help flag is never taken as prose
     #[test]
     fn a_flag_is_refused_a_separator_files_it_and_help_is_not_a_capture() {
+        let _knobs = crate::knobenv::lock();
         let err = file_survey::positionals(&argv(&["--list"]), "prose")
             .expect_err("a leading-dash prose was captured");
         assert!(err.contains("--list"), "the refusal named no offender: {}", err);
@@ -78,6 +79,7 @@ mod tests {
     // spec: lifecycle-kit/SPEC.md §The consult inbox — one positional, required non-empty
     #[test]
     fn arity_misuse_is_a_refusal() {
+        let _knobs = crate::knobenv::lock();
         assert!(emit(&argv(&[])).is_err());
         assert!(emit(&argv(&[""])).is_err());
         assert!(emit(&argv(&["one", "two"])).is_err());

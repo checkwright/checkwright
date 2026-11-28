@@ -324,6 +324,7 @@ mod tests {
 
     #[test]
     fn each_finding_kind_reds_and_one_file_is_one_home() {
+        let _knobs = crate::knobenv::lock();
         let decl = "rule(\"R-1\")\nrule(\"R-2\")\nrule(\"R-3\")\n";
         let r = judged(
             decl,
@@ -342,6 +343,7 @@ mod tests {
 
     #[test]
     fn any_home_admits_several_files_and_the_valve_exempts_each_side() {
+        let _knobs = crate::knobenv::lock();
         let decl = "rule(\"R-1\")\n// rule-id-exempt: reserved for the next release\nrule(\"R-2\")\nrule(\"R-3\") // rule-id-exempt:\n";
         let r = judged(decl, &[("a.md", "[R-1]\n<!-- rule-id-exempt: a retired id -->\n[R-7]\n"), ("b.md", "[R-1]\n")], false);
         assert_eq!(

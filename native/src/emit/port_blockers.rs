@@ -800,6 +800,7 @@ mod tests {
     // substrates by one rule, and an off-floor one keeps its `(--needs)` evidence.
     #[test]
     fn a_compiled_members_requirement_is_read_off_the_registry_and_floor_filtered() {
+        let _knobs = crate::knobenv::lock();
         let reg = bare_registry();
         let m = needs_rows("check-shellcheck", "gate-sdk/checks/check-shellcheck.gate", false, &reg);
         assert!(!m.undecidable);
@@ -828,6 +829,7 @@ mod tests {
     // because the question failed is the captured-emptiness false green in report form.
     #[test]
     fn a_member_the_registry_cannot_answer_for_is_undecidable_rather_than_clean() {
+        let _knobs = crate::knobenv::lock();
         let reg = bare_registry();
         let m = needs_rows("check-not-a-registered-member", "scripts/absent.gate", false, &reg);
         assert!(m.undecidable, "the cannot-answer branch did not reach the counter");
@@ -873,6 +875,7 @@ mod tests {
     // what the `--group` key is made of, so no roster of corpus primitives is maintained anywhere.
     #[test]
     fn a_kit_library_call_leaves_the_rows_and_joins_the_key() {
+        let _knobs = crate::knobenv::lock();
         let mut reg = bare_registry();
         reg.kit_funcs.insert("gate_find".to_string());
         let m = scan_rows(

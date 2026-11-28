@@ -313,6 +313,7 @@ mod tests {
     // refuses a `kit:` member and a second line
     #[test]
     fn a_projection_glob_is_covered_by_its_own_couples() {
+        let _knobs = crate::knobenv::lock();
         let d = |lines: &[&str], couples: &[&str]| {
             let lines: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
             let (_, paths, refused) = resolve_lines(&lines).expect("literal members resolve");

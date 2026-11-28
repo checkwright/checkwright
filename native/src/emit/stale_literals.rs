@@ -209,6 +209,7 @@ mod tests {
     // flag refuses with the usage before any git is read
     #[test]
     fn a_malformed_argv_refuses_with_the_usage() {
+        let _knobs = crate::knobenv::lock();
         for args in [&["--write"][..], &["--base"], &["--base", "a", "--base", "b"], &["main"]] {
             let argv: Vec<String> = args.iter().map(|a| a.to_string()).collect();
             let fault = emit(&argv).expect_err("a malformed argv must refuse");

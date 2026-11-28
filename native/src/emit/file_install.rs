@@ -317,6 +317,7 @@ mod tests {
     // `--author` alone; anywhere else before a `--` the flag is refused, after one it is a value.
     #[test]
     fn a_leading_author_flag_selects_the_author_record_and_a_later_one_is_refused() {
+        let _knobs = crate::knobenv::lock();
         let lead = argv(&["--author", "install", "i1", "p", "f", "5"]);
         let (knob, rest) = seat(&lead);
         assert_eq!(knob, "DRIFT_KIT_AUTHOR_INSTALL_RECORD");
@@ -352,6 +353,7 @@ mod tests {
     // positional, and a closed-set field whose value is outside its set.
     #[test]
     fn each_refusal_class_refuses_before_a_write() {
+        let _knobs = crate::knobenv::lock();
         assert!(emit(&argv(&[])).is_err(), "no kind at all");
         assert!(emit(&argv(&["deploy", "i1"])).is_err(), "unknown kind");
         let k = kind("red").expect("the red kind");

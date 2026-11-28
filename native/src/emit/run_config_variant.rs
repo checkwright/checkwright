@@ -359,6 +359,7 @@ mod tests {
 
     #[test]
     fn a_variant_redding_a_member_prints_its_row_and_output_and_exits_1() {
+        let _knobs = crate::knobenv::lock();
         let t = tree("red");
         let files = variant("red", &[("demo-config.knobs", "DEMO_RED_two = 1\n")]);
         let (c, _) = run_case("red", &t, &files, false);
@@ -371,6 +372,7 @@ mod tests {
 
     #[test]
     fn a_variant_arming_a_clean_line_is_a_moved_row_at_exit_0() {
+        let _knobs = crate::knobenv::lock();
         let t = tree("moved");
         let files = variant("moved", &[("demo-config.knobs", "DEMO_ARM_one = 1\n")]);
         let (c, _) = run_case("moved", &t, &files, false);
@@ -382,6 +384,7 @@ mod tests {
 
     #[test]
     fn a_variant_moving_nothing_prints_no_row_though_the_baseline_wrote_state() {
+        let _knobs = crate::knobenv::lock();
         let t = tree("inert");
         let files = variant("inert", &[("demo-config.knobs", "# a comment only\n")]);
         let (c, _) = run_case("inert", &t, &files, false);
@@ -393,6 +396,7 @@ mod tests {
 
     #[test]
     fn a_variant_registry_drops_and_adds_members() {
+        let _knobs = crate::knobenv::lock();
         let t = tree("registry");
         let files = variant("registry", &[("gates.list", "check-one\ncheck-three\n")]);
         let (c, _) = run_case("registry", &t, &files, false);
@@ -405,6 +409,7 @@ mod tests {
 
     #[test]
     fn an_unusable_variant_dir_exits_2_before_any_scratch() {
+        let _knobs = crate::knobenv::lock();
         let d = scratch("refused");
         assert_eq!(run(&[d.join("absent").display().to_string()]), 2);
         assert_eq!(run(&[d.display().to_string()]), 2);
@@ -417,6 +422,7 @@ mod tests {
 
     #[test]
     fn an_unstaged_edit_reaches_both_runs_and_an_untracked_file_neither() {
+        let _knobs = crate::knobenv::lock();
         let t = tree("worktree");
         std::fs::write(t.join("probe.txt"), "unstaged\n").expect("write");
         std::fs::write(t.join("untracked.txt"), "x\n").expect("write");
@@ -431,6 +437,7 @@ mod tests {
 
     #[test]
     fn the_scratch_is_removed_unless_kept() {
+        let _knobs = crate::knobenv::lock();
         let t = tree("keep");
         let files = variant("keep", &[("demo-config.knobs", "DEMO_ARM_one = 1\n")]);
         let (gone, base) = run_case("keep", &t, &files, false);

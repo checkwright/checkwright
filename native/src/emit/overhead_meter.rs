@@ -372,6 +372,7 @@ mod tests {
     // exactly, however many newer candidates its descendants wrote, and an absent one is the notice
     #[test]
     fn a_top_level_session_measures_its_own_transcript_not_the_newest() {
+        let _knobs = crate::knobenv::lock();
         let dir = scratch("top");
         let log = format!("{}/log.txt", dir);
         transcript(&format!("{}/{}.jsonl", dir, LEAD), 1_000);
@@ -394,6 +395,7 @@ mod tests {
     // nothing, and a spurious child flag is the top-level verdict rather than a refusal
     #[test]
     fn a_delegated_session_prints_the_notice_and_writes_no_log_line() {
+        let _knobs = crate::knobenv::lock();
         let dir = scratch("delegated");
         let log = format!("{}/log.txt", dir);
         transcript(&format!("{}/{}/subagents/agent-aaaabbbb00.jsonl", dir, LEAD), 1_000);
@@ -412,6 +414,7 @@ mod tests {
     // stands, and the reading says it was taken that way
     #[test]
     fn an_undetermined_session_takes_the_newest_and_says_so() {
+        let _knobs = crate::knobenv::lock();
         let dir = scratch("undetermined");
         let log = format!("{}/log.txt", dir);
         transcript(&format!("{}/{}.jsonl", dir, LEAD), 1_000);
@@ -433,6 +436,7 @@ mod tests {
     // `session8` normalized against each candidate, else the notice naming it
     #[test]
     fn the_operand_takes_a_path_or_a_session8_and_names_an_unmatched_one() {
+        let _knobs = crate::knobenv::lock();
         let dir = scratch("operand");
         let log = format!("{}/log.txt", dir);
         let child = format!("{}/{}/subagents/agent-aaaabbbb00.jsonl", dir, LEAD);

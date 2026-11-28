@@ -312,6 +312,7 @@ mod tests {
     // `checks/` count, and a root without `checks/` counts none rather than failing
     #[test]
     fn descriptors_count_gate_files_under_checks_alone() {
+        let _knobs = crate::knobenv::lock();
         let base = std::env::temp_dir().join(format!("csmoke-desc.{}", std::process::id()));
         let kit = base.join("kit");
         std::fs::create_dir_all(kit.join("checks")).unwrap();

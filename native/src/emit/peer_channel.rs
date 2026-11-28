@@ -591,6 +591,7 @@ mod tests {
     // refusal before any channel is read
     #[test]
     fn misuse_is_refused_before_the_channel_is_read() {
+        let _knobs = crate::knobenv::lock();
         let argv = |a: &[&str]| a.iter().map(|s| s.to_string()).collect::<Vec<_>>();
         for a in [&[][..], &["Bad_Peer"][..], &["a", "b"][..]] {
             assert!(file(&argv(a)).is_err(), "{:?}", a);
@@ -618,6 +619,7 @@ mod tests {
     // no tab, since peer-list prints both into a tab-separated row
     #[test]
     fn a_tab_is_refused_where_a_row_prints_it() {
+        let _knobs = crate::knobenv::lock();
         let tabbed = BODY.replace("the gate refuses a path", "the gate\trefuses a path");
         assert!(sections(&lines(&tabbed)).unwrap_err().contains("holds a tab"));
         assert!(sections(&lines(&BODY.replace("run it", "run\tit"))).is_ok(), "a tab off the need line was refused");

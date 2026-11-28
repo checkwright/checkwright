@@ -218,6 +218,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §with-foreign-shells — no command is the arm's own exit 2
     #[test]
     fn no_command_is_a_refusal() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&[]), exit::USAGE);
     }
 
@@ -235,6 +236,7 @@ mod tests {
     #[cfg(not(target_os = "linux"))]
     #[test]
     fn off_linux_every_command_skips() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&["true".to_string()]), 0);
     }
 

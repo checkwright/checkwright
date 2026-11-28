@@ -235,6 +235,7 @@ mod tests {
     // argument is arity misuse the arm refuses rather than a silently blank field
     #[test]
     fn four_fields_or_an_empty_one_is_arity_misuse() {
+        let _knobs = crate::knobenv::lock();
         assert!(emit(&argv(&["q", "c", "o", "i"])).is_err());
         assert!(emit(&argv(&["q", "c", "o", "", "f"])).is_err());
         assert!(emit(&argv(&[])).is_err());
@@ -287,6 +288,7 @@ mod tests {
     // before it reads HEAD or writes anything
     #[test]
     fn the_corpus_grammar_refuses_prose_open_quotes_and_none_beside_a_pathspec() {
+        let _knobs = crate::knobenv::lock();
         for bad in [
             "TASK-QUEUE.md (all sections)",
             "*/SPEC.md",

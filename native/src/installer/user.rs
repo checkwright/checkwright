@@ -900,6 +900,7 @@ mod tests {
     // re-run leaving the data dir byte-identical
     #[test]
     fn init_places_the_arm_prints_its_entry_and_a_rerun_changes_nothing() {
+        let _knobs = crate::knobenv::lock();
         let s = Scratch::new("init");
         let d = s.dirs();
         let report = init(&s, &d, "1.2.0", &flags(false, false)).expect("init");

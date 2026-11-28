@@ -325,6 +325,7 @@ mod tests {
     // other word is a usage refusal rather than a mode the caller believes it selected
     #[test]
     fn help_answers_and_an_operand_is_refused() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(super::run(&["--help".to_string()]), 0);
         assert_eq!(super::run(&["extra".to_string()]), crate::exit::USAGE);
     }
@@ -333,6 +334,7 @@ mod tests {
     // refuses at exit 2 rather than reaching for the contributor's kit roots
     #[test]
     fn a_source_checkout_gets_the_no_payload_refusal() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(super::run(&[]), crate::exit::REFUSED);
     }
 

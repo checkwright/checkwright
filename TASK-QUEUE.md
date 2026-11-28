@@ -18,16 +18,6 @@
 
 ## Technical Debt
 
-### crate-test-corpus-read-flake
-
-In close's full `cargo test` run at link-shape-residue-pass, `registry::tests::the_couples_knob_sentinel_expands_to_the_static_names_the_corpus_carries` panicked once at its `expect` that the descriptor corpus is readable: `couples_knob_names` returned Err from `walk::glob_files` over the repo's check dirs. It was green alone and on the full rerun. Build's single unreproduced `check-crate-arms` red, a gate that runs the crate's test arm, may be the same flake.
-
-**Deliverable:** debt: find the concurrent writer and make the test read a corpus no other test mutates, or make the read tolerate an entry vanishing mid-listing where the spec allows, with the cause named in the fix's commit.
-
-**Inferred, cannot run before build:** — the race reproduces only under load, so the writer is unidentified. Re-verified at scope: the walk's Err paths are `Descent::at` on the root and a `read_dir` entry error in `walk::expand`, so an entry under a check dir vanishing while it is listed fits.
-
-**Cost while deferred:** a commit or a CI leg reds at random on a green tree, and the red reads as a real crate-arm failure. Surfaced 2026-11-28 at link-shape-residue-pass' close; filed at the next scope. Owner lookup: `couples_knob`, `flake` in this file, none; owner gate-sdk/SPEC.md §The install disposition and the crate's test arm.
-
 ### install-boundary-write-residue
 
 Three write paths fall short of installer/SPEC.md §The install boundary's 'A whole-file write goes through a temporary created exclusively'. (1) `install::sibling_tmp` gives every writer of a file the one temporary `<file>.tmp`, and the usage snapshot's two producers (`--usage-poll` and the statusline producer) both write it through `Snapshot::write` unserialized: writer B's `create_tmp` unlinks A's finished temporary, so A's rename publishes B's empty or partial file, and `write_atomically`'s cleanup can unlink the other writer's temporary. (2) Four temporaries are written with `std::fs::write`, which follows a link standing at the path: `peer_channel.rs` `create_exclusive`'s `.<id>.<pid>.tmp`, which also leaves a partial temporary behind on a write error, and `run_validate.rs`'s staged statement, staged manifest and lock record. (3) The repo install's kit-file placement (`install::place`, `fs::copy`) and init's writes into the adopter tree (`installer/init.rs`, the lock manifest and the registry, agent file and other direct writes) stage no temporary, so a failed write leaves the target torn.
@@ -1011,4 +1001,6 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- crate-test-corpus-read-flake
 

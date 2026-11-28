@@ -175,6 +175,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §The non-gate arm — `--help` is the member's shape refusal carrying the usage
     #[test]
     fn help_and_a_second_operand_are_refusals_carrying_the_usage() {
+        let _knobs = crate::knobenv::lock();
         for argv in [vec!["--help".to_string()], vec!["a".into(), "b".into()]] {
             let err = emit(&argv).expect_err("a usage error must refuse");
             assert!(err.contains(USAGE), "{}", err);

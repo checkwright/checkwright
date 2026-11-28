@@ -406,6 +406,7 @@ mod tests {
     // `--help` instance the shell absorbed as a path; both fail before the history knob is read
     #[test]
     fn a_dash_led_operand_refuses_with_the_usage() {
+        let _knobs = crate::knobenv::lock();
         let flag = emit(&["--help".to_string()]).expect_err("[--help]: want a refusal");
         assert!(
             flag.contains("unrecognized option: --help") && flag.contains("usage: --emit"),

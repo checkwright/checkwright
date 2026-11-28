@@ -1413,6 +1413,7 @@ mod tests {
     // root and a plain token passes through, which is the expansion both substrates must agree on
     #[test]
     fn kit_tokens_expand_and_plain_tokens_pass_through() {
+        let _knobs = crate::knobenv::lock();
         let roots = vec!["gate-sdk".to_string(), "queue-kit/".to_string()];
         assert_eq!(
             expand_couples("scripts/gates.list,kit:*.sh", &roots).expect("no knob token"),
@@ -1531,6 +1532,7 @@ mod tests {
     // expansion is every `knob:` name the descriptor corpus carries, each a static kit's
     #[test]
     fn the_couples_knob_sentinel_expands_to_the_static_names_the_corpus_carries() {
+        let _knobs = crate::knobenv::lock();
         let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
         let dirs = repo_check_dirs(&repo);
         let names = couples_knob_names(&dirs).expect("the descriptor corpus is readable");

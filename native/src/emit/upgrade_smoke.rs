@@ -1007,6 +1007,7 @@ mod tests {
 
     #[test]
     fn the_member_takes_no_arguments() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&["--anything".to_string()]), 2);
     }
 

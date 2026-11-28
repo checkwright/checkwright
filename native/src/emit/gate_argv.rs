@@ -121,6 +121,7 @@ mod tests {
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the operand is one declaration path, never a flag
     #[test]
     fn the_operand_is_one_declaration() {
+        let _knobs = crate::knobenv::lock();
         assert!(emit(&[]).unwrap_err().starts_with("usage:"));
         assert!(emit(&["--x".to_string()]).unwrap_err().contains("unrecognized option"));
         assert!(emit(&["a/b.txt".to_string()]).unwrap_err().contains("neither a .sh nor a .gate"));

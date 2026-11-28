@@ -690,6 +690,7 @@ mod tests {
 
     #[test]
     fn an_argument_is_refused_before_any_config_is_read() {
+        let _knobs = crate::knobenv::lock();
         for word in ["--help", "--nope", "suite"] {
             let err = dispatch(&[word.to_string()]).expect_err("an argument ran the spine");
             assert_eq!(err.code, 2);

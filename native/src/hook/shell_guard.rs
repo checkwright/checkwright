@@ -185,6 +185,7 @@ mod tests {
     // any knob or consumer command is read
     #[test]
     fn a_missing_payload_is_let_through() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&Payload { bytes: Vec::new(), value: None }), 0);
     }
 }

@@ -100,6 +100,7 @@ mod tests {
 
     #[test]
     fn the_table_follows_the_slice_and_renders_an_empty_default_as_a_word() {
+        let _knobs = crate::knobenv::lock();
         let t = render("subagent-stop-liveness").expect("render");
         let rows: Vec<&str> = t.trim().lines().skip(2).collect();
         let slice = hook::knobs("subagent-stop-liveness").unwrap();
@@ -114,12 +115,14 @@ mod tests {
 
     #[test]
     fn an_empty_slice_renders_its_line_and_no_table() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(hook::knobs("escalation-guard"), Some(&[][..]));
         assert_eq!(render("escalation-guard").expect("render"), format!("\n{}\n", NO_KNOB));
     }
 
     #[test]
     fn a_non_member_and_a_value_with_a_pipe() {
+        let _knobs = crate::knobenv::lock();
         assert!(render("no-such-hook").is_err());
         assert_eq!(cell(Value::Indexed(vec!["a|b".into(), "c".into()])), "`a\\|b`, `c`");
         assert_eq!(cell(Value::Keyed(Vec::new())), EMPTY);

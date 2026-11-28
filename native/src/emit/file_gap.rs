@@ -372,6 +372,7 @@ one line, still live work.
     // arity misuse is a refusal rather than an empty bullet appended to a committed surface.
     #[test]
     fn arity_misuse_is_a_refusal() {
+        let _knobs = crate::knobenv::lock();
         assert!(emit(&argv(&[])).is_err());
         assert!(emit(&argv(&[""])).is_err());
         assert!(emit(&argv(&["one", "two"])).is_err());
@@ -381,6 +382,7 @@ one line, still live work.
     // a date elsewhere in the prose is not
     #[test]
     fn a_leading_dated_prose_is_refused() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(leading_day("2026-11-26 — a gap"), Some("2026-11-26"));
         assert_eq!(leading_day("2026-11-26— a gap"), Some("2026-11-26"));
         assert_eq!(leading_day("2026-11-26 a gap"), None);

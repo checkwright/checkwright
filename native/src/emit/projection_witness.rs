@@ -316,6 +316,7 @@ mod tests {
     // file, the create beside it stays green, and its own output is live rather than inert
     #[test]
     fn a_projection_reading_an_undeclared_file_is_a_finding() {
+        let _knobs = crate::knobenv::lock();
         let tree = std::env::temp_dir().join(format!("projection-witness-test.{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&tree);
         std::fs::create_dir_all(tree.join("in")).expect("mkdir");

@@ -3541,6 +3541,7 @@ mod tests {
     #[test]
     #[ignore = "the registry coverage tests' child, run inside a fixture case"]
     fn a_registry_member_run_inside_its_case_dir() {
+        let _knobs = crate::knobenv::lock();
         assert!(
             std::env::var_os(OBSERVER_MARKER).is_some(),
             "this case runs only as the registry coverage tests' child — in-process it would \

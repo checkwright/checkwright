@@ -479,6 +479,7 @@ mod tests {
     // the whole run rather than emitting a digest missing or double-sourcing its bullet.
     #[test]
     fn a_rule_without_exactly_one_trailer_refuses_the_run() {
+        let _knobs = crate::knobenv::lock();
         let dir = scratch("refuse");
         let doc = dir.join("DOCTRINE.md").display().to_string();
         let agent = dir.join("AGENT.md").display().to_string();

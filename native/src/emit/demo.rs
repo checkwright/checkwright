@@ -353,6 +353,7 @@ mod tests {
     // refusal rather than a mode the caller believes it selected.
     #[test]
     fn the_member_takes_no_operand() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&["--keep".to_string()]), 2);
         assert_eq!(run(&["--nope".to_string()]), 2);
     }

@@ -639,6 +639,7 @@ mod tests {
     // resolves, so a stray flag wires nothing
     #[test]
     fn a_flag_refuses_with_the_usage_before_any_wiring() {
+        let _knobs = crate::knobenv::lock();
         let err = dispatch(&["--help".to_string()]).expect_err("--help must refuse");
         assert!(err.contains("--help") && err.contains(USAGE), "{}", err);
     }
@@ -647,6 +648,7 @@ mod tests {
     // refuses before any wiring rather than reading as a successful opt-in
     #[test]
     fn a_bare_positional_refuses_with_the_usage_before_any_wiring() {
+        let _knobs = crate::knobenv::lock();
         for argv in [vec!["foo"], vec!["--", "foo"]] {
             let args: Vec<String> = argv.iter().map(|s| s.to_string()).collect();
             let err = dispatch(&args).expect_err("a positional must refuse");
@@ -658,6 +660,7 @@ mod tests {
     // operand, so a token after it refuses before anything is placed
     #[test]
     fn refresh_refuses_a_trailing_token_with_the_usage() {
+        let _knobs = crate::knobenv::lock();
         for extra in ["foo", "--force"] {
             let err = dispatch(&[REFRESH.to_string(), extra.to_string()]).expect_err("an operand must refuse");
             assert!(err.contains(&format!("got: {}", extra)) && err.contains(USAGE), "{}", err);
@@ -668,6 +671,7 @@ mod tests {
     // clone whose `core.hooksPath` names the hooks directory, so its caller never opts a clone in
     #[test]
     fn refresh_targets_only_the_top_of_a_clone_already_opted_in() {
+        let _knobs = crate::knobenv::lock();
         let d = std::env::temp_dir().join(format!("checkwright-install-hooks-refresh.{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
         std::fs::create_dir_all(d.join("repo/sub")).expect("scratch");
@@ -732,6 +736,7 @@ mod tests {
     // placed, the gates serving pre-commit; a directory of samples alone records and forwards nothing
     #[test]
     fn a_live_hook_in_the_default_directory_is_chained_and_samples_forward_nothing() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("default");
         let default = PathBuf::from(format!("{}/.git/hooks", top));
         let samples = prior(&top, &hooks);
@@ -765,6 +770,7 @@ mod tests {
     // is replaced with a note
     #[test]
     fn a_local_hooks_path_with_a_live_hook_is_recorded_and_forwarded() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("set");
         let theirs = d.join("husky").display().to_string();
         proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &theirs]).expect("git config");
@@ -784,6 +790,7 @@ mod tests {
     // with nothing placed, its help naming the remedy
     #[test]
     fn an_empty_hooks_path_is_refused_with_nothing_placed() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("empty");
         proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", ""]).expect("git config");
         let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.record);
@@ -807,6 +814,7 @@ mod tests {
     // as bytes so the case runs on every host, is refused with nothing placed
     #[test]
     fn a_value_that_is_not_utf8_is_refused_with_nothing_placed() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("not-utf8");
         append_config(&top, b"[core]\n\thooksPath = h\xffk\n");
         let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.record);
@@ -824,6 +832,7 @@ mod tests {
     // worktree-scope value reaches the local read alone, and is refused there
     #[test]
     fn a_local_value_that_is_not_utf8_under_a_worktree_value_is_refused() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("local-not-utf8");
         append_config(&top, b"[core]\n\thooksPath = h\xffk\n");
         proc::run(&programs::GIT, &["-C", &top, "config", "extensions.worktreeConfig", "true"]).expect("git config");
@@ -843,6 +852,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn a_value_resolving_to_a_directory_that_is_not_utf8_is_refused() {
+        let _knobs = crate::knobenv::lock();
         use std::os::unix::ffi::OsStrExt;
         let (d, top, hooks) = scratch_repo("resolves-not-utf8");
         let odd = d.join(std::ffi::OsStr::from_bytes(b"h\xffk"));
@@ -864,6 +874,7 @@ mod tests {
     // line feed git appends, so the line-break refusal sees it
     #[test]
     fn a_value_ending_in_a_line_break_is_refused() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("trailing-break");
         proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", "hk\n"]).expect("git config");
         let ran = bare_run(&top, &hooks, &binary(&d)).map(|p| p.record);
@@ -902,6 +913,7 @@ mod tests {
     // included file's, records an empty restore
     #[test]
     fn a_hooks_path_set_outside_the_local_scope_records_an_empty_restore() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("global");
         let theirs = d.join("global-hooks");
         plant(&theirs, "pre-push", true);
@@ -922,6 +934,7 @@ mod tests {
     // refresh does, forwards a hook the recorded directory gained since the first run
     #[test]
     fn a_rerun_keeps_the_record_and_forwards_a_hook_added_since() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("rechain");
         let theirs = d.join("husky");
         proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &theirs.display().to_string()]).expect("git config");
@@ -1003,6 +1016,7 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn a_hooks_path_through_a_link_and_dotdot_reads_the_directory_git_runs() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("physical");
         let outside = d.join("outside");
         std::fs::create_dir_all(outside.join("sub")).expect("scratch");
@@ -1023,6 +1037,7 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn a_hook_without_the_executable_bit_proceeds() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("bit");
         plant(&PathBuf::from(format!("{}/.git/hooks", top)), "pre-commit", false);
         let got = prior(&top, &hooks);
@@ -1034,6 +1049,7 @@ mod tests {
     // a re-run, whatever the default directory holds
     #[test]
     fn a_rerun_proceeds_past_a_live_hook_in_the_default_directory() {
+        let _knobs = crate::knobenv::lock();
         let (d, top, hooks) = scratch_repo("rerun");
         plant(&PathBuf::from(format!("{}/.git/hooks", top)), "pre-commit", true);
         proc::run(&programs::GIT, &["-C", &top, "config", "core.hooksPath", &hooks.display().to_string()]).expect("git config");

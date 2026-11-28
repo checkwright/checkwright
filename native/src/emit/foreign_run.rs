@@ -1248,6 +1248,7 @@ mod tests {
     // any prompt file does: the adapter reads its bytes whole and the clone stays clean
     #[test]
     fn a_stage_contract_document_runs_as_an_audit_prompt() {
+        let _knobs = crate::knobenv::lock();
         let (audit, _) = admitted_stages();
         for stage in audit {
             let r = Repo::new(&format!("stage-contract-{}", stage));
@@ -1269,6 +1270,7 @@ mod tests {
     // run: the adapter reads its bytes whole, its one write is the patch, and the source takes no commit
     #[test]
     fn a_sweep_stage_contract_document_runs_as_a_sweep_prompt() {
+        let _knobs = crate::knobenv::lock();
         let (_, sweep) = admitted_stages();
         for stage in sweep {
             let r = Repo::new(&format!("sweep-contract-{}", stage));
@@ -1407,6 +1409,7 @@ mod tests {
     // the key's default and its one-component rule, and the `--` escape
     #[test]
     fn the_argv_shape_is_held() {
+        let _knobs = crate::knobenv::lock();
         let run = |argv: &[&str], why: &str| match parse(&strings(argv)).expect(why) {
             Form::Run(a) => a,
             Form::Budget(_) => panic!("{:?} is no budget form", argv),

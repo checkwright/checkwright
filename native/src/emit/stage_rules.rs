@@ -189,6 +189,7 @@ mod tests {
     // spec: doctrine-kit/SPEC.md §stage-rules — a missing `<stage>` is exit 2
     #[test]
     fn a_missing_stage_argument_refuses() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(emit(&[]).err().map(|f| f.status()), Some(crate::exit::USAGE));
         assert_eq!(emit(&["".to_string()]).err().map(|f| f.status()), Some(crate::exit::USAGE));
     }

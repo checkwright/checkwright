@@ -480,6 +480,7 @@ mod tests {
     // than a row dropped, which would leave a governed surface silently ungoverned
     #[test]
     fn the_ceiling_file_parses_its_rows_and_refuses_one_it_cannot_read() {
+        let _knobs = crate::knobenv::lock();
         let dir = std::env::temp_dir().join(format!("ck-ceiling-{}", std::process::id()));
         std::fs::create_dir_all(&dir).expect("cannot make the scratch dir");
         let path = dir.join("surface-ceiling.txt");

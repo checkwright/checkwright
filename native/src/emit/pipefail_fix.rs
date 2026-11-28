@@ -77,6 +77,7 @@ mod tests {
     // any knob or file is read
     #[test]
     fn a_flag_refuses_with_the_usage() {
+        let _knobs = crate::knobenv::lock();
         for args in [&["--write"][..], &["a.sh", "-n"]] {
             let argv: Vec<String> = args.iter().map(|a| a.to_string()).collect();
             let fault = emit(&argv).expect_err("a flag must refuse");

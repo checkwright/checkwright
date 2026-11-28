@@ -111,6 +111,7 @@ mod tests {
 
     #[test]
     fn a_positional_page_wins_and_a_missing_member_refuses() {
+        let _knobs = crate::knobenv::lock();
         let args = vec!["x".to_string(), "one.md".to_string()];
         assert_eq!(paths(&args, 1), Ok(vec!["one.md".to_string()]));
         let e = read(&["no/such/install-docs.md".to_string()], "install page not found").err().unwrap();

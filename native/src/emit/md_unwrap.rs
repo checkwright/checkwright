@@ -53,6 +53,7 @@ mod tests {
     // so none reaches a file
     #[test]
     fn a_malformed_argv_refuses_with_the_usage() {
+        let _knobs = crate::knobenv::lock();
         for args in [&[][..], &["--write"], &["--help"], &["a.md", "--b.md"]] {
             let argv: Vec<String> = args.iter().map(|a| a.to_string()).collect();
             let fault = emit(&argv).expect_err("a malformed argv must refuse");

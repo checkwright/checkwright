@@ -714,6 +714,7 @@ mod tests {
 
     #[test]
     fn help_answers_and_an_unknown_argument_refuses() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&["--help".to_string()]), 0);
         assert_eq!(run(&["--nope".to_string()]), exit::USAGE);
     }

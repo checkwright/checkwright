@@ -317,6 +317,7 @@ mod tests {
     // case cannot be a tree whose gates directory resolves to nothing
     #[test]
     fn an_empty_corpus_is_a_finished_port_or_a_misconfiguration_and_never_both() {
+        let _knobs = crate::knobenv::lock();
         let base = std::env::temp_dir().join(format!("checkwright-gfc.{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&base);
         let ported = base.join("ported");

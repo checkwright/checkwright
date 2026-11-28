@@ -646,6 +646,7 @@ mod tests {
     // is a refusal rather than a kit root
     #[test]
     fn an_unknown_option_is_a_usage_refusal() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run(&["--nope".to_string()]), 2);
     }
 
@@ -681,6 +682,7 @@ mod tests {
     // declaration whose tree holds no binary is a harness error, never a probe verdict
     #[test]
     fn a_probe_separates_an_absent_declaration_from_an_absent_binary() {
+        let _knobs = crate::knobenv::lock();
         let base = std::env::temp_dir().join(format!("csmoke-probe.{}", std::process::id()));
         let checks = base.join("checks");
         std::fs::create_dir_all(&checks).unwrap();

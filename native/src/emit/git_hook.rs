@@ -302,6 +302,7 @@ mod tests {
     // commit-msg with no message file are refused before anything is read
     #[test]
     fn a_malformed_argv_is_a_usage_refusal() {
+        let _knobs = crate::knobenv::lock();
         for bad in [&[][..], &["pre-push"][..], &["pre-commit", "x"][..], &["commit-msg"][..], &["commit-msg", "m", "x"][..]] {
             let e = parse(&argv(bad)).err().unwrap_or_else(|| panic!("{:?} was accepted", bad));
             assert!(e.ends_with(USAGE), "{:?} refused without the usage line: {}", bad, e);
@@ -329,6 +330,7 @@ mod tests {
 
     #[test]
     fn an_empty_staged_set_passes_printing_nothing() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(run_over(&Hook::PreCommit, &[]), Ok((0, String::new(), 0)));
     }
 
@@ -336,6 +338,7 @@ mod tests {
     // order, and an operand is refused before anything is read
     #[test]
     fn the_figure_is_the_middle_sample_and_an_operand_is_refused() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(median(&[30, 10, 20]), 20);
         assert_eq!(median(&[5, 5, 9]), 5);
         assert_eq!(median(&[7]), 7);
@@ -416,6 +419,7 @@ mod tests {
     // regular-file operands, a member left with none not run, and an unresolved member selected to red
     #[test]
     fn the_selection_keeps_the_precommit_tier_and_regular_file_operands() {
+        let _knobs = crate::knobenv::lock();
         let base = std::env::temp_dir().join(format!("checkwright-git-hook-select.{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&base);
         let checks = base.join("checks");
@@ -531,6 +535,7 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn a_failing_member_stops_the_run_and_a_green_one_prints_the_summary() {
+        let _knobs = crate::knobenv::lock();
         let base = std::env::temp_dir().join(format!("checkwright-git-hook-report.{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&base);
         let checks = base.join("checks");

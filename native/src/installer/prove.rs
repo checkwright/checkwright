@@ -552,6 +552,7 @@ mod tests {
     // is a usage refusal
     #[test]
     fn help_answers_and_an_operand_is_refused() {
+        let _knobs = crate::knobenv::lock();
         assert_eq!(super::run(&["--help".to_string()]), 0);
         assert_eq!(super::run(&["extra".to_string()]), crate::exit::USAGE);
     }

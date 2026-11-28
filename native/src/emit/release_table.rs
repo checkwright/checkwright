@@ -171,6 +171,7 @@ mod tests {
 
     #[test]
     fn each_bump_class_and_a_dash_on_the_oldest_row() {
+        let _knobs = crate::knobenv::lock();
         let r = rows(
             "bump",
             &[
@@ -190,6 +191,7 @@ mod tests {
 
     #[test]
     fn a_gate_a_rename_or_a_removal_needs_action_and_an_addition_alone_does_not() {
+        let _knobs = crate::knobenv::lock();
         let body = |gates: &str, knobs: &str| format!("## Gates\n\n{}\n\n## Knobs\n\n{}\n\n## Behavior\n\nNone.\n", gates, knobs);
         let r = rows(
             "action",
@@ -206,6 +208,7 @@ mod tests {
 
     #[test]
     fn a_none_body_counts_zero_and_an_absent_section_a_dash_and_an_alias_counts_under_its_role() {
+        let _knobs = crate::knobenv::lock();
         let r = rows(
             "count",
             &[note(
@@ -219,6 +222,7 @@ mod tests {
 
     #[test]
     fn every_refusal_is_an_error() {
+        let _knobs = crate::knobenv::lock();
         let e = render_err("grammar", &[note("2026-01-01-a.md", "v1.0", NONE)]);
         assert!(e.contains("outside the grammar"), "{}", e);
         let e = render_err("twin", &[note("2026-01-01-a.md", "v0.1.0", NONE), note("2026-01-02-b.md", "0.1.0", NONE)]);
