@@ -825,9 +825,15 @@ pub fn authoring_tree(crate_dir: &str) -> bool {
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the crate's only `std::fs::canonicalize`, beneath
-// `canonicalize` and `physical_against_strict`
+// `canonicalize`, `canonical_path` and `physical_against_strict`
 fn resolve(p: impl AsRef<Path>) -> Option<PathBuf> {
     fs::canonicalize(p).ok()
+}
+
+// spec: gate-sdk/SPEC.md §The crate's crosser — the resolution with its bytes kept, for a caller
+// that opens or writes the answer
+pub fn canonical_path(p: impl AsRef<Path>) -> Option<PathBuf> {
+    resolve(p)
 }
 
 // spec: gate-sdk/SPEC.md §The crate's crosser — the one producer that hands its answer back

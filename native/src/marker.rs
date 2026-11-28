@@ -56,11 +56,11 @@ pub fn target(path: &str) -> Result<PathBuf, String> {
     if !std::fs::symlink_metadata(at).is_ok_and(|m| m.file_type().is_symlink()) {
         return Ok(at.to_path_buf());
     }
-    let real = crate::walk::canonicalize(at).map(PathBuf::from).ok_or_else(|| {
+    let real = crate::walk::canonical_path(at).ok_or_else(|| {
         format!("{}: a link that resolves to no file — refusing to write through it or replace it", path)
     })?;
     let dir = at.parent().filter(|d| !d.as_os_str().is_empty()).unwrap_or(Path::new("."));
-    let root = crate::walk::canonicalize(dir).map(PathBuf::from).and_then(|d| {
+    let root = crate::walk::canonical_path(dir).and_then(|d| {
         d.ancestors().find(|a| std::fs::symlink_metadata(a.join(".git")).is_ok()).map(Path::to_path_buf)
     });
     match root {
@@ -68,7 +68,7 @@ pub fn target(path: &str) -> Result<PathBuf, String> {
         _ => Err(format!(
             "{}: a link resolving to {}, outside the repository it sits in — refusing to write through it or replace it",
             path,
-            real.display()
+            crate::walk::escaped_os(real.as_os_str())
         )),
     }
 }
@@ -724,6 +724,31 @@ mod tests {
             assert_eq!(fresh::read_captured(&outside.display().to_string()).expect("read"), seed, "{} wrote outside", name);
             assert!(!repo.join("missing.md").exists(), "{} created the dangling link's file", name);
         }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a link naming a file that is not UTF-8 rewrites that
+    // file, never the one its lossy spelling names. macOS refuses such a name at creation.
+    #[cfg(all(unix, not(target_os = "macos")))]
+    #[test]
+    fn a_link_to_a_name_that_is_not_utf8_rewrites_that_file() {
+        use std::ffi::OsStr;
+        use std::os::unix::ffi::OsStrExt;
+        use std::os::unix::fs::symlink;
+        let dir = std::env::temp_dir().join(format!("cw-marker-lossy-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(dir.join(".git")).expect("cannot make the scratch repository");
+        let odd = dir.join(OsStr::from_bytes(b"a\xff.md"));
+        let lossy = dir.join("a\u{FFFD}.md");
+        let seed = format!("head\n{}\nold\n{}\n", B, E);
+        std::fs::write(&odd, &seed).expect("cannot seed the odd name");
+        std::fs::write(&lossy, &seed).expect("cannot seed the lossy name");
+        symlink(OsStr::from_bytes(b"a\xff.md"), dir.join("CLAUDE.md")).expect("cannot link");
+        let link = dir.join("CLAUDE.md").display().to_string();
+        assert_eq!(target(&link).expect("resolves"), crate::walk::canonical_path(&odd).expect("odd resolves"));
+        install_block(&link, B, E, "new\n").expect("install through the link");
+        assert_ne!(std::fs::read(&odd).expect("read odd"), seed.as_bytes(), "the link's own file was not rewritten");
+        assert_eq!(std::fs::read(&lossy).expect("read lossy"), seed.as_bytes(), "the lossy spelling's file was rewritten");
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

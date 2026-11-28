@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### marker-target-lossy-resolve
-
-`marker::target` (`native/src/marker.rs`) rebuilds the resolved path from `walk::canonicalize`'s string, which goes through the lossy `Path::display`. On Unix, a link to an in-repository filename with invalid UTF-8 can then resolve to a different file whose name has replacement characters in those positions, and the writer rewrites that file.
-
-**Deliverable:** keep the resolved `PathBuf` through resolution, or refuse a target that has no UTF-8 representation, with one Unix unit case.
-
-**Cost while deferred:** this needs two crafted filenames in the adopter's own tree, so it is reachable only by deliberate construction. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Owner lookup: `canonicalize`, `lossy` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
 ### block-seed-before-resolve
 
 `--install-lifecycle` seeds an absent `.gitattributes` with `fs::write` (`native/src/emit/install_lifecycle.rs`) before `marker::install_block` resolves that target. `fs::write` follows a link, so a `.gitattributes` link to an absent path outside the repository creates the external file, and only then does the writer refuse. `emit/env_probe.rs` and `installer/personal.rs` seed in the same order. gate-sdk/SPEC.md §lib/inject.sh rules that an escaping or dangling link refuses every writer with nothing written.
@@ -1009,4 +1001,6 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- marker-target-lossy-resolve
 
