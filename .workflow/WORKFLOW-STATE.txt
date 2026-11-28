@@ -5,3 +5,4 @@
 ---
 
 crate-flake-write-residue-pass scope abb0eea2 2026-11-28 2555462c2
+crate-flake-write-residue-pass build a81b3165 2026-11-28 67a9e3416
