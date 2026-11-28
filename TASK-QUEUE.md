@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### atomic-write-temp-link
-
-`write_atomically` in native/src/installer/user.rs writes its sibling temporary (`<file>.tmp`) with `std::fs::write`, which follows a link already standing at that path, so a link at `user.lock.tmp` makes every user-form lock write, `uninstall --user`'s narrowing included, overwrite a file outside the data dir; the link preflight never reads the temporary. Two more sites share the shape: `place_binary`'s `fs::copy` onto the same sibling temporary, and native/src/install.rs `write_atomically`, the repo-scope seam write, where a link committed in the adopter's tree stands at the temporary.
-
-**Deliverable:** debt: each temporary created exclusively (any stale entry at the path removed first, the create refusing an existing one), with a case per site for a link at the temporary.
-
-**Cost while deferred:** a planted or stale link at a temporary turns an install write into an overwrite outside the install. Surfaced 2026-11-28 by the second-vendor review at uninstall-containment-pass' close, carried from its close; filed at the next scope. Re-verified: all three sites open the temporary following links. Owner lookup: `write_atomically`, `sibling_tmp` in this file, none; owner installer/SPEC.md §The user install and §The install boundary.
-
 ### uninstall-check-remove-window
 
 `uninstall --user` reads each path for a link once, then removes by path, so a component swapped for a link between the check and the `remove_file` still removes through it, while installer/SPEC.md §uninstall states 'Nothing is removed through a link' unqualified.
@@ -993,4 +985,6 @@ Tree-bound hook arms have no docs/hooks page.
 The manual-install PowerShell attestation-verify block has not been run on a Windows host.
 
 ## Done
+
+- atomic-write-temp-link
 

@@ -222,22 +222,43 @@ pub fn seam_text_with(
     out
 }
 
-// spec: installer/SPEC.md §The install boundary — the seam write is a temporary beside the
-// target and a rename, so no reader sees a half-written knob file and a failed write leaves
-// whatever was there intact.
-fn write_atomically(file: &Path, body: &str) -> Result<(), String> {
-    let mut tmp: PathBuf = file.to_path_buf();
-    let mut name = file
-        .file_name()
-        .map(|n| n.to_string_lossy().into_owned())
-        .unwrap_or_default();
-    name.push_str(".tmp");
-    tmp.set_file_name(name);
-    std::fs::write(&tmp, body).map_err(|e| format!("cannot write {}: {}", tmp.display(), e))?;
-    std::fs::rename(&tmp, file).map_err(|e| {
+pub fn sibling_tmp(file: &Path) -> PathBuf {
+    let mut name = file.file_name().map(|n| n.to_os_string()).unwrap_or_default();
+    name.push(".tmp");
+    file.with_file_name(name)
+}
+
+// spec: installer/SPEC.md §The install boundary — the temporary is created exclusively after any
+// stale entry at its path is removed, so a link standing there is unlinked, never written through
+pub fn create_tmp(tmp: &Path) -> Result<std::fs::File, String> {
+    match std::fs::remove_file(tmp) {
+        Err(e) if e.kind() != std::io::ErrorKind::NotFound => {
+            return Err(format!("cannot remove the stale {}: {}", tmp.display(), e));
+        }
+        _ => {}
+    }
+    std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(tmp)
+        .map_err(|e| format!("cannot write {}: {}", tmp.display(), e))
+}
+
+// spec: installer/SPEC.md §The install boundary — a temporary beside the target and a rename, so no
+// reader sees a half-written file and a failed write leaves whatever was there intact
+pub fn write_atomically(file: &Path, body: &[u8]) -> Result<(), String> {
+    use std::io::Write;
+    let tmp = sibling_tmp(file);
+    let written = create_tmp(&tmp).and_then(|mut f| {
+        f.write_all(body).map_err(|e| format!("cannot write {}: {}", tmp.display(), e))
+    });
+    let moved = written.and_then(|()| {
+        std::fs::rename(&tmp, file).map_err(|e| format!("cannot write {}: {}", file.display(), e))
+    });
+    if moved.is_err() {
         let _ = std::fs::remove_file(&tmp);
-        format!("cannot write {}: {}", file.display(), e)
-    })
+    }
+    moved
 }
 
 // spec: installer/SPEC.md §The install boundary — the op's argv after resolution, carried as one
@@ -301,7 +322,7 @@ pub fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> 
                 };
                 write_atomically(
                     &seam_path,
-                    &seam_text_with(existing.as_deref(), p.dest, p.declared, p.recipe_retire, p.recipe_add),
+                    seam_text_with(existing.as_deref(), p.dest, p.declared, p.recipe_retire, p.recipe_add).as_bytes(),
                 )?;
             }
             records.push(format!("own\t{}", p.seam));
@@ -701,6 +722,49 @@ mod tests {
             .expect("the dry run failed");
         assert_eq!(planned, owned);
         assert!(!dir.join(dest).exists(), "--dry-run wrote the artifact");
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The install boundary — a hard link, or a symbolic one on unix,
+    // committed at the seam's temporary is unlinked and the file it reaches left byte-identical
+    #[test]
+    fn a_link_at_the_seam_temporary_is_never_written_through() {
+        let dir = scratch("tmplink");
+        let src = dir.join("payload-binary");
+        std::fs::write(&src, "artifact bytes\n").expect("cannot write the scratch artifact");
+        let digest = sha256::file_hex(&src).expect("cannot hash the scratch artifact");
+        let src_s = src.to_string_lossy().into_owned();
+        let seam = dir.join("scripts/gate-sdk-config.knobs");
+        let tmp = sibling_tmp(&seam);
+        let outside = dir.join("outside");
+        std::fs::write(&outside, "not the install's\n").expect("cannot write the victim");
+        #[cfg_attr(not(unix), allow(unused_mut))]
+        let mut plants: Vec<fn(&Path, &Path) -> std::io::Result<()>> = vec![|v, t| std::fs::hard_link(v, t)];
+        #[cfg(unix)]
+        plants.push(|v, t| std::os::unix::fs::symlink(v, t));
+        for plant in plants {
+            plant(&outside, &tmp).expect("cannot plant the link");
+            place(&placement(&dir, &src_s, &digest, false), &Recorded::none()).expect("the placement failed");
+            assert_eq!(std::fs::read_to_string(&outside).expect("the victim went"), "not the install's\n");
+            assert!(std::fs::read_to_string(&seam).expect("no seam").contains("GATE_SDK_NATIVE_BIN"));
+            assert!(std::fs::symlink_metadata(&tmp).is_err(), "the temporary stayed");
+            std::fs::remove_file(&seam).expect("cannot clear the seam");
+        }
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The install boundary — a directory standing at the temporary is no
+    // stale entry the write removes, so the write refuses naming it and leaves the target alone
+    #[test]
+    fn a_directory_at_the_temporary_refuses_the_write() {
+        let dir = scratch("tmpdir");
+        let target = dir.join("scripts/seam.knobs");
+        std::fs::write(&target, "A = 1\n").expect("cannot seed the target");
+        std::fs::create_dir_all(sibling_tmp(&target).join("held")).expect("cannot make the directory");
+        let e = write_atomically(&target, b"B = 2\n").expect_err("a directory at the temporary passed");
+        assert!(e.contains("seam.knobs.tmp"), "{}", e);
+        assert_eq!(std::fs::read_to_string(&target).expect("target"), "A = 1\n");
+        assert!(sibling_tmp(&target).join("held").is_dir(), "the directory's content went");
         std::fs::remove_dir_all(&dir).ok();
     }
 }

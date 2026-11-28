@@ -224,7 +224,7 @@ A relative XDG value is ignored, as the XDG base-directory specification require
 
 1. Resolves the two dirs and creates `<data>/bin`, `<data>/knobs` and `<state>/tmp`.
 2. Applies [§update](#update)'s downgrade refusal against `user.lock`'s `version`, at exit 1, lifted by `--force`.
-3. Places the payload artifact the bootstrap verified at `<data>/bin`, in-process, with [§Placement](#placement)'s skip-rewrite test against `user.lock`'s `artifact` key and the on-disk digest. The write goes to a sibling temporary file renamed over the target. On Windows a rename over an image in use fails, and the verb refuses at exit 1, naming the file and telling the user to end the sessions running it and re-run.
+3. Places the payload artifact the bootstrap verified at `<data>/bin`, in-process, with [§Placement](#placement)'s skip-rewrite test against `user.lock`'s `artifact` key and the on-disk digest. The write is [§The install boundary](#the-install-boundary)'s temporary and rename. On Windows a rename over an image in use fails, and the verb refuses at exit 1, naming the file and telling the user to end the sessions running it and re-run.
 4. Writes the member's knob file by its claim.
 5. Writes `user.lock`, the member joining `hooks`, only where its bytes change.
 6. Prints the report.
@@ -362,6 +362,8 @@ Step 5's rule is the only conditional shape either bootstrap carries, and it is 
 **How the port oracle reads those three values — a stated contract a cut can cite.** The dispositions are a two-sided port disposition. `bootstrap` is the port's irreducible in the strict sense: something must run before the binary exists on the machine, and fetching and executing the first artifact cannot itself be that artifact. A file whose *whole* body is bootstrap steps declares `# no-port:` citing this paragraph, the only `no-port` cause `installer/` may carry. `behind-invoke` is a **port obligation**: a file carrying any such step stays `owed` in `--emit port-blockers --tree` until the step moves behind the invoke and the shell that ran it is deleted. `retired` steps are deleted, not declared. `installer/` carries the two bootstraps, each wholly bootstrap steps and each declaring `# no-port:` citing this paragraph, and nothing else. The `--pack-installer` arm's disposition is [§The packer](#the-packer)'s, not this section's.
 
 Both halves of the disposition bind. Read with `bootstrap` silent, the one shell surface the interpreter policy sanctions would have no cause to declare on, and would read as owed forever. Read as saying only *when* a step runs and not *whether* it ports, the rule would void its own words for `behind-invoke`, "written once, in Rust", which is a port commitment.
+
+**A whole-file write goes through a temporary created exclusively.** The seam write ([§Placement](#placement)) and the user install's binary, knob file and `user.lock` writes go to a sibling `<target>.tmp` renamed over the target. No reader sees a half-written file, and a failed write leaves the target intact. A file or link at the temporary's path is removed first, and the create refuses an entry standing there. So a link there, stale, planted or committed, is unlinked rather than written through, and one swapped in after the removal fails the write. A directory there refuses the write, naming it. [§init](#init)'s link refusal never reads a temporary. The exclusive create is the standard library's on every host.
 
 ### Parity between the two bootstraps
 
