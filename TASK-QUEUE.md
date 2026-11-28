@@ -140,7 +140,7 @@ The observe half of `npm-trusted-publishing`: the npm job runs only in a release
 
 **Deliverable:** debt: read that run's `npm` job and the version's `_npmUser`, published with provenance by the trusted publisher (RELEASING.md step 5 names the witness), then delete the `NPM_TOKEN` secret; a red is filed as a defect.
 
-**Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner RELEASING.md step 5.
+**Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.46.0 publish run 46136462075: the `npm` job green under npm 11.19.1, a signed provenance statement published, and `_npmUser` reading `GitHub Actions <npm-oidc-no-reply@github.com>`, so the trusted publisher published while `NPM_TOKEN` was still set; the read is done and only the secret's deletion, the operator's act, remains. Owner lookup: the parent's; owner RELEASING.md step 5.
 
 ### site-documents-unreleased
 
@@ -222,7 +222,7 @@ The observe half of `front-door-npx-resolution`: the front-door legs run only in
 
 **Deliverable:** debt: read that run's front-door legs in both drivers, the package route green on the first attempt; a red on registry lag is filed as a defect.
 
-**Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.44.0 publish run 46112266019: every front-door leg of both drivers green on the run's first attempt, and no lag seen, the package route's registry-to-init gap matching the v0.43.0 pre-fix run's, so the fix is still unwitnessed and the entry stays. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
+**Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.44.0 publish run 46112266019: every front-door leg of both drivers green on the run's first attempt, and no lag seen, the package route's registry-to-init gap matching the v0.43.0 pre-fix run's, so the fix is still unwitnessed and the entry stays. Read again at the v0.46.0 publish run 46136462075: all seven front-door legs green on the first attempt, no lag seen. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
 
 ### marker-target-admission-gaps
 
