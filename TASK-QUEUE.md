@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: link-shape-residue-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-28, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** debt only, so no authoring stage walks. The four carried second-vendor-review bullets are the set, as three entries: `atomic-write-temp-link` leads, as the one adopter-facing data-safety defect on the board, widened to the two sites sharing its shape; `uninstall-check-remove-window` states the limit rather than removing handle-relative; `usage-pair-shape-residue` takes both producer-shape bullets. The adopter has no open asks, and the peer channel holds no request. `exit-status-funnel-typing` stays deferred, since its 527 call sites buy an exit-code cut no in-tree reader branches on; `release-record-gates` and `audit-trigger-dod-citation` stay deferred, since each needs a design call the set's debt-only walk does not carry.
-
-  **The release (2026-11-28, lead decision under the same delegation, not a ruling):** v0.43.0 is cut at this close, carrying the last close's four Behavior-changes declarations, the uninstall data-safety fix among them, and this set's fixes.
-
-  **The pushes (2026-11-28, lead decision under the same delegation, not a ruling):** push need 2 against 2, inside the grant: the closing push, and the v0.43.0 tag push that fires `publish`. No unit needs a mid-iteration push: each fix is portable std or pure parsing with no per-host branch, and the closing push's Windows legs read green before the tag is cut.
 
 ---
 
