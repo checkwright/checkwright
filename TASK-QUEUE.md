@@ -970,9 +970,3 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 ## Done
 
-- marker-target-lossy-resolve
-- block-seed-before-resolve
-- init-agent-seed-dangling-link
-- knobenv-closure-barrier-gaps
-- audit-trigger-dod-citation
-
