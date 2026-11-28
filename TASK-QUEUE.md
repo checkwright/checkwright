@@ -18,20 +18,6 @@
 
 ## Technical Debt
 
-### front-door-npx-resolution
-
-The front-door package route polls `npm pack --prefer-online <package>@<version>` until the tarball fetches, then runs `npx --yes` at the version (scripts/ci-front-door.sh and its PowerShell twin). On publish run 46096434361's first attempt, both x86 Ubuntu legs printed `package: registry: ok` after about three minutes of polling, then `npx checkwright@0.43.0 init` failed 1.4 s later on ETARGET, no matching version; the other legs passed and the re-run greened. The poll's predicate is not the document `npx` resolves the version through.
-
-**Deliverable:** debt: the readiness predicate is the route's own resolution, the `npx` step polled under the bound or the metadata it reads fetched fresh, in both drivers, and RELEASING.md §The front-door rehearsal's package-route sentence says which.
-
-**Inferred, cannot run before build:** — only a publish run meets the lag, so which document read stale, the abbreviated packument behind the registry's CDN or a cache entry the polls left, is unprobed.
-
-**First-run risk:** the PowerShell twin's edit first executes on a tag's `publish` run.
-
-**Cost while deferred:** a release's front-door verdict reds on registry lag, a re-run that reads as a broken front door, and it has now redded two releases running. Surfaced 2026-11-28 by the lead from that run at link-shape-residue-pass' close; filed at this scope as a new defect rather than a recurrence, since `front-door-registry-readiness` has no live entry (`--queue recur` refuses it) and its tarball poll passed here. Owner lookup: `npx`, `ETARGET`, `prefer-online` in this file, none; owner RELEASING.md §The front-door rehearsal.
-
-Its observe half is [npx-resolution-observe](#npx-resolution-observe), split at this scope since only a release run reads it.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -242,7 +228,7 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 
 [cost: event/low] [surface: scripts] [observed-by: publish]
 
-The observe half of [front-door-npx-resolution](#front-door-npx-resolution): the front-door legs run only in a release `publish` run, so the first release after the fix is the only run that shows the package route waiting for what `npx` resolves.
+The observe half of `front-door-npx-resolution`: the front-door legs run only in a release `publish` run, so the first release after the fix is the only run that shows the package route waiting for what `npx` resolves.
 
 **Deliverable:** debt: read that run's front-door legs in both drivers, the package route green on the first attempt; a red on registry lag is filed as a defect.
 
@@ -996,4 +982,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - crate-test-corpus-read-flake
 - install-boundary-write-residue
+- front-door-npx-resolution
 

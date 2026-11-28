@@ -47,6 +47,7 @@ $script:Session = ''
 $script:Repo = ''
 $script:GatesDir = ''
 $script:Notes = 0
+$script:Waited = 0
 
 function Invoke-InRepo {
     param([string]$File, [string[]]$Arguments = @())
@@ -262,7 +263,6 @@ function Test-FirstUpgrade {
 # spec: RELEASING.md §The front-door rehearsal — the tarball itself, which the registry can serve after the metadata names the version
 function Test-RegistryVisible {
     param([string]$Npm)
-    $waited = 0
     $fetched = Join-Path $Base 'registry-fetch'
     New-Item -ItemType Directory -Force -Path $fetched | Out-Null
     while ($true) {
@@ -271,9 +271,22 @@ function Test-RegistryVisible {
         $code = $LASTEXITCODE
         foreach ($line in $out) { $script:Log.Add("$line") }
         if ($code -eq 0) { return $true }
-        if ($waited -ge $RegistryBound) { return $false }
+        if ($script:Waited -ge $RegistryBound) { return $false }
         Start-Sleep -Seconds $RegistryPoll
-        $waited += $RegistryPoll
+        $script:Waited += $RegistryPoll
+    }
+}
+
+# spec: RELEASING.md §The front-door rehearsal — npx's own resolution, polled under the same bound while it answers ETARGET
+function Test-NpxInit {
+    param([string]$Npx)
+    while ($true) {
+        $script:Log.Clear()
+        if ((Invoke-InRepo $Npx @('--yes', '--prefer-online', "$Package@$Version", 'init')) -eq 0) { return $true }
+        if (-not ($script:Log | Where-Object { $_ -match 'code ETARGET' })) { return $false }
+        if ($script:Waited -ge $RegistryBound) { return $false }
+        Start-Sleep -Seconds $RegistryPoll
+        $script:Waited += $RegistryPoll
     }
 }
 
@@ -288,7 +301,7 @@ function Test-PackageRoute {
     Write-Ok 'registry'
     $npx = Get-Command npx -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $npx) { Write-Bad 'init' 'npx does not resolve on PATH'; return $false }
-    if ((Invoke-InRepo $npx.Source @('--yes', "$Package@$Version", 'init')) -ne 0) {
+    if (-not (Test-NpxInit $npx.Source)) {
         Write-Bad 'init' "npx $Package@$Version init exited non-zero"
         return $false
     }

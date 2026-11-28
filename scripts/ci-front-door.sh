@@ -39,6 +39,7 @@ package='checkwright'
 lock='checkwright.lock'
 registry_bound=900
 registry_poll=15
+waited=0
 
 base="$(mktemp -d "${RUNNER_TEMP:-${TMPDIR:-/tmp}}/front-door.XXXXXX")" || {
     echo "front-door: seat: could not make a scratch directory" >&2
@@ -191,7 +192,7 @@ first_upgrade() {
 
 # spec: RELEASING.md §The front-door rehearsal — the tarball itself, which the registry can serve after the metadata names the version
 registry_visible() {
-    local waited=0 fetched="$base/registry-fetch"
+    local fetched="$base/registry-fetch"
     mkdir -p "$fetched" || return 1
     while :; do
         : > "$log"
@@ -202,11 +203,23 @@ registry_visible() {
     done
 }
 
+# spec: RELEASING.md §The front-door rehearsal — npx's own resolution, polled under the same bound while it answers ETARGET
+npx_init() {
+    while :; do
+        : > "$log"
+        run npx --yes --prefer-online "$package@$version" init && return 0
+        grep -q 'code ETARGET' "$log" || return 1
+        [ "$waited" -ge "$registry_bound" ] && return 1
+        sleep "$registry_poll"
+        waited=$((waited + registry_poll))
+    done
+}
+
 package_route() {
     new_repo 'package' package || { bad 'repository' 'git init failed'; return 1; }
     registry_visible || { bad 'registry' "npm pack $package@$version fetched no tarball within ${registry_bound}s of polling"; return 1; }
     ok 'registry'
-    run npx --yes "$package@$version" init || { bad 'init' "npx $package@$version init exited non-zero"; return 1; }
+    npx_init || { bad 'init' "npx $package@$version init exited non-zero"; return 1; }
     [ -f "$repo/$lock" ] || { bad 'init' "the install left no $lock"; return 1; }
     [ "$(lock_field version)" = "$version" ] || { bad 'init' "$lock names version '$(lock_field version)', not $version"; return 1; }
     ok 'init'
