@@ -395,6 +395,21 @@ fn write_in(
     Ok(true)
 }
 
+// spec: installer/SPEC.md §What init seeds — a linked agent file resolves before the first write,
+// so one resolving to no file or outside the repository is never replaced by the seed
+fn agent_file_resolves(root: &Path, kits: &[String]) -> Result<(), Refusal> {
+    if !kits.iter().any(|k| recipe::needs_agent_file(k)) {
+        return Ok(());
+    }
+    crate::marker::target(&root.join(AGENT_FILE).to_string_lossy()).map(|_| ()).map_err(|e| {
+        refuse(
+            e,
+            "nothing was written. init seeds the agent file only where none stands and writes its block into the file a link names, so a link resolving to no file would be replaced. Create the file the link names inside this repository, or remove the link, then re-run.",
+            exit::INPUT,
+        )
+    })
+}
+
 fn file_name(dest: &str) -> &str {
     dest.rsplit('/').next().unwrap_or(dest)
 }
@@ -651,7 +666,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         personal::check(&root).map_err(|e| {
             refuse(
                 format!("could not write the personal install's exclude block: {}", e),
-                "nothing was written. Restore this worktree's end marker in the exclude file, or delete its begin line, then re-run.",
+                "nothing was written. Restore this worktree's end marker in the exclude file, or delete its begin line, or point a link at the exclude file to a file inside this repository, then re-run.",
                 exit::INPUT,
             )
         })?;
@@ -674,6 +689,8 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
             ));
         }
     }
+
+    agent_file_resolves(&root, &kits)?;
 
     let mut r = Roster::new();
 
@@ -1316,6 +1333,49 @@ fn in_tree(root: &Path, p: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // spec: installer/SPEC.md §What init seeds — the preflight refuses a dangling or escaping
+    // agent-file link at exit 3 and admits a resolving link, a regular file, an absent one, and any
+    // link where no selected kit needs the agent file
+    #[cfg(unix)]
+    #[test]
+    fn a_dangling_or_escaping_agent_file_link_refuses_the_install() {
+        use std::os::unix::fs::symlink;
+        let dir = std::env::temp_dir().join(format!("cw-init-agent-link-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let repo = dir.join("repo");
+        std::fs::create_dir_all(repo.join(".git")).expect("cannot make the scratch repository");
+        std::fs::write(dir.join("outside.md"), "x\n").expect("cannot seed outside");
+        std::fs::write(repo.join("AGENTS.md"), "x\n").expect("cannot seed the named file");
+        let agent = repo.join(AGENT_FILE);
+        let doctrine = vec!["gate-sdk".to_string(), "doctrine-kit".to_string()];
+        let without = vec!["gate-sdk".to_string()];
+        let verdict = |kits: &[String]| agent_file_resolves(&repo, kits).map_err(|r| (r.code, r.message));
+        let absent = verdict(&doctrine);
+        std::fs::write(&agent, "x\n").expect("cannot seed the agent file");
+        let regular = verdict(&doctrine);
+        let mut linked = Vec::new();
+        for to in ["AGENTS.md", "missing.md", "../outside.md"] {
+            std::fs::remove_file(&agent).expect("cannot clear the agent file");
+            symlink(to, &agent).expect("cannot link");
+            linked.push((to, verdict(&doctrine), verdict(&without)));
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(absent, Ok(()), "an absent agent file refused");
+        assert_eq!(regular, Ok(()), "a regular agent file refused");
+        for (to, with_doctrine, without_doctrine) in linked {
+            assert_eq!(without_doctrine, Ok(()), "a link to {} refused where no kit needs the agent file", to);
+            match to {
+                "AGENTS.md" => assert_eq!(with_doctrine, Ok(()), "the resolving link refused"),
+                _ => assert!(
+                    with_doctrine.as_ref().is_err_and(|(code, m)| *code == exit::INPUT && m.contains("refusing to write through it")),
+                    "a link to {} did not refuse: {:?}",
+                    to,
+                    with_doctrine
+                ),
+            }
+        }
+    }
 
     // spec: installer/SPEC.md §init — the profile phrase: no adjustment, an addition, a removal and both
     #[test]

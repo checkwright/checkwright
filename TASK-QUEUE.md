@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### init-agent-seed-dangling-link
-
-`init`'s agent-file seed (`native/src/installer/init.rs`) guards on `is_file`, which a dangling `CLAUDE.md` link fails, so the seed's atomic write renames over the link and leaves a regular file. installer/SPEC.md §The install boundary rules that an ordinary atomic write replaces a link at its target, and the marker-block exception, which follows one, does not reach the seed.
-
-**Deliverable:** debt, the refusal branch (lead decision 2026-11-28 under the operator's delegation, not a ruling): `init`'s preflight reads a linked agent file with one `marker::target` call and refuses a dangling or escaping link before any write. installer/SPEC.md §What init seeds states the rule and points to gate-sdk/SPEC.md §lib/inject.sh rather than restating it, with one init unit or installer-smoke case.
-
-**Cost while deferred:** an adopter whose agent file is a dangling link has the link replaced by init's seed with no notice, so a later fix of the link's target forks from it. The bug predates this iteration. Its preflight costs one `marker::target` read. Filed 2026-11-28 by trusted-publish-pass' close from build's inbox bullet. Re-verified: the seed guard is `!root.join(AGENT_FILE).is_file()` and the write is `install::write_atomically`, read at the close entry head, and `Path::is_file` reads false on a dangling link, probed with a scratch binary. Owner lookup: `dangling`, `agent-file seed`, `seeds_agent` in this file and the disposed-findings record, none; owner installer/SPEC.md §What init seeds.
-
 ### knobenv-closure-barrier-gaps
 
 The knob-lock case check in `native/src/knobenv.rs` misreads two shapes. A false negative: the reader closure's barrier is the transitive set of guard takers, so a function that calls a releasing taker and then walks (`render(); walk::find_files();`) counts as a taker, and a test calling only it passes unheld. A false positive: the guard-owning struct scan starts on the line after the struct's declaration, so `struct Held { env: KnobEnv }` on one line, or `struct Held(KnobEnv);`, goes unrecognised, and a test holding one reds.
@@ -996,4 +988,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - marker-target-lossy-resolve
 - block-seed-before-resolve
+- init-agent-seed-dangling-link
 

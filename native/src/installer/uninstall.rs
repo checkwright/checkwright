@@ -153,7 +153,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
         super::personal::check(&root).map_err(|e| {
             refuse(
                 format!("could not remove the personal install's exclude block: {}", e),
-                "nothing was removed. Restore this worktree's end marker in the exclude file, or delete its begin line, then re-run.",
+                "nothing was removed. Restore this worktree's end marker in the exclude file, or delete its begin line, or point a link at the exclude file to a file inside this repository, then re-run.",
                 exit::INPUT,
             )
         })?;
