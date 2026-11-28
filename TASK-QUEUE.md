@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### knobenv-closure-barrier-gaps
-
-The knob-lock case check in `native/src/knobenv.rs` misreads two shapes. A false negative: the reader closure's barrier is the transitive set of guard takers, so a function that calls a releasing taker and then walks (`render(); walk::find_files();`) counts as a taker, and a test calling only it passes unheld. A false positive: the guard-owning struct scan starts on the line after the struct's declaration, so `struct Held { env: KnobEnv }` on one line, or `struct Held(KnobEnv);`, goes unrecognised, and a test holding one reds.
-
-**Deliverable:** bar the closure at direct takers only, so a releasing taker leaves its caller a reader, and read a struct's fields from its declaration line, tuple fields included. Add one unit fixture per shape, and widen the honest-limit line in gate-sdk/SPEC.md §lib/gate.sh to the shapes that remain.
-
-**Cost while deferred:** a crate test can walk unheld through a wrapper without the check catching it, and the sibling-write race it guards against can recur under it. A false red costs a rewrite of the struct. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Re-verified by source read at the close head. Owner lookup: `knobenv`, `lockers` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/gate.sh.
-
 ### audit-trigger-dod-citation
 
 `check-stage-entry` assertion C reads the amendment DoD's Causal-completeness line, which cites `canon-kit/SPEC.md §The causal-completeness check`, as a contract token naming the canon-kit roster dir. So a single-component amendment reaches two components on that citation alone, and build entry demands an align stamp or a waiver. Both gate-sdk amendments of migration-parity-pass met it: the build simulate refused, and the set ran align.
@@ -989,4 +981,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - marker-target-lossy-resolve
 - block-seed-before-resolve
 - init-agent-seed-dangling-link
+- knobenv-closure-barrier-gaps
 

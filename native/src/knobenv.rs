@@ -254,7 +254,8 @@ mod tests {
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a type owning the guard by value, so a function
-    // returning one hands its caller the lock rather than releasing it
+    // returning one hands its caller the lock rather than releasing it; its fields start on the
+    // declaration line, which carries all of them in a one-line or tuple struct
     fn guard_types(text: &str) -> Vec<String> {
         let lines: Vec<&str> = text.lines().collect();
         let mut out = Vec::new();
@@ -263,9 +264,13 @@ mod tests {
             let t = t.strip_prefix("pub(crate) ").or_else(|| t.strip_prefix("pub ")).unwrap_or(t);
             let Some(rest) = t.strip_prefix("struct ") else { continue };
             let name: String = rest.chars().take_while(|c| ident(*c)).collect();
-            let close = format!("{}}}", &l[..indent(l)]);
-            let fields = lines[i + 1..].iter().take_while(|f| **f != close);
-            if !name.is_empty() && fields.into_iter().any(|f| f.contains("KnobEnv") && !f.contains('&')) {
+            let head = &rest[name.len()..];
+            let ends = head.trim_end().ends_with(';') || head.trim_end().ends_with('}');
+            let tuple = head.find('(').is_some_and(|p| head.find('{').map_or(true, |b| p < b));
+            let close = format!("{}{}", &l[..indent(l)], if tuple { ");" } else { "}" });
+            let body = if ends { &[][..] } else { &lines[i + 1..] };
+            let fields = std::iter::once(head).chain(body.iter().copied().take_while(|f| *f != close));
+            if !name.is_empty() && fields.flat_map(|f| f.split(',')).any(|f| f.contains("KnobEnv") && !f.contains('&')) {
                 out.push(name);
             }
         }
@@ -373,16 +378,26 @@ mod tests {
         }
     }
 
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a function holding the guard across its body is the
+    // barrier: one taking it, or one calling a taker that hands it back. A caller of a releasing taker
+    // holds nothing for the walk after the call, so reaching a taker is no barrier
+    fn barrier(all: &[Func], guards: &[String]) -> BTreeSet<String> {
+        let handers = handers(all, guards);
+        all.iter()
+            .filter(|f| !f.case && (f.held || f.calls.iter().any(|n| handers.contains(n))))
+            .map(|f| f.key.clone())
+            .collect()
+    }
+
     // spec: gate-sdk/SPEC.md §lib/gate.sh — the roots are walk.rs's own functions, top-level or an
-    // impl's, never a case's or a test helper's; a function reaching the guard is the barrier, since
-    // its reads are serialized
-    fn knob_readers(all: &[Func], lockers: &BTreeSet<String>) -> BTreeSet<String> {
+    // impl's, never a case's or a test helper's
+    fn knob_readers(all: &[Func], barrier: &BTreeSet<String>) -> BTreeSet<String> {
         let roots = all
             .iter()
             .filter(|f| f.key.starts_with("walk::") && f.own && !f.case && f.reads)
             .map(|f| f.key.clone())
             .collect();
-        closure(all, roots, lockers)
+        closure(all, roots, barrier)
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a taker releasing the guard on return holds nothing for
@@ -402,9 +417,55 @@ mod tests {
         all.extend(fns(src, &src.join("probe.rs"), probe, false));
         let guards = guard_types(probe);
         assert_eq!(guards, vec!["Held".to_string()]);
-        let lockers = closure(&all, all.iter().filter(|f| !f.case && f.held).map(|f| f.key.clone()).collect(), &BTreeSet::new());
-        let readers = knob_readers(&all, &lockers);
+        let readers = knob_readers(&all, &barrier(&all, &guards));
         assert_eq!(unheld(&all, &readers, &guards), vec!["probe::released calls walk::find_files".to_string()]);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a wrapper calling a releasing taker and then walking is a
+    // reader, so a case reaching the walk only through it is unheld; one holding a handed guard is not
+    #[test]
+    fn a_wrapper_walking_after_a_released_taker_is_a_reader() {
+        let src = Path::new("/probe/src");
+        let walk = concat!("pub fn find_files() {\n    let _ = std::env::", "var(\"K\");\n}\n");
+        let probe = concat!(
+            "struct Held {\n    env: KnobEnv,\n}\n",
+            "fn render() -> String {\n    let _k = crate::knobenv::", "lock();\n    String::new()\n}\n",
+            "fn hold() -> Held {\n    let env = crate::knobenv::", "lock();\n    Held { env }\n}\n",
+            "fn after_render() {\n    render();\n    walk::", "find_files();\n}\n",
+            "fn after_hold() {\n    let _h = hold();\n    walk::", "find_files();\n}\n",
+            "#[test]\nfn wrapped() {\n    after_render();\n}\n",
+            "#[test]\nfn handed() {\n    after_hold();\n}\n",
+        );
+        let mut all = fns(src, &src.join("walk.rs"), walk, true);
+        all.extend(fns(src, &src.join("probe.rs"), probe, false));
+        let guards = guard_types(probe);
+        let readers = knob_readers(&all, &barrier(&all, &guards));
+        assert!(readers.contains("probe::after_render") && !readers.contains("probe::after_hold"));
+        assert_eq!(unheld(&all, &readers, &guards), vec!["probe::wrapped calls probe::after_render".to_string()]);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a struct's fields are read from its declaration line on,
+    // so a one-line or tuple struct owning the guard carries it, and a borrowed field never does
+    #[test]
+    fn a_one_line_or_tuple_struct_owning_the_guard_carries_it() {
+        let src = Path::new("/probe/src");
+        let walk = concat!("pub fn find_files() {\n    let _ = std::env::", "var(\"K\");\n}\n");
+        let probe = concat!(
+            "struct Braced { env: KnobEnv }\n",
+            "pub struct Tuple(KnobEnv);\n",
+            "struct Mixed<'a> { name: &'a str, env: KnobEnv }\n",
+            "struct Split(\n    String,\n    KnobEnv,\n);\n",
+            "struct Borrowed<'a>(&'a KnobEnv);\n",
+            "struct Plain {\n    name: String,\n}\n",
+            "fn hold() -> Tuple {\n    Tuple(crate::knobenv::", "lock())\n}\n",
+            "#[test]\nfn handed() {\n    let _h = hold();\n    walk::", "find_files();\n}\n",
+        );
+        let guards = guard_types(probe);
+        assert_eq!(guards, ["Braced", "Tuple", "Mixed", "Split"].map(String::from).to_vec());
+        let mut all = fns(src, &src.join("walk.rs"), walk, true);
+        all.extend(fns(src, &src.join("probe.rs"), probe, false));
+        let readers = knob_readers(&all, &barrier(&all, &guards));
+        assert!(unheld(&all, &readers, &guards).is_empty());
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a walk reads the knob set, so a case walking unlocked,
@@ -426,8 +487,7 @@ mod tests {
         for known in ["Marked", "Sandbox"] {
             assert!(guards.iter().any(|g| g == known), "the guard types lost {}", known);
         }
-        let lockers = closure(&all, all.iter().filter(|f| !f.case && f.held).map(|f| f.key.clone()).collect(), &BTreeSet::new());
-        let readers = knob_readers(&all, &lockers);
+        let readers = knob_readers(&all, &barrier(&all, &guards));
         for known in [
             "walk::prune_dirs",
             "walk::find_files",
@@ -439,6 +499,7 @@ mod tests {
         }
         // spec: gate-sdk/SPEC.md §lib/gate.sh — the guard is not reentrant, so a function taking it
         // never reaches another function that does: the thread would wait on itself
+        let lockers = closure(&all, all.iter().filter(|f| !f.case && f.held).map(|f| f.key.clone()).collect(), &BTreeSet::new());
         let reentrant: Vec<String> = all
             .iter()
             .filter(|f| f.held)
