@@ -102,6 +102,7 @@
 6497cp docs/posts/2026-11-27-checkwright-v0-41-0.md
 3612cp docs/posts/2026-11-27-checkwright-v0-42-0.md
 5338cp docs/posts/2026-11-28-checkwright-v0-43-0.md
+3621cp docs/posts/2026-11-28-checkwright-v0-44-0.md
 7064cp docs/projection-fan-outs.md
 1460cp docs/queue-kit/index.md
 8559cp docs/requirements.md
@@ -119,7 +120,7 @@
 3130cp gate-sdk/templates/adopt.md
 356958cp guard-kit/SPEC.md
 4439cp guard-kit/templates/close-triage.md
-335642cp installer/SPEC.md
+335731cp installer/SPEC.md
 412820cp lifecycle-kit/SPEC.md
 8155cp lifecycle-kit/templates/consult.md
 1212cp lifecycle-kit/templates/frames/project-critique.md
