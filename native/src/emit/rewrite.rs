@@ -216,7 +216,6 @@ fn has_git_component(p: &Path) -> bool {
 
 struct Planned {
     shown: String,
-    canonical: String,
     target: PathBuf,
     new: Option<Vec<u8>>,
     changes: Vec<Change>,
@@ -226,10 +225,10 @@ struct Planned {
 // first write.
 fn check_operand(
     op: &str,
-    root: &str,
+    root: &Path,
     is_state: &dyn Fn(&str) -> Result<bool, String>,
     seen: &[Planned],
-) -> Result<(String, PathBuf, Vec<u8>), Fault> {
+) -> Result<(PathBuf, Vec<u8>), Fault> {
     let path = Path::new(op);
     let meta = std::fs::symlink_metadata(path).map_err(|_| Fault::refused(format!("no such file: {}", op)))?;
     if meta.file_type().is_symlink() {
@@ -243,11 +242,14 @@ fn check_operand(
     }
     let target =
         crate::walk::canonical_path(path).ok_or_else(|| Fault::input(format!("cannot resolve {}", op)))?;
-    let canonical = target.display().to_string();
-    if !super::scratch_run::is_inside(root, &canonical) {
-        return Err(Fault::refused(format!("refusing {} — outside the working directory {}", op, root)));
-    }
-    if has_git_component(Path::new(&canonical[root.len()..])) {
+    let Ok(below) = target.strip_prefix(root) else {
+        return Err(Fault::refused(format!(
+            "refusing {} — outside the working directory {}",
+            op,
+            crate::walk::escaped_os(root.as_os_str())
+        )));
+    };
+    if has_git_component(below) {
         return Err(Fault::refused(format!("refusing {} — resolves through .git", op)));
     }
     match is_state(op) {
@@ -265,14 +267,14 @@ fn check_operand(
             )))
         }
     }
-    if seen.iter().any(|p| p.canonical == canonical) {
+    if seen.iter().any(|p| p.target == target) {
         return Err(Fault::usage(format!("refusing {} — names a file already listed", op)));
     }
     let content = std::fs::read(path).map_err(|e| Fault::input(format!("cannot read {}: {}", op, e)))?;
     if !text_ok(&content) {
         return Err(Fault::input(format!("refusing {} — not UTF-8 text, or carries a NUL byte", op)));
     }
-    Ok((canonical, target, content))
+    Ok((target, content))
 }
 
 // spec: queue-kit/SPEC.md §The queue verbs — the sibling-temporary-and-rename write the verbs share
@@ -306,7 +308,7 @@ pub fn write_replacing(target: &Path, content: &[u8]) -> Result<(), String> {
 
 fn execute(
     args: &[String],
-    root: &str,
+    root: &Path,
     is_state: &dyn Fn(&str) -> Result<bool, String>,
     out: &mut dyn Write,
     err: &mut dyn Write,
@@ -334,7 +336,7 @@ fn execute(
     };
     let mut planned: Vec<Planned> = Vec::new();
     for op in &opts.files {
-        let (canonical, target, content) = match check_operand(op, root, is_state, &planned) {
+        let (target, content) = match check_operand(op, root, is_state, &planned) {
             Ok(v) => v,
             Err(e) => return refuse(e.status(), &e),
         };
@@ -354,7 +356,6 @@ fn execute(
         };
         planned.push(Planned {
             shown: op.clone(),
-            canonical,
             target,
             new,
             changes,
@@ -410,7 +411,7 @@ fn execute(
 }
 
 pub fn run(args: &[String]) -> i32 {
-    let root = match crate::walk::cwd().ok().and_then(crate::walk::canonicalize) {
+    let root = match crate::walk::canonical_path(".") {
         Some(r) => r,
         None => {
             eprintln!("{}: cannot resolve the working directory", NAME);
@@ -436,7 +437,7 @@ mod tests {
     // hands it to `execute`, compared only against the operands' own canonical answers; `root` is
     // its stripped spelling, the one the seeds are composed from
     struct Sandbox {
-        canonical: String,
+        canonical: PathBuf,
         root: String,
     }
 
@@ -445,8 +446,8 @@ mod tests {
             let dir = std::env::temp_dir().join(format!("cw-rewrite-{}-{}", tag, std::process::id()));
             let _ = std::fs::remove_dir_all(&dir);
             std::fs::create_dir_all(&dir).expect("cannot create the sandbox");
-            let canonical = crate::walk::canonicalize(&dir).expect("the sandbox must resolve");
-            let root = crate::walk::normalize_abs(crate::walk::strip_extended_prefix(&canonical));
+            let canonical = crate::walk::canonical_path(&dir).expect("the sandbox must resolve");
+            let root = crate::walk::normalize_abs(crate::walk::strip_extended_prefix(&canonical.display().to_string()));
             Sandbox { canonical, root }
         }
         fn file(&self, name: &str, body: &[u8]) -> String {
@@ -600,6 +601,55 @@ mod tests {
         assert_eq!(rc, 0, "{}", err);
         assert_eq!(std::fs::read(odd.join("a.md")).expect("read odd"), b"y\n", "the operand's own file was not rewritten");
         assert_eq!(std::fs::read(lossy.join("a.md")).expect("read lossy"), b"x\n", "the lossy spelling's file was rewritten");
+    }
+
+    // spec: guard-kit/SPEC.md §rewrite — operand identity is the resolved path's bytes, so two files
+    // whose names differ only in bytes that are not UTF-8 are two operands, never one listed twice
+    #[cfg(all(unix, not(target_os = "macos")))]
+    #[test]
+    fn two_files_alike_only_in_their_lossy_spelling_are_two_operands() {
+        use std::ffi::OsStr;
+        use std::os::unix::ffi::OsStrExt;
+        use std::os::unix::fs::symlink;
+        let sb = Sandbox::new("lossy-pair");
+        let root = Path::new(&sb.root);
+        for (dir, link) in [(&b"d\xfe"[..], "one"), (&b"d\xff"[..], "two")] {
+            std::fs::create_dir_all(root.join(OsStr::from_bytes(dir))).expect("cannot make a sandbox directory");
+            std::fs::write(root.join(OsStr::from_bytes(dir)).join("a.md"), b"x\n").expect("cannot seed a sandbox file");
+            symlink(OsStr::from_bytes(dir), root.join(link)).expect("cannot link");
+        }
+        let ops = ["one", "two"].map(|l| root.join(l).join("a.md").display().to_string());
+        let (rc, _, err) = sb.run(&["x", "y", &ops[0], &ops[1]]);
+        assert_eq!(rc, 0, "{}", err);
+        for dir in [&b"d\xfe"[..], &b"d\xff"[..]] {
+            assert_eq!(std::fs::read(root.join(OsStr::from_bytes(dir)).join("a.md")).expect("read"), b"y\n");
+        }
+    }
+
+    // spec: guard-kit/SPEC.md §rewrite — containment compares paths, so under a working directory
+    // whose name is not UTF-8 a link to a sibling alike only in that spelling is outside it
+    #[cfg(all(unix, not(target_os = "macos")))]
+    #[test]
+    fn a_sibling_alike_only_in_its_lossy_spelling_is_outside_the_working_directory() {
+        use std::ffi::OsStr;
+        use std::os::unix::ffi::OsStrExt;
+        use std::os::unix::fs::symlink;
+        let sb = Sandbox::new("lossy-root");
+        let base = Path::new(&sb.root);
+        let (here, sibling) = (base.join(OsStr::from_bytes(b"r\xff")), base.join(OsStr::from_bytes(b"r\xfe")));
+        std::fs::create_dir_all(&here).expect("cannot make the working directory");
+        std::fs::create_dir_all(&sibling).expect("cannot make the sibling");
+        std::fs::write(sibling.join("a.md"), b"x\n").expect("cannot seed the sibling's file");
+        symlink(OsStr::from_bytes(b"../r\xfe"), here.join("esc")).expect("cannot link");
+        symlink(OsStr::from_bytes(b"r\xff"), base.join("here")).expect("cannot link");
+        let op = base.join("here").join("esc").join("a.md").display().to_string();
+        let argv: Vec<String> = ["x", "y", op.as_str()].iter().map(|s| s.to_string()).collect();
+        let (mut out, mut err) = (Vec::new(), Vec::new());
+        let root = crate::walk::canonical_path(&here).expect("the working directory must resolve");
+        let rc = execute(&argv, &root, &|_: &str| Ok(false), &mut out, &mut err);
+        assert_eq!(rc, exit::REFUSED, "{}", String::from_utf8_lossy(&err));
+        assert!(String::from_utf8_lossy(&err).contains("outside the working directory"));
+        assert_eq!(std::fs::read(sibling.join("a.md")).expect("read"), b"x\n", "the sibling's file was rewritten");
     }
 
     #[test]

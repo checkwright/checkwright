@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### rewrite-lossy-operand-identity
-
-`check_operand` in `native/src/emit/rewrite.rs` writes to the operand's resolved path with its bytes kept, but tests containment and duplicates on the lossy spelling, the working directory's included. Two operands resolving to distinct files whose names differ only in bytes that are not UTF-8 read as one file and refuse the run, and under a working directory whose name is not UTF-8, a link to a sibling directory differing only in those bytes passes containment. guard-kit/SPEC.md §rewrite refuses only an operand naming the same canonical file as an earlier one, and one outside the working directory.
-
-**Deliverable:** debt: resolve the working directory as a path and compare and contain on paths, with a unix case for each half.
-
-**Cost while deferred:** a false refusal of two such operands, and a containment escape reachable only from a working directory whose name is not UTF-8. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `seen` compares `canonical`, the display string, and `root` is `walk::canonicalize` of the working directory. Owner lookup: `lossy`, `same canonical file` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §rewrite.
-
 ### npm-trusted-publishing-observe
 
 [drain-exempt: close deletes the secret]
@@ -1003,4 +995,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - marker-target-admission-gaps
 - seed-write-link-race
 - knobenv-struct-comment-scan
+- rewrite-lossy-operand-identity
 
