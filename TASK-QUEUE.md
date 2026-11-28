@@ -264,6 +264,26 @@ The guard-owning struct scan in `native/src/knobenv.rs` ends a declaration on it
 
 **Cost while deferred:** a false refusal of two such operands, and a containment escape reachable only from a working directory whose name is not UTF-8. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `seen` compares `canonical`, the display string, and `root` is `walk::canonicalize` of the working directory. Owner lookup: `lossy`, `same canonical file` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §rewrite.
 
+### cross-file-duplicate-text
+
+[cost: event/low] [surface: canon-kit]
+
+An adopter request, relayed by the lead from the orchestrator adopter: a general cross-file duplicate-text gate, holding that no run of N or more normalized words is shared across a declared file set, its knobs the file-set globs and N. The closest coverage today is narrower: `check-docs-page-repeat` reads within one page, and `check-shim-restatement` reads one binding-shim corpus and installs `never`.
+
+**Deliverable:** design-pending, a feature: a canon-kit gate over a consumer-declared glob set and run length, off by default, with its fixture pair; the spec stage settles normalization, the run-length default and whether `check-shim-restatement`'s n-gram reading is shared or folded in.
+
+**Cost while deferred:** a restatement spanning two files drifts with no gate to catch it, the SSOT rule left to review in the requesting adopter's tree. About one iteration with a spec stage, the n-gram reading already in the crate. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Owner lookup: `duplicate`, `cross-file`, `n-gram` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md, beside §check-docs-page-repeat.
+
+### prose-command-liveness
+
+[cost: event/low] [surface: canon-kit]
+
+An adopter request, relayed by the lead from the orchestrator adopter: a prose command-liveness gate, holding that each backticked command word in governed prose still resolves against a resolver the consumer selects: the PATH, the verbs a named binary's `--help` prints, or a list file. Today `check-md-refs`, `check-settings-paths` and `check-task-path-claim` read only paths and links, and `check-docs-cmd` and `check-fence-command-head` read fenced script paths and fence heads, never a command named in prose.
+
+**Deliverable:** design-pending, a feature: a canon-kit gate whose resolver is a consumer-selectable set with off among the options (Policy-as-choice), with a fixture pair per resolver; the spec stage settles what counts as a command word in a backtick span.
+
+**Cost while deferred:** a renamed or retired command stays cited in prose until a reader runs it. About one iteration with a spec stage, the `--help` resolver the costliest, since it runs a binary at gate time. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Owner lookup: `command word`, `--help`, `resolver` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md, beside §check-docs-cmd.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
