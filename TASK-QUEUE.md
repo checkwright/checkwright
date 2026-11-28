@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### doctrine-install-atomic-write
-
-init's doctrine recipe rewrites the agent file in place: `native/src/installer/recipe.rs` calls `doctrine::install_in`, whose `marker::install_block` ends in the in-place `std::fs::write` of `native/src/marker.rs`, so an interrupted install can tear the adopter's agent file and a hard link at it is written through; `init.rs` stages only the agent file's seed. `install.rs`'s `no_install_writer_writes_a_file_in_place` scans the install, init, recipe, user and uninstall sources but not `doctrine.rs` or `marker.rs`, the check class that missed it.
-
-**Deliverable:** debt: `marker::install_block` writes by the replace-by-rename path `install::write_atomically` already takes, the scan widened to `doctrine.rs` and `marker.rs`, installer/SPEC.md §The install boundary's narrowing to the seed lifted, and a release declaration. The writer is also gate-sdk/SPEC.md §lib/inject.sh's, so `--inject`'s callers take the same change.
-
-**Cost while deferred:** rare and harmful: an interrupted `init` or `--inject` can leave the adopter's always-loaded agent file torn. Surfaced 2026-11-28 by crate-flake-write-residue-pass' close, its second-vendor review, source-read confirmed; promoted at the next scope. Re-verified: `marker.rs` writes in place and `install.rs` holds `write_atomically`. Owner lookup: `marker.rs`, `install_block` in this file, none; owner installer/SPEC.md §The install boundary.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -991,4 +983,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - npm-trusted-publishing
 - front-door-retry-marker
 - knob-lock-taker-exemption
+- doctrine-install-atomic-write
 

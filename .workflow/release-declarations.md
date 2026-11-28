@@ -1,1 +1,5 @@
 # contract: gate-sdk/SPEC.md §upgrade-smoke — the accumulating release declaration surface; the note's declaration-bearing sections in the note's grammar, Platforms excepted since composition derives it, appended by the session landing a kit-shipped change or the one discovering its omission, composed into the release note and drained to this header at the tag.
+
+## Behavior changes
+
+- **`init`, `--install-doctrine`, `--install-lifecycle` and every arm that writes a marker block** — the block writers now replace the file whole, through a temporary named `<target>.<pid>.<seq>.tmp` renamed over it, keeping the file's permissions, where they used to rewrite it in place. An interrupted `init` or install can no longer leave the agent file torn, and a link standing at a rewritten file, a hard link or a symlinked agent file, is replaced by a regular file rather than written through. Nothing to do, unless your agent file is a symlink to the file you mean to carry the block: name that file as the agent file (`DOCTRINE_KIT_AGENT_FILE`, or `--install-lifecycle`'s agent-file argument).

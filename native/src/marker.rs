@@ -64,8 +64,10 @@ fn has_line(lines: &[&[u8]], marker: &str) -> bool {
     lines.iter().any(|l| is_line(l, marker))
 }
 
+// spec: gate-sdk/SPEC.md §lib/inject.sh — every writer replaces the file whole, through a temporary
+// and a rename, never writing it in place
 fn write_bytes(path: &str, out: &[u8]) -> Result<(), String> {
-    std::fs::write(path, out).map_err(|e| format!("cannot write {}: {}", path, e))
+    crate::install::rewrite_atomically(std::path::Path::new(path), out)
 }
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the one well-formedness test: once a begin marker is
@@ -596,6 +598,57 @@ mod tests {
             fresh::read_captured(&empty).unwrap(),
             format!("\n{}\nx\n{}\n", B, E)
         );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a writer replaces the file whole: a hard link at it
+    // keeps the old bytes, the file keeps its permissions, and no temporary stays beside it
+    #[test]
+    fn every_writer_replaces_the_file_rather_than_writing_through_it() {
+        let dir = std::env::temp_dir().join(format!("cw-marker-rename-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("cannot make the scratch dir");
+        let p = dir.join("AGENT.md");
+        let linked = dir.join("linked.md");
+        let path = p.display().to_string();
+        let seed = format!("head\n{}\nold\n{}\n", B, E);
+        std::fs::write(&p, &seed).expect("cannot seed");
+        std::fs::hard_link(&p, &linked).expect("cannot link");
+        let mode = |p: &std::path::Path| -> u32 {
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                std::fs::metadata(p).expect("stat").permissions().mode() & 0o777
+            }
+            #[cfg(not(unix))]
+            {
+                u32::from(std::fs::metadata(p).expect("stat").permissions().readonly())
+            }
+        };
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&p, std::fs::Permissions::from_mode(0o640)).expect("cannot set the seed's mode");
+        }
+        let seeded = mode(&p);
+        for name in ["install_block", "write_block", "uninstall_block", "remove_block"] {
+            let wrote = match name {
+                "install_block" => install_block(&path, B, E, "new\n").map(|_| ()),
+                "write_block" => write_block(&path, B, E, "newer\n"),
+                "uninstall_block" => uninstall_block(&path, B, E).map(|_| ()),
+                _ => install_block(&path, B, E, "again\n").and_then(|_| remove_block(&path, B, E)).map(|_| ()),
+            };
+            wrote.unwrap_or_else(|e| panic!("{} failed: {}", name, e));
+            assert_eq!(fresh::read_captured(&linked.display().to_string()).expect("link"), seed, "{} wrote through the link", name);
+            assert_eq!(mode(&p), seeded, "{} dropped the file's permissions", name);
+            let left: Vec<String> = crate::walk::list_dir(&dir)
+                .expect("cannot list the scratch dir")
+                .into_iter()
+                .map(|(n, _)| n)
+                .filter(|n| n.ends_with(".tmp"))
+                .collect();
+            assert!(left.is_empty(), "{} left {:?}", name, left);
+        }
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

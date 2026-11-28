@@ -366,13 +366,13 @@ Both halves of the disposition bind. Read with `bootstrap` silent, the one shell
 **A whole-file write goes through a temporary created exclusively.** These writes go to a sibling `<target>.<pid>.<seq>.tmp` renamed over the target:
 
 - the repo install's artifact and seam ([§Placement](#placement));
-- init's writes into the adopter tree: kit files, composed seams, the registry, the agent file's seed, the CI workflow, the queue and recipe seeds, a captured projection, and the manifest;
+- init's writes into the adopter tree: kit files, composed seams, the registry, the agent file's seed and the doctrine block's rewrite of it ([gate-sdk/SPEC.md §lib/inject.sh](../gate-sdk/SPEC.md#libinjectsh)), the CI workflow, the queue and recipe seeds, a captured projection, and the manifest;
 - `uninstall`'s narrowed manifest;
 - the user install's binary, knob file and `user.lock`.
 
-No reader sees a half-written file, a failed write leaves the target intact, and a link standing at the target is replaced rather than written through. The name carries the writer's process id and a per-process sequence, so each writer's temporary is its own. Two writers of one file never publish each other's bytes, and a write removes only a temporary it created. A file or link at the temporary's path is removed first, and the create refuses an entry standing there. So a link there, stale or planted, is unlinked rather than written through, and one swapped in after the removal fails the write. A directory there refuses the write, naming it. A kit file keeps its source's permissions, and the artifact is made executable on the temporary before the rename. The same exclusive create stages the peer channel's request and run-validate's lock record, manifest and Statement. [§init](#init)'s link refusal never reads a temporary. The exclusive create is the standard library's on every host.
+No reader sees a half-written file, a failed write leaves the target intact, and a link standing at the target is replaced rather than written through. The name carries the writer's process id and a per-process sequence, so each writer's temporary is its own. Two writers of one file never publish each other's bytes, and a write removes only a temporary it created. A file or link at the temporary's path is removed first, and the create refuses an entry standing there. So a link there, stale or planted, is unlinked rather than written through, and one swapped in after the removal fails the write. A directory there refuses the write, naming it. A kit file keeps its source's permissions, a rewrite of an existing file keeps that file's own, and the artifact is made executable on the temporary before the rename. The same exclusive create stages the peer channel's request and run-validate's lock record, manifest and Statement. [§init](#init)'s link refusal never reads a temporary. The exclusive create is the standard library's on every host.
 
-Its honest limits: a writer killed between the create and the rename leaves its temporary behind, and no later write reuses or removes it; and the doctrine recipe's block rewrite of the agent file still writes in place.
+Its honest limit: a writer killed between the create and the rename leaves its temporary behind, and no later write reuses or removes it.
 
 ### Parity between the two bootstraps
 

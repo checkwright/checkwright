@@ -286,6 +286,17 @@ pub fn write_atomically(file: &Path, body: &[u8]) -> Result<(), String> {
     publish(&tmp, file).map_err(|e| format!("cannot write {}: {}", file.display(), e))
 }
 
+// spec: installer/SPEC.md §The install boundary — a rewrite of an existing file keeps that file's
+// permissions, set on the temporary before the rename
+pub fn rewrite_atomically(file: &Path, body: &[u8]) -> Result<(), String> {
+    let perms = std::fs::metadata(file).map_err(|e| format!("cannot stat {}: {}", file.display(), e))?.permissions();
+    let tmp = stage(file, |f| {
+        std::io::Write::write_all(f, body)?;
+        f.set_permissions(perms)
+    })?;
+    publish(&tmp, file).map_err(|e| format!("cannot write {}: {}", file.display(), e))
+}
+
 // spec: installer/SPEC.md §The install boundary — a kit file keeps its source's permissions, as the
 // copy it replaces did; an artifact is made executable instead, on the temporary before the rename
 pub fn stage_copy(src: &Path, file: &Path, executable: bool) -> Result<PathBuf, String> {
@@ -925,6 +936,8 @@ mod tests {
             ("installer/recipe.rs", include_str!("installer/recipe.rs")),
             ("installer/user.rs", include_str!("installer/user.rs")),
             ("installer/uninstall.rs", include_str!("installer/uninstall.rs")),
+            ("doctrine.rs", include_str!("doctrine.rs")),
+            ("marker.rs", include_str!("marker.rs")),
         ];
         let in_place = [concat!("fs::", "write("), concat!("fs::", "copy("), concat!("File::", "create(")];
         for (name, text) in sources {
