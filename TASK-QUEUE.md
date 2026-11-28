@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### knobenv-struct-comment-scan
-
-The guard-owning struct scan in `native/src/knobenv.rs` ends a declaration on its own line only when that line ends in `;` or `}`, so `struct Empty; // note` runs on to the next bare `}` and takes a later struct's `KnobEnv` field as its own. A releasing taker returning `Empty` then reads as handing the guard back, so a test calling it reads held and an unlocked reader passes. gate-sdk/SPEC.md §lib/gate.sh's honest limits name aliases, generics and macros, never this.
-
-**Deliverable:** debt: drop a trailing line comment before the boundary test, with a unit case.
-
-**Cost while deferred:** a false negative only where a unit or one-line struct carries a trailing comment and a guard struct follows it; no such declaration is in the crate (`struct <name>; //` grepped over native/src at the close head, none). Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read of `guard_types`. Owner lookup: `trailing comment`, `guard_types` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/gate.sh.
-
 ### rewrite-lossy-operand-identity
 
 `check_operand` in `native/src/emit/rewrite.rs` writes to the operand's resolved path with its bytes kept, but tests containment and duplicates on the lossy spelling, the working directory's included. Two operands resolving to distinct files whose names differ only in bytes that are not UTF-8 read as one file and refuse the run, and under a working directory whose name is not UTF-8, a link to a sibling directory differing only in those bytes passes containment. guard-kit/SPEC.md §rewrite refuses only an operand naming the same canonical file as an earlier one, and one outside the working directory.
@@ -1010,4 +1002,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - gates-dir-knob-resolution
 - marker-target-admission-gaps
 - seed-write-link-race
+- knobenv-struct-comment-scan
 

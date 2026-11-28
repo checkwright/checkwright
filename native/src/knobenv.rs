@@ -257,7 +257,7 @@ mod tests {
     // returning one hands its caller the lock rather than releasing it; its fields start on the
     // declaration line, which carries all of them in a one-line or tuple struct
     fn guard_types(text: &str) -> Vec<String> {
-        let lines: Vec<&str> = text.lines().collect();
+        let lines: Vec<&str> = text.lines().map(|l| l.find("//").map_or(l, |c| &l[..c]).trim_end()).collect();
         let mut out = Vec::new();
         for (i, l) in lines.iter().enumerate() {
             let t = l.trim_start();
@@ -466,6 +466,18 @@ mod tests {
         all.extend(fns(src, &src.join("probe.rs"), probe, false));
         let readers = knob_readers(&all, &barrier(&all, &guards));
         assert!(unheld(&all, &readers, &guards).is_empty());
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/gate.sh — a trailing line comment is no part of a declaration, so a
+    // unit or one-line struct carrying one ends on its own line and takes no later struct's field
+    #[test]
+    fn a_trailing_comment_does_not_carry_a_declaration_past_its_line() {
+        let probe = concat!(
+            "struct Empty; // a note\n",
+            "struct Inline { name: String } // KnobEnv named in prose\n",
+            "struct Held {\n    env: KnobEnv, // the guard\n} // end\n",
+        );
+        assert_eq!(guard_types(probe), vec!["Held".to_string()]);
     }
 
     // spec: gate-sdk/SPEC.md §lib/gate.sh — a walk reads the knob set, so a case walking unlocked,
