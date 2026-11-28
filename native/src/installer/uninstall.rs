@@ -398,7 +398,7 @@ fn remove(f: &Flags) -> Result<i32, Refusal> {
             std::fs::remove_file(&lock_path)
                 .map_err(|e| refuse(format!("could not remove {}: {}", lock::FILE, e), "", exit::TOOL))?;
         } else {
-            std::fs::write(&lock_path, residual(&keep)).map_err(|e| {
+            crate::install::write_atomically(&lock_path, residual(&keep).as_bytes()).map_err(|e| {
                 refuse(
                     format!("could not rewrite {} over the kept file(s): {}", lock::FILE, e),
                     "",

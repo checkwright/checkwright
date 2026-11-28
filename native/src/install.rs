@@ -222,9 +222,14 @@ pub fn seam_text_with(
     out
 }
 
-pub fn sibling_tmp(file: &Path) -> PathBuf {
+static TMP_SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+// spec: installer/SPEC.md §The install boundary — each writer's temporary is its own, the process id
+// and a per-process sequence after the target's name, so two writers of one file never share one
+fn sibling_tmp(file: &Path) -> PathBuf {
     let mut name = file.file_name().map(|n| n.to_os_string()).unwrap_or_default();
-    name.push(".tmp");
+    let seq = TMP_SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    name.push(format!(".{}.{}.tmp", std::process::id(), seq));
     file.with_file_name(name)
 }
 
@@ -244,21 +249,67 @@ pub fn create_tmp(tmp: &Path) -> Result<std::fs::File, String> {
         .map_err(|e| format!("cannot write {}: {}", tmp.display(), e))
 }
 
+// spec: installer/SPEC.md §The install boundary — a failed fill removes the temporary this call
+// created, and an entry the create refused is never removed, so no other writer's file goes
+pub fn stage_at(
+    tmp: PathBuf,
+    fill: impl FnOnce(&mut std::fs::File) -> std::io::Result<()>,
+) -> Result<PathBuf, String> {
+    let filled = {
+        let mut f = create_tmp(&tmp)?;
+        fill(&mut f)
+    };
+    match filled {
+        Ok(()) => Ok(tmp),
+        Err(e) => {
+            let _ = std::fs::remove_file(&tmp);
+            Err(format!("cannot write {}: {}", tmp.display(), e))
+        }
+    }
+}
+
+pub fn stage(file: &Path, fill: impl FnOnce(&mut std::fs::File) -> std::io::Result<()>) -> Result<PathBuf, String> {
+    stage_at(sibling_tmp(file), fill)
+}
+
+pub fn publish(tmp: &Path, file: &Path) -> std::io::Result<()> {
+    std::fs::rename(tmp, file).map_err(|e| {
+        let _ = std::fs::remove_file(tmp);
+        e
+    })
+}
+
 // spec: installer/SPEC.md §The install boundary — a temporary beside the target and a rename, so no
 // reader sees a half-written file and a failed write leaves whatever was there intact
 pub fn write_atomically(file: &Path, body: &[u8]) -> Result<(), String> {
-    use std::io::Write;
-    let tmp = sibling_tmp(file);
-    let written = create_tmp(&tmp).and_then(|mut f| {
-        f.write_all(body).map_err(|e| format!("cannot write {}: {}", tmp.display(), e))
-    });
-    let moved = written.and_then(|()| {
-        std::fs::rename(&tmp, file).map_err(|e| format!("cannot write {}: {}", file.display(), e))
-    });
-    if moved.is_err() {
-        let _ = std::fs::remove_file(&tmp);
+    let tmp = stage(file, |f| std::io::Write::write_all(f, body))?;
+    publish(&tmp, file).map_err(|e| format!("cannot write {}: {}", file.display(), e))
+}
+
+// spec: installer/SPEC.md §The install boundary — a kit file keeps its source's permissions, as the
+// copy it replaces did; an artifact is made executable instead, on the temporary before the rename
+pub fn stage_copy(src: &Path, file: &Path, executable: bool) -> Result<PathBuf, String> {
+    let mut from = std::fs::File::open(src).map_err(|e| format!("cannot read {}: {}", src.display(), e))?;
+    let perms = from.metadata().map_err(|e| format!("cannot stat {}: {}", src.display(), e))?.permissions();
+    let tmp = stage(file, |f| {
+        std::io::copy(&mut from, f)?;
+        if executable {
+            return Ok(());
+        }
+        f.set_permissions(perms)
+    })?;
+    if executable {
+        make_executable(&tmp).map_err(|e| {
+            let _ = std::fs::remove_file(&tmp);
+            e
+        })?;
     }
-    moved
+    Ok(tmp)
+}
+
+pub fn copy_atomically(src: &Path, file: &Path, executable: bool) -> Result<(), String> {
+    let tmp = stage_copy(src, file, executable)?;
+    publish(&tmp, file).map_err(|e| format!("cannot write {}: {}", file.display(), e))
 }
 
 // spec: installer/SPEC.md §The install boundary — the op's argv after resolution, carried as one
@@ -300,9 +351,8 @@ pub fn place(p: &Placement, recorded: &Recorded) -> Result<Vec<String>, String> 
             || !dest_path.is_file()
             || sha256::file_hex(&dest_path)? != p.digest;
         if stale {
-            std::fs::copy(p.src, &dest_path)
+            copy_atomically(Path::new(p.src), &dest_path, true)
                 .map_err(|e| format!("could not write {}: {}", p.dest, e))?;
-            make_executable(&dest_path)?;
         }
     }
     records.push(format!("own\t{}", p.dest));
@@ -725,17 +775,23 @@ mod tests {
         std::fs::remove_dir_all(&dir).ok();
     }
 
+    fn temporaries(dir: &Path) -> Vec<String> {
+        let mut out: Vec<String> = crate::walk::list_dir(dir)
+            .expect("cannot list the scratch dir")
+            .into_iter()
+            .map(|(n, _)| n)
+            .filter(|n| n.ends_with(".tmp"))
+            .collect();
+        out.sort();
+        out
+    }
+
     // spec: installer/SPEC.md §The install boundary — a hard link, or a symbolic one on unix,
-    // committed at the seam's temporary is unlinked and the file it reaches left byte-identical
+    // standing at a writer's temporary is unlinked and the file it reaches left byte-identical
     #[test]
-    fn a_link_at_the_seam_temporary_is_never_written_through() {
+    fn a_link_at_a_writers_temporary_is_never_written_through() {
         let dir = scratch("tmplink");
-        let src = dir.join("payload-binary");
-        std::fs::write(&src, "artifact bytes\n").expect("cannot write the scratch artifact");
-        let digest = sha256::file_hex(&src).expect("cannot hash the scratch artifact");
-        let src_s = src.to_string_lossy().into_owned();
         let seam = dir.join("scripts/gate-sdk-config.knobs");
-        let tmp = sibling_tmp(&seam);
         let outside = dir.join("outside");
         std::fs::write(&outside, "not the install's\n").expect("cannot write the victim");
         #[cfg_attr(not(unix), allow(unused_mut))]
@@ -743,12 +799,13 @@ mod tests {
         #[cfg(unix)]
         plants.push(|v, t| std::os::unix::fs::symlink(v, t));
         for plant in plants {
+            let tmp = sibling_tmp(&seam);
             plant(&outside, &tmp).expect("cannot plant the link");
-            place(&placement(&dir, &src_s, &digest, false), &Recorded::none()).expect("the placement failed");
+            let staged = stage_at(tmp.clone(), |f| std::io::Write::write_all(f, b"A = 1\n")).expect("the stage failed");
+            publish(&staged, &seam).expect("the rename failed");
             assert_eq!(std::fs::read_to_string(&outside).expect("the victim went"), "not the install's\n");
-            assert!(std::fs::read_to_string(&seam).expect("no seam").contains("GATE_SDK_NATIVE_BIN"));
+            assert_eq!(std::fs::read_to_string(&seam).expect("no seam"), "A = 1\n");
             assert!(std::fs::symlink_metadata(&tmp).is_err(), "the temporary stayed");
-            std::fs::remove_file(&seam).expect("cannot clear the seam");
         }
         std::fs::remove_dir_all(&dir).ok();
     }
@@ -760,11 +817,134 @@ mod tests {
         let dir = scratch("tmpdir");
         let target = dir.join("scripts/seam.knobs");
         std::fs::write(&target, "A = 1\n").expect("cannot seed the target");
-        std::fs::create_dir_all(sibling_tmp(&target).join("held")).expect("cannot make the directory");
-        let e = write_atomically(&target, b"B = 2\n").expect_err("a directory at the temporary passed");
-        assert!(e.contains("seam.knobs.tmp"), "{}", e);
+        let tmp = sibling_tmp(&target);
+        std::fs::create_dir_all(tmp.join("held")).expect("cannot make the directory");
+        let e = stage_at(tmp.clone(), |f| std::io::Write::write_all(f, b"B = 2\n"))
+            .expect_err("a directory at the temporary passed");
+        assert!(e.contains(&tmp.file_name().expect("a name").to_string_lossy().into_owned()), "{}", e);
         assert_eq!(std::fs::read_to_string(&target).expect("target"), "A = 1\n");
-        assert!(sibling_tmp(&target).join("held").is_dir(), "the directory's content went");
+        assert!(tmp.join("held").is_dir(), "the directory's content went");
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The install boundary — a write removes only the temporary it created:
+    // another writer's temporary beside the target survives both a write and a failed fill
+    #[test]
+    fn a_write_removes_only_the_temporary_it_created() {
+        let dir = scratch("tmpown");
+        let target = dir.join("scripts/seam.knobs");
+        let theirs = sibling_tmp(&target);
+        std::fs::write(&theirs, "another writer's\n").expect("cannot seed the other temporary");
+        write_atomically(&target, b"A = 1\n").expect("the write failed");
+        let failed = stage(&target, |_| Err(std::io::Error::new(std::io::ErrorKind::Other, "refused fill")));
+        assert!(failed.expect_err("a failed fill passed").contains("refused fill"));
+        assert_eq!(std::fs::read_to_string(&target).expect("target"), "A = 1\n");
+        assert_eq!(std::fs::read_to_string(&theirs).expect("the other temporary went"), "another writer's\n");
+        let left = temporaries(&dir.join("scripts"));
+        assert_eq!(left, vec![theirs.file_name().expect("a name").to_string_lossy().into_owned()]);
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The install boundary — concurrent writers of one file each succeed and
+    // a reader meets one writer's whole body, never a mix or a torn one, and no temporary is left
+    #[test]
+    fn concurrent_writers_of_one_file_each_publish_a_whole_body() {
+        let dir = scratch("tmprace");
+        let target = dir.join("scripts/usage.txt");
+        let bodies: Vec<Vec<u8>> = (0..8u8).map(|i| vec![b'a' + i; 64 * 1024]).collect();
+        std::fs::write(&target, &bodies[0]).expect("cannot seed the target");
+        let done = std::sync::atomic::AtomicBool::new(false);
+        let (written, torn) = std::thread::scope(|s| {
+            let reader = s.spawn(|| {
+                while !done.load(std::sync::atomic::Ordering::Relaxed) {
+                    match std::fs::read(&target) {
+                        Ok(got) if bodies.contains(&got) => {}
+                        Ok(got) => return Some(format!("a torn body of {} bytes", got.len())),
+                        Err(e) => return Some(format!("the target vanished: {}", e)),
+                    }
+                }
+                None
+            });
+            let writers: Vec<_> = bodies
+                .iter()
+                .map(|b| s.spawn(|| (0..40).map(|_| write_atomically(&target, b)).collect::<Result<Vec<_>, _>>()))
+                .collect();
+            let written: Vec<_> = writers.into_iter().map(|w| w.join().expect("a writer panicked")).collect();
+            done.store(true, std::sync::atomic::Ordering::Relaxed);
+            (written, reader.join().expect("the reader panicked"))
+        });
+        assert_eq!(torn, None, "a reader met a write that was not whole");
+        for w in written {
+            w.expect("a write failed");
+        }
+        assert!(bodies.contains(&std::fs::read(&target).expect("target")));
+        assert!(temporaries(&dir.join("scripts")).is_empty(), "{:?}", temporaries(&dir.join("scripts")));
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The install boundary — the artifact and the seam each replace the
+    // target by rename: a hard link standing at either keeps the bytes it reached
+    #[test]
+    fn a_placement_replaces_its_targets_rather_than_writing_through_them() {
+        let dir = scratch("tmpplace");
+        let src = dir.join("payload-binary");
+        std::fs::write(&src, "artifact bytes\n").expect("cannot write the scratch artifact");
+        let digest = sha256::file_hex(&src).expect("cannot hash the scratch artifact");
+        let src_s = src.to_string_lossy().into_owned();
+        let p = placement(&dir, &src_s, &digest, false);
+        let (dest, seam) = (dir.join(p.dest), dir.join(p.seam));
+        for (i, target) in [&dest, &seam].into_iter().enumerate() {
+            let outside = dir.join(format!("outside-{}", i));
+            std::fs::write(&outside, "not the install's\n").expect("cannot write the victim");
+            std::fs::hard_link(&outside, target).expect("cannot plant the link");
+        }
+        place(&p, &Recorded::none()).expect("the placement failed");
+        for i in 0..2 {
+            let v = std::fs::read_to_string(dir.join(format!("outside-{}", i))).expect("a victim went");
+            assert_eq!(v, "not the install's\n", "the placement wrote through target {}", i);
+        }
+        assert_eq!(sha256::file_hex(&dest).expect("no artifact was placed"), digest);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mode = std::fs::metadata(&dest).expect("artifact").permissions().mode();
+            assert_eq!(mode & 0o111, 0o111, "the artifact is not executable: {:o}", mode);
+        }
+        assert!(temporaries(&dir.join("scripts")).is_empty(), "{:?}", temporaries(&dir.join("scripts")));
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The install boundary — every whole-file write the install and init make
+    // goes through this file's writers: an in-place write or copy in their sources reds here
+    #[test]
+    fn no_install_writer_writes_a_file_in_place() {
+        let sources = [
+            ("install.rs", include_str!("install.rs")),
+            ("installer/init.rs", include_str!("installer/init.rs")),
+            ("installer/recipe.rs", include_str!("installer/recipe.rs")),
+            ("installer/user.rs", include_str!("installer/user.rs")),
+            ("installer/uninstall.rs", include_str!("installer/uninstall.rs")),
+        ];
+        let in_place = [concat!("fs::", "write("), concat!("fs::", "copy("), concat!("File::", "create(")];
+        for (name, text) in sources {
+            let live = text.split(concat!("#[cfg", "(test)]")).next().unwrap_or_default();
+            for (n, line) in live.lines().enumerate() {
+                assert!(!in_place.iter().any(|w| line.contains(w)), "{}:{} writes in place: {}", name, n + 1, line.trim());
+            }
+        }
+    }
+
+    // spec: installer/SPEC.md §The install boundary — a copy whose source cannot be read leaves the
+    // target as it was and no temporary beside it
+    #[test]
+    fn a_failed_copy_leaves_the_target_whole() {
+        let dir = scratch("tmpcopy");
+        let target = dir.join("scripts/kit-file.sh");
+        std::fs::write(&target, "echo kept\n").expect("cannot seed the target");
+        let e = copy_atomically(&dir.join("no-such-source"), &target, false).expect_err("a missing source copied");
+        assert!(e.contains("no-such-source"), "{}", e);
+        assert_eq!(std::fs::read_to_string(&target).expect("target"), "echo kept\n");
+        assert!(temporaries(&dir.join("scripts")).is_empty(), "{:?}", temporaries(&dir.join("scripts")));
         std::fs::remove_dir_all(&dir).ok();
     }
 }

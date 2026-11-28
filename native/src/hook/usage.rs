@@ -185,37 +185,34 @@ mod tests {
         assert!(!text.contains("account="), "an absent account must not be written");
     }
 
-    // spec: delegation-kit/SPEC.md §The usage.txt contract — a hard link, or a symbolic one on unix,
-    // at the snapshot's temporary is unlinked and the file it reaches left byte-identical
+    // spec: delegation-kit/SPEC.md §The usage.txt contract — the poll and the statusline producer
+    // write the snapshot unserialized, so each writer's own temporary keeps every write whole
     #[test]
-    fn a_link_at_the_snapshot_temporary_is_never_written_through() {
-        let dir = std::env::temp_dir().join(format!("cw-usage-link-{}", std::process::id()));
+    fn two_snapshot_writers_each_publish_a_whole_snapshot() {
+        let dir = std::env::temp_dir().join(format!("cw-usage-race-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).expect("scratch");
-        let usage = dir.join("usage.txt");
-        let tmp = crate::install::sibling_tmp(&usage);
-        let outside = dir.join("outside");
-        std::fs::write(&outside, "not the snapshot\n").expect("cannot write the victim");
-        let s = Snapshot {
-            five_hour_used_pct: "12".to_string(),
+        let usage = dir.join("usage.txt").to_string_lossy().into_owned();
+        let snap = |pct: &str| Snapshot {
+            five_hour_used_pct: pct.to_string(),
             five_hour_resets_at: "1756656000".to_string(),
             seven_day_used_pct: String::new(),
             seven_day_resets_at: String::new(),
             account: String::new(),
             tier: String::new(),
         };
-        #[cfg_attr(not(unix), allow(unused_mut))]
-        let mut plants: Vec<fn(&std::path::Path, &std::path::Path) -> std::io::Result<()>> =
-            vec![|v, t| std::fs::hard_link(v, t)];
-        #[cfg(unix)]
-        plants.push(|v, t| std::os::unix::fs::symlink(v, t));
-        for plant in plants {
-            plant(&outside, &tmp).expect("cannot plant the link");
-            assert!(s.write(&usage.to_string_lossy()), "the snapshot write failed");
-            assert_eq!(std::fs::read_to_string(&outside).expect("the victim went"), "not the snapshot\n");
-            assert!(std::fs::read_to_string(&usage).expect("no snapshot").starts_with("five_hour_used_pct=12\n"));
-            assert!(std::fs::symlink_metadata(&tmp).is_err(), "the temporary stayed");
-        }
+        let (a, b) = (snap("12"), snap("87"));
+        let whole = [a.render(), b.render()];
+        std::thread::scope(|s| {
+            let writers: Vec<_> = [&a, &b].into_iter().map(|w| s.spawn(|| (0..200).all(|_| w.write(&usage)))).collect();
+            for w in writers {
+                assert!(w.join().expect("a writer panicked"), "a snapshot write failed");
+            }
+        });
+        let text = std::fs::read_to_string(&usage).expect("no snapshot");
+        assert!(whole.contains(&text), "a torn snapshot: {:?}", text);
+        let left = crate::walk::list_dir(&dir).expect("scratch");
+        assert_eq!(left.len(), 1, "a temporary stayed: {:?}", left);
         let _ = std::fs::remove_dir_all(&dir);
     }
 

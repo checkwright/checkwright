@@ -129,11 +129,11 @@ pub fn queue_source(payload: &Path, kits: &[String]) -> Option<String> {
 pub fn write_queue(src: &str, root: &Path, queue_file: &str) -> Result<(), String> {
     let dest = root.join(queue_file);
     if src != "-" {
-        return std::fs::copy(src, &dest)
-            .map(|_| ())
+        return crate::install::copy_atomically(Path::new(src), &dest, false)
             .map_err(|e| format!("cannot write {}: {}", queue_file, e));
     }
-    std::fs::write(&dest, skeleton(queue_file)).map_err(|e| format!("cannot write {}: {}", queue_file, e))
+    crate::install::write_atomically(&dest, skeleton(queue_file).as_bytes())
+        .map_err(|e| format!("cannot write {}: {}", queue_file, e))
 }
 
 fn skeleton(queue_file: &str) -> String {
@@ -171,7 +171,7 @@ fn seed_absent(root: Option<&Path>, rel: &str, body: &str, dry: bool, out: &mut 
     if let Some(parent) = dest.parent() {
         std::fs::create_dir_all(parent).map_err(|e| format!("cannot create {}: {}", rel, e))?;
     }
-    std::fs::write(&dest, body).map_err(|e| format!("cannot write {}: {}", rel, e))?;
+    crate::install::write_atomically(&dest, body.as_bytes()).map_err(|e| format!("cannot write {}: {}", rel, e))?;
     out.push(Seeded::Path(rel.to_string()));
     Ok(())
 }

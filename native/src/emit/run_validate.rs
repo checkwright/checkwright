@@ -419,11 +419,10 @@ fn dispatch(args: &[String]) -> Result<i32, Refusal> {
                     parent.display()
                 )));
             }
-            let staged = format!("{}/validate-statement.{}", cfg.tmpdir, std::process::id());
             let body = evidence::statement(&key, subject, block.clone(), &rows) + "\n";
+            let staged = stage_in(&cfg.tmpdir, "validate-statement", body.as_bytes())
+                .map_err(|e| failed(format!("cannot stage the Statement: {} — nothing recorded", e)))?;
             claimed.statement = Some(staged.clone());
-            std::fs::write(&staged, &body)
-                .map_err(|e| failed(format!("cannot stage the Statement {}: {} — nothing recorded", staged, e)))?;
             Some(Staged { path: staged, body: body.into_bytes(), subject: subject.clone() })
         }
     };
@@ -516,12 +515,16 @@ pub(crate) fn fold(
             out.push('\n');
         }
     }
-    let staged = format!("{}/validate-evidence.{}", tmpdir, std::process::id());
-    std::fs::write(&staged, out).map_err(|e| format!("cannot write {}: {}", staged, e))?;
-    std::fs::rename(&staged, manifest).map_err(|e| {
-        let _ = std::fs::remove_file(&staged);
-        format!("cannot publish {}: {}", manifest, e)
-    })
+    let staged = stage_in(tmpdir, "validate-evidence", out.as_bytes())?;
+    crate::install::publish(Path::new(&staged), Path::new(manifest)).map_err(|e| format!("cannot publish {}: {}", manifest, e))
+}
+
+// spec: installer/SPEC.md §The install boundary — a staged file is the exclusive create, so a link
+// standing at its name is unlinked, never written through, and a failed write leaves none behind
+fn stage_in(tmpdir: &str, name: &str, body: &[u8]) -> Result<String, String> {
+    let path = format!("{}/{}.{}", tmpdir, name, std::process::id());
+    crate::install::stage_at(path.clone().into(), |f| f.write_all(body))?;
+    Ok(path)
 }
 
 // spec: evidence-kit/SPEC.md §The producer-liveness lock — the claim sits after the guards and the
@@ -529,9 +532,8 @@ pub(crate) fn fold(
 // place, the link being that section's asserted mechanism rather than one spelling of atomicity.
 pub(crate) fn claim(tmpdir: &str, lock: &str, key: &str) -> Result<Claimed, Refusal> {
     let pid = std::process::id();
-    let tmp = format!("{}/run-validate-lock.{}", tmpdir, pid);
-    std::fs::write(&tmp, format!("pid={} run={}\n", pid, key))
-        .map_err(|e| failed(format!("cannot stage the lock record {}: {}", tmp, e)))?;
+    let tmp = stage_in(tmpdir, "run-validate-lock", format!("pid={} run={}\n", pid, key).as_bytes())
+        .map_err(|e| failed(format!("cannot stage the lock record: {}", e)))?;
     let refuse = |r: Refusal| {
         let _ = std::fs::remove_file(&tmp);
         r
@@ -878,6 +880,45 @@ mod tests {
             std::fs::write(&m, body).unwrap();
             assert_eq!(manifest_guard(&m).is_ok(), ok, "{:?}", body);
             assert_eq!(std::fs::read_to_string(&m).unwrap(), body);
+        }
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // spec: installer/SPEC.md §The install boundary — a hard link, or a symbolic one on unix, at the
+    // lock record's, the manifest's or the Statement's staged name is unlinked and its file left whole
+    #[test]
+    fn a_link_at_a_staged_name_is_never_written_through() {
+        let dir = std::env::temp_dir().join(format!("cw-stage-link-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let t = dir.display().to_string();
+        let outside = dir.join("outside");
+        std::fs::write(&outside, "not the run's\n").unwrap();
+        let staged = |name: &str| dir.join(format!("{}.{}", name, std::process::id()));
+        let names = ["run-validate-lock", "validate-evidence", "validate-statement"];
+        #[cfg_attr(not(unix), allow(unused_mut))]
+        let mut plants: Vec<fn(&Path, &Path) -> std::io::Result<()>> = vec![|v, t| std::fs::hard_link(v, t)];
+        #[cfg(unix)]
+        plants.push(|v, t| std::os::unix::fs::symlink(v, t));
+        for plant in plants {
+            for name in names {
+                plant(&outside, &staged(name)).unwrap();
+            }
+            let lock = dir.join("lock").display().to_string();
+            let Ok(claimed) = claim(&t, &lock, "iter_a") else { panic!("the claim was refused") };
+            assert!(std::fs::read_to_string(&lock).unwrap().starts_with("pid="), "the lock holds no record");
+            drop(claimed);
+            let m = dir.join("manifest").display().to_string();
+            std::fs::write(&m, "# contract: evidence-manifest v2\n").unwrap();
+            fold(&m, &t, "iter_a", &[row()], &[]).unwrap();
+            assert!(std::fs::read_to_string(&m).unwrap().contains("iter_a gates "), "the fold published no row");
+            let statement = stage_in(&t, "validate-statement", b"{}\n").unwrap();
+            assert_eq!(std::fs::read_to_string(&statement).unwrap(), "{}\n");
+            std::fs::remove_file(&statement).unwrap();
+            assert_eq!(std::fs::read_to_string(&outside).unwrap(), "not the run's\n");
+            for name in names {
+                assert!(std::fs::symlink_metadata(staged(name)).is_err(), "{} stayed", name);
+            }
         }
         std::fs::remove_dir_all(&dir).ok();
     }

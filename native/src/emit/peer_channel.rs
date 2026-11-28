@@ -337,11 +337,12 @@ fn file_with(
 }
 
 // spec: lifecycle-kit/SPEC.md §The peer request channel — a linked temporary file, so a collision
-// refuses rather than overwrites; the collision is the one refusal that prints, the existing id alone
+// refuses rather than overwrites; the collision is the one refusal that prints, the existing id alone;
+// the temporary is installer/SPEC.md §The install boundary's exclusive create, never written through
 fn create_exclusive(dir: &Path, id: &str, bytes: &[u8]) -> Result<(), Fault> {
     let target = dir.join(format!("{}.md", id));
     let tmp = dir.join(format!(".{}.{}.tmp", id, std::process::id()));
-    std::fs::write(&tmp, bytes).map_err(|e| Fault::tool(format!("cannot write {}: {}", tmp.display(), e)))?;
+    let tmp = crate::install::stage_at(tmp, |f| std::io::Write::write_all(f, bytes)).map_err(Fault::tool)?;
     let linked = std::fs::hard_link(&tmp, &target);
     let _ = std::fs::remove_file(&tmp);
     match linked {
@@ -677,6 +678,31 @@ mod tests {
             let f = r.expect_err(name);
             assert_eq!((f.status(), f.stdout), (status, None), "{}: {}", name, f.message);
         }
+    }
+
+    // spec: installer/SPEC.md §The install boundary — a hard link, or a symbolic one on unix, at the
+    // request's temporary is unlinked, the file it reaches left byte-identical, and the request filed
+    #[test]
+    fn a_link_at_the_request_temporary_is_never_written_through() {
+        let dir = std::env::temp_dir().join(format!("cw-peer-tmplink-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let outside = dir.join("outside");
+        std::fs::write(&outside, "not the channel's\n").unwrap();
+        #[cfg_attr(not(unix), allow(unused_mut))]
+        let mut plants: Vec<fn(&Path, &Path) -> std::io::Result<()>> = vec![|v, t| std::fs::hard_link(v, t)];
+        #[cfg(unix)]
+        plants.push(|v, t| std::os::unix::fs::symlink(v, t));
+        for (i, plant) in plants.into_iter().enumerate() {
+            let (id, bytes) = filed("peer-a", &format!("2026-11-24T10:20:3{}Z", i), BODY);
+            let tmp = dir.join(format!(".{}.{}.tmp", id, std::process::id()));
+            plant(&outside, &tmp).unwrap();
+            create_exclusive(&dir, &id, &bytes).expect("the filing was refused");
+            assert_eq!(std::fs::read_to_string(&outside).unwrap(), "not the channel's\n");
+            assert_eq!(std::fs::read(dir.join(format!("{}.md", id))).unwrap(), bytes);
+            assert!(std::fs::symlink_metadata(&tmp).is_err(), "the temporary stayed");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // spec: lifecycle-kit/SPEC.md §The peer request channel — a fence closes only on its own character

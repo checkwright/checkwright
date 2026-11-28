@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### install-boundary-write-residue
-
-Three write paths fall short of installer/SPEC.md §The install boundary's 'A whole-file write goes through a temporary created exclusively'. (1) `install::sibling_tmp` gives every writer of a file the one temporary `<file>.tmp`, and the usage snapshot's two producers (`--usage-poll` and the statusline producer) both write it through `Snapshot::write` unserialized: writer B's `create_tmp` unlinks A's finished temporary, so A's rename publishes B's empty or partial file, and `write_atomically`'s cleanup can unlink the other writer's temporary. (2) Four temporaries are written with `std::fs::write`, which follows a link standing at the path: `peer_channel.rs` `create_exclusive`'s `.<id>.<pid>.tmp`, which also leaves a partial temporary behind on a write error, and `run_validate.rs`'s staged statement, staged manifest and lock record. (3) The repo install's kit-file placement (`install::place`, `fs::copy`) and init's writes into the adopter tree (`installer/init.rs`, the lock manifest and the registry, agent file and other direct writes) stage no temporary, so a failed write leaves the target torn.
-
-**Deliverable:** debt: a per-writer unique temporary (pid plus sequence, as `verdict_store.rs` and `emit/update_notice.rs` already use) with cleanup only of a temporary this call created; the four sites routed through `install::create_tmp`; placement and init's whole-file writes moved onto `write_atomically`; the section's `<target>.tmp` spelling and its enumeration brought to the code, with a case per site.
-
-**Cost while deferred:** concurrent snapshot writers can publish a torn usage file, a planted link at a scratch temporary is written through, and an interrupted install or init leaves a half-written file in the adopter's tree. Surfaced 2026-11-28 as three bullets from the second-vendor review at link-shape-residue-pass' close; filed at the next scope. Re-verified: every site as stated, and init carries more direct writes than the bullet's manifest. Concurrency inferred, not reproduced. Owner lookup: `write_atomically`, `create_tmp`, `sibling_tmp` in this file, none; owner installer/SPEC.md §The install boundary.
-
 ### front-door-npx-resolution
 
 The front-door package route polls `npm pack --prefer-online <package>@<version>` until the tarball fetches, then runs `npx --yes` at the version (scripts/ci-front-door.sh and its PowerShell twin). On publish run 46096434361's first attempt, both x86 Ubuntu legs printed `package: registry: ok` after about three minutes of polling, then `npx checkwright@0.43.0 init` failed 1.4 s later on ETARGET, no matching version; the other legs passed and the re-run greened. The poll's predicate is not the document `npx` resolves the version through.
@@ -1003,4 +995,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 ## Done
 
 - crate-test-corpus-read-flake
+- install-boundary-write-residue
 

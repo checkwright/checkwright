@@ -274,7 +274,7 @@ fn copy_in(
             std::fs::create_dir_all(parent)
                 .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", exit::TOOL))?;
         }
-        std::fs::copy(src, &target)
+        install::copy_atomically(src, &target, false)
             .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", exit::TOOL))?;
     }
     r.record(dest, None);
@@ -388,7 +388,7 @@ fn write_in(
         return Ok(false);
     }
     if !f.dry {
-        std::fs::write(root.join(dest), text)
+        install::write_atomically(&root.join(dest), text.as_bytes())
             .map_err(|e| refuse(format!("could not write {}: {}", dest, e), "", exit::TOOL))?;
     }
     r.record(dest, None);
@@ -726,7 +726,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
     }
     if claim(&root, &gates_list, &prior, f.force, &mut r) {
         if !f.dry {
-            std::fs::write(root.join(&gates_list), &planned_registry)
+            install::write_atomically(&root.join(&gates_list), planned_registry.as_bytes())
                 .map_err(|e| refuse(format!("could not write {}: {}", gates_list, e), "", exit::TOOL))?;
         }
         r.record(&gates_list, None);
@@ -775,7 +775,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                 AGENT_FILE
             );
             if !f.dry {
-                std::fs::write(root.join(AGENT_FILE), body)
+                install::write_atomically(&root.join(AGENT_FILE), body.as_bytes())
                     .map_err(|e| refuse(format!("could not seed {}: {}", AGENT_FILE, e), "", exit::TOOL))?;
             }
             // spec: installer/SPEC.md §What init seeds — a seed-once surface is written only where
@@ -829,7 +829,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
                             refuse(format!("could not seed {}: {}", workflow::PATH, e), "", exit::TOOL)
                         })?;
                     }
-                    std::fs::write(&target, body).map_err(|e| {
+                    install::write_atomically(&target, body.as_bytes()).map_err(|e| {
                         refuse(format!("could not seed {}: {}", workflow::PATH, e), "", exit::TOOL)
                     })?;
                 }
@@ -1039,7 +1039,7 @@ fn vendor(pkg: &Package, f: &Flags) -> Result<i32, Refusal> {
         return Ok(0);
     }
 
-    std::fs::write(&lock_path, manifest_text(&r))
+    install::write_atomically(&lock_path, manifest_text(&r).as_bytes())
         .map_err(|e| refuse(format!("could not write {}: {}", lock::FILE, e), "", exit::TOOL))?;
     r.written.push(lock::FILE.to_string());
     stage.push(lock::FILE.to_string());
@@ -1290,7 +1290,7 @@ fn run_vendored(
         if let Some(parent) = dest.parent() {
             let _ = std::fs::create_dir_all(parent);
         }
-        std::fs::write(dest, out.output())
+        install::write_atomically(dest, out.output())
             .map_err(|e| refuse(format!("could not write {}: {}", dest.display(), e), "", exit::TOOL))?;
     }
     Ok(())

@@ -356,7 +356,14 @@ Step 5's rule is the only conditional shape either bootstrap carries, and it is 
 
 Both halves of the disposition bind. Read with `bootstrap` silent, the one shell surface the interpreter policy sanctions would have no cause to declare on, and would read as owed forever. Read as saying only *when* a step runs and not *whether* it ports, the rule would void its own words for `behind-invoke`, "written once, in Rust", which is a port commitment.
 
-**A whole-file write goes through a temporary created exclusively.** The seam write (§Placement) and the user install's binary, knob file and `user.lock` writes go to a sibling `<target>.tmp` renamed over the target. No reader sees a half-written file, and a failed write leaves the target intact. A file or link at the temporary's path is removed first, and the create refuses an entry standing there. So a link there, stale, planted or committed, is unlinked rather than written through, and one swapped in after the removal fails the write. A directory there refuses the write, naming it. §init's link refusal never reads a temporary. The exclusive create is the standard library's on every host.
+**A whole-file write goes through a temporary created exclusively.** These writes go to a sibling `<target>.<pid>.<seq>.tmp` renamed over the target:
+
+- the repo install's artifact and seam (§Placement);
+- init's writes into the adopter tree: kit files, composed seams, the registry, the agent file, the CI workflow, the queue and recipe seeds, a captured projection, and the manifest;
+- `uninstall`'s narrowed manifest;
+- the user install's binary, knob file and `user.lock`.
+
+No reader sees a half-written file, a failed write leaves the target intact, and a link standing at the target is replaced rather than written through. The name carries the writer's process id and a per-process sequence, so each writer's temporary is its own. Two writers of one file never publish each other's bytes, and a write removes only a temporary it created. A file or link at the temporary's path is removed first, and the create refuses an entry standing there. So a link there, stale or planted, is unlinked rather than written through, and one swapped in after the removal fails the write. A directory there refuses the write, naming it. A kit file keeps its source's permissions, and the artifact is made executable on the temporary before the rename. The same exclusive create stages the peer channel's request and run-validate's lock record, manifest and Statement. §init's link refusal never reads a temporary. The exclusive create is the standard library's on every host. Its honest limit: a writer killed between the create and the rename leaves its temporary behind, and no later write reuses or removes it.
 
 ### Parity between the two bootstraps
 

@@ -527,23 +527,8 @@ fn init_one(d: &Dirs, src: &Source, member: &str, f: &Flags, out: &mut dyn Write
 // spec: installer/SPEC.md §The user install — the artifact goes to a sibling temporary renamed over
 // the target; on Windows a rename over an image in use fails, and that is the refusal's remedy
 fn place_binary(artifact: &Path, bin: &Path) -> Result<(), Refusal> {
-    let tmp = install::sibling_tmp(bin);
-    let copied = std::fs::File::open(artifact)
-        .map_err(|e| format!("cannot read {}: {}", artifact.display(), e))
-        .and_then(|mut src| {
-            let mut f = install::create_tmp(&tmp)?;
-            std::io::copy(&mut src, &mut f).map_err(|e| format!("cannot write {}: {}", tmp.display(), e))
-        });
-    if let Err(e) = copied {
-        let _ = std::fs::remove_file(&tmp);
-        return Err(refuse(e, "", 1));
-    }
-    install::make_executable(&tmp).map_err(|e| {
-        let _ = std::fs::remove_file(&tmp);
-        refuse(e, "", 1)
-    })?;
-    std::fs::rename(&tmp, bin).map_err(|e| {
-        let _ = std::fs::remove_file(&tmp);
+    let tmp = install::stage_copy(artifact, bin, true).map_err(|e| refuse(e, "", 1))?;
+    install::publish(&tmp, bin).map_err(|e| {
         refuse(
             format!("cannot replace {}: {}", bin.display(), e),
             "a harness session running the hook holds the binary open where the platform locks a running image. End the sessions running it, then re-run.",
@@ -1102,11 +1087,11 @@ mod tests {
         assert!(!d.data.exists() && victim.is_file());
     }
 
-    // spec: installer/SPEC.md §The install boundary — a hard link, or a symbolic one on unix, at the
-    // binary's, the knob file's or the manifest's temporary, `uninstall`'s narrowing included, is
-    // unlinked and the file it reaches outside the data dir left byte-identical
+    // spec: installer/SPEC.md §The install boundary — the binary's, the knob file's and the manifest's
+    // writes, `uninstall`'s narrowing included, replace each target by rename: a hard link standing
+    // at one keeps the bytes it reached, and no writer's temporary stays beside a target
     #[test]
-    fn a_link_at_a_temporary_is_never_written_through() {
+    fn a_link_at_a_target_is_replaced_never_written_through() {
         let s = Scratch::new("tmplink");
         let d = s.dirs();
         let outside = s.0.join("outside");
@@ -1114,43 +1099,46 @@ mod tests {
         let lock_path = d.data.join(LOCK_FILE);
         let knob = at_rel(&d, &knob_rel(MEMBER));
         let targets = [binary(&d), knob.clone(), lock_path.clone()];
-        let plant = |round: &str, targets: &[PathBuf]| -> Vec<PathBuf> {
-            let mut victims = Vec::new();
-            for (i, target) in targets.iter().enumerate() {
-                std::fs::create_dir_all(target.parent().expect("a parent")).expect("parent");
-                let tmp = install::sibling_tmp(target);
-                let _ = std::fs::remove_file(&tmp);
-                let victim = outside.join(format!("{}-{}", round, i));
-                std::fs::write(&victim, b"not the install's\n").expect("victim");
-                #[cfg(unix)]
-                if i == 0 {
-                    std::os::unix::fs::symlink(&victim, &tmp).expect("cannot make a symbolic link");
-                    victims.push(victim);
-                    continue;
-                }
-                std::fs::hard_link(&victim, &tmp).expect("cannot make a hard link");
-                victims.push(victim);
-            }
-            victims
-        };
-        let untouched = |victims: &[PathBuf]| {
-            for v in victims {
-                assert_eq!(std::fs::read(v).expect("a victim went"), b"not the install's\n", "{}", v.display());
-            }
-            for t in &targets[targets.len() - victims.len()..] {
-                assert!(std::fs::symlink_metadata(install::sibling_tmp(t)).is_err(), "a temporary stayed beside {}", t.display());
+        let no_temporary = |targets: &[PathBuf]| {
+            for t in targets {
+                let leaf = t.file_name().expect("a leaf").to_string_lossy().into_owned();
+                let left: Vec<String> = crate::walk::list_dir(t.parent().expect("a parent"))
+                    .expect("the target's directory")
+                    .into_iter()
+                    .map(|(n, _)| n)
+                    .filter(|n| n.starts_with(&leaf) && n.ends_with(".tmp"))
+                    .collect();
+                assert!(left.is_empty(), "a temporary stayed beside {}: {:?}", t.display(), left);
             }
         };
-        let victims = plant("init", &targets);
-        init(&s, &d, "1.2.0", &flags(false, false)).expect("init through planted temporaries");
-        untouched(&victims);
+        let plant = |name: &str, target: &Path, foreign: Option<&[u8]>| -> (PathBuf, Vec<u8>) {
+            let victim = outside.join(name);
+            if let Some(bytes) = foreign {
+                std::fs::write(&victim, bytes).expect("victim");
+                std::fs::remove_file(target).expect("cannot clear the target");
+                std::fs::hard_link(&victim, target).expect("cannot make a hard link");
+            } else {
+                std::fs::hard_link(target, &victim).expect("cannot make a hard link");
+            }
+            let held = std::fs::read(&victim).expect("victim");
+            (victim, held)
+        };
+        let untouched = |(victim, held): &(PathBuf, Vec<u8>)| {
+            assert_eq!(&std::fs::read(victim).expect("a victim went"), held, "{}", victim.display());
+        };
+        init(&s, &d, "1.2.0", &flags(false, false)).expect("init");
+        no_temporary(&targets);
+        let linked = plant("binary", &binary(&d), Some(b"not the install's\n"));
+        init(&s, &d, "1.2.0", &flags(false, false)).expect("init over a linked binary");
+        untouched(&linked);
         assert_eq!(std::fs::read(binary(&d)).expect("binary"), b"the gate binary\n");
-        assert_eq!(std::fs::read_to_string(&knob).expect("knob"), knob_text(&d, MEMBER));
+        no_temporary(&targets);
         std::fs::write(&knob, "edited\n").expect("edit");
-        let victims = plant("uninstall", &targets[2..]);
+        let linked = plant("lock", &lock_path, None);
         uninstall(&d, &flags(false, false), &mut Vec::new()).expect("uninstall");
-        untouched(&victims);
+        untouched(&linked);
         assert!(UserLock::read(&lock_path).expect("lock").is_some_and(|l| l.hooks.is_empty()), "the narrowing missed");
+        no_temporary(&targets[1..]);
     }
 
     // spec: installer/SPEC.md §uninstall — the binary and an unedited knob file go, an edited one
