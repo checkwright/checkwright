@@ -5,7 +5,7 @@
 use crate::ere::Ere;
 use crate::exit::{self, Fault};
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub const KNOBS: &[&str] = &["LIFECYCLE_KIT_STATE_FILE"];
 
@@ -217,6 +217,7 @@ fn has_git_component(p: &Path) -> bool {
 struct Planned {
     shown: String,
     canonical: String,
+    target: PathBuf,
     new: Option<Vec<u8>>,
     changes: Vec<Change>,
 }
@@ -228,7 +229,7 @@ fn check_operand(
     root: &str,
     is_state: &dyn Fn(&str) -> Result<bool, String>,
     seen: &[Planned],
-) -> Result<(String, Vec<u8>), Fault> {
+) -> Result<(String, PathBuf, Vec<u8>), Fault> {
     let path = Path::new(op);
     let meta = std::fs::symlink_metadata(path).map_err(|_| Fault::refused(format!("no such file: {}", op)))?;
     if meta.file_type().is_symlink() {
@@ -240,8 +241,9 @@ fn check_operand(
     if has_git_component(path) {
         return Err(Fault::refused(format!("refusing {} — a path through .git", op)));
     }
-    let canonical =
-        crate::walk::canonicalize(path).ok_or_else(|| Fault::input(format!("cannot resolve {}", op)))?;
+    let target =
+        crate::walk::canonical_path(path).ok_or_else(|| Fault::input(format!("cannot resolve {}", op)))?;
+    let canonical = target.display().to_string();
     if !super::scratch_run::is_inside(root, &canonical) {
         return Err(Fault::refused(format!("refusing {} — outside the working directory {}", op, root)));
     }
@@ -270,12 +272,12 @@ fn check_operand(
     if !text_ok(&content) {
         return Err(Fault::input(format!("refusing {} — not UTF-8 text, or carries a NUL byte", op)));
     }
-    Ok((canonical, content))
+    Ok((canonical, target, content))
 }
 
 // spec: queue-kit/SPEC.md §The queue verbs — the sibling-temporary-and-rename write the verbs share
-pub fn write_replacing(canonical: &str, content: &[u8]) -> Result<(), String> {
-    let target = Path::new(canonical);
+pub fn write_replacing(target: &Path, content: &[u8]) -> Result<(), String> {
+    let canonical = target.display();
     let dir = target.parent().unwrap_or(Path::new("."));
     let leaf = target.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
     let tmp = dir.join(format!(".{}.rewrite-{}.tmp", leaf, std::process::id()));
@@ -332,7 +334,7 @@ fn execute(
     };
     let mut planned: Vec<Planned> = Vec::new();
     for op in &opts.files {
-        let (canonical, content) = match check_operand(op, root, is_state, &planned) {
+        let (canonical, target, content) = match check_operand(op, root, is_state, &planned) {
             Ok(v) => v,
             Err(e) => return refuse(e.status(), &e),
         };
@@ -353,6 +355,7 @@ fn execute(
         planned.push(Planned {
             shown: op.clone(),
             canonical,
+            target,
             new,
             changes,
         });
@@ -383,7 +386,7 @@ fn execute(
             let _ = writeln!(out, "{}: no match", p.shown);
             continue;
         };
-        if let Err(e) = write_replacing(&p.canonical, new) {
+        if let Err(e) = write_replacing(&p.target, new) {
             let done = if replaced.is_empty() {
                 "none".to_string()
             } else {
@@ -572,6 +575,31 @@ mod tests {
         let broken = |_: &str| Err("no knob".to_string());
         assert_eq!(execute(&argv, &sb.canonical, &broken, &mut out, &mut err), exit::REFUSED);
         assert_eq!(read(&f), b"x\n");
+    }
+
+    // spec: guard-kit/SPEC.md §rewrite — the write names the operand's resolved path, so one reached
+    // through a linked directory whose name is not UTF-8 rewrites that file, never the one its lossy
+    // spelling names. macOS refuses such a name at creation.
+    #[cfg(all(unix, not(target_os = "macos")))]
+    #[test]
+    fn a_linked_directory_not_utf8_rewrites_its_own_file() {
+        use std::ffi::OsStr;
+        use std::os::unix::ffi::OsStrExt;
+        use std::os::unix::fs::symlink;
+        let sb = Sandbox::new("lossy");
+        let root = Path::new(&sb.root);
+        let odd = root.join(OsStr::from_bytes(b"d\xff"));
+        let lossy = root.join("d\u{FFFD}");
+        for d in [&odd, &lossy] {
+            std::fs::create_dir_all(d).expect("cannot make a sandbox directory");
+            std::fs::write(d.join("a.md"), b"x\n").expect("cannot seed a sandbox file");
+        }
+        symlink(OsStr::from_bytes(b"d\xff"), root.join("link")).expect("cannot link");
+        let op = root.join("link").join("a.md").display().to_string();
+        let (rc, _, err) = sb.run(&["x", "y", &op]);
+        assert_eq!(rc, 0, "{}", err);
+        assert_eq!(std::fs::read(odd.join("a.md")).expect("read odd"), b"y\n", "the operand's own file was not rewritten");
+        assert_eq!(std::fs::read(lossy.join("a.md")).expect("read lossy"), b"x\n", "the lossy spelling's file was rewritten");
     }
 
     #[test]

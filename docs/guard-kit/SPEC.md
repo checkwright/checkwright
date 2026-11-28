@@ -894,7 +894,7 @@ An unrecognized `-`-prefixed argument before `--` is a refusal, wherever it sits
 - its content, or the content the rewrite would produce, is not UTF-8 or carries a NUL byte — the matcher is byte-wise, so a match can split a multi-byte character;
 - it names the same canonical file as an earlier operand.
 
-**The write.** Every operand is read, checked and rewritten in memory before the first byte is written. Each changed file is then written to a temporary file in its own directory and renamed over the original, with the original's permission bits, and its spans print once it is replaced. An I/O error part-way through is exit 3, and the message names the files already replaced, since a rename already done is not undone.
+**The write.** Every operand is read, checked and rewritten in memory before the first byte is written. Each changed file is then written to a temporary file in its own directory and renamed over the original, with its permission bits, and its spans print once it is replaced. The original is the operand's resolved path, its bytes kept ([gate-sdk/SPEC.md §The crate's crosser](../gate-sdk/SPEC.md#the-crates-crosser)), never its lossy spelling. An I/O error part-way through is exit 3, and the message names the files already replaced, since a rename already done is not undone.
 
 ### The rewrite arm's security posture
 

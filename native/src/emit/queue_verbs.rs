@@ -114,7 +114,7 @@ fn execute(args: &[String]) -> Result<i32, String> {
     let Some(new) = out.text else {
         return Ok(0);
     };
-    rewrite::write_replacing(&file, new.as_bytes())?;
+    rewrite::write_replacing(std::path::Path::new(&file), new.as_bytes())?;
     let _ = std::io::stdout().flush();
     Ok(match post_check(&file) {
         Ok(0) => 0,
