@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### seed-write-link-race
-
-The three seeding arms resolve the target, test its absence and then seed it with `fs::write` (`native/src/emit/install_lifecycle.rs`, `emit/env_probe.rs`, `installer/personal.rs`), which follows a link. A link planted between the resolve and the seed has the seed create the file it names outside the repository before the block writer refuses, and at `--install-lifecycle` the agent-file block is already written by then.
-
-**Deliverable:** debt: seed with an exclusive create (`OpenOptions::create_new`), which fails on any entry at the path, a link included, in all three arms, with one unit case.
-
-**Cost while deferred:** the window needs a concurrent writer in the adopter's own tree and opens on an absent target only, so nothing is overwritten; at worst an empty file is created outside the repository. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `marker::target`, then the `is_file` test, then `fs::write` in install_lifecycle.rs. Owner lookup: `create_new`, `race`, `TOCTOU` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
 ### knobenv-struct-comment-scan
 
 The guard-owning struct scan in `native/src/knobenv.rs` ends a declaration on its own line only when that line ends in `;` or `}`, so `struct Empty; // note` runs on to the next bare `}` and takes a later struct's `KnobEnv` field as its own. A releasing taker returning `Empty` then reads as handing the guard back, so a test calling it reads held and an unlocked reader passes. gate-sdk/SPEC.md §lib/gate.sh's honest limits name aliases, generics and macros, never this.
@@ -1017,4 +1009,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - cross-file-duplicate-text
 - gates-dir-knob-resolution
 - marker-target-admission-gaps
+- seed-write-link-race
 

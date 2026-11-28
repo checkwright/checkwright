@@ -290,10 +290,7 @@ pub fn emit(_args: &[String]) -> Result<String, Fault> {
 // never followed by the seed (gate-sdk/SPEC.md §lib/inject.sh).
 fn seed(file: &str) -> Result<(), Fault> {
     crate::marker::target(file).map_err(|e| Fault::input(format!("failed to write profile block: {}", e)))?;
-    if !std::path::Path::new(file).is_file() {
-        std::fs::write(file, SEED).map_err(|e| Fault::tool(format!("cannot write {}: {}", file, e)))?;
-    }
-    Ok(())
+    crate::marker::seed(std::path::Path::new(file), SEED.as_bytes()).map_err(|e| Fault::tool(format!("cannot write {}: {}", file, e)))
 }
 
 // spec: gate-sdk/SPEC.md §lib/inject.sh — the writer's refusal of markers that do not pair runs

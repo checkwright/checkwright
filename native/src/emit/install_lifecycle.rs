@@ -84,9 +84,7 @@ fn install_blocks(agent: &str, attrs: &str) -> Result<(), Fault> {
     // spec: lifecycle-kit/SPEC.md §bin/install-lifecycle.sh — `.gitattributes` is legitimately
     // minted when absent: it is not an always-loaded file the consumer authored. The opposite
     // disposition to the agent file above, one call apart, and neither is the other's default.
-    if !Path::new(attrs).is_file() {
-        std::fs::write(attrs, "").map_err(|e| Fault::tool(format!("cannot create {}: {}", attrs, e)))?;
-    }
+    marker::seed(Path::new(attrs), b"").map_err(|e| Fault::tool(format!("cannot create {}: {}", attrs, e)))?;
     let attrs_block = stages::merge_attrs_block().map_err(Fault::refused)?;
     let aaction = marker::install_block(attrs, ABEGIN, AEND, &attrs_block).map_err(Fault::input)?;
     println!(

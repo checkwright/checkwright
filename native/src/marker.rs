@@ -110,6 +110,17 @@ pub fn target(path: &str) -> Result<PathBuf, String> {
     Ok(real)
 }
 
+// spec: gate-sdk/SPEC.md §lib/inject.sh — a seed is an exclusive create: any entry at the path, a
+// link planted after `target` included, leaves the seed unwritten for the block writer to refuse
+pub fn seed(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
+    use std::io::Write;
+    match std::fs::OpenOptions::new().write(true).create_new(true).open(path) {
+        Ok(mut f) => f.write_all(bytes),
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => Ok(()),
+        Err(e) => Err(e),
+    }
+}
+
 fn byte_lines(text: &[u8]) -> Vec<&[u8]> {
     if text.is_empty() {
         return Vec::new();
@@ -807,6 +818,25 @@ mod tests {
         assert!(target(&at("profiles/new/me.md")).is_err(), "a component not yet created escaped containment");
         assert_eq!(target(&at("inner/me.md")).expect("an in-repo linked directory refused"), repo.join("inner/me.md"));
         assert!(target(&at("fresh/sub/me.md")).is_ok(), "a directory not yet created refused");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a seed creates an absent file, keeps a present one, and
+    // never follows a link planted at the path, dangling or not
+    #[cfg(unix)]
+    #[test]
+    fn a_seed_creates_only_where_no_entry_stands() {
+        use std::os::unix::fs::symlink;
+        let dir = std::env::temp_dir().join(format!("cw-marker-seed-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("cannot make the scratch directory");
+        seed(&dir.join("new.md"), b"seed\n").expect("an absent file refused its seed");
+        assert_eq!(std::fs::read(dir.join("new.md")).expect("read"), b"seed\n");
+        seed(&dir.join("new.md"), b"other\n").expect("a present file refused");
+        assert_eq!(std::fs::read(dir.join("new.md")).expect("read"), b"seed\n", "a present file was reseeded");
+        symlink("planted.md", dir.join("link.md")).expect("cannot link");
+        seed(&dir.join("link.md"), b"seed\n").expect("a planted link refused the seed rather than standing");
+        assert!(!dir.join("planted.md").exists(), "the seed followed a planted link");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

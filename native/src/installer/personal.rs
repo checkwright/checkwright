@@ -176,9 +176,7 @@ pub fn write(root: &Path, recorded: &[String], kits: &[String]) -> Result<Exclud
     if let Some(dir) = e.path.parent() {
         std::fs::create_dir_all(dir).map_err(|err| format!("cannot create {}: {}", dir.display(), err))?;
     }
-    if !e.path.is_file() {
-        std::fs::write(&e.path, "").map_err(|err| format!("cannot create {}: {}", e.shown, err))?;
-    }
+    crate::marker::seed(&e.path, b"").map_err(|err| format!("cannot create {}: {}", e.shown, err))?;
     let (begin, end) = markers(wt.key.as_deref());
     crate::marker::install_block(&e.path.to_string_lossy(), &begin, &end, &text)?;
     e.said = prune(&e, &wt)?;
