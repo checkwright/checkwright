@@ -1,0 +1,4 @@
+docs/b.md:3: a run of 11 words first stated at docs/a.md:3: "every commit runs the full battery …"
+docs/b.md:6: a run of 13 words first stated at docs/a.md:5: "the shared run starts here on …"
+docs/c.md:3: a run of 11 words first stated at docs/a.md:3: "every commit runs the full battery …"
+docs/c.md:6: a run of 11 words first stated at docs/a.md:7: "a reasonless valve never exempts the …" (its duplicate-text-exempt valve carries no reason)

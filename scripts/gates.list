@@ -115,6 +115,7 @@ check-docs-since
 check-docs-cmd
 check-docs-restatement-parity
 check-docs-page-repeat
+check-duplicate-text
 check-docs-page-length
 check-citation-link
 check-fence-command-head

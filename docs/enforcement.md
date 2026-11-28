@@ -129,6 +129,7 @@ The rows below derive from the class registries — the gate registry, the KPI r
 | [canon-kit](canon-kit/index.md) | check-docs-cmd | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-restatement-parity | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-page-repeat | precommit |
+| [canon-kit](canon-kit/index.md) | check-duplicate-text | precommit |
 | [canon-kit](canon-kit/index.md) | check-docs-page-length | precommit |
 | [canon-kit](canon-kit/index.md) | check-citation-link | precommit |
 | [canon-kit](canon-kit/index.md) | check-fence-command-head | precommit |

@@ -1,0 +1,3 @@
+# spec: canon-kit/SPEC.md §check-duplicate-text — fixture consumer config: every page under docs/ is compared at a six-word run
+CANON_KIT_DUPLICATE_TEXT_GLOBS[] = docs/*.md
+CANON_KIT_DUPLICATE_TEXT_MIN_WORDS = 6

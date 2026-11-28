@@ -64,6 +64,10 @@ pub const KIT: Kit = Kit {
         Row::indexed("CANON_KIT_PAGE_LENGTH_PAGES", &[]),
         Row::indexed("CANON_KIT_PAGE_LENGTH_EXCLUDE", &[]),
         Row::scalar("CANON_KIT_PAGE_LENGTH_MAX_WORDS", "off"),
+        Row::indexed("CANON_KIT_DUPLICATE_TEXT_GLOBS", &[]),
+        Row::indexed("CANON_KIT_DUPLICATE_TEXT_EXCLUDE", &[]),
+        Row::scalar("CANON_KIT_DUPLICATE_TEXT_MIN_WORDS", "12"),
+        Row::scalar("CANON_KIT_DUPLICATE_TEXT_WITHIN_FILE", "off"),
         Row::indexed("CANON_KIT_CITATION_LINK_PAGES", &[]),
         Row::indexed("CANON_KIT_FENCE_PASTE_PAGES", &[]),
         Row::indexed("CANON_KIT_TASK_LIST_GLOBS", &[]),
@@ -427,6 +431,10 @@ fn validate(v: &Values) -> Vec<String> {
     if let Some(s) = scalar(v, "CANON_KIT_PROSE_BOUND_REPEAT_MIN").filter(|s| !at_least_or_off(s, 2) || *s == "off") {
         errs.push(format!("CANON_KIT_PROSE_BOUND_REPEAT_MIN must be an integer >= 2 (got '{}')", s));
     }
+    errs.extend(duplicate_text_refusals(
+        scalar(v, "CANON_KIT_DUPLICATE_TEXT_MIN_WORDS"),
+        scalar(v, "CANON_KIT_DUPLICATE_TEXT_WITHIN_FILE"),
+    ));
     errs.extend(task_label_refusals(
         keyed(v, "CANON_KIT_TASK_LABEL_CITES").unwrap_or(&[]),
         keyed(v, "CANON_KIT_TASK_LABEL_DEFINES").unwrap_or(&[]),
@@ -589,6 +597,19 @@ fn at_least_or_off(v: &str, floor: u64) -> bool {
     v == "off" || (digits(v) && v.parse::<u64>().is_ok_and(|n| n >= floor))
 }
 
+// spec: canon-kit/SPEC.md §Layout and configuration — the run length is an integer of at least 3, and
+// the within-file switch is off or on
+fn duplicate_text_refusals(min_words: Option<&str>, within_file: Option<&str>) -> Vec<String> {
+    let mut errs = Vec::new();
+    if let Some(s) = min_words.filter(|s| *s == "off" || !at_least_or_off(s, 3)) {
+        errs.push(format!("CANON_KIT_DUPLICATE_TEXT_MIN_WORDS must be an integer >= 3 (got '{}')", s));
+    }
+    if let Some(s) = within_file.filter(|s| !matches!(*s, "off" | "on")) {
+        errs.push(format!("CANON_KIT_DUPLICATE_TEXT_WITHIN_FILE must be off|on (got '{}')", s));
+    }
+    errs
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -660,6 +681,21 @@ mod tests {
             assert!(!at_least_or_off(bad, 1), "{}", bad);
         }
         assert!(!at_least_or_off("2", 3));
+    }
+
+    // spec: canon-kit/SPEC.md §check-duplicate-text — the exit-2 width and mode, which a `bad/` fixture
+    // held to exit 1 cannot express
+    #[test]
+    fn the_duplicate_text_width_is_at_least_three_and_its_mode_off_or_on() {
+        for (n, mode) in [("3", "off"), ("12", "on"), ("40", "off")] {
+            assert!(duplicate_text_refusals(Some(n), Some(mode)).is_empty(), "{} {}", n, mode);
+        }
+        for bad in ["", "2", "0", "off", "4.5", "-3"] {
+            assert_eq!(duplicate_text_refusals(Some(bad), Some("off")).len(), 1, "{}", bad);
+        }
+        for bad in ["", "yes", "ON", "1"] {
+            assert_eq!(duplicate_text_refusals(Some("12"), Some(bad)).len(), 1, "{}", bad);
+        }
     }
 
     // spec: canon-kit/SPEC.md §check-task-label-resolution — the exit-2 config, which a `bad/`

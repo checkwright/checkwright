@@ -17,7 +17,7 @@
 1155cp .claude/commands/spec.md
 1728cp .claude/commands/validate.md
 12456cp CLAUDE.md
-263956cp canon-kit/SPEC.md
+269306cp canon-kit/SPEC.md
 5785cp canon-kit/templates/amendment.md
 29101cp companion/SPEC.md
 119887cp context-kit/SPEC.md
@@ -55,7 +55,7 @@
 3007cp docs/methodology.md
 3341cp docs/openspec.md
 10075cp docs/orchestration.md
-8511cp docs/page-authoring.md
+8617cp docs/page-authoring.md
 10041cp docs/positioning.md
 1869cp docs/posts/2026-07-09-announcing-checkwright.md
 1034cp docs/posts/2026-07-14-checkwright-v0-1-0.md

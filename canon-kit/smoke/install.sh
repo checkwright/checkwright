@@ -23,6 +23,7 @@ check-docs-link-convention
 check-docs-page-length
 check-docs-page-repeat
 check-docs-restatement-parity
+check-duplicate-text
 check-fence-command-head
 check-fence-paste-unit
 check-fence-run

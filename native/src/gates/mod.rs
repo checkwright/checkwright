@@ -34,6 +34,7 @@ pub mod docs_liquid_parse;
 pub mod docs_page_length;
 pub mod docs_page_repeat;
 pub mod docs_restatement_parity;
+pub mod duplicate_text;
 pub mod fence_command_head;
 pub mod fence_paste_unit;
 pub mod fence_run;
@@ -716,6 +717,22 @@ pub const REGISTRY: &[GateEntry] = &[
             "CANON_KIT_PAGE_REPEAT_PAGES",
             "CANON_KIT_PAGE_REPEAT_MIN_WORDS",
             "CANON_KIT_PAGE_REPEAT_CHROME",
+        ],
+        "canon-kit",
+        &[],
+    ),
+    // spec: canon-kit/SPEC.md §check-duplicate-text — the compared files are the knob's glob walk
+    (
+        "check-duplicate-text",
+        duplicate_text::run,
+        &[(".", "glob:knob:CANON_KIT_DUPLICATE_TEXT_GLOBS", "", "")],
+        &[
+            "GATE_SDK_PRUNE_DIRS",
+            "GATE_SDK_PRUNE_EXTRA_DIRS",
+            "CANON_KIT_DUPLICATE_TEXT_GLOBS",
+            "CANON_KIT_DUPLICATE_TEXT_EXCLUDE",
+            "CANON_KIT_DUPLICATE_TEXT_MIN_WORDS",
+            "CANON_KIT_DUPLICATE_TEXT_WITHIN_FILE",
         ],
         "canon-kit",
         &[],

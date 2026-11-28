@@ -79,12 +79,12 @@ A repository install commits the profile's kit files, the gate binary and a hand
 | `starter` | 1 | 720 | 660 | 540 kB |
 | `workflow` | 3 | 980 | 880 | 1.0 MB |
 | `delegation` | 8 | 1,200 | 1,100 | 1.6 MB |
-| `prose` | 2 | 1,100 | 1,000 | 770 kB |
-| `full` | 11 | 1,700 | 1,500 | 1.9 MB |
+| `prose` | 2 | 1,200 | 1,100 | 770 kB |
+| `full` | 11 | 1,800 | 1,500 | 1.9 MB |
 
 | Kit | Files | Of which gate-tests | Size |
 | --- | --- | --- | --- |
-| canon-kit | 430 | 390 | 230 kB |
+| canon-kit | 440 | 400 | 230 kB |
 | context-kit | 69 | 47 | 48 kB |
 | delegation-kit | 46 | 35 | 92 kB |
 | doctrine-kit | 12 | 9 | 64 kB |

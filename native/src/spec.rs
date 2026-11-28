@@ -4,6 +4,7 @@
 use crate::exit::Fault;
 use crate::programs;
 use crate::walk;
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
@@ -908,6 +909,220 @@ pub fn word_count(s: &str) -> usize {
     s.split([' ', '\t']).filter(|w| !w.is_empty()).count()
 }
 
+// spec: canon-kit/SPEC.md §The shared spec adapters — an inline code span is one word, spelled as a
+// byte no prose carries so neither the sentence split nor the phrase walk reads inside it
+const CODE: u8 = 0x01;
+
+pub struct Unit {
+    pub fnr: usize,
+    pub text: String,
+    line_of: Vec<usize>,
+}
+
+impl Unit {
+    pub fn line_at(&self, byte: usize) -> usize {
+        self.line_of.get(byte).or(self.line_of.last()).copied().unwrap_or(self.fnr)
+    }
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the unit's lines rejoined with one space, each
+// byte mapped to its physical line, and each inline code span collapsed to one word
+pub fn build_unit(lines: &[(usize, String)]) -> Unit {
+    let mut joined: Vec<u8> = Vec::new();
+    let mut lines_of: Vec<usize> = Vec::new();
+    for (k, (fnr, l)) in lines.iter().enumerate() {
+        if k > 0 {
+            joined.push(b' ');
+            lines_of.push(*fnr);
+        }
+        joined.extend_from_slice(l.as_bytes());
+        lines_of.extend(std::iter::repeat(*fnr).take(l.len()));
+    }
+    let mut out: Vec<u8> = Vec::with_capacity(joined.len());
+    let mut line_of: Vec<usize> = Vec::with_capacity(joined.len());
+    let mut i = 0usize;
+    while i < joined.len() {
+        if joined[i] == b'`' {
+            if let Some(off) = joined[i + 1..].iter().position(|&c| c == b'`') {
+                out.push(CODE);
+                line_of.push(lines_of[i]);
+                i = i + 1 + off + 1;
+                continue;
+            }
+        }
+        out.push(joined[i]);
+        line_of.push(lines_of[i]);
+        i += 1;
+    }
+    Unit {
+        fnr: lines.first().map(|l| l.0).unwrap_or(1),
+        text: String::from_utf8_lossy(&out).into_owned(),
+        line_of,
+    }
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — a link target is dropped with the rest of the
+// non-prose, so a shared citation is no shared phrase; each kept byte keeps its source offset
+fn drop_link_targets(s: &str) -> (String, Vec<usize>) {
+    let mut out = String::with_capacity(s.len());
+    let mut from: Vec<usize> = Vec::with_capacity(s.len());
+    let keep = |out: &mut String, from: &mut Vec<usize>, base: usize, piece: &str| {
+        out.push_str(piece);
+        from.extend(base..base + piece.len());
+    };
+    let mut at_base = 0usize;
+    let mut rest = s;
+    while let Some(at) = rest.find("](") {
+        keep(&mut out, &mut from, at_base, &rest[..at + 1]);
+        let after = &rest[at + 2..];
+        let after_base = at_base + at + 2;
+        match after.find(')') {
+            Some(close) => {
+                rest = &after[close + 1..];
+                at_base = after_base + close + 1;
+            }
+            None => {
+                rest = after;
+                at_base = after_base;
+                break;
+            }
+        }
+    }
+    keep(&mut out, &mut from, at_base, rest);
+    (out, from)
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — a token carrying a separator, or a dot between
+// two alphanumerics, names a path or a file rather than a word of prose
+fn path_shaped(tok: &str) -> bool {
+    if tok.contains('/') || tok.contains('\\') {
+        return true;
+    }
+    let b = tok.as_bytes();
+    (1..b.len().saturating_sub(1))
+        .any(|i| b[i] == b'.' && b[i - 1].is_ascii_alphanumeric() && b[i + 1].is_ascii_alphanumeric())
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the phrase stream: case folded, and code spans,
+// link targets, path-shaped tokens and punctuation dropped first; each word carries its source byte
+fn phrase_tokens(text: &str) -> Vec<(String, usize)> {
+    let (kept, from) = drop_link_targets(text);
+    let mut out = Vec::new();
+    let mut start: Option<usize> = None;
+    let push = |s: usize, e: usize, out: &mut Vec<(String, usize)>| {
+        let tok = &kept[s..e];
+        if tok.as_bytes().contains(&CODE) || path_shaped(tok) {
+            return;
+        }
+        let word: String = tok
+            .chars()
+            .filter(|c| c.is_alphanumeric() || matches!(c, '-' | '_' | '\''))
+            .collect();
+        let word = word.trim_matches(|c| matches!(c, '-' | '_' | '\''));
+        if !word.is_empty() {
+            out.push((word.to_lowercase(), from[s]));
+        }
+    };
+    for (i, c) in kept.char_indices() {
+        match (c.is_whitespace(), start) {
+            (true, Some(s)) => {
+                push(s, i, &mut out);
+                start = None;
+            }
+            (false, None) => start = Some(i),
+            _ => {}
+        }
+    }
+    if let Some(s) = start {
+        push(s, kept.len(), &mut out);
+    }
+    out
+}
+
+pub fn phrase_words(text: &str) -> Vec<String> {
+    phrase_tokens(text).into_iter().map(|t| t.0).collect()
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the phrase stream with each word's physical line
+pub fn phrase_words_lined(u: &Unit) -> Vec<(String, usize)> {
+    phrase_tokens(&u.text).into_iter().map(|(w, b)| (w, u.line_at(b))).collect()
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — a comment-only line is markup, not prose
+fn comment_only(s: &str) -> bool {
+    let t = s.trim();
+    t.starts_with("<!--") && t.ends_with("-->")
+}
+
+// spec: canon-kit/SPEC.md §The shared spec adapters — the unit-cutting sink; `front_matter` holds out
+// that many leading lines, `held` takes a member's own hold-outs before the walk
+#[derive(Default)]
+pub struct UnitSink {
+    pub held: HashSet<usize>,
+    in_gen: bool,
+    pub front_matter: usize,
+    pub headings: Vec<(usize, String)>,
+    pub units: Vec<Unit>,
+}
+
+impl ProseSink for UnitSink {
+    // spec: canon-kit/SPEC.md §The shared spec adapters — headings, table rows, generated regions and
+    // comment-only lines are held out; a heading also opens the next section
+    fn on_line(&mut self, _file: &str, fnr: usize, raw: &str) {
+        if fnr <= self.front_matter {
+            self.held.insert(fnr);
+            return;
+        }
+        if is_gen_marker(raw, ":begin") {
+            self.in_gen = true;
+            self.held.insert(fnr);
+            return;
+        }
+        if is_gen_marker(raw, ":end") {
+            self.in_gen = false;
+            self.held.insert(fnr);
+            return;
+        }
+        if self.in_gen {
+            self.held.insert(fnr);
+            return;
+        }
+        if prose_heading_level(raw) > 0 {
+            let text = raw.trim().trim_start_matches('#').trim().to_string();
+            self.headings.push((fnr, text));
+            self.held.insert(fnr);
+            return;
+        }
+        if is_table_row(raw) || comment_only(raw) {
+            self.held.insert(fnr);
+        }
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — each list item and its continuation lines is
+    // a unit of its own, and a held-out line closes the unit it interrupts
+    fn on_pflush(&mut self, _file: &str, para: &Para) {
+        let mut cur: Vec<(usize, String)> = Vec::new();
+        for (k, line) in para.line.iter().enumerate() {
+            let fnr = para.fnr[k];
+            if self.held.contains(&fnr) {
+                if !cur.is_empty() {
+                    self.units.push(build_unit(&cur));
+                    cur.clear();
+                }
+                continue;
+            }
+            if is_list_item(line) && !cur.is_empty() {
+                self.units.push(build_unit(&cur));
+                cur.clear();
+            }
+            cur.push((fnr, line.clone()));
+        }
+        if !cur.is_empty() {
+            self.units.push(build_unit(&cur));
+        }
+    }
+}
+
 // spec: canon-kit/SPEC.md §The shared spec adapters — the fence reader: one state every fence
 // toggle steps, so no two parsers disagree on where a block ends
 #[derive(Clone, Copy, Default)]
@@ -1798,6 +2013,38 @@ fn delimited(b: &[u8], d: u8, nonempty: bool) -> Option<(usize, usize)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_code_span_is_one_word_and_its_dots_split_nothing() {
+        let u = build_unit(&[(3, "Run `a. b. c` now.".to_string()), (4, "Then stop.".to_string())]);
+        let spans = sentence_spans(&u.text);
+        assert_eq!(spans.len(), 2);
+        assert_eq!(word_count(&u.text[spans[0].0..spans[0].1]), 3);
+        assert_eq!(u.line_at(spans[1].0), 4);
+    }
+
+    #[test]
+    fn the_phrase_stream_drops_code_links_paths_and_punctuation() {
+        let u = build_unit(&[(1, "The [rule](a/b.md#x) in `k` and SPEC.md, per canon-kit/SPEC.md — stated.".to_string())]);
+        let w = phrase_words(&u.text);
+        assert_eq!(w, vec!["the", "rule", "in", "and", "per", "stated"]);
+    }
+
+    // spec: canon-kit/SPEC.md §The shared spec adapters — each word keeps its physical line across a
+    // wrap and a dropped link target, and a target glued to its text leaves one word
+    #[test]
+    fn each_phrase_word_carries_its_physical_line() {
+        let u = build_unit(&[
+            (7, "One [two](x/y.md) `c` three".to_string()),
+            (8, "[four](z)s five.".to_string()),
+        ]);
+        let w = phrase_words_lined(&u);
+        let want: Vec<(String, usize)> = [("one", 7), ("two", 7), ("three", 7), ("fours", 8), ("five", 8)]
+            .iter()
+            .map(|(s, l)| (s.to_string(), *l))
+            .collect();
+        assert_eq!(w, want);
+    }
 
     fn fenced(text: &str, mut fence: Fence) -> Vec<bool> {
         text.lines().map(|l| fence.delimits(l) || fence.is_open()).collect()
