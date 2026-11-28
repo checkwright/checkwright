@@ -6,3 +6,4 @@
 
 link-shape-residue-pass scope ac5dcb41 2026-11-28 45a5c3654
 link-shape-residue-pass build a282a4f7 2026-11-28 f14a43be2
+link-shape-residue-pass validate af338c4c 2026-11-28 023520c8e
