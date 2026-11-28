@@ -284,6 +284,26 @@ An adopter request, relayed by the lead from the orchestrator adopter: a prose c
 
 **Cost while deferred:** a renamed or retired command stays cited in prose until a reader runs it. About one iteration with a spec stage, the `--help` resolver the costliest, since it runs a binary at gate time. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Owner lookup: `command word`, `--help`, `resolver` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md, beside §check-docs-cmd.
 
+### verdict-key-knob-files
+
+[cost: event/low] [surface: gate-sdk]
+
+An adopter finding, relayed by the lead from the orchestrator adopter and measured on v0.45.0: `--run` reads each kit's knob layers, the gitignored `<stem>-config.local.knobs` overlay among them, but the verdict key's `treeId` names tracked content only, and `worktree` reads `clean` past an untracked tracked-layer file (`--untracked-files=no`). A stored or carried pass can therefore rest on host-local knob values the key does not name. gate-sdk/SPEC.md §run-gates already states, at the verdict store's key, the limit (a knob set in the environment and an untracked file a member reads are in no key field), so widening the key is a feature, not a defect.
+
+**Deliverable:** design-pending, a feature: either a key field digesting every knob file the run read, or a refusal to store or emit a keyed verdict while an untracked knob layer is read, with the verdict-key goldens moved and a fixture per arm.
+
+**Cost while deferred:** a verdict looked up or carried between hosts can be a pass one host's local overlay bought. About one iteration with a spec stage, the key's contract version and goldens moving with it. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Re-verified by reading §run-gates' verdict store's key paragraph and the `worktree` row. Owner lookup: `verdict key`, `local.knobs`, `treeId` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates' verdict store.
+
+### gates-dir-knob-resolution
+
+[cost: event/low] [surface: gate-sdk]
+
+An adopter finding, relayed by the lead from the orchestrator adopter and measured on v0.45.0: `--run --gates-dir <dir>` selects the registry only, while every knob layer still resolves under `GATE_SDK_GATES_DIR` (default `scripts`), so a knob file placed beside an outside registry is never read. gate-sdk/SPEC.md §The knob file writes the layers as `<gates-dir>/<stem>-config.knobs`, which a reader of §run-gates' `--gates-dir` can take to mean the flag's directory, and no section says which.
+
+**Deliverable:** debt: state in §The knob file where the layers are read under `--gates-dir`, or, if the scope rules that the flag's directory supplies them, move the resolution with a unit case and a release declaration.
+
+**Cost while deferred:** an adopter running an outside registry sets knobs where they are silently unread and gets the defaults. A one-paragraph SPEC edit if the current behaviour stands. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Re-verified by source read: `registry_of` in `native/src/runner.rs` takes the flag for the registry alone, and `knobs::gates_dir` reads only `GATE_SDK_GATES_DIR`. Owner lookup: `gates-dir`, `knob file` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The knob file.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
