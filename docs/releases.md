@@ -14,6 +14,7 @@ The table reads every note for you, newest first. **Action on upgrade** says whe
 
 | Release | Date | Bump | Action on upgrade | New and tightened gates | Knob changes | Gate-authoring changes | Platforms | Behavior changes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [v0.46.0](posts/2026-11-28-checkwright-v0-46-0.md) | 2026-11-28 | minor | no | 0 | 0 | 0 | 0 | 5 |
 | [v0.45.0](posts/2026-11-28-checkwright-v0-45-0.md) | 2026-11-28 | minor | no | 0 | 0 | 0 | 0 | 1 |
 | [v0.44.0](posts/2026-11-28-checkwright-v0-44-0.md) | 2026-11-28 | minor | no | 0 | 0 | 0 | 0 | 3 |
 | [v0.43.0](posts/2026-11-28-checkwright-v0-43-0.md) | 2026-11-28 | minor | no | 0 | 0 | 0 | 0 | 7 |
