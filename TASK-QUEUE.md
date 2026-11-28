@@ -1,16 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: trusted-publish-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-28, scope decision under the operator's delegation of 2026-11-26, relayed by the lead's dispatch, not a ruling):** `npm-trusted-publishing` leads, the one tree-actionable `high` row on the board and the only one on a clock, its stored token lapsing by 2027-01-23 under npm's write-token cap (inferred); its observe half splits to Deferred, and the spec stage authors its amendment. `front-door-retry-marker` joins it on the release surface, and `doctrine-install-atomic-write` and `knob-lock-taker-exemption` take the last close's other two inbox bullets on the native crate. The three bullets alone were refused as an iteration: two are residue of a residue, worth a batch and not a fixed cost. The adopter has no open asks, and the peer channel and the GitHub lanes hold nothing. The trusted-publisher registration is an operator act under the operator's npm login; the produce half keeps the stored token as its fallback, so the set lands whether or not it is done by close.
-
-  **The release (2026-11-28, scope decision under the same delegation, not a ruling):** a cut at this close is granted where the set's declarations price one; the agent-file write fix is adopter-facing.
-
-  **The pushes (2026-11-28, scope decision under the same delegation, not a ruling):** push need 2 against 2, inside the grant: the closing push, and the tag push that fires `publish`, the first run of the changed `npm` job and of the retry marker. No unit needs a mid-iteration push.
 
 ---
 
