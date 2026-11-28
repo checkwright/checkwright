@@ -18,14 +18,6 @@
 
 ## Technical Debt
 
-### audit-trigger-dod-citation
-
-`check-stage-entry` assertion C reads the amendment DoD's Causal-completeness line, which cites `canon-kit/SPEC.md §The causal-completeness check`, as a contract token naming the canon-kit roster dir. So a single-component amendment reaches two components on that citation alone, and build entry demands an align stamp or a waiver. Both gate-sdk amendments of migration-parity-pass met it: the build simulate refused, and the set ran align.
-
-**Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
-
-**Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
-
 ## Deferred
 
 ### benchmark-ab-experiment
@@ -982,4 +974,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 - block-seed-before-resolve
 - init-agent-seed-dangling-link
 - knobenv-closure-barrier-gaps
+- audit-trigger-dod-citation
 

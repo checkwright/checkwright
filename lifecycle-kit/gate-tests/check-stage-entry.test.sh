@@ -262,6 +262,21 @@ demo-iteration build bbbbbbbb 2026-06-02 none
 EOF
 check_case "C4 single-component" "$c4" 0 "STAGE-ENTRY: clean"
 
+# C15–C17: a task-list item's section citation names the procedure the item runs,
+# so it is no reach; the same token on a prose line, or an item naming no section, is.
+citation_case() {  # $1=label  $2=the amendment's second line  $3=want-rc  $4=want-substring
+    local d="$SANDBOX/$1"
+    build_queue "$d"
+    mkdir -p "$d/.workflow" "$d/widget-service" "$d/procedure-kit"
+    : >"$d/widget-service/SPEC.md"; : >"$d/procedure-kit/SPEC.md"
+    printf 'delta stays within widget-service/SPEC.md\n%s\n' "$2" >"$d/widget-service/SPEC-foo.md"
+    printf -- '---\n\ndemo-iteration scope aaaaaaaa 2026-06-01 none\ndemo-iteration build bbbbbbbb 2026-06-02 none\n' >"$d/.workflow/WORKFLOW-STATE.txt"
+    check_case "$1" "$d" "$3" "$4"
+}
+citation_case "C15 checklist-section-citation-is-no-reach" '- [ ] **Causal completeness** — every point of procedure-kit/SPEC.md §The completeness check holds.' 0 "STAGE-ENTRY: clean"
+citation_case "C16 checklist-item-naming-no-section-reaches" '- [ ] procedure-kit/SPEC.md updated to match.' 1 "references 2 components: procedure-kit widget-service"
+citation_case "C17 prose-section-citation-reaches" 'consumes procedure-kit/SPEC.md §The completeness check as its input.' 1 "references 2 components: procedure-kit widget-service"
+
 # C5 (good): a single real amendment (own dir) plus a templates/ stub amendment
 # in another dir — the stub is a copyable skeleton, not a live amendment, so it
 # is excluded from the scan and does not fabricate a second component.
@@ -428,5 +443,5 @@ if [[ "$fails" -gt 0 ]]; then
     echo "check-stage-entry.test.sh: $fails case(s) failed"
     exit 1
 fi
-echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + path-shaped amendment glob + mirror fold + assertion D inferred-claim residue over amendments and active queue entries + assertion E marker grammar at every cursor, 27 scenarios)"
+echo "check-stage-entry.test.sh: clean (assertion B queue-empty + drain-exempt model + observed-by refusal branch + assertion C cross-component align/waiver + templates-stub exclusion + path-shaped amendment glob + mirror fold + checklist procedure citations + assertion D inferred-claim residue over amendments and active queue entries + assertion E marker grammar at every cursor, 30 scenarios)"
 exit 0

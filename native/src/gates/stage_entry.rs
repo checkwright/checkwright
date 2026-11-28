@@ -320,6 +320,18 @@ fn fold_mirror(root: &str, roster: &[String], d: String) -> String {
     }
 }
 
+// spec: lifecycle-kit/SPEC.md §check-stage-entry — a task-list item citing a section names the
+// procedure the item runs, never a surface the amendment changes, so the token is no reach
+fn procedure_citation(line: &str, tok: &str) -> bool {
+    let item = line.trim_start();
+    let Some(item) = ["- ", "* ", "+ "].iter().find_map(|b| item.strip_prefix(b)) else { return false };
+    if !["[ ] ", "[x] ", "[X] "].iter().any(|c| item.starts_with(c)) {
+        return false;
+    }
+    let end = tok.as_ptr() as usize - line.as_ptr() as usize + tok.len();
+    line[end..].trim_start_matches(['`', ' ']).starts_with('§')
+}
+
 // spec: lifecycle-kit/SPEC.md §check-stage-entry — assertion C's signal, or None.
 fn audit_signal(k: &Knobs, rel: &[String]) -> Result<Option<String>, String> {
     let base = |p: &str| basename(p).to_string();
@@ -375,7 +387,7 @@ fn audit_signal(k: &Knobs, rel: &[String]) -> Result<Option<String>, String> {
             .unwrap_or_default();
         let mut comps: Vec<String> = vec![dir(af)];
         for line in text.lines() {
-            for tok in all_matches(&re, line) {
+            for tok in all_matches(&re, line).into_iter().filter(|t| !procedure_citation(line, t)) {
                 let mut d = tok.to_string();
                 for ct in &k.contract_tokens {
                     if let Some(s) = d.strip_suffix(&format!("/{}", ct)) {
@@ -835,5 +847,19 @@ mod tests {
             vec!["panel-facade/SPEC.md", "widget-service/SPEC.md"]
         );
         assert!(all_matches(&re, "no token here").is_empty());
+    }
+
+    #[test]
+    fn only_a_task_list_items_section_citation_is_a_procedure_citation() {
+        let re = Ere::compile("[a-z0-9][a-z0-9/_-]*/(SPEC\\.md|proto/)").expect("compiles");
+        fn citations<'a>(re: &Ere, line: &'a str) -> Vec<&'a str> {
+            all_matches(re, line).into_iter().filter(|t| procedure_citation(line, t)).collect()
+        }
+        let cited = |line: &'static str| citations(&re, line);
+        assert_eq!(cited("- [ ] **Causal completeness** — every point of canon-kit/SPEC.md §The check holds"), vec!["canon-kit/SPEC.md"]);
+        assert_eq!(cited("  * [x] run `canon-kit/SPEC.md` §The check, then a/SPEC.md"), vec!["canon-kit/SPEC.md"]);
+        assert!(cited("- [ ] canon-kit/SPEC.md updated").is_empty());
+        assert!(cited("every point of canon-kit/SPEC.md §The check holds").is_empty());
+        assert!(cited("- every point of canon-kit/SPEC.md §The check holds").is_empty());
     }
 }
