@@ -234,7 +234,7 @@ The observe half of `front-door-npx-resolution`: the front-door legs run only in
 
 **Deliverable:** debt: read that run's front-door legs in both drivers, the package route green on the first attempt; a red on registry lag is filed as a defect.
 
-**Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
+**Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.44.0 publish run 46112266019: every front-door leg of both drivers green on the run's first attempt, and no lag seen, the package route's registry-to-init gap matching the v0.43.0 pre-fix run's, so the fix is still unwitnessed and the entry stays. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
 
 ## Icebox
 
