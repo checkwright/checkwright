@@ -234,6 +234,16 @@ The observe half of `front-door-npx-resolution`: the front-door legs run only in
 
 **Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.44.0 publish run 46112266019: every front-door leg of both drivers green on the run's first attempt, and no lag seen, the package route's registry-to-init gap matching the v0.43.0 pre-fix run's, so the fix is still unwitnessed and the entry stays. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
 
+### init-agent-seed-dangling-link
+
+[cost: event/low] [surface: installer]
+
+`init`'s agent-file seed (`native/src/installer/init.rs`) guards on `is_file`, which a dangling `CLAUDE.md` link fails, so the seed's atomic write renames over the link and leaves a regular file. installer/SPEC.md §The install boundary rules that an ordinary atomic write replaces a link at its target, and the marker-block exception, which follows one, does not reach the seed.
+
+**Deliverable:** design-pending, a behavior change: either refuse a dangling or escaping agent-file link in `init`'s preflight, before any write, as `marker::target` refuses one for a block writer, or seed the in-repo file the link names. The chosen rule lands in installer/SPEC.md §What init seeds, with one init unit or installer-smoke case.
+
+**Cost while deferred:** an adopter whose agent file is a dangling link has the link replaced by init's seed with no notice, so a later fix of the link's target forks from it. The bug predates this iteration. Its preflight costs one `marker::target` read. Filed 2026-11-28 by trusted-publish-pass' close from build's inbox bullet. Re-verified: the seed guard is `!root.join(AGENT_FILE).is_file()` and the write is `install::write_atomically`, read at the close entry head, and `Path::is_file` reads false on a dangling link, probed with a scratch binary. Owner lookup: `dangling`, `agent-file seed`, `seeds_agent` in this file and the disposed-findings record, none; owner installer/SPEC.md §What init seeds.
+
 ## Icebox
 
   Dormant entries, one line each: the cost field said the carry was low, no `[roadmap:]` commitment rides on it, and no named event is waiting to promote it. Still live work — a legal `[blocked-by:]` target, conserved on the way in and on the way back out. The removed body is recoverable from the evicting commit (queue-kit/SPEC.md §The icebox tier).
