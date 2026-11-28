@@ -11,3 +11,7 @@
 - `CANON_KIT_DUPLICATE_TEXT_EXCLUDE` — new: the files subtracted from that set, such as a generated mirror, default empty.
 - `CANON_KIT_DUPLICATE_TEXT_MIN_WORDS` — new: the shortest shared run, an integer of at least `3`, default `12`.
 - `CANON_KIT_DUPLICATE_TEXT_WITHIN_FILE` — new: `on` also pairs two units of one file, default `off`.
+
+## Behavior changes
+
+- **The marker writers and the `init` agent-file guard** — a target link resolving to a directory, or to anything else that is no regular file, now refuses as a link escaping the repository does, with nothing written; before, `init` replaced such a `CLAUDE.md` link with its seed. A target reached through a linked directory resolving outside the repository refuses too, where before only a linked leaf was contained. Nothing to reconcile unless a block or seed target of yours sits behind such a link: point the link at a regular file inside the repository, or unlink the directory.

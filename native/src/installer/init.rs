@@ -396,7 +396,7 @@ fn write_in(
 }
 
 // spec: installer/SPEC.md §What init seeds — a linked agent file resolves before the first write,
-// so one resolving to no file or outside the repository is never replaced by the seed
+// so one resolving to no file, a directory, or outside the repository is never replaced by the seed
 fn agent_file_resolves(root: &Path, kits: &[String]) -> Result<(), Refusal> {
     if !kits.iter().any(|k| recipe::needs_agent_file(k)) {
         return Ok(());
@@ -404,7 +404,7 @@ fn agent_file_resolves(root: &Path, kits: &[String]) -> Result<(), Refusal> {
     crate::marker::target(&root.join(AGENT_FILE).to_string_lossy()).map(|_| ()).map_err(|e| {
         refuse(
             e,
-            "nothing was written. init seeds the agent file only where none stands and writes its block into the file a link names, so a link resolving to no file would be replaced. Create the file the link names inside this repository, or remove the link, then re-run.",
+            "nothing was written. init seeds the agent file only where none stands and writes its block into the file a link names, so a link resolving to no regular file would be replaced. Create the file the link names inside this repository, or remove the link, then re-run.",
             exit::INPUT,
         )
     })

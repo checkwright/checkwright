@@ -48,29 +48,66 @@ fn read_bytes(path: &str) -> Result<(PathBuf, Vec<u8>), String> {
     Ok((file, text))
 }
 
-// spec: gate-sdk/SPEC.md §lib/inject.sh — a link at the path is followed to the file it names,
-// which is rewritten while the link stands; one resolving nowhere, or outside the repository the
-// link sits in, refuses before any read or write
+fn is_link(p: &Path) -> bool {
+    std::fs::symlink_metadata(p).is_ok_and(|m| m.file_type().is_symlink())
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the repository a path sits in, read off its own spelling:
+// the nearest directory above it holding a `.git` entry, a link among them skipped, since the
+// repository a linked directory holds is its target's
+fn repo_of(dir: &Path) -> Option<PathBuf> {
+    dir.ancestors()
+        .find(|a| !is_link(a) && std::fs::symlink_metadata(a.join(".git")).is_ok())
+        .and_then(crate::walk::canonical_path)
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — the nearest existing directory resolved, since a component
+// not yet created is no link
+fn resolved_dir(dir: &Path) -> Option<PathBuf> {
+    dir.ancestors().find(|a| std::fs::symlink_metadata(a).is_ok()).and_then(crate::walk::canonical_path)
+}
+
+// spec: gate-sdk/SPEC.md §lib/inject.sh — a link at the path is followed to the regular file it
+// names and rewritten while it stands; one resolving nowhere, to no regular file, or outside the
+// repository refuses before any read or write, as a directory resolving outside it does
 pub fn target(path: &str) -> Result<PathBuf, String> {
     let at = Path::new(path);
-    if !std::fs::symlink_metadata(at).is_ok_and(|m| m.file_type().is_symlink()) {
+    let abs = crate::walk::canonical_path(".")
+        .ok_or_else(|| format!("{}: the working directory resolves to nothing — refusing to write", path))?
+        .join(at);
+    let dir = abs.parent().unwrap_or(&abs);
+    let root = repo_of(dir);
+    let outside = |real: &Path, what: &str| {
+        format!(
+            "{}: {} {}, outside the repository it sits in — refusing to write through it or replace it",
+            path,
+            what,
+            crate::walk::escaped_os(real.as_os_str())
+        )
+    };
+    if let (Some(root), Some(real_dir)) = (&root, resolved_dir(dir)) {
+        if !real_dir.starts_with(root) {
+            return Err(outside(&real_dir, "a linked directory resolving to"));
+        }
+    }
+    if !is_link(at) {
         return Ok(at.to_path_buf());
     }
     let real = crate::walk::canonical_path(at).ok_or_else(|| {
         format!("{}: a link that resolves to no file — refusing to write through it or replace it", path)
     })?;
-    let dir = at.parent().filter(|d| !d.as_os_str().is_empty()).unwrap_or(Path::new("."));
-    let root = crate::walk::canonical_path(dir).and_then(|d| {
-        d.ancestors().find(|a| std::fs::symlink_metadata(a.join(".git")).is_ok()).map(Path::to_path_buf)
-    });
     match root {
-        Some(root) if real.starts_with(&root) => Ok(real),
-        _ => Err(format!(
-            "{}: a link resolving to {}, outside the repository it sits in — refusing to write through it or replace it",
+        Some(root) if real.starts_with(&root) => {}
+        _ => return Err(outside(&real, "a link resolving to")),
+    }
+    if !std::fs::metadata(&real).is_ok_and(|m| m.is_file()) {
+        return Err(format!(
+            "{}: a link resolving to {}, which is no regular file — refusing to write through it or replace it",
             path,
             crate::walk::escaped_os(real.as_os_str())
-        )),
+        ));
     }
+    Ok(real)
 }
 
 fn byte_lines(text: &[u8]) -> Vec<&[u8]> {
@@ -724,6 +761,52 @@ mod tests {
             assert_eq!(fresh::read_captured(&outside.display().to_string()).expect("read"), seed, "{} wrote outside", name);
             assert!(!repo.join("missing.md").exists(), "{} created the dangling link's file", name);
         }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a link resolving to a directory, even one inside the
+    // repository, is no regular file and refuses
+    #[cfg(unix)]
+    #[test]
+    fn a_link_to_a_directory_refuses() {
+        use std::os::unix::fs::symlink;
+        let dir = std::env::temp_dir().join(format!("cw-marker-linkdir-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let repo = dir.join("repo");
+        std::fs::create_dir_all(repo.join(".git")).expect("cannot make the scratch repository");
+        std::fs::create_dir_all(repo.join("docs")).expect("cannot make the directory");
+        symlink("docs", repo.join("CLAUDE.md")).expect("cannot link");
+        let at = repo.join("CLAUDE.md").display().to_string();
+        let err = target(&at).expect_err("a link to a directory was admitted");
+        assert!(err.contains("no regular file"), "{}", err);
+        assert!(install_block(&at, B, E, "new\n").is_err(), "a writer wrote through a link to a directory");
+        assert!(std::fs::symlink_metadata(repo.join("CLAUDE.md")).expect("stat").file_type().is_symlink());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // spec: gate-sdk/SPEC.md §lib/inject.sh — a linked directory component is contained like a
+    // linked leaf: one resolving outside the repository refuses a target that is no link itself, one
+    // resolving inside it passes, and a component not yet created resolves through its nearest parent
+    #[cfg(unix)]
+    #[test]
+    fn a_linked_parent_directory_is_contained() {
+        use std::os::unix::fs::symlink;
+        let dir = std::env::temp_dir().join(format!("cw-marker-linkparent-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let repo = dir.join("repo");
+        std::fs::create_dir_all(repo.join(".git")).expect("cannot make the scratch repository");
+        std::fs::create_dir_all(repo.join("kept")).expect("cannot make the directory");
+        std::fs::create_dir_all(dir.join("outside")).expect("cannot make the outside directory");
+        symlink("../outside", repo.join("profiles")).expect("cannot link");
+        symlink("kept", repo.join("inner")).expect("cannot link");
+        let at = |p: &str| repo.join(p).display().to_string();
+        let err = target(&at("profiles/me.md")).expect_err("a linked directory escaping the repository was admitted");
+        assert!(err.contains("outside the repository"), "{}", err);
+        assert!(install_block(&at("profiles/me.md"), B, E, "new\n").is_err(), "a writer wrote through the linked directory");
+        assert!(!dir.join("outside/me.md").exists(), "a file was written outside the repository");
+        assert!(target(&at("profiles/new/me.md")).is_err(), "a component not yet created escaped containment");
+        assert_eq!(target(&at("inner/me.md")).expect("an in-repo linked directory refused"), repo.join("inner/me.md"));
+        assert!(target(&at("fresh/sub/me.md")).is_ok(), "a directory not yet created refused");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

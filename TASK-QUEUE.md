@@ -16,14 +16,6 @@
 
 ## Technical Debt
 
-### marker-target-admission-gaps
-
-`marker::target` (`native/src/marker.rs`) checks only the final component, and only that it resolves inside the repository. A target whose leaf is no link returns unchecked, so a seed or block reached through a linked parent directory (`profiles -> ../outside` under the env-profile knob, or a linked `.git/info`) writes outside the repository. And a leaf link resolving to a directory inside the repository is admitted, so `init`, whose agent-file seed guard is `!is_file()`, renames its seed over a `CLAUDE.md` link to a directory.
-
-**Deliverable:** debt: refuse a link resolving to anything but a regular file, and resolve the target's parent so a linked directory component is contained too, with gate-sdk/SPEC.md §lib/inject.sh widened to say so and a unit case each.
-
-**Cost while deferred:** a target under a linked directory naming one outside the repository has the install write there, and a `CLAUDE.md` link to a directory is replaced by init's seed, the directory itself untouched. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `target`'s early return on a leaf that is no link, and `agent_file_resolves` admitting a contained directory ahead of the `is_file` seed guard and `write_atomically`. Owner lookup: `linked parent`, `parent directory`, `regular file` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh and installer/SPEC.md §What init seeds.
-
 ### seed-write-link-race
 
 The three seeding arms resolve the target, test its absence and then seed it with `fs::write` (`native/src/emit/install_lifecycle.rs`, `emit/env_probe.rs`, `installer/personal.rs`), which follows a link. A link planted between the resolve and the seed has the seed create the file it names outside the repository before the block writer refuses, and at `--install-lifecycle` the agent-file block is already written by then.
@@ -1024,4 +1016,5 @@ The manual-install PowerShell attestation-verify block has not been run on a Win
 
 - cross-file-duplicate-text
 - gates-dir-knob-resolution
+- marker-target-admission-gaps
 
