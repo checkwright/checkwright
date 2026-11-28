@@ -7,3 +7,4 @@
 trusted-publish-pass scope a53f30f7 2026-11-28 1c49e0707
 trusted-publish-pass spec abc03816 2026-11-28 32d775ebb
 trusted-publish-pass build af0d04d4 2026-11-28 0d58b70e0
+trusted-publish-pass validate abcf49e4 2026-11-28 56c9ec416
