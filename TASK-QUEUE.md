@@ -1,14 +1,62 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: install-link-safety-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-28, lead decision under the operator's delegation of 2026-11-26, not a ruling):** five debt entries on the native crate, in build order: `marker-target-lossy-resolve` first, so `block-seed-before-resolve` and `init-agent-seed-dangling-link` call the fixed resolver; then `knobenv-closure-barrier-gaps` and `audit-trigger-dod-citation`, the last joining because an align run or a waiver per amendment-bearing iteration outweighs one gate fix. No `session` or `iteration` row and no threshold recurrence stood; the adopter has no open asks, and the peer channel and the GitHub lanes hold nothing.
+
+  **The release (2026-11-28, lead decision under the same delegation, not a ruling):** a cut at this close is granted, its bump set by close's release policy; init's new refusal is a Behavior-changes candidate. `npm-trusted-publishing-observe` stays deferred, the lead asking the operator to register the trusted publisher before the tag.
+
+  **Push need (2026-11-28, inside the budget):** 2 of 2, the closing push and the release tag push; no entry is observed-by.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### marker-target-lossy-resolve
+
+`marker::target` (`native/src/marker.rs`) rebuilds the resolved path from `walk::canonicalize`'s string, which goes through the lossy `Path::display`. On Unix, a link to an in-repository filename with invalid UTF-8 can then resolve to a different file whose name has replacement characters in those positions, and the writer rewrites that file.
+
+**Deliverable:** keep the resolved `PathBuf` through resolution, or refuse a target that has no UTF-8 representation, with one Unix unit case.
+
+**Cost while deferred:** this needs two crafted filenames in the adopter's own tree, so it is reachable only by deliberate construction. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Owner lookup: `canonicalize`, `lossy` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
+### block-seed-before-resolve
+
+`--install-lifecycle` seeds an absent `.gitattributes` with `fs::write` (`native/src/emit/install_lifecycle.rs`) before `marker::install_block` resolves that target. `fs::write` follows a link, so a `.gitattributes` link to an absent path outside the repository creates the external file, and only then does the writer refuse. `emit/env_probe.rs` and `installer/personal.rs` seed in the same order. gate-sdk/SPEC.md §lib/inject.sh rules that an escaping or dangling link refuses every writer with nothing written.
+
+**Deliverable:** run `marker::target` on every block target before any seed of it, in all three arms, with one unit case per arm.
+
+**Cost while deferred:** a planted `.gitattributes` link can make an install create an empty file at an absent path outside the repository. Nothing is overwritten, since an existing target is never seeded. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Re-verified by source read at the close head: the `is_file` guard, then `fs::write`, then `install_block`. Owner lookup: `gitattributes`, `marker::target` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
+### init-agent-seed-dangling-link
+
+`init`'s agent-file seed (`native/src/installer/init.rs`) guards on `is_file`, which a dangling `CLAUDE.md` link fails, so the seed's atomic write renames over the link and leaves a regular file. installer/SPEC.md §The install boundary rules that an ordinary atomic write replaces a link at its target, and the marker-block exception, which follows one, does not reach the seed.
+
+**Deliverable:** debt, the refusal branch (lead decision 2026-11-28 under the operator's delegation, not a ruling): `init`'s preflight reads a linked agent file with one `marker::target` call and refuses a dangling or escaping link before any write. installer/SPEC.md §What init seeds states the rule and points to gate-sdk/SPEC.md §lib/inject.sh rather than restating it, with one init unit or installer-smoke case.
+
+**Cost while deferred:** an adopter whose agent file is a dangling link has the link replaced by init's seed with no notice, so a later fix of the link's target forks from it. The bug predates this iteration. Its preflight costs one `marker::target` read. Filed 2026-11-28 by trusted-publish-pass' close from build's inbox bullet. Re-verified: the seed guard is `!root.join(AGENT_FILE).is_file()` and the write is `install::write_atomically`, read at the close entry head, and `Path::is_file` reads false on a dangling link, probed with a scratch binary. Owner lookup: `dangling`, `agent-file seed`, `seeds_agent` in this file and the disposed-findings record, none; owner installer/SPEC.md §What init seeds.
+
+### knobenv-closure-barrier-gaps
+
+The knob-lock case check in `native/src/knobenv.rs` misreads two shapes. A false negative: the reader closure's barrier is the transitive set of guard takers, so a function that calls a releasing taker and then walks (`render(); walk::find_files();`) counts as a taker, and a test calling only it passes unheld. A false positive: the guard-owning struct scan starts on the line after the struct's declaration, so `struct Held { env: KnobEnv }` on one line, or `struct Held(KnobEnv);`, goes unrecognised, and a test holding one reds.
+
+**Deliverable:** bar the closure at direct takers only, so a releasing taker leaves its caller a reader, and read a struct's fields from its declaration line, tuple fields included. Add one unit fixture per shape, and widen the honest-limit line in gate-sdk/SPEC.md §lib/gate.sh to the shapes that remain.
+
+**Cost while deferred:** a crate test can walk unheld through a wrapper without the check catching it, and the sibling-write race it guards against can recur under it. A false red costs a rewrite of the struct. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Re-verified by source read at the close head. Owner lookup: `knobenv`, `lockers` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/gate.sh.
+
+### audit-trigger-dod-citation
+
+`check-stage-entry` assertion C reads the amendment DoD's Causal-completeness line, which cites `canon-kit/SPEC.md §The causal-completeness check`, as a contract token naming the canon-kit roster dir. So a single-component amendment reaches two components on that citation alone, and build entry demands an align stamp or a waiver. Both gate-sdk amendments of migration-parity-pass met it: the build simulate refused, and the set ran align.
+
+**Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
+
+**Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
 
 ## Deferred
 
@@ -206,16 +254,6 @@ Two release records state contracts no gate holds. `.workflow/release-dispositio
 
 **Cost while deferred:** a stricter gate can ship as a patch, the bump an adopter takes unread; content-checks-pass' close met it when its patch cut for two review fixes was ruled and then deferred. Surfaced 2026-11-26 at content-checks-pass' close; filed at the next scope. Owner lookup: `release-disposition`, `release-bump`, `patch-only` in this file and the disposed-findings record, none; owner installer/SPEC.md §Versioning and lifecycle-kit/SPEC.md §templates/stages/.
 
-### audit-trigger-dod-citation
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`check-stage-entry` assertion C reads the amendment DoD's Causal-completeness line, which cites `canon-kit/SPEC.md §The causal-completeness check`, as a contract token naming the canon-kit roster dir. So a single-component amendment reaches two components on that citation alone, and build entry demands an align stamp or a waiver. Both gate-sdk amendments of migration-parity-pass met it: the build simulate refused, and the set ran align.
-
-**Deliverable:** debt: assertion C stops counting a citation of the procedure the DoD line runs as a component reference, either by excluding that line's procedure citations or by reading only the delta-surface lines, with a fixture case and the honest-limit paragraph updated.
-
-**Cost while deferred:** every amendment carrying the standard DoD line reads as cross-component, so an iteration whose amendments touch one component pays an align run or a waiver for no cross-component reach. Filed 2026-11-26 by migration-parity-pass' close from a lead inbox bullet. Re-verified: the amendment at 1840100f1 names no roster dir but its own and `canon-kit/` on the DoD line, the `docs/` mirror folding under `LIFECYCLE_KIT_MIRROR_ROOT`. Inferred: that the spec template obliges the kit-qualified spelling, since canon-kit/templates/amendment.md writes `SPEC §`. Owner lookup: `assertion C`, `causal-completeness`, `audit-trigger` in this file and the disposed-findings record, none; owner lifecycle-kit/SPEC.md §check-stage-entry.
-
 ### npx-resolution-observe
 
 [cost: event/low] [surface: scripts] [observed-by: publish]
@@ -225,46 +263,6 @@ The observe half of `front-door-npx-resolution`: the front-door legs run only in
 **Deliverable:** debt: read that run's front-door legs in both drivers, the package route green on the first attempt; a red on registry lag is filed as a defect.
 
 **Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.44.0 publish run 46112266019: every front-door leg of both drivers green on the run's first attempt, and no lag seen, the package route's registry-to-init gap matching the v0.43.0 pre-fix run's, so the fix is still unwitnessed and the entry stays. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
-
-### init-agent-seed-dangling-link
-
-[cost: event/low] [surface: installer]
-
-`init`'s agent-file seed (`native/src/installer/init.rs`) guards on `is_file`, which a dangling `CLAUDE.md` link fails, so the seed's atomic write renames over the link and leaves a regular file. installer/SPEC.md §The install boundary rules that an ordinary atomic write replaces a link at its target, and the marker-block exception, which follows one, does not reach the seed.
-
-**Deliverable:** design-pending, a behavior change: either refuse a dangling or escaping agent-file link in `init`'s preflight, before any write, as `marker::target` refuses one for a block writer, or seed the in-repo file the link names. The chosen rule lands in installer/SPEC.md §What init seeds, with one init unit or installer-smoke case.
-
-**Cost while deferred:** an adopter whose agent file is a dangling link has the link replaced by init's seed with no notice, so a later fix of the link's target forks from it. The bug predates this iteration. Its preflight costs one `marker::target` read. Filed 2026-11-28 by trusted-publish-pass' close from build's inbox bullet. Re-verified: the seed guard is `!root.join(AGENT_FILE).is_file()` and the write is `install::write_atomically`, read at the close entry head, and `Path::is_file` reads false on a dangling link, probed with a scratch binary. Owner lookup: `dangling`, `agent-file seed`, `seeds_agent` in this file and the disposed-findings record, none; owner installer/SPEC.md §What init seeds.
-
-### block-seed-before-resolve
-
-[cost: event/low] [surface: lifecycle-kit]
-
-`--install-lifecycle` seeds an absent `.gitattributes` with `fs::write` (`native/src/emit/install_lifecycle.rs`) before `marker::install_block` resolves that target. `fs::write` follows a link, so a `.gitattributes` link to an absent path outside the repository creates the external file, and only then does the writer refuse. `emit/env_probe.rs` and `installer/personal.rs` seed in the same order. gate-sdk/SPEC.md §lib/inject.sh rules that an escaping or dangling link refuses every writer with nothing written.
-
-**Deliverable:** run `marker::target` on every block target before any seed of it, in all three arms, with one unit case per arm.
-
-**Cost while deferred:** a planted `.gitattributes` link can make an install create an empty file at an absent path outside the repository. Nothing is overwritten, since an existing target is never seeded. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Re-verified by source read at the close head: the `is_file` guard, then `fs::write`, then `install_block`. Owner lookup: `gitattributes`, `marker::target` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
-### knobenv-closure-barrier-gaps
-
-[cost: event/low] [surface: gate-sdk]
-
-The knob-lock case check in `native/src/knobenv.rs` misreads two shapes. A false negative: the reader closure's barrier is the transitive set of guard takers, so a function that calls a releasing taker and then walks (`render(); walk::find_files();`) counts as a taker, and a test calling only it passes unheld. A false positive: the guard-owning struct scan starts on the line after the struct's declaration, so `struct Held { env: KnobEnv }` on one line, or `struct Held(KnobEnv);`, goes unrecognised, and a test holding one reds.
-
-**Deliverable:** bar the closure at direct takers only, so a releasing taker leaves its caller a reader, and read a struct's fields from its declaration line, tuple fields included. Add one unit fixture per shape, and widen the honest-limit line in gate-sdk/SPEC.md §lib/gate.sh to the shapes that remain.
-
-**Cost while deferred:** a crate test can walk unheld through a wrapper without the check catching it, and the sibling-write race it guards against can recur under it. A false red costs a rewrite of the struct. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Re-verified by source read at the close head. Owner lookup: `knobenv`, `lockers` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/gate.sh.
-
-### marker-target-lossy-resolve
-
-[cost: event/low] [surface: gate-sdk]
-
-`marker::target` (`native/src/marker.rs`) rebuilds the resolved path from `walk::canonicalize`'s string, which goes through the lossy `Path::display`. On Unix, a link to an in-repository filename with invalid UTF-8 can then resolve to a different file whose name has replacement characters in those positions, and the writer rewrites that file.
-
-**Deliverable:** keep the resolved `PathBuf` through resolution, or refuse a target that has no UTF-8 representation, with one Unix unit case.
-
-**Cost while deferred:** this needs two crafted filenames in the adopter's own tree, so it is reachable only by deliberate construction. Filed 2026-11-28 by trusted-publish-pass' close from its second-vendor review. Owner lookup: `canonicalize`, `lossy` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
 
 ## Icebox
 
