@@ -10,23 +10,13 @@
 
   **The release and pushes (2026-11-28, lead grant under the operator's delegation, not a ruling):** cut v0.47.0, a minor for the new gate, at this iteration's close. Push need 2 against 2, inside the budget: the closing push, and the release tag push.
 
+  **The npm entry's demotion (2026-11-28, validate, lead decision under the operator's delegation, not a ruling):** the npm entry is demoted to Deferred so close's entry proceeds; close deletes `NPM_TOKEN` per the operator direction and discharges the entry at its drain.
+
 ---
 
 ## New Features
 
 ## Technical Debt
-
-### npm-trusted-publishing-observe
-
-[drain-exempt: close deletes the secret]
-
-The observe half of `npm-trusted-publishing`: the npm job runs only in a release `publish` run, so the first release after the trusted-publisher registration is the only run that shows the package publishing over OIDC.
-
-**Deliverable:** debt: the read is done (below). Build points RELEASING.md step 5's sentence on deleting the secret at the closing session, a GitHub write after the account step. Close deletes the `NPM_TOKEN` secret before the release tag push, so that publish run is the first with no stored fallback; a red is filed as a defect. `publish.yml`'s fallback branch stays, since it reads an absent secret as unset. **Delete at close (2026-11-28, operator direction, lead-relayed, not a ruling):** the closing session deletes it after the account step, the fallback proven unneeded.
-
-**Push need (2026-11-28, inside the budget):** the release tag push at close, whose publish run witnesses the trusted publisher alone.
-
-**Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.46.0 publish run 46136462075: the `npm` job green under npm 11.19.1, a signed provenance statement published, and `_npmUser` reading `GitHub Actions <npm-oidc-no-reply@github.com>`, so the trusted publisher published while `NPM_TOKEN` was still set; the read is done and only the secret's deletion remains. Owner lookup: the parent's; owner RELEASING.md step 5.
 
 ## Deferred
 
@@ -141,6 +131,18 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 **Deliverable:** on a Codex release discovering hooks beside the root manifest, re-run plugin/SPEC.md §The validation leg's Codex install, wire the guards, and update plugin/SPEC.md's Codex row and plugin/README.md's guard bullet. Its patch residue split off as `codex-patch-path-residue` at foreign-harness-write-path-pass' scope (operator direction 2026-10-23, lead-relayed, not a ruling), and landed there.
 
 **Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-25 on 0.164.0 in a scratch home: still none beside the root manifest; with it moved aside the hooks are discovered, marked untrusted, since 0.164.0 gates plugin hooks on trust. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
+
+### npm-trusted-publishing-observe
+
+[cost: event/high] [surface: .github]
+
+The observe half of `npm-trusted-publishing`: the npm job runs only in a release `publish` run, so the first release after the trusted-publisher registration is the only run that shows the package publishing over OIDC.
+
+**Deliverable:** debt: the read is done (below). Build points RELEASING.md step 5's sentence on deleting the secret at the closing session, a GitHub write after the account step. Close deletes the `NPM_TOKEN` secret before the release tag push, so that publish run is the first with no stored fallback; a red is filed as a defect. `publish.yml`'s fallback branch stays, since it reads an absent secret as unset. **Delete at close (2026-11-28, operator direction, lead-relayed, not a ruling):** the closing session deletes it after the account step, the fallback proven unneeded.
+
+**Push need (2026-11-28, inside the budget):** the release tag push at close, whose publish run witnesses the trusted publisher alone.
+
+**Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.46.0 publish run 46136462075: the `npm` job green under npm 11.19.1, a signed provenance statement published, and `_npmUser` reading `GitHub Actions <npm-oidc-no-reply@github.com>`, so the trusted publisher published while `NPM_TOKEN` was still set; the read is done and only the secret's deletion remains. Owner lookup: the parent's; owner RELEASING.md step 5.
 
 ### site-documents-unreleased
 
