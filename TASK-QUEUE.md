@@ -1,14 +1,72 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: —
+## Iteration: cross-file-duplicate-pass
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
+
+  **Set record**
+
+  **The unit set (2026-11-28, scope, lead-delegated, not a ruling, following the adopter's ranked asks):** feature for spec to author: `cross-file-duplicate-text`, the adopter's first ask. Debt: `gates-dir-knob-resolution` as docs only, its third; the four second-vendor link-safety fixes; and `npm-trusted-publishing-observe`, its read done, riding to close. Kept deferred: `verdict-key-knob-files`, the adopter's second, which the adopter covers in its own CI step and whose key change shares no design with the feature; and `prose-command-liveness`, its last, a second feature design. Both are left to keep the set lean against last close's health readings.
+
+  **Pushes:** 2 against 2, inside the budget: the closing push, and the release tag push if the lead rules the minor cut scope recommends for the new gate.
 
 ---
 
 ## New Features
 
 ## Technical Debt
+
+### gates-dir-knob-resolution
+
+An adopter finding, relayed by the lead from the orchestrator adopter and measured on v0.45.0: `--run --gates-dir <dir>` selects the registry only, while every knob layer still resolves under `GATE_SDK_GATES_DIR` (default `scripts`), so a knob file placed beside an outside registry is never read. gate-sdk/SPEC.md §The knob file writes the layers as `<gates-dir>/<stem>-config.knobs`, which a reader of §run-gates' `--gates-dir` can take to mean the flag's directory, and no section says which.
+
+**Deliverable:** debt: state in §The knob file, and at §run-gates' `--gates-dir`, that the flag selects the registry alone and every knob layer still resolves under `GATE_SDK_GATES_DIR`. No resolution moves (scope decision 2026-11-28, lead-delegated, not a ruling, matching the adopter's docs-only ask), so no release declaration is owed.
+
+**Cost while deferred:** an adopter running an outside registry sets knobs where they are silently unread and gets the defaults. A one-paragraph SPEC edit if the current behaviour stands. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Re-verified by source read: `registry_of` in `native/src/runner.rs` takes the flag for the registry alone, and `knobs::gates_dir` reads only `GATE_SDK_GATES_DIR`. Owner lookup: `gates-dir`, `knob file` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The knob file.
+
+### marker-target-admission-gaps
+
+`marker::target` (`native/src/marker.rs`) checks only the final component, and only that it resolves inside the repository. A target whose leaf is no link returns unchecked, so a seed or block reached through a linked parent directory (`profiles -> ../outside` under the env-profile knob, or a linked `.git/info`) writes outside the repository. And a leaf link resolving to a directory inside the repository is admitted, so `init`, whose agent-file seed guard is `!is_file()`, renames its seed over a `CLAUDE.md` link to a directory.
+
+**Deliverable:** debt: refuse a link resolving to anything but a regular file, and resolve the target's parent so a linked directory component is contained too, with gate-sdk/SPEC.md §lib/inject.sh widened to say so and a unit case each.
+
+**Cost while deferred:** a target under a linked directory naming one outside the repository has the install write there, and a `CLAUDE.md` link to a directory is replaced by init's seed, the directory itself untouched. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `target`'s early return on a leaf that is no link, and `agent_file_resolves` admitting a contained directory ahead of the `is_file` seed guard and `write_atomically`. Owner lookup: `linked parent`, `parent directory`, `regular file` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh and installer/SPEC.md §What init seeds.
+
+### seed-write-link-race
+
+The three seeding arms resolve the target, test its absence and then seed it with `fs::write` (`native/src/emit/install_lifecycle.rs`, `emit/env_probe.rs`, `installer/personal.rs`), which follows a link. A link planted between the resolve and the seed has the seed create the file it names outside the repository before the block writer refuses, and at `--install-lifecycle` the agent-file block is already written by then.
+
+**Deliverable:** debt: seed with an exclusive create (`OpenOptions::create_new`), which fails on any entry at the path, a link included, in all three arms, with one unit case.
+
+**Cost while deferred:** the window needs a concurrent writer in the adopter's own tree and opens on an absent target only, so nothing is overwritten; at worst an empty file is created outside the repository. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `marker::target`, then the `is_file` test, then `fs::write` in install_lifecycle.rs. Owner lookup: `create_new`, `race`, `TOCTOU` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
+
+### knobenv-struct-comment-scan
+
+The guard-owning struct scan in `native/src/knobenv.rs` ends a declaration on its own line only when that line ends in `;` or `}`, so `struct Empty; // note` runs on to the next bare `}` and takes a later struct's `KnobEnv` field as its own. A releasing taker returning `Empty` then reads as handing the guard back, so a test calling it reads held and an unlocked reader passes. gate-sdk/SPEC.md §lib/gate.sh's honest limits name aliases, generics and macros, never this.
+
+**Deliverable:** debt: drop a trailing line comment before the boundary test, with a unit case.
+
+**Cost while deferred:** a false negative only where a unit or one-line struct carries a trailing comment and a guard struct follows it; no such declaration is in the crate (`struct <name>; //` grepped over native/src at the close head, none). Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read of `guard_types`. Owner lookup: `trailing comment`, `guard_types` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/gate.sh.
+
+### rewrite-lossy-operand-identity
+
+`check_operand` in `native/src/emit/rewrite.rs` writes to the operand's resolved path with its bytes kept, but tests containment and duplicates on the lossy spelling, the working directory's included. Two operands resolving to distinct files whose names differ only in bytes that are not UTF-8 read as one file and refuse the run, and under a working directory whose name is not UTF-8, a link to a sibling directory differing only in those bytes passes containment. guard-kit/SPEC.md §rewrite refuses only an operand naming the same canonical file as an earlier one, and one outside the working directory.
+
+**Deliverable:** debt: resolve the working directory as a path and compare and contain on paths, with a unix case for each half.
+
+**Cost while deferred:** a false refusal of two such operands, and a containment escape reachable only from a working directory whose name is not UTF-8. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `seen` compares `canonical`, the display string, and `root` is `walk::canonicalize` of the working directory. Owner lookup: `lossy`, `same canonical file` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §rewrite.
+
+### npm-trusted-publishing-observe
+
+[drain-exempt: close deletes the secret]
+
+The observe half of `npm-trusted-publishing`: the npm job runs only in a release `publish` run, so the first release after the trusted-publisher registration is the only run that shows the package publishing over OIDC.
+
+**Deliverable:** debt: the read is done (below). Build points RELEASING.md step 5's sentence on deleting the secret at the closing session, a GitHub write after the account step. Close deletes the `NPM_TOKEN` secret before the release tag push, so that publish run is the first with no stored fallback; a red is filed as a defect. `publish.yml`'s fallback branch stays, since it reads an absent secret as unset. The closing session deletes it by lead decision 2026-11-28 (operator-delegated, not a ruling): the fallback is proven unneeded.
+
+**Push need (2026-11-28, inside the budget):** the release tag push at close, whose publish run witnesses the trusted publisher alone.
+
+**Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.46.0 publish run 46136462075: the `npm` job green under npm 11.19.1, a signed provenance statement published, and `_npmUser` reading `GitHub Actions <npm-oidc-no-reply@github.com>`, so the trusted publisher published while `NPM_TOKEN` was still set; the read is done and only the secret's deletion remains. Owner lookup: the parent's; owner RELEASING.md step 5.
 
 ## Deferred
 
@@ -124,16 +182,6 @@ surface (c) of `evaluator-agent-discovery`, split off at evaluator-discovery-pas
 
 **Cost while deferred:** a Codex adopter gets the skills and no shell, wakeup or workflow-state guard. Filed 2026-10-18 by harness-reach-pass' close. Re-verified there: plugin/SPEC.md's Codex row and limits. Re-probed 2026-10-25 on 0.164.0 in a scratch home: still none beside the root manifest; with it moved aside the hooks are discovered, marked untrusted, since 0.164.0 gates plugin hooks on trust. Owner lookup: `codex`, `apply_patch` in this file and the disposed-findings record, none; owner plugin/SPEC.md §The harnesses.
 
-### npm-trusted-publishing-observe
-
-[cost: event/high] [surface: .github] [observed-by: publish]
-
-The observe half of `npm-trusted-publishing`: the npm job runs only in a release `publish` run, so the first release after the trusted-publisher registration is the only run that shows the package publishing over OIDC.
-
-**Deliverable:** debt: read that run's `npm` job and the version's `_npmUser`, published with provenance by the trusted publisher (RELEASING.md step 5 names the witness), then delete the `NPM_TOKEN` secret; a red is filed as a defect.
-
-**Cost while deferred:** until read, the stored token stays the live credential and its expiry still halts a release. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.46.0 publish run 46136462075: the `npm` job green under npm 11.19.1, a signed provenance statement published, and `_npmUser` reading `GitHub Actions <npm-oidc-no-reply@github.com>`, so the trusted publisher published while `NPM_TOKEN` was still set; the read is done and only the secret's deletion, the operator's act, remains. Owner lookup: the parent's; owner RELEASING.md step 5.
-
 ### site-documents-unreleased
 
 [cost: event/low] [surface: docs] [not-icebox-eligible: 2026-11-14 its since: lever landed at liveness-arm-adoption-pass, and which pages it widens to is the next scope's call]
@@ -216,46 +264,6 @@ The observe half of `front-door-npx-resolution`: the front-door legs run only in
 
 **Cost while deferred:** until read, the fix is unwitnessed against the registry. Filed 2026-11-28 at scope as a split from the parent, the observation being release-run-only. Read at the v0.44.0 publish run 46112266019: every front-door leg of both drivers green on the run's first attempt, and no lag seen, the package route's registry-to-init gap matching the v0.43.0 pre-fix run's, so the fix is still unwitnessed and the entry stays. Read again at the v0.46.0 publish run 46136462075: all seven front-door legs green on the first attempt, no lag seen. Owner lookup: the parent's; owner RELEASING.md §The front-door rehearsal and scripts/ci-front-door.sh.
 
-### marker-target-admission-gaps
-
-[cost: event/low] [surface: gate-sdk]
-
-`marker::target` (`native/src/marker.rs`) checks only the final component, and only that it resolves inside the repository. A target whose leaf is no link returns unchecked, so a seed or block reached through a linked parent directory (`profiles -> ../outside` under the env-profile knob, or a linked `.git/info`) writes outside the repository. And a leaf link resolving to a directory inside the repository is admitted, so `init`, whose agent-file seed guard is `!is_file()`, renames its seed over a `CLAUDE.md` link to a directory.
-
-**Deliverable:** debt: refuse a link resolving to anything but a regular file, and resolve the target's parent so a linked directory component is contained too, with gate-sdk/SPEC.md §lib/inject.sh widened to say so and a unit case each.
-
-**Cost while deferred:** a target under a linked directory naming one outside the repository has the install write there, and a `CLAUDE.md` link to a directory is replaced by init's seed, the directory itself untouched. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `target`'s early return on a leaf that is no link, and `agent_file_resolves` admitting a contained directory ahead of the `is_file` seed guard and `write_atomically`. Owner lookup: `linked parent`, `parent directory`, `regular file` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh and installer/SPEC.md §What init seeds.
-
-### seed-write-link-race
-
-[cost: event/low] [surface: gate-sdk]
-
-The three seeding arms resolve the target, test its absence and then seed it with `fs::write` (`native/src/emit/install_lifecycle.rs`, `emit/env_probe.rs`, `installer/personal.rs`), which follows a link. A link planted between the resolve and the seed has the seed create the file it names outside the repository before the block writer refuses, and at `--install-lifecycle` the agent-file block is already written by then.
-
-**Deliverable:** debt: seed with an exclusive create (`OpenOptions::create_new`), which fails on any entry at the path, a link included, in all three arms, with one unit case.
-
-**Cost while deferred:** the window needs a concurrent writer in the adopter's own tree and opens on an absent target only, so nothing is overwritten; at worst an empty file is created outside the repository. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `marker::target`, then the `is_file` test, then `fs::write` in install_lifecycle.rs. Owner lookup: `create_new`, `race`, `TOCTOU` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/inject.sh.
-
-### knobenv-struct-comment-scan
-
-[cost: event/low] [surface: gate-sdk]
-
-The guard-owning struct scan in `native/src/knobenv.rs` ends a declaration on its own line only when that line ends in `;` or `}`, so `struct Empty; // note` runs on to the next bare `}` and takes a later struct's `KnobEnv` field as its own. A releasing taker returning `Empty` then reads as handing the guard back, so a test calling it reads held and an unlocked reader passes. gate-sdk/SPEC.md §lib/gate.sh's honest limits name aliases, generics and macros, never this.
-
-**Deliverable:** debt: drop a trailing line comment before the boundary test, with a unit case.
-
-**Cost while deferred:** a false negative only where a unit or one-line struct carries a trailing comment and a guard struct follows it; no such declaration is in the crate (`struct <name>; //` grepped over native/src at the close head, none). Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read of `guard_types`. Owner lookup: `trailing comment`, `guard_types` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §lib/gate.sh.
-
-### rewrite-lossy-operand-identity
-
-[cost: event/low] [surface: guard-kit]
-
-`check_operand` in `native/src/emit/rewrite.rs` writes to the operand's resolved path with its bytes kept, but tests containment and duplicates on the lossy spelling, the working directory's included. Two operands resolving to distinct files whose names differ only in bytes that are not UTF-8 read as one file and refuse the run, and under a working directory whose name is not UTF-8, a link to a sibling directory differing only in those bytes passes containment. guard-kit/SPEC.md §rewrite refuses only an operand naming the same canonical file as an earlier one, and one outside the working directory.
-
-**Deliverable:** debt: resolve the working directory as a path and compare and contain on paths, with a unix case for each half.
-
-**Cost while deferred:** a false refusal of two such operands, and a containment escape reachable only from a working directory whose name is not UTF-8. Filed 2026-11-28 by install-link-safety-pass' close from its second-vendor review. Re-verified by source read at the close head: `seen` compares `canonical`, the display string, and `root` is `walk::canonicalize` of the working directory. Owner lookup: `lossy`, `same canonical file` in this file and the disposed-findings record, none; owner guard-kit/SPEC.md §rewrite.
-
 ### cross-file-duplicate-text
 
 [cost: event/low] [surface: canon-kit]
@@ -263,6 +271,8 @@ The guard-owning struct scan in `native/src/knobenv.rs` ends a declaration on it
 An adopter request, relayed by the lead from the orchestrator adopter: a general cross-file duplicate-text gate, holding that no run of N or more normalized words is shared across a declared file set, its knobs the file-set globs and N. The closest coverage today is narrower: `check-docs-page-repeat` reads within one page, and `check-shim-restatement` reads one binding-shim corpus and installs `never`.
 
 **Deliverable:** design-pending, a feature: a canon-kit gate over a consumer-declared glob set and run length, off by default, with its fixture pair; the spec stage settles normalization, the run-length default and whether `check-shim-restatement`'s n-gram reading is shared or folded in.
+
+**Scope's seam decision (2026-11-28, lead-delegated, not a ruling):** the mechanism ships as one canon-kit gate; the file globs and run length are consumer knobs, the globs empty by default so the gate is off. Every file set is consumer config and no kit literal names one. That `check-shim-restatement` is lifecycle-kit's (`native/src/gates/shim_restatement.rs`) favours lifting its word reading into a shared crate module over folding the gate in. A refactor of `native/` adds no component, so the amendment stays canon-kit's alone. A run repeated within one file stays §check-docs-page-repeat's. The amendment must reconcile that section's *a repeat across pages* not-asserted sentence: verbatim runs across a declared set are asserted, and a paraphrase still is not.
 
 **Cost while deferred:** a restatement spanning two files drifts with no gate to catch it, the SSOT rule left to review in the requesting adopter's tree. About one iteration with a spec stage, the n-gram reading already in the crate. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Owner lookup: `duplicate`, `cross-file`, `n-gram` in this file and the disposed-findings record, none; owner canon-kit/SPEC.md, beside §check-docs-page-repeat.
 
@@ -285,16 +295,6 @@ An adopter finding, relayed by the lead from the orchestrator adopter and measur
 **Deliverable:** design-pending, a feature: either a key field digesting every knob file the run read, or a refusal to store or emit a keyed verdict while an untracked knob layer is read, with the verdict-key goldens moved and a fixture per arm.
 
 **Cost while deferred:** a verdict looked up or carried between hosts can be a pass one host's local overlay bought. About one iteration with a spec stage, the key's contract version and goldens moving with it. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Re-verified by reading §run-gates' verdict store's key paragraph and the `worktree` row. Owner lookup: `verdict key`, `local.knobs`, `treeId` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §run-gates' verdict store.
-
-### gates-dir-knob-resolution
-
-[cost: event/low] [surface: gate-sdk]
-
-An adopter finding, relayed by the lead from the orchestrator adopter and measured on v0.45.0: `--run --gates-dir <dir>` selects the registry only, while every knob layer still resolves under `GATE_SDK_GATES_DIR` (default `scripts`), so a knob file placed beside an outside registry is never read. gate-sdk/SPEC.md §The knob file writes the layers as `<gates-dir>/<stem>-config.knobs`, which a reader of §run-gates' `--gates-dir` can take to mean the flag's directory, and no section says which.
-
-**Deliverable:** debt: state in §The knob file where the layers are read under `--gates-dir`, or, if the scope rules that the flag's directory supplies them, move the resolution with a unit case and a release declaration.
-
-**Cost while deferred:** an adopter running an outside registry sets knobs where they are silently unread and gets the defaults. A one-paragraph SPEC edit if the current behaviour stands. Filed 2026-11-28 by install-link-safety-pass' close from the lead's relay. Re-verified by source read: `registry_of` in `native/src/runner.rs` takes the flag for the registry alone, and `knobs::gates_dir` reads only `GATE_SDK_GATES_DIR`. Owner lookup: `gates-dir`, `knob file` in this file and the disposed-findings record, none; owner gate-sdk/SPEC.md §The knob file.
 
 ## Icebox
 
