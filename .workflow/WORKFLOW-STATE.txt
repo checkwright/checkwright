@@ -4,7 +4,4 @@
 
 ---
 
-uninstall-containment-pass scope af01fce8 2026-11-27 9ec98e9d9
-uninstall-containment-pass build abcaca22 2026-11-27 5efea3ddf
-uninstall-containment-pass validate a4228253 2026-11-28 49f4fc434
-uninstall-containment-pass close a850a840 2026-11-28 f8ceb2a62
+— scope ac5dcb41 2026-11-28 45a5c3654

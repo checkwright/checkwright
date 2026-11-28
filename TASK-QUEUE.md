@@ -1,14 +1,8 @@
 # TASK-QUEUE.md — Checkwright work queue
 
-## Iteration: uninstall-containment-pass
+## Iteration: —
 
   The lifecycle-kit gates read this header's iteration name and the stage cursor — the last stamp in `.workflow/WORKFLOW-STATE.txt` (lifecycle-kit/SPEC.md §The state machine); queue-kit formalizes the queue format itself and gates this file. One iteration per hardening or roadmap unit; [docs/kits.md](docs/kits.md) maps the kits.
-
-  **Set record**
-
-  **The unit set (2026-11-27, lead decision under the operator's delegation of 2026-11-26, not a ruling, ruled at scope on the lead's dispatch):** debt only, so no authoring stage walks. `user-uninstall-containment` leads, as the one adopter-facing data-safety defect on the board. It is joined by three verified defects from second-vendor reviews: `wakeup-log-write-unreported`, `weekly-pair-shape-check` and `price-row-shape-strictness`. It is also joined by the release-provenance follow-through: `release-assets-coverage`, promoted from both carried inbox bullets, and `binary-only-archive-route`, whose trigger fired when the pins moved to v0.42.0. The adopter has no open asks. `release-record-gates` stays deferred, since it is a feature whose second half needs design, and adding it would walk the authoring stage for an event/low cost. `exit-status-funnel-typing` stays deferred, since its fix spans some 520 call sites and no in-tree reader branches on 2 against 3.
-
-  **The pushes (2026-11-27, lead decision under the same delegation, not a ruling):** push need 2 against 2, inside the budget. The first is the mid-iteration push recorded on `user-uninstall-containment`. The second is the closing push, which also carries the two close commits already on master locally. No release cut is priced.
 
 ---
 
